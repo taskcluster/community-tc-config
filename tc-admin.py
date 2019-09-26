@@ -38,7 +38,7 @@ worker_pool_definitions = {
 	    "maxCapacity": 5,
 	    "minCapacity": 0,
 	    "capacityPerInstance": 1,
-	    "machineType": "custom-32-29440",
+	    "machineType": "n1-standard-4",
 	    "regions": ["us-east1"],
 	    "scheduling": {
 		"onHostMaintenance": "terminate",
@@ -49,7 +49,7 @@ worker_pool_definitions = {
 		"boot": True,
 		"autoDelete": True,
 		"initializeParams": {
-		    "sourceImage": "global/images/taskcluster-worker-googlecompute-2019-09-04t19-01-49z",
+		    "sourceImage": "projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2019-09-25t19-53-35z",
 		    "diskSizeGb": 50
 		    },
 	    }],

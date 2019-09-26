@@ -21,7 +21,7 @@ Then, run
 TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com/. tc-admin apply
 ```
 
-Typically a memebr of hte Taskcluster team will do the latter for you once a PR has been merged.
+Typically a member of the Taskcluster team will do the latter for you once a PR has been merged.
 
 ## Deployment Details
 
