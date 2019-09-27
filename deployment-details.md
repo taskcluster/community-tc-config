@@ -11,7 +11,7 @@ All of the information here can be modified via bugs filed in `Operations: Taskc
 
 # GitHub App
 
-The GitHub app to connect your repositories to Taskcluster is is called `Community-TC Integration`, under the Taskcluster organization.
+The GitHub app to connect your repositories to Taskcluster is called `Community-TC Integration`, under the Taskcluster organization.
 You can configure it at https://github.com/apps/community-tc-integration.
 
 # Sign-In

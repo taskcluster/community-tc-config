@@ -11,14 +11,14 @@ Install this app by running `pip install -e .` in this directory.
 After making a change the the configuration, you can examine the results with
 
 ```
-TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com/. tc-admin diff
+TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com tc-admin diff
 ```
 
 To apply the configuration, you will need to have a client with suffucient scopes set up in `TASKCLUSTER_CLIENT_ID` and `TASKCLUSTER_ACCESS_TOKEN`.
 Then, run
 
 ```
-TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com/. tc-admin apply
+TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com tc-admin apply
 ```
 
 Typically a member of the Taskcluster team will do the latter for you once a PR has been merged.
