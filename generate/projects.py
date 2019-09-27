@@ -122,9 +122,7 @@ async def generate_parameterized_roles(resources):
             # project-specific worker pools and workers
             "worker-manager:create-worker-type:proj-<..>", # old, see https://bugzilla.mozilla.org/show_bug.cgi?id=1583935
             "worker-manager:update-worker-type:proj-<..>", # old
-            "worker-manager:update-worker-type:proj-<..>", # old
             "worker-manager:create-worker-pool:proj-<..>",
-            "worker-manager:update-worker-pool:proj-<..>",
             "worker-manager:update-worker-pool:proj-<..>",
             "worker-manager:create-worker:proj-<..>",
 
