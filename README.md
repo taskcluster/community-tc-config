@@ -8,7 +8,7 @@ See that tool's documentation for background on how the process works.
 
 Install this app by running `pip install -e .` in this directory.
 
-After making a change the the configuration, you can examine the results with
+After making a change to the configuration, you can examine the results with
 
 ```
 TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com tc-admin diff
