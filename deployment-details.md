@@ -1,9 +1,11 @@
 # Deployment Details
 
-What follows are details about the Community-TC deployment.
-Some of this information is useful for configuring resources in this repository, but lots of this information is handy for folks requesting changes to the deployment.
+The Community-TC Taskcluster deployment has a number of service configuration settings that are not available in the API.
+Most of those settings involve access credentials for various cloud providers and other external services, so they cannot be made public.
+The following summarizes the non-secret parts of those settings for reference by those who do not have access to the secrets.
 
-All of the information here can be modified via bugs filed in `Operations: Taskcluster Services` in the `Cloud Services` product on https://bugzilla.mozilla.org.
+The cloudops team manages the service configuration.
+Modifications to service configuration are handled via bugs filed in `Operations: Taskcluster Services` in the `Cloud Services` product on https://bugzilla.mozilla.org.
 
 # Worker Manager Providers
 
@@ -11,8 +13,8 @@ All of the information here can be modified via bugs filed in `Operations: Taskc
 
 # GitHub App
 
-The GitHub app to connect your repositories to Taskcluster is called `Community-TC Integration`, under the Taskcluster organization.
-You can configure it at https://github.com/apps/community-tc-integration.
+The GitHub app for the `taskcluster-github` service is called `Community-TC Integration`, under the Taskcluster organization.
+Its public URL is https://github.com/apps/community-tc-integration.
 
 # Sign-In
 
