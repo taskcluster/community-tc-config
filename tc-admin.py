@@ -13,7 +13,7 @@ appconfig = AppConfig()
 
 projects = {
     'taskcluster': {
-        'admin-roles': ['github-team:taskcluster/core', 'mozilla-group:team_taskcluster'],
+        'admin-roles': ['github-team:taskcluster/core'],
         'worker-pools': {
             'ci': {
                 "$mergeDeep": [
@@ -146,8 +146,6 @@ async def generate_group_roles(resources, projects):
         'github-org-admin:',
         'github-team:',
         'login-identity:',
-        'mozilla-group:',
-        'mozillians-group:',
     ]
     for prefix in prefixes:
         resources.manage(r'Role={}.*'.format(prefix))
