@@ -27,4 +27,4 @@ Azure tables are in the `communitytc` storage account in the "Firefox CI Product
 
 # AWS (Storage)
 
-TBD
+Artifacts are stored in buckets in the `cloudops-taskcluster-aws-prod` account.
