@@ -6,9 +6,10 @@
 
 from tcadmin.appconfig import AppConfig
 
-import generate.projects
+from generate import projects, repo_access
 
 
 appconfig = AppConfig()
 
-appconfig.generators.register(generate.projects.update_resources)
+appconfig.generators.register(projects.update_resources)
+appconfig.generators.register(repo_access.update_resources)
