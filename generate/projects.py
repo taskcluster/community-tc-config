@@ -31,7 +31,7 @@ worker_pool_definitions = {
     'standard-docker-worker': {
         'description': '',
         'owner': 'nobody@mozilla.com',
-        'provider_id': 'community-tc-workers',
+        'provider_id': 'community-tc-workers-google',
 	'config': {
 	    "maxCapacity": 5,
 	    "minCapacity": 0,
@@ -40,7 +40,13 @@ worker_pool_definitions = {
 	    "regions": ["us-east1"],
 	    "scheduling": {
 		"onHostMaintenance": "terminate",
+                "automaticRestart": False,
 	    },
+            "workerConfig": {
+                "shutdown": {
+                    "enabled": True,
+                },
+            },
 	    "userData": {},
 	    "disks": [{
 		"type": "PERSISTENT",
