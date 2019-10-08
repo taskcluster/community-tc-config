@@ -32,37 +32,37 @@ worker_pool_definitions = {
         'description': '',
         'owner': 'nobody@mozilla.com',
         'provider_id': 'community-tc-workers-google',
-	'config': {
-	    "maxCapacity": 5,
-	    "minCapacity": 0,
-	    "capacityPerInstance": 1,
-	    "machineType": "n1-standard-4",
-	    "regions": ["us-east1"],
-	    "scheduling": {
-		"onHostMaintenance": "terminate",
+        'config': {
+            "maxCapacity": 5,
+            "minCapacity": 0,
+            "capacityPerInstance": 1,
+            "machineType": "n1-standard-4",
+            "regions": ["us-east1"],
+            "scheduling": {
+                "onHostMaintenance": "terminate",
                 "automaticRestart": False,
-	    },
+            },
             "workerConfig": {
                 "shutdown": {
                     "enabled": True,
                 },
             },
-	    "userData": {},
-	    "disks": [{
-		"type": "PERSISTENT",
-		"boot": True,
-		"autoDelete": True,
-		"initializeParams": {
-		    "sourceImage": "projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2019-09-25t19-53-35z",
-		    "diskSizeGb": 50
-		    },
-	    }],
-	    "networkInterfaces": [{
-		"accessConfigs": [{
-			"type": "ONE_TO_ONE_NAT"
-		    }],
-	    }],
-	},
+            "userData": {},
+            "disks": [{
+                "type": "PERSISTENT",
+                "boot": True,
+                "autoDelete": True,
+                "initializeParams": {
+                    "sourceImage": "projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2019-09-25t19-53-35z",
+                    "diskSizeGb": 50
+                    },
+            }],
+            "networkInterfaces": [{
+                "accessConfigs": [{
+                        "type": "ONE_TO_ONE_NAT"
+                    }],
+            }],
+        },
         'email_on_error': False,
     },
 }

@@ -12,12 +12,12 @@ from tcadmin.resources import Role
 repo_access = [
     {
         'scopes': [
-	],
-	'worker-pools': [
-	    'proj-taskcluster/ci',
-	],
+        ],
+        'worker-pools': [
+            'proj-taskcluster/ci',
+        ],
         'for': [
-	    'github.com/taskcluster/*',
+            'github.com/taskcluster/*',
         ]
     },
 ]
