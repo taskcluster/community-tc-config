@@ -12,6 +12,9 @@ from tcadmin.resources import Role
 repo_access = [
     {
         'scopes': [
+            # The account and secret for the Azure testing storage account.
+            # This is secret but ok for use by PRs.
+            'secrets:get:project/taskcluster/testing/azure',
         ],
         'worker-pools': [
             'proj-taskcluster/ci',
