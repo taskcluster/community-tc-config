@@ -20,8 +20,15 @@ projects = {
                         'base': 'standard-docker-worker',
                         'owner': 'taskcluster-notifications+workers@mozilla.com',
                         'email_on_error': False,
-                    }
-                ]
+                        'config': {
+                            'workerConfig': {
+                                'dockerConfig': {
+                                    'allowPrivileged': True,
+                                },
+                            },
+                        },
+                    },
+                ],
             },
         },
     },
