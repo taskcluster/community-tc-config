@@ -23,6 +23,17 @@ repo_access = [
             'github.com/taskcluster/*',
         ]
     },
+    {
+        'scopes': [
+            'secrets:get:project/taskcluster/testing/codecov',
+            # service-specific secrets
+            'secrets:get:project/taskcluster/testing/taskcluster-*',
+            'docker-worker:cache:taskcluster-*',
+        ],
+        'for': [
+            'github.com/taskcluster/taskcluster:*',
+        ]
+    },
 ]
 
 
