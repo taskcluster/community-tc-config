@@ -146,6 +146,10 @@ async def generate_parameterized_roles(resources):
             # project-specific secrets
             "secrets:get:project/<..>/*",
             "secrets:set:project/<..>/*",
+
+            # allow all caches, since workers are per-project
+            'docker-worker:cache:*',
+            'generic-worker:cache:*',
         ]))
 
 
