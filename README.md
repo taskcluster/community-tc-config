@@ -35,3 +35,11 @@ Then, change the configuration in this repository, using the comments in the rel
 After making a change the the configuration, you can examine the results by running `tc-admin diff` again.
 If you are adding or removing a number of resources, you can use `--ids-only` to show only the names of the added or removed resources.
 See `tc-admin --help` for more useful command-line tricks.
+
+## Conventions
+
+This deployment follows the convention of [project namespaces](https://docs.taskcluster.net/docs/manual/using/namespaces#projects).
+Each project has a its own worker pools, and user roles can be given "admin" access to the project.
+
+Repositories are granted scopes via the [Taskcluster-github scheme](https://docs.taskcluster.net/docs/reference/integrations/github/taskcluster-yml-v1#scopes-and-roles).
+Each repository is associated with a project, and scopes granted to the repository should be associated with that project.
