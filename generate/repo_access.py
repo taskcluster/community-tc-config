@@ -34,6 +34,22 @@ repo_access = [
             'github.com/taskcluster/taskcluster:*',
         ]
     },
+    {
+        'scopes': [
+            'docker-worker:cache:docker-worker-garbage-*',
+            'docker-worker:capability:privileged',
+            'docker-worker:capability:device:loopbackAudio',
+            'docker-worker:capability:device:loopbackVideo',
+            'project/taskcluster/testing/docker-worker/ci-creds',
+            'project/taskcluster/testing/docker-worker/pulse-creds',
+        ],
+        'worker-pools': [
+            'proj-taskcluster/ci',
+        ],
+        'for': [
+            'github.com/taskcluster/docker-worker:*',
+        ],
+    }
 ]
 
 
