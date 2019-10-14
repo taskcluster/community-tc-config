@@ -11,6 +11,7 @@ setup(
     install_requires=[
         "tc-admin~=1.0.0",
         "json-e~=3.0.0",
+        "pytest~=5.2.1",
     ],
     setup_requires=["pytest-runner", "flake8"],
     tests_require=["pytest-mock", "pytest-asyncio", "flake8"],
