@@ -11,6 +11,7 @@ from generate import (
     repo_access,
     login_identity,
     hacks,
+    websocktunnel,
 )
 
 
@@ -20,3 +21,4 @@ appconfig.generators.register(projects.update_resources)
 appconfig.generators.register(repo_access.update_resources)
 appconfig.generators.register(login_identity.update_resources)
 appconfig.generators.register(hacks.update_resources)
+appconfig.generators.register(websocktunnel.update_resources)
