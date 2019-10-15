@@ -37,6 +37,16 @@ repo_access = [
         ]
     },
     {
+        'project': 'taskcluster',
+        'scopes': [
+            'queue:route:notify.email.taskcluster-internal@mozilla.com.*',
+            'queue:route:notify.irc-channel.#taskcluster-bots.*',
+        ],
+        'for': [
+            'github.com/taskcluster/taskcluster:branch:master',
+        ]
+    },
+    {
         'scopes': [
             'docker-worker:cache:docker-worker-garbage-*',
             'docker-worker:capability:privileged',
