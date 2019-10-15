@@ -40,8 +40,8 @@ worker_pool_definitions = {
         'owner': 'nobody@mozilla.com',
         'provider_id': 'community-tc-workers-google',
         'config': {
-            "maxCapacity": 5,
-            "minCapacity": 0,
+            "maxCapacity": 20,
+            "minCapacity": 1,
             "capacityPerInstance": 1,
             "machineType": "n1-standard-4",
             "regions": ["us-east1"],
@@ -60,7 +60,7 @@ worker_pool_definitions = {
                 "boot": True,
                 "autoDelete": True,
                 "initializeParams": {
-                    "sourceImage": "projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2019-09-25t19-53-35z",
+                    "sourceImage": "projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2019-10-08t02-31-36z",
                     "diskSizeGb": 50
                     },
             }],
