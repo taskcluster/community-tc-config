@@ -34,6 +34,16 @@ projects = {
     },
 }
 
+google_regions_zones = {
+    "us-east1": ["b", "c", "d"],
+    "us-east4": ["a", "b", "c"],
+}
+
+google_zones_regions = []
+for region, zones in google_regions_zones.items():
+    for zone in zones:
+        google_zones_regions.append(("{}-{}".format(region, zone), region))
+
 worker_pool_definitions = {
     'standard-docker-worker': {
         'description': '',
@@ -42,33 +52,38 @@ worker_pool_definitions = {
         'config': {
             "maxCapacity": 20,
             "minCapacity": 1,
-            "capacityPerInstance": 1,
-            "machineType": "n1-standard-4",
-            "regions": ["us-east1"],
-            "scheduling": {
-                "onHostMaintenance": "terminate",
-                "automaticRestart": False,
-            },
-            "workerConfig": {
-                "shutdown": {
-                    "enabled": True,
-                },
-            },
-            "userData": {},
-            "disks": [{
-                "type": "PERSISTENT",
-                "boot": True,
-                "autoDelete": True,
-                "initializeParams": {
-                    "sourceImage": "projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2019-10-08t02-31-36z",
-                    "diskSizeGb": 50
+            "launchConfigs": [
+                {
+                    "capacityPerInstance": 1,
+                    "machineType": "zones/{}/machineTypes/n1-standard-4".format(zone),
+                    "region": region,
+                    "zone": zone,
+                    "scheduling": {
+                        "onHostMaintenance": "terminate",
                     },
-            }],
-            "networkInterfaces": [{
-                "accessConfigs": [{
-                        "type": "ONE_TO_ONE_NAT"
+                    "workerConfig": {
+                        "shutdown": {
+                            "enabled": True,
+                            "afterIdleSeconds": 900,
+                        },
+                    },
+                    "disks": [{
+                        "type": "PERSISTENT",
+                        "boot": True,
+                        "autoDelete": True,
+                        "initializeParams": {
+                            "sourceImage": "projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2019-10-08t02-31-36z",
+                            "diskSizeGb": 50
+                            },
                     }],
-            }],
+                    "networkInterfaces": [{
+                        "accessConfigs": [{
+                            "type": "ONE_TO_ONE_NAT"
+                        }],
+                    }],
+                }
+                for zone, region in google_zones_regions
+            ]
         },
         'email_on_error': False,
     },
