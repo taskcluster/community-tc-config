@@ -5,106 +5,32 @@
 # obtain one at http://mozilla.org/MPL/2.0/.
 
 import jsone
+import attr
 
 from tcadmin.resources import Role, WorkerPool
+from tcadmin.util.config import ConfigDict
+from .loader import loader
+from .workers import build_worker_pool
 
+class Projects(ConfigDict):
 
-projects = {
-    'taskcluster': {
-        'admin-roles': ['github-team:taskcluster/core'],
-        'worker-pools': {
-            'ci': {
-                "$mergeDeep": [
-                    {"$eval": "definitions['standard-docker-worker']"},
-                    {
-                        'base': 'standard-docker-worker',
-                        'owner': 'taskcluster-notifications+workers@mozilla.com',
-                        'email_on_error': False,
-                        'config': {
-                            "launchConfigs": {
-                                "$map": {"$eval": "definitions['standard-docker-worker'].config.launchConfigs"},
-                                "each(cfg)": {
-                                    "$mergeDeep": [
-                                        {"$eval": "cfg"},
-                                        {
-                                            'workerConfig': {
-                                                'dockerConfig': {
-                                                    'allowPrivileged': True,
-                                                },
-                                            },
-                                        }
-                                    ],
-                                },
-                            },
-                        },
-                    },
-                ],
-            },
-        },
-    },
-}
+    filename = "config/projects.yml"
 
-google_regions_zones = {
-    "us-east1": ["b", "c", "d"],
-    "us-east4": ["a", "b", "c"],
-}
+    @attr.s
+    class Item:
+        name = attr.ib(type=str)
+        adminRoles = attr.ib(type=list, factory=lambda: [])
+        workerPools = attr.ib(type=dict, factory=lambda: {})
 
-google_zones_regions = []
-for region, zones in google_regions_zones.items():
-    for zone in zones:
-        google_zones_regions.append(("{}-{}".format(region, zone), region))
-
-worker_pool_definitions = {
-    'standard-docker-worker': {
-        'description': '',
-        'owner': 'nobody@mozilla.com',
-        'provider_id': 'community-tc-workers-google',
-        'config': {
-            "maxCapacity": 20,
-            "minCapacity": 1,
-            "launchConfigs": [
-                {
-                    "capacityPerInstance": 1,
-                    "machineType": "zones/{}/machineTypes/n1-standard-4".format(zone),
-                    "region": region,
-                    "zone": zone,
-                    "scheduling": {
-                        "onHostMaintenance": "terminate",
-                    },
-                    "workerConfig": {
-                        "shutdown": {
-                            "enabled": True,
-                            "afterIdleSeconds": 900,
-                        },
-                    },
-                    "disks": [{
-                        "type": "PERSISTENT",
-                        "boot": True,
-                        "autoDelete": True,
-                        "initializeParams": {
-                            "sourceImage": "projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2019-10-08t02-31-36z",
-                            "diskSizeGb": 50
-                            },
-                    }],
-                    "networkInterfaces": [{
-                        "accessConfigs": [{
-                            "type": "ONE_TO_ONE_NAT"
-                        }],
-                    }],
-                }
-                for zone, region in google_zones_regions
-            ]
-        },
-        'email_on_error': False,
-    },
-}
 
 async def update_resources(resources):
+    projects = Projects.load(loader)
+
     await generate_parameterized_roles(resources)
     await generate_group_roles(resources, projects)
 
-    for project, cfg in projects.items():
-        await generate_project(resources, project, cfg)
+    for project in projects.values():
+        await generate_project(resources, project)
 
 
 async def generate_parameterized_roles(resources):
@@ -188,10 +114,10 @@ async def generate_group_roles(resources, projects):
         resources.manage(r'Role={}.*'.format(prefix))
 
     by_role = {}
-    for project, cfg in projects.items():
-        for role in cfg.get('admin-roles', []):
+    for project in projects.values():
+        for role in project.adminRoles:
             assert any(role.startswith(p) for p in prefixes)
-            by_role.setdefault(role, []).append(project)
+            by_role.setdefault(role, []).append(project.name)
 
     for roleId, project_names in by_role.items():
         resources.add(Role(
@@ -201,19 +127,14 @@ async def generate_group_roles(resources, projects):
         ))
 
 
-async def generate_project(resources, project, cfg):
-    if 'worker-pools' in cfg:
-        resources.manage('WorkerPool=proj-.*')
-        await generate_project_worker_pools(resources, project, cfg['worker-pools'])
+async def generate_project(resources, project):
+    if project.workerPools:
+        resources.manage('WorkerPool=proj-{}/.*'.format(project.name))
+        await generate_project_worker_pools(resources, project)
 
 
-async def generate_project_worker_pools(resources, project, worker_pools):
-    for name, worker_pool in worker_pools.items():
-        worker_pool = jsone.render(worker_pool, {'definitions': worker_pool_definitions})
-        resources.add(WorkerPool(
-            workerPoolId='proj-{}/{}'.format(project, name),
-            description=worker_pool['description'] or 'Workers for ' + project,
-            owner=worker_pool['owner'],
-            providerId=worker_pool['provider_id'],
-            config=worker_pool['config'],
-            emailOnError=worker_pool['email_on_error']))
+async def generate_project_worker_pools(resources, project):
+    for name, worker_pool in project.workerPools.items():
+        worker_pool_id = 'proj-{}/{}'.format(project.name, name)
+        worker_pool['description'] = "Workers for " + project.name
+        resources.add(build_worker_pool(worker_pool_id, worker_pool))

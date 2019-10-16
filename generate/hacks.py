@@ -11,6 +11,7 @@ from tcadmin.resources import Role, WorkerPool
 
 
 async def update_resources(resources):
+    resources.manage('Role=login-identity:.*')
     resources.add(Role(
         roleId="login-identity:TEMP",
         description=textwrap.dedent("""\

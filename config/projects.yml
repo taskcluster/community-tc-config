@@ -1,0 +1,32 @@
+# "Projects", as defined in https://docs.taskcluster.net/docs/manual/using/namespaces#projects
+#
+# Each project is a distinct namespace within the deployment, with access to its own resources.
+# In particular, each project has its own workers.  A project also has a set of administrators
+# defined by user roles.
+#
+# Each entry in this file is defined as follows:
+#
+# <project-name>:
+#   admin-roles:
+#     # roles with administrative access to the project's resources
+#     - role1
+#     - ..
+#   worker-pools:
+#     <worker-pool-name>:
+#       owner: ..
+#       emailOnError: ..
+#       type: <name of a function in `generate/workers.py`)
+#       ..: ..  # arguments to that function
+#
+# The worker-pool configurations are defined by Python functions, keyed by the `type` property.
+# See that file for the available options.  The defaults are usually fine.
+
+taskcluster:
+  adminRoles:
+    - github-team:taskcluster/core
+  workerPools:
+    ci:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      privileged: true
