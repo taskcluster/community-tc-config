@@ -21,9 +21,19 @@ projects = {
                         'owner': 'taskcluster-notifications+workers@mozilla.com',
                         'email_on_error': False,
                         'config': {
-                            'workerConfig': {
-                                'dockerConfig': {
-                                    'allowPrivileged': True,
+                            "launchConfigs": {
+                                "$map": {"$eval": "definitions['standard-docker-worker'].config.launchConfigs"},
+                                "each(cfg)": {
+                                    "$mergeDeep": [
+                                        {"$eval": "cfg"},
+                                        {
+                                            'workerConfig': {
+                                                'dockerConfig': {
+                                                    'allowPrivileged': True,
+                                                },
+                                            },
+                                        }
+                                    ],
                                 },
                             },
                         },
