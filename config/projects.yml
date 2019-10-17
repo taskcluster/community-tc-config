@@ -1,0 +1,62 @@
+# "Projects", as defined in https://docs.taskcluster.net/docs/manual/using/namespaces#projects
+#
+# Each project is a distinct namespace within the deployment, with access to its own resources.
+# In particular, each project has its own workers.  A project also has a set of administrators
+# defined by user roles.
+#
+# Each entry in this file is defined as follows:
+#
+# <project-name>:
+#   admin-roles:
+#     # roles with administrative access to the project's resources
+#     - role1
+#     - ..
+#   worker-pools:
+#     <worker-pool-name>:
+#       owner: ..
+#       emailOnError: ..
+#       type: <name of a function in `generate/workers.py`)
+#       ..: ..  # arguments to that function
+#   grants:  # (same format as grants.yml)
+#
+# The worker-pool configurations are defined by Python functions, keyed by the `type` property.
+# See that file for the available options.  The defaults are usually fine.
+
+taskcluster:
+  adminRoles:
+    - github-team:taskcluster/core
+  workerPools:
+    ci:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      privileged: true
+  grants:
+    - grant:
+        - queue:create-task:highest:proj-taskcluster/ci
+        # The account and secret for the Azure testing storage account.
+        # This is secret but ok for use by PRs.
+        - secrets:get:project/taskcluster/testing/azure
+      to: repo:github.com/taskcluster/*
+
+    - grant:
+        - secrets:get:project/taskcluster/testing/codecov
+        - secrets:get:project/taskcluster/testing/taskcluster-*
+        - docker-worker:cache:taskcluster-*
+      to: repo:github.com/taskcluster/taskcluster:*
+
+    - grant:
+        # pushes to monorepo master can notify on failure
+        - queue:route:notify.email.taskcluster-internal@mozilla.com.*
+        - queue:route:notify.irc-channel.#taskcluster-bots.*
+      to: repo:github.com/taskcluster/taskcluster:branch:master
+
+    - grant:
+        - assume:project:taskcluster:worker-test-scopes
+        - docker-worker:cache:docker-worker-garbage-*
+        - docker-worker:capability:privileged
+        - docker-worker:capability:device:loopbackAudio
+        - docker-worker:capability:device:loopbackVideo
+        - project/taskcluster/testing/docker-worker/ci-creds
+        - project/taskcluster/testing/docker-worker/pulse-creds
+      to: repo:github.com/taskcluster/docker-worker:*

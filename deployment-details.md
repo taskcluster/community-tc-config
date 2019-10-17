@@ -9,7 +9,7 @@ Modifications to service configuration are handled via bugs filed in `Operations
 
 # Worker Manager Providers
 
-* `community-tc-workers` is a google provider corresponding to GCP project `community-tc-workers` (NOTE: this will change to `community-tc-workers-google`)
+* `community-tc-workers-google` is a google provider corresponding to GCP project `community-tc-workers`
 
 # GitHub App
 

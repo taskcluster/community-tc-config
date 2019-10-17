@@ -8,17 +8,13 @@ from tcadmin.appconfig import AppConfig
 
 from generate import (
     projects,
-    repo_access,
+    grants,
     login_identity,
-    hacks,
-    websocktunnel,
 )
 
 
 appconfig = AppConfig()
 
 appconfig.generators.register(projects.update_resources)
-appconfig.generators.register(repo_access.update_resources)
+appconfig.generators.register(grants.update_resources)
 appconfig.generators.register(login_identity.update_resources)
-appconfig.generators.register(hacks.update_resources)
-appconfig.generators.register(websocktunnel.update_resources)

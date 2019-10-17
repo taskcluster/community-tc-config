@@ -31,7 +31,7 @@ TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com tc-admin diff
 This will show you the current difference between what's defined in your local repository and the runtime configuration of the deployment.
 Most of the time, there should be no difference.
 
-Then, change the configuration in this repository, using the comments in the relevant files as a guide (@petemoore: these don't exist yet, TBD).
+Then, change the configuration in this repository, using the comments in the relevant files as a guide.
 After making a change the the configuration, you can examine the results by running `tc-admin diff` again.
 If you are adding or removing a number of resources, you can use `--ids-only` to show only the names of the added or removed resources.
 See `tc-admin --help` for more useful command-line tricks.
@@ -43,3 +43,4 @@ Each project has a its own worker pools, and user roles can be given "admin" acc
 
 Repositories are granted scopes via the [Taskcluster-github scheme](https://docs.taskcluster.net/docs/reference/integrations/github/taskcluster-yml-v1#scopes-and-roles).
 Each repository is associated with a project, and scopes granted to the repository should be associated with that project.
+This occurs within `config/projects.yml`.
