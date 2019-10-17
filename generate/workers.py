@@ -28,7 +28,10 @@ def worker_pool_type(fn):
 
 
 def build_worker_pool(workerPoolId, cfg):
-    wp = TYPES[cfg['type']](**cfg)
+    try:
+        wp = TYPES[cfg['type']](**cfg)
+    except Exception as e:
+        raise RuntimeError('Error generating worker pool configuration for {}'.format(workerPoolId)) from e
     return WorkerPool(
         workerPoolId=workerPoolId,
         description=cfg.get('description', ''),
@@ -37,12 +40,19 @@ def build_worker_pool(workerPoolId, cfg):
         **wp)
 
 
-def base_google_config(**cfg):
+def base_google_config(*, minCapacity=0, maxCapacity=None, **cfg):
+    """
+    Build a base config for a GCP instance
+
+      minCapacity: minimum capacity to run at any time (default 0)
+      maxCapacity: maximum capacity to run at any time (required)
+    """
+    assert maxCapacity, "must give a maxCapacity"
     return {
         'providerId': GCP_PROVIDER,
         'config': {
-            "maxCapacity": 20,
-            "minCapacity": 1,
+            "maxCapacity": maxCapacity,
+            "minCapacity": minCapacity,
             "launchConfigs": [
                 {
                     "capacityPerInstance": 1,
@@ -78,6 +88,7 @@ def standard_gcp_docker_worker(*, image=None, diskSizeGb=50, privileged=False, *
       image: image name (defaults to the standard image)
       diskSizeGb: boot disk size, in Gb (defaults to 50)
       privileged: true if this worker should allow privileged tasks (default false)
+      ..in addition to kwargs from base_google_config
     """
     if image is None:
         image = DEFAUlT_GCP_DOCKER_WORKER_IMAGE
