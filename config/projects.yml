@@ -30,6 +30,8 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
       type: standard_gcp_docker_worker
+      minCapacity: 1
+      maxCapacity: 20
       privileged: true
   grants:
     - grant:
