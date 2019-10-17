@@ -61,15 +61,15 @@
     - queue:route:index.project.<..>.*
 
     # project-specific worker pools and workers
-    - worker-manager:create-worker-type:proj-<..>  # old, see https://bugzilla.mozilla.org/show_bug.cgi?id=1583935
-    - worker-manager:update-worker-type:proj-<..>  # old
-    - worker-manager:create-worker-pool:proj-<..>
-    - worker-manager:update-worker-pool:proj-<..>
-    - worker-manager:create-worker:proj-<..>
+    - worker-manager:create-worker-type:proj-<..>/*  # old, see https://bugzilla.mozilla.org/show_bug.cgi?id=1583935
+    - worker-manager:update-worker-type:proj-<..>/*  # old
+    - worker-manager:create-worker-pool:proj-<..>/*
+    - worker-manager:update-worker-pool:proj-<..>/*
+    - worker-manager:create-worker:proj-<..>/*
 
     # project-specific worker pools secrets
-    - secrets:get:worker-pool:proj-<..>
-    - secrets:set:worker-pool:proj-<..>
+    - secrets:get:worker-pool:proj-<..>/*
+    - secrets:set:worker-pool:proj-<..>/*
 
     # project-specific secrets
     - secrets:get:project/<..>/*
