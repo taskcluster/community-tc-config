@@ -62,3 +62,16 @@ taskcluster:
         - project/taskcluster/testing/docker-worker/ci-creds
         - project/taskcluster/testing/docker-worker/pulse-creds
       to: repo:github.com/taskcluster/docker-worker:*
+
+winsign:
+  adminRoles: []
+  workerPools:
+    ci:
+      owner: catlee@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 0
+      maxCapacity: 2
+  grants:
+    - grant: queue:create-task:highest:proj-winsign/ci
+      to: repo:github.com/mozilla-releng/winsign:*
