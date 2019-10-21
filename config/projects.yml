@@ -66,12 +66,12 @@ taskcluster:
 bors-ng:
   adminRoles: []
   workerPools:
-  ci:
-    owner: michael@notriddle.com
-    emailOnError: false
-    type: standard_gcp_docker_worker
-    minCapacity: 0
-    maxCapacity: 2
+    ci:
+      owner: michael@notriddle.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 0
+      maxCapacity: 2
   grants:
     - grant: queue:create-task:highest:proj-bors-ng/ci
       to: repo:github.com/bors-ng/bors-ng:*
