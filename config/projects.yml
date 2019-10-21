@@ -180,3 +180,45 @@ misc:
   grants:
     - grant: queue:create-task:highest:proj-misc/ci
       to: repo:github.com/mozilla/*
+
+git-cinnabar:
+  adminRoles:
+    - login-identity:github/1038527|glandium
+  workerPools:
+    ci:
+      type: standard_gcp_docker_worker
+      maxCapacity: 5
+    win2012r2:
+      type: standard_aws_generic_worker_win2012r2
+      maxCapacity: 2
+  clients:
+    worker-osx-10-10:
+      scopes:
+        - queue:claim-work:proj-git-cinnabar/osx-10-10
+        - queue:worker-id:proj-git-cinnabar/travis-*
+    worker-osx-10-11:
+      scopes:
+        - queue:claim-work:proj-git-cinnabar/osx-10-11
+        - queue:worker-id:proj-git-cinnabar/travis-*
+  grants:
+    - grant:
+        - queue:create-task:highest:proj-git-cinnabar/ci
+        - queue:create-task:highest:proj-git-cinnabar/win2012r2
+        # these two workerTypes are implemented in Travis-CI (!)
+        - queue:create-task:highest:proj-git-cinnabar/osx-10-10
+        - queue:create-task:highest:proj-git-cinnabar/osx-10-11
+        - queue:scheduler-id:taskcluster-github
+      to:
+        - repo:github.com/glandium/git-cinnabar:decision-task
+
+    - grant: assume:repo:github.com/glandium/git-cinnabar:decision-task
+      to: repo:github.com/glandium/git-cinnabar:pull-request
+
+    - grant:
+        - assume:repo:github.com/glandium/git-cinnabar:decision-task
+        - secrets:get:project/git-cinnabar/codecov
+        - queue:route:index.project.git-cinnabar.glandium.*
+      to:
+        - repo:github.com/glandium/git-cinnabar:release
+        - repo:github.com/glandium/git-cinnabar:branch:*
+        - repo:github.com/glandium/git-cinnabar:tag:*
