@@ -115,7 +115,7 @@ mozilla:
   adminRoles: []
   workerPools:
     ci:
-      owner:
+      owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
       type: standard_gcp_docker_worker
       minCapacity: 1
