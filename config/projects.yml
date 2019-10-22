@@ -110,3 +110,16 @@ bors-ng:
   grants:
     - grant: queue:create-task:highest:proj-bors-ng/ci
       to: repo:github.com/bors-ng/bors-ng:*
+
+mozilla:
+  adminRoles: []
+  workerPools:
+    ci:
+      owner:
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 1
+      maxCapacity: 20
+  grants:
+    - grant: queue:create-task:highest:proj-mozilla/ci
+      to: repo:github.com/mozilla/*
