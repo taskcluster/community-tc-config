@@ -37,7 +37,7 @@ async def update_resources(resources):
     for prefix in ADMIN_ROLE_PREFIXES:
         resources.manage(r'Role={}.*'.format(prefix))
 
-    projects = Projects.load(loader)
+    projects = await Projects.load(loader)
 
     for project in projects.values():
         for roleId in project.adminRoles:
