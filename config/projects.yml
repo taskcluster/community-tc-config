@@ -111,7 +111,9 @@ bors-ng:
     - grant: queue:create-task:highest:proj-bors-ng/ci
       to: repo:github.com/bors-ng/bors-ng:*
 
-mozilla:
+# catch-all repo for simple mozilla projects
+# if you need more complexity, talk to the taskcluster team!
+mozilla-misc:
   adminRoles: []
   workerPools:
     ci:
@@ -121,5 +123,5 @@ mozilla:
       minCapacity: 1
       maxCapacity: 20
   grants:
-    - grant: queue:create-task:highest:proj-mozilla/ci
+    - grant: queue:create-task:highest:proj-mozilla-misc/ci
       to: repo:github.com/mozilla/*
