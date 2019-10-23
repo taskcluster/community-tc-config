@@ -110,3 +110,19 @@ bors-ng:
   grants:
     - grant: queue:create-task:highest:proj-bors-ng/ci
       to: repo:github.com/bors-ng/bors-ng:*
+
+# catch-all repo for simple mozilla projects
+# if you need more complexity, talk to the taskcluster team!
+misc:
+  adminRoles:
+    - github-team:taskcluster/core
+  workerPools:
+    ci:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 1
+      maxCapacity: 20
+  grants:
+    - grant: queue:create-task:highest:proj-misc/ci
+      to: repo:github.com/mozilla/*
