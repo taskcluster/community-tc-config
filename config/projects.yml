@@ -111,6 +111,22 @@ bors-ng:
     - grant: queue:create-task:highest:proj-bors-ng/ci
       to: repo:github.com/bors-ng/bors-ng:*
 
+relman:
+  adminRoles:
+    - github-team:mozilla/release-management
+  workerPools:
+    ci:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 0
+      maxCapacity: 2
+  grants:
+    - grant: secrets:get:project/relman/microannotate/deploy
+      to: repo:github.com/mozilla/microannotate:tag:*
+    - grant: queue:create-task:highest:proj-relman/ci
+      to: repo:github.com/mozilla/microannotate:*
+
 # catch-all repo for simple mozilla projects
 # if you need more complexity, talk to the taskcluster team!
 misc:
