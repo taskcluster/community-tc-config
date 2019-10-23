@@ -113,8 +113,9 @@ bors-ng:
 
 # catch-all repo for simple mozilla projects
 # if you need more complexity, talk to the taskcluster team!
-mozilla-misc:
-  adminRoles: []
+misc:
+  adminRoles:
+    - github-team:taskcluster/core
   workerPools:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -123,5 +124,5 @@ mozilla-misc:
       minCapacity: 1
       maxCapacity: 20
   grants:
-    - grant: queue:create-task:highest:proj-mozilla-misc/ci
+    - grant: queue:create-task:highest:proj-misc/ci
       to: repo:github.com/mozilla/*
