@@ -1,22 +1,26 @@
 # "Projects", as defined in https://docs.taskcluster.net/docs/manual/using/namespaces#projects
 #
 # Each project is a distinct namespace within the deployment, with access to its own resources.
-# In particular, each project has its own workers.  A project also has a set of administrators
+# In particular, each project has its own workers. A project also has a set of administrators
 # defined by user roles.
 #
 # Each entry in this file is defined as follows:
 #
 # <project-name>:
-#   admin-roles:
+#   adminRoles:
 #     # roles with administrative access to the project's resources
 #     - role1
 #     - ..
-#   worker-pools:
+#   workerPools:
 #     <worker-pool-name>:
 #       owner: ..
 #       emailOnError: ..
 #       type: <name of a function in `generate/workers.py`)
 #       ..: ..  # arguments to that function
+#   clients:
+#     <clientId-suffix>:  # suffix after `project/<project-name>/`
+#       scopes: [ .. ]
+#       description: ..   # optional
 #   grants:  # (same format as grants.yml)
 #
 # The worker-pool configurations are defined by Python functions, keyed by the `type` property.
@@ -111,6 +115,18 @@ bors-ng:
     - grant: queue:create-task:highest:proj-bors-ng/ci
       to: repo:github.com/bors-ng/bors-ng:*
 
+redo:
+  adminRoles: []
+  workerPools:
+    ci:
+      owner: bhearsum@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 0
+      maxCapacity: 2
+    - grant: queue:create-task:highest:proj-redo/ci
+      to: repo:github.com/mozilla-releng/redo:*
+      
 relman:
   adminRoles:
     - github-team:mozilla/release-management
