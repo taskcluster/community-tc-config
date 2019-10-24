@@ -17,6 +17,10 @@
 #       emailOnError: ..
 #       type: <name of a function in `generate/workers.py`)
 #       ..: ..  # arguments to that function
+#   clients:
+#     <clientId-suffix>:  # suffix after `project/<project-name>/`
+#       scopes: [ .. ]
+#       description: ..   # optional
 #   grants:  # (same format as grants.yml)
 #
 # The worker-pool configurations are defined by Python functions, keyed by the `type` property.
