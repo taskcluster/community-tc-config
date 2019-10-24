@@ -12,6 +12,25 @@ for region in us-{west,east}-{1,2}; do
     fi
     echo " vpcId: $vpcId"
 
+    igwId=$(aws ec2 describe-internet-gateways --region $region --filter Name=tag:Name,Values=community-workers | jq -r '.InternetGateways[0].InternetGatewayId')
+    if [ "$igwId" = "null" ]; then
+        igwId=$(aws ec2 create-internet-gateway --region $region | jq -r '.InternetGateway.InternetGatewayId')
+        aws ec2 create-tags --region $region --resources $igwId --tags Key=Name,Value=community-workers
+        aws ec2 attach-internet-gateway --region $region --internet-gateway-id $igwId --vpc-id $vpcId
+    fi
+    echo " igwId: $igwId"
+
+    # this is created automatically for the VPC
+    routeTableId=$(aws ec2 describe-route-tables --region $region --filter Name=vpc-id,Values=$vpcId | jq -r '.RouteTables[0].RouteTableId')
+    if [ "$routeTableId" != "null" ]; then
+        aws ec2 create-route --region $region --route-table-id $routeTableId --gateway-id $igwId --destination-cidr-block 0.0.0.0/0
+        aws ec2 create-tags --region $region --resources $routeTableId --tags Key=Name,Value=community-workers
+    else
+        echo " could not find associated route table for vpcId: $vpcId"
+        exit 1
+    fi
+    echo " routeTableId: $routeTableId"
+
     echo " subnets by AZ":
     cidr=0
     for az in $(aws ec2 describe-availability-zones --region $region | jq -r '.AvailabilityZones[] | .ZoneName'); do
