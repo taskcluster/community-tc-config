@@ -20,14 +20,12 @@ for region in us-{west,east}-{1,2}; do
     fi
     echo " igwId: $igwId"
 
-    # this is created automatically for the VPC
-    routeTableId=$(aws ec2 describe-route-tables --region $region --filter Name=vpc-id,Values=$vpcId | jq -r '.RouteTables[0].RouteTableId')
-    if [ "$routeTableId" != "null" ]; then
-        aws ec2 create-route --region $region --route-table-id $routeTableId --gateway-id $igwId --destination-cidr-block 0.0.0.0/0
-        aws ec2 create-tags --region $region --resources $routeTableId --tags Key=Name,Value=community-workers
-    else
-        echo " could not find associated route table for vpcId: $vpcId"
-        exit 1
+    # checks for a route table with a route to our igw (skips if it already exists)
+    routeTableId=$(aws ec2 describe-route-tables --region $region --filter Name=route.gateway-id,Values=$igwId | jq -r '.RouteTables[0].RouteTableId')
+    if [ "$routeTableId" = "null" ]; then
+        routeTableId=$(aws ec2 describe-route-tables --region $region --filter Name=vpc-id,Values=$vpcId | jq -r '.RouteTables[0].RouteTableId')
+        # this output is useless
+        aws ec2 create-route --region $region --route-table-id $routeTableId --gateway-id $igwId --destination-cidr-block 0.0.0.0/0 > /dev/null
     fi
     echo " routeTableId: $routeTableId"
 
