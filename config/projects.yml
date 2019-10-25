@@ -115,6 +115,20 @@ bors-ng:
     - grant: queue:create-task:highest:proj-bors-ng/ci
       to: repo:github.com/bors-ng/bors-ng:*
 
+servo:
+  adminRoles: [github-team:servo/taskcluster-admins]
+  workerPools:
+    ci:
+      owner: nobody@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 0
+      maxCapacity: 2
+  grants:
+    - grant: assume:repo-admin:github.com/servo/*
+      to: github-team:servo/taskcluster-admins
+
+
 redo:
   adminRoles: []
   workerPools:
