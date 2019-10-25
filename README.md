@@ -48,6 +48,6 @@ This occurs within `config/projects.yml`.
 ### Externally Managed Projects
 
 This respository manages all resources in the deployment *except* those associated with "externally managed" projects.
-Projects that manage their own resources, either by hand or via their own automation, should have the `externallyManaged` attribute set in `config/projects.yml`, otherwise the next run of `tc-admin apply` will delete the project's resoureces!
+Projects that manage their own resources, either by hand or via their own automation, should have the `externallyManaged` attribute set in `config/projects.yml`, otherwise the next run of `tc-admin apply` will delete the project's resources!
 Note that externally managed projects can still define other resources in their `projects.yml` stanza.
 Such resources will be created and managed by this repository, but if they are removed from `projects.yml`, this repository cannot delete them.

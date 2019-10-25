@@ -6,6 +6,7 @@
 
 import jsone
 import attr
+import re
 
 from tcadmin.resources import Role, Client, WorkerPool
 from tcadmin.util.config import ConfigDict
@@ -66,7 +67,19 @@ async def update_resources(resources):
             grant.update_resources(resources)
 
 
-async def list_externally_managed_projects():
-    "Get the names of all externally-managed projects"
+async def get_externally_managed_resource_patterns():
+    "Get a list of regular expressions for resources that are externally managed"
     projects = await Projects.load(loader)
-    return [p.name for p in projects.values() if p.externallyManaged]
+    patterns = []
+    for project in projects.values():
+        if not project.externallyManaged:
+            continue
+        name = re.escape(project.name)
+        # this list corresponds to that for project-admin in config/grants.yml
+        patterns.append(r"Role=project:{}:.*".format(name))
+        patterns.append(r"Client=project/{}/.*".format(name))
+        patterns.append(r"WorkerPool=proj-{}/.*".format(name))
+        patterns.append(r"Hook=project-{}/.*".format(name))
+        patterns.append(r"Role=hook-id:project-{}/.*".format(name))
+
+    return patterns
