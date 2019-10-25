@@ -44,3 +44,10 @@ Each project has a its own worker pools, and user roles can be given "admin" acc
 Repositories are granted scopes via the [Taskcluster-github scheme](https://docs.taskcluster.net/docs/reference/integrations/github/taskcluster-yml-v1#scopes-and-roles).
 Each repository is associated with a project, and scopes granted to the repository should be associated with that project.
 This occurs within `config/projects.yml`.
+
+### Externally Managed Projects
+
+This respository manages all resources in the deployment *except* those associated with "externally managed" projects.
+Projects that manage their own resources, either by hand or via their own automation, should have the `externallyManaged` attribute set in `config/projects.yml`, otherwise the next run of `tc-admin apply` will delete the project's resoureces!
+Note that externally managed projects can still define other resources in their `projects.yml` stanza.
+Such resources will be created and managed by this repository, but if they are removed from `projects.yml`, this repository cannot delete them.
