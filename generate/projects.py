@@ -19,6 +19,7 @@ ADMIN_ROLE_PREFIXES = [
     'login-identity:',
 ]
 
+
 class Projects(ConfigDict):
 
     filename = "config/projects.yml"
@@ -30,13 +31,10 @@ class Projects(ConfigDict):
         workerPools = attr.ib(type=dict, factory=lambda: {})
         clients = attr.ib(type=dict, factory=lambda: {})
         grants = attr.ib(type=list, factory=lambda: [])
+        externallyManaged = attr.ib(type=bool, default=False)
 
 
 async def update_resources(resources):
-    resources.manage(r'WorkerPool=.*')
-    resources.manage(r'Client=(?!(github|static)/).*')
-    resources.manage(r'Role=.*')
-
     projects = await Projects.load(loader)
 
     for project in projects.values():
@@ -44,16 +42,20 @@ async def update_resources(resources):
             assert any(roleId.startswith(p) for p in ADMIN_ROLE_PREFIXES)
             resources.add(Role(
                 roleId=roleId,
-                description="", 
+                description="",
                 scopes=['assume:project-admin:{}'.format(project.name)]))
         if project.workerPools:
             for name, worker_pool in project.workerPools.items():
                 worker_pool_id = 'proj-{}/{}'.format(project.name, name)
+                if project.externallyManaged:
+                    resources.manage('WorkerPool={}'.format(worker_pool_id))
                 worker_pool['description'] = "Workers for " + project.name
                 resources.add(build_worker_pool(worker_pool_id, worker_pool))
         if project.clients:
             for name, info in project.clients.items():
                 clientId = 'project/{}/{}'.format(project.name, name)
+                if project.externallyManaged:
+                    resources.manage('Client={}'.format(client_id))
                 description = info.get('description', '')
                 scopes = info['scopes']
                 resources.add(Client(
@@ -62,3 +64,9 @@ async def update_resources(resources):
                     scopes=scopes))
         for grant in Grants.from_project(project):
             grant.update_resources(resources)
+
+
+async def list_externally_managed_projects():
+    "Get the names of all externally-managed projects"
+    projects = await Projects.load(loader)
+    return [p.name for p in projects.values() if p.externallyManaged]

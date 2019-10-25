@@ -11,6 +11,10 @@
 #     # roles with administrative access to the project's resources
 #     - role1
 #     - ..
+#   # "externally managed" means that the resources in this project are managed outside
+#   # of this repository.  If this is not set, then this repository will try to delete
+#   # any such externally-managed resources.
+#   externallyManaged: false
 #   workerPools:
 #     <worker-pool-name>:
 #       owner: ..
@@ -117,6 +121,7 @@ bors-ng:
 
 servo:
   adminRoles: [github-team:servo/taskcluster-admins]
+  externallyManaged: true
   workerPools:
     ci:
       owner: nobody@mozilla.com
