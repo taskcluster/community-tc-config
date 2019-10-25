@@ -29,6 +29,7 @@ class Projects(ConfigDict):
     class Item:
         name = attr.ib(type=str)
         adminRoles = attr.ib(type=list, factory=lambda: [])
+        repos = attr.ib(type=list, factory=lambda: [])
         workerPools = attr.ib(type=dict, factory=lambda: {})
         clients = attr.ib(type=dict, factory=lambda: {})
         grants = attr.ib(type=list, factory=lambda: [])
@@ -45,6 +46,12 @@ async def update_resources(resources):
                 roleId=roleId,
                 description="",
                 scopes=['assume:project-admin:{}'.format(project.name)]))
+        if project.repos:
+            resources.add(Role(
+                roleId='project-admin:{}'.format(project.name),
+                description="",
+                scopes=['assume:repo-admin:{}'.format(repo)
+                    for repo in project.repos]))
         if project.workerPools:
             for name, worker_pool in project.workerPools.items():
                 worker_pool_id = 'proj-{}/{}'.format(project.name, name)
@@ -75,11 +82,17 @@ async def get_externally_managed_resource_patterns():
         if not project.externallyManaged:
             continue
         name = re.escape(project.name)
-        # this list corresponds to that for project-admin in config/grants.yml
+
+        # this list corresponds to that for project-admin:* in config/grants.yml
         patterns.append(r"Role=project:{}:.*".format(name))
         patterns.append(r"Client=project/{}/.*".format(name))
         patterns.append(r"WorkerPool=proj-{}/.*".format(name))
         patterns.append(r"Hook=project-{}/.*".format(name))
         patterns.append(r"Role=hook-id:project-{}/.*".format(name))
+
+        # this corresponds to repo-admin:*
+        for repo in project.repos:
+            pat = (re.escape(repo[:-1]) + '.*') if repo[-1] == '*' else re.escape(repo)
+            patterns.append(r"Role=repo:" + pat)
 
     return patterns

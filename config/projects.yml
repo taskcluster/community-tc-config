@@ -11,20 +11,31 @@
 #     # roles with administrative access to the project's resources
 #     - role1
 #     - ..
+#
 #   # "externally managed" means that the resources in this project are managed outside
 #   # of this repository.  If this is not set, then this repository will try to delete
 #   # any such externally-managed resources.
 #   externallyManaged: false
+#
+#   repos:
+#     # repositories over which project admins have control; this is a prefix of a tc-github
+#     # repository roleId, so it should end in `:*` to select a specific repository, or `/*`
+#     # for an organization:
+#     - github.com/org/*
+#     - github.com/org/repo:*
+#
 #   workerPools:
 #     <worker-pool-name>:
 #       owner: ..
 #       emailOnError: ..
 #       type: <name of a function in `generate/workers.py`)
 #       ..: ..  # arguments to that function
+#
 #   clients:
 #     <clientId-suffix>:  # suffix after `project/<project-name>/`
 #       scopes: [ .. ]
 #       description: ..   # optional
+#
 #   grants:  # (same format as grants.yml)
 #
 # The worker-pool configurations are defined by Python functions, keyed by the `type` property.
@@ -33,6 +44,9 @@
 taskcluster:
   adminRoles:
     - github-team:taskcluster/core
+  repos:
+    - github.com/taskcluster/*
+    - github.com/mozilla/community-tc-config:*
   workerPools:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -108,6 +122,8 @@ taskcluster:
 
 bors-ng:
   adminRoles: []
+  repos:
+    - github.com/bors-ng/bors-ng:*
   workerPools:
     ci:
       owner: michael@notriddle.com
@@ -122,6 +138,8 @@ bors-ng:
 servo:
   adminRoles: [github-team:servo/taskcluster-admins]
   externallyManaged: true
+  repos: 
+    - github.com/servo/*
   workerPools:
     ci:
       owner: nobody@mozilla.com
@@ -129,13 +147,11 @@ servo:
       type: standard_gcp_docker_worker
       minCapacity: 0
       maxCapacity: 2
-  grants:
-    - grant: assume:repo-admin:github.com/servo/*
-      to: github-team:servo/taskcluster-admins
-
 
 redo:
   adminRoles: []
+  repos:
+    - github.com/mozilla-releng/redo:*
   workerPools:
     ci:
       owner: bhearsum@mozilla.com
@@ -152,6 +168,8 @@ redo:
 misc:
   adminRoles:
     - github-team:taskcluster/core
+  repos:
+    - github.com/mozilla/*
   workerPools:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
