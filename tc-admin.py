@@ -6,15 +6,9 @@
 
 from tcadmin.appconfig import AppConfig
 
-from generate import (
-    projects,
-    grants,
-    login_identity,
-)
+from generate import update_resources
 
 
 appconfig = AppConfig()
 
-appconfig.generators.register(projects.update_resources)
-appconfig.generators.register(grants.update_resources)
-appconfig.generators.register(login_identity.update_resources)
+appconfig.generators.register(update_resources)

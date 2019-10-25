@@ -41,7 +41,5 @@ class Grants(ConfigList):
 
 
 async def update_resources(resources):
-    resources.manage('Role=.*')
-
     for grant in await Grants.load(loader):
         grant.update_resources(resources)

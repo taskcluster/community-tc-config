@@ -17,8 +17,6 @@ users = {
 }
 
 async def update_resources(resources):
-    resources.manage(r"Role=login-identity:.*")
-
     resources.add(Role(
         roleId="login-identity:*",
         description=textwrap.dedent("""\

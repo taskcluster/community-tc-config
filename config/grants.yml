@@ -80,6 +80,14 @@
     - generic-worker:cache:*
   to: project-admin:*
 
+# repo-admin:* parameterized role, defining administrative scopes over a github repo
+- grant:
+    - auth:create-role:repo:<..>
+    - auth:delete-role:repo:<..>
+    - auth:update-role:repo:<..>
+    - assume:repo:<..>
+  to: repo-admin:*
+
 # Grant permission to use websocktunnel with audience `communitytc` to all
 # workers in all pools
 - grant: auth:websocktunnel-token:communitytc/*
