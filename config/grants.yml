@@ -88,6 +88,17 @@
     - assume:repo:<..>
   to: repo-admin:*
 
+- grant:
+    # support users' creation of clients
+    - auth:create-client:<..>/*
+    - auth:delete-client:<..>/*
+    - auth:update-client:<..>/*
+    - auth:reset-access-token:<..>/*
+    # grant all users access to scheduler-id `-`, the default
+    - queue:scheduler-id:-
+  to:
+    - login-identity:*
+
 # Grant permission to use websocktunnel with audience `communitytc` to all
 # workers in all pools
 - grant: auth:websocktunnel-token:communitytc/*

@@ -17,14 +17,3 @@ users = {
 }
 
 async def update_resources(resources):
-    resources.add(Role(
-        roleId="login-identity:*",
-        description=textwrap.dedent("""\
-            Scopes for anyone who logs into the service;
-            see [login-identities docs](https://docs.taskcluster.net/docs/manual/design/conventions/login-identities)."""),
-        scopes=[
-            'auth:create-client:<..>/*',
-            'auth:delete-client:<..>/*',
-            'auth:reset-access-token:<..>/*',
-            'auth:update-client:<..>/*',
-        ]))

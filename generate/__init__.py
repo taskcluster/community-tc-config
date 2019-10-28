@@ -6,7 +6,7 @@
 
 import re
 
-from . import projects, login_identity, grants
+from . import projects, grants
 
 
 async def update_resources(resources):
@@ -19,5 +19,4 @@ async def update_resources(resources):
     resources.manage(re.compile(r"(?!{}).*".format(em_bar)))
 
     await projects.update_resources(resources)
-    await login_identity.update_resources(resources)
     await grants.update_resources(resources)
