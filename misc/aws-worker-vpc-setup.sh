@@ -36,6 +36,8 @@ for region in us-{west,east}-{1,2}; do
         if [ "$subnetId" = "null" ]; then
             subnetId=$(aws ec2 create-subnet --region $region --vpc-id $vpcId --availability-zone $az --cidr-block 10.0.$cidr.0/20 | jq -r '.Subnet.SubnetId')
             aws ec2 create-tags --region $region --resources $subnetId --tags Key=Name,Value=community-workers
+            # We need public IPs for now - see https://bugzilla.mozilla.org/show_bug.cgi?id=1592025 for a fix
+            aws ec2 modify-subnet-attribute --region $region --subnet-id $subnetId --map-public-ip-on-launch
         fi
         echo "  $az: $subnetId"
         cidr=$((cidr + 16))
