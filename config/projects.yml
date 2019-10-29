@@ -217,7 +217,7 @@ git-cinnabar:
     - grant:
         - assume:repo:github.com/glandium/git-cinnabar:decision-task
         - secrets:get:project/git-cinnabar/codecov
-        - queue:route:index.project.git-cinnabar.glandium.*
+        - queue:route:index.project.git-cinnabar.*
       to:
         - repo:github.com/glandium/git-cinnabar:release
         - repo:github.com/glandium/git-cinnabar:branch:*
