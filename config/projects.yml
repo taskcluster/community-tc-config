@@ -120,6 +120,12 @@ taskcluster:
         - secrets:get:project/taskcluster/testing/docker-worker/pulse-creds
       to: repo:github.com/taskcluster/docker-worker:*
 
+  clients:
+    # JF0BcOaZQOanwCNfLTyZwwm3KQ3zPFR1-wGHzPoDHlNw
+    docker-worker/ci:
+      scopes:
+        - assume:repo:github.com/taskcluster/docker-worker:*
+
 bors-ng:
   adminRoles: []
   repos:
