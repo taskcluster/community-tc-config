@@ -169,6 +169,21 @@ redo:
     - grant: queue:create-task:highest:proj-redo/ci
       to: repo:github.com/mozilla-releng/redo:*
 
+taskcluster_yml_validator:
+  adminRoles: []
+  repos:
+    - github.com/marco-c/taskcluster_yml_validator:*
+  workerPools:
+    ci:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 0
+      maxCapacity: 2
+  grants:
+    - grant: queue:create-task:highest:proj-taskcluster_yml_validator/ci
+      to: repo:github.com/marco-c/taskcluster_yml_validator:*
+
 # catch-all repo for simple mozilla projects
 # if you need more complexity, talk to the taskcluster team!
 misc:
