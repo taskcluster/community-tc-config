@@ -170,7 +170,8 @@ redo:
       to: repo:github.com/mozilla-releng/redo:*
 
 taskcluster_yml_validator:
-  adminRoles: []
+  adminRoles:
+    - login-identity:github/1616846|marco-c
   repos:
     - github.com/marco-c/taskcluster_yml_validator:*
   workerPools:
