@@ -121,7 +121,6 @@ taskcluster:
       to: repo:github.com/taskcluster/docker-worker:*
 
   clients:
-    # JF0BcOaZQOanwCNfLTyZwwm3KQ3zPFR1-wGHzPoDHlNw
     docker-worker/ci:
       scopes:
         - assume:repo:github.com/taskcluster/docker-worker:*
