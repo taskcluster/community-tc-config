@@ -76,6 +76,13 @@ taskcluster:
       to: repo:github.com/taskcluster/taskcluster:branch:master
 
     - grant:
+        # pushes to json-e master can read secrets for deploying the site
+        - secrets:get:project/taskcluster/json-e-deploy
+        # ..and notify on failure
+        - queue:route:notify.email.taskcluster-notifications@mozilla.com.*
+      to: repo:github.com/taskcluster/json-e:branch:master
+
+    - grant:
         - assume:project:taskcluster:worker-test-scopes
         - assume:worker-id:docker-worker/docker-worker
         - auth:sentry:test-dummy-worker
