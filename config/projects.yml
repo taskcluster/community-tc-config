@@ -258,6 +258,8 @@ misc:
 git-cinnabar:
   adminRoles:
     - login-identity:github/1038527|glandium
+  repos:
+    - github.com/glandium/git-cinnabar
   workerPools:
     ci:
       type: standard_gcp_docker_worker
