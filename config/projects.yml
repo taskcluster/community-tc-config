@@ -297,6 +297,19 @@ git-cinnabar:
         - repo:github.com/glandium/git-cinnabar:branch:*
         - repo:github.com/glandium/git-cinnabar:tag:*
 
+wpt:
+  adminRoles:
+    - github-team:web-platform-tests/admins
+  workerPools:
+    ci:
+      type: standard_gcp_docker_worker
+      maxCapacity: 40
+  repos:
+    - github.com/web-platform-tests/*
+  grants:
+    - grant: queue:create-task:highest:proj-wpt/ci
+      to: repo:github.com/web-platform-tests/wpt:*
+
 relman:
   adminRoles:
     - github-team:mozilla/release-management
