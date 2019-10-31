@@ -103,3 +103,14 @@
 # workers in all pools
 - grant: auth:websocktunnel-token:communitytc/*
   to: worker-pool:*
+
+# As a temporary measure until we invent a better solution, we allow a number
+# of lucky people to rerun, cancel, and schedule all tasks created by
+# taskcluster-github.
+- grant:
+    - queue:cancel-task:taskcluster-github/*
+    - queue:schedule-task:taskcluster-github/*
+    - queue:rerun-task:taskcluster-github/*
+  to:
+    - github-team:taskcluster/core
+    - login-identity:github/1038527|glandium
