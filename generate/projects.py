@@ -47,6 +47,9 @@ async def update_resources(resources):
                 description="",
                 scopes=['assume:project-admin:{}'.format(project.name)]))
         if project.repos:
+            for repo in project.repos:
+                assert repo.endswith('/*') or repo.endswith(':*'), \
+                    "project.repos should end with `/*` or `:*`, got {}".format(repo)
             resources.add(Role(
                 roleId='project-admin:{}'.format(project.name),
                 description="",
