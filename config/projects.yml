@@ -150,7 +150,7 @@ bors-ng:
 servo:
   adminRoles: [github-team:servo/taskcluster-admins]
   externallyManaged: true
-  repos: 
+  repos:
     - github.com/servo/*
   workerPools:
     ci:
@@ -218,7 +218,10 @@ redo:
       minCapacity: 0
       maxCapacity: 2
   grants:
-    - grant: queue:create-task:highest:proj-redo/ci
+    - grant:
+        - queue:create-task:highest:proj-redo/ci
+        - queue:scheduler-id:taskcluster-github
+        - queue:route:statuses
       to: repo:github.com/mozilla-releng/redo:*
 
 taskcluster_yml_validator:
