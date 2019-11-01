@@ -151,7 +151,7 @@ servo:
   adminRoles: [github-team:servo/taskcluster-admins]
   externallyManaged: true
   repos: 
-    - github.com/servo/*
+    - github.com/servo/servo:*
   workerPools:
     ci:
       owner: nobody@mozilla.com
@@ -333,3 +333,38 @@ relman:
         - docker-worker:capability:privileged
         - queue:route:statuses
       to: repo:github.com/mozilla/code-review:*
+
+webrender:
+  adminRoles:
+    - login-identity:github/27658|jdm
+    - login-identity:github/332653|jrmuizel
+    - login-identity:github/485789|staktrace
+    - login-identity:github/39062770|gw3583
+  repos:
+    - github.com/servo/webrender:*
+    - github.com/staktrace/webrender:*
+  workerPools:
+    ci-linux:
+      owner: kats@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 0
+      maxCapacity: 2
+  clients:
+    macos:
+      scopes:
+        - queue:claim-work:proj-webrender/ci-macos
+        - queue:worker-id:proj-webrender/*
+  grants:
+    - grant:
+        - queue:create-task:highest:proj-webrender/ci-linux
+        - queue:create-task:highest:proj-webrender/ci-macos
+      to:
+        - repo:github.com/servo/webrender:*
+        - repo:github.com/staktrace/webrender:*
+    - grant:
+        - assume:worker-pool:proj-webrender/macos
+        - auth:sentry:generic-worker
+        - secrets:get:worker-pool:proj-webrender/*
+      to:
+        - project/webrender/macos
