@@ -206,20 +206,21 @@ firefoxreality:
     - grant: secrets:get:project/firefoxreality/frpc/github-deploy-key
       to: repo:github.com/MozillaReality/FirefoxRealityPC:branch:*
 
-redo:
-  adminRoles: []
+releng:
+  adminRoles:
+    - github-team:mozilla-releng/releng
   repos:
-    - github.com/mozilla-releng/redo:*
+    - github.com/mozilla-releng/*
   workerPools:
     ci:
-      owner: bhearsum@mozilla.com
+      owner: release@mozilla.com
       emailOnError: false
       type: standard_gcp_docker_worker
       minCapacity: 0
-      maxCapacity: 2
+      maxCapacity: 10
   grants:
-    - grant: queue:create-task:highest:proj-redo/ci
-      to: repo:github.com/mozilla-releng/redo:*
+    - grant: queue:create-task:highest:proj-releng/*
+      to: repo:github.com/mozilla-releng/*
 
 taskcluster_yml_validator:
   adminRoles:
