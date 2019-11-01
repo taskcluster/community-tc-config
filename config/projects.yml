@@ -297,6 +297,12 @@ git-cinnabar:
         - repo:github.com/glandium/git-cinnabar:branch:*
         - repo:github.com/glandium/git-cinnabar:tag:*
 
+    # glandium gets permission to access interactive sessions
+    - grant:
+        - queue:get-artifact:private/docker-worker/*
+      to:
+        - login-identity:github/1038527|glandium
+
 wpt:
   adminRoles:
     - github-team:web-platform-tests/admins
