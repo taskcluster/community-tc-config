@@ -347,6 +347,12 @@ deepspeech:
       type: standard_gcp_docker_worker
       minCapacity: 0
       maxCapacity: 3
+    win:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      type: aws_generic_worker_deepspeech_win
+      minCapacity: 0
+      maxCapacity: 5
     win-b:
       owner: deepspeech@mozilla.com
       emailOnError: false
