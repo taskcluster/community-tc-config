@@ -333,3 +333,67 @@ relman:
         - docker-worker:capability:privileged
         - queue:route:statuses
       to: repo:github.com/mozilla/code-review:*
+
+deepspeech:
+  adminRoles:
+    - github-team:mozilla/research-machine-learning
+  repos:
+    - github.com/mozilla/deepspeech
+    - github.com/mozilla/tensorflow
+  workerPools:
+    ci:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 0
+      maxCapacity: 3
+    win-b:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      type: aws_generic_worker_deepspeech_win_b
+      minCapacity: 0
+      maxCapacity: 5
+  clients:
+    ds-rpi3:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-rpi3-*
+        - queue:claim-work:proj-deepspeech/ds-rpi3
+        - queue:worker-id:proj-deepspeech/ds-rpi3-*
+    ds-lepotato:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-lepotato-*
+        - queue:claim-work:proj-deepspeech/ds-lepotato
+        - queue:worker-id:proj-deepspeech/ds-lepotato-*
+    ds-macos-heavy:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-heavy-*
+        - queue:claim-work:proj-deepspeech/ds-macos-heavy
+        - queue:worker-id:proj-deepspeech/ds-macos-heavy-*
+    ds-macos-light:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    ds-pkguploader:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-scriptworker-*
+        - queue:claim-work:proj-deepspeech/ds-scriptworker
+        - queue:worker-id:proj-deepspeech/ds-scriptworker-*
+  grants:
+    - grant:
+      - queue:create-task:highest:proj-deepspeech/*
+      - queue:create-task:lowest:proj-deepspeech/*
+      # decision task:
+        # https://github.com/mozilla/tensorflow/blob/master/tc-schedule.sh
+        # =>
+        # https://github.com/lissyx/taskcluster-github-decision/blob/master/tc-decision.py
+      - queue:scheduler-id:taskcluster-github
+      - queue:rerun-task:taskcluster-github/*
+      - queue:route:index.project.deepspeech.*
+      to:
+        - repo:github.com/mozilla/deepspeech:*
+        - repo:github.com/mozilla/tensorflow:*
+    - grant:
+      - generic-worker:allow-rdp:proj-deepspeech/*
+      to:
+        - project-admin:deepspeech

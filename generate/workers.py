@@ -254,3 +254,20 @@ def standard_aws_generic_worker_win2012r2(**cfg):
             if lc['launchConfig']['Placement']['AvailabilityZone'] != 'us-east-1a']
 
     return rv
+
+@worker_pool_type
+def aws_generic_worker_deepspeech_win_b(**cfg):
+    """
+    Build a deepspeech-win-b worker instance in AWS
+    """
+    deepspeech_win_b_images = {
+        'us-east-1': 'ami-0081dc6e528d277f6',
+        'us-west-1': 'ami-085a3abd95ca9301d',
+        'us-west-2': 'ami-01e9bc39c5157adc1',
+    }
+    rv = base_aws_generic_worker_config(
+        imageIds=deepspeech_win_b_images,
+        instanceTypes={"m5d.2xlarge": 1},
+        **cfg)
+
+    return rv
