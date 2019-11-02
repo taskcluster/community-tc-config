@@ -66,6 +66,7 @@
     - worker-manager:create-worker-pool:proj-<..>/*
     - worker-manager:update-worker-pool:proj-<..>/*
     - worker-manager:create-worker:proj-<..>/*
+    - worker-manager:remove-worker:proj-<..>/*
 
     # project-specific worker pools secrets
     - secrets:get:worker-pool:proj-<..>/*
