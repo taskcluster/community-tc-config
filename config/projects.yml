@@ -175,12 +175,18 @@ servo:
   repos: 
     - github.com/servo/*
   workerPools:
-    ci:
-      owner: nobody@mozilla.com
+    docker:
+      owner: servo-ops@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 2
+      maxCapacity: 20
+    docker-untrusted:
+      owner: servo-ops@mozilla.com
       emailOnError: false
       type: standard_gcp_docker_worker
       minCapacity: 0
-      maxCapacity: 2
+      maxCapacity: 6
 
 firefoxreality:
   adminRoles:
