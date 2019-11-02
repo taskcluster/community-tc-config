@@ -15,7 +15,7 @@ Modifications to service configuration are handled via bugs filed in `Operations
 
 ## AWS
 
-`community-tc-workers-aws` is an `aws` provider corresponding to AWS account `moz-fx-tc-community-workers`.
+`community-tc-workers-aws` is an `aws` provider corresponding to AWS account `moz-fx-tc-community-workers` with account ID 885316786408.
 It has the following configuration:
 
 ```
