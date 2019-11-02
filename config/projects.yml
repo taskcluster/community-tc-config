@@ -127,7 +127,29 @@ taskcluster:
         - secrets:get:project/taskcluster/testing/docker-worker/pulse-creds
       to: repo:github.com/taskcluster/docker-worker:*
 
+    - grant:
+        - auth:create-client:project/taskcluster/smoketest/*
+        - auth:create-role:project:taskcluster:smoketest:*
+        - auth:delete-client:project/taskcluster/smoketest/*
+        - auth:delete-role:project:taskcluster:smoketest:*
+        - auth:reset-access-token:project/taskcluster/smoketest/*
+        - auth:update-client:project/taskcluster/smoketest/*
+        - auth:update-role:project:taskcluster:smoketest:*
+        - project:taskcluster:smoketest:*
+        - purge-cache:built-in/succeed:smoketest-cache
+        - queue:create-task:highest:built-in/*
+        - queue:create-task:highest:built-in/fail
+        - queue:create-task:highest:built-in/succeed
+        - queue:route:index.project.taskcluster.smoketest.*
+        - queue:scheduler-id:-
+        - secrets:get:project/taskcluster/smoketest/*
+        - secrets:set:project/taskcluster/smoketest/*
+      to: project:taskcluster:smoketests
+
   clients:
+    smoketests:
+      scopes:
+        - assume:project:taskcluster:smoketests
     docker-worker/ci:
       scopes:
         - assume:repo:github.com/taskcluster/docker-worker:*
