@@ -78,6 +78,10 @@
     # allow all caches, since workers are per-project
     - docker-worker:cache:*
     - generic-worker:cache:*
+
+    # allow use of all providers
+    - worker-manager:provider:null-provider
+    - worker-manager:provider:community-tc-workers-*
   to: project-admin:*
 
 # repo-admin:* parameterized role, defining administrative scopes over a github repo
