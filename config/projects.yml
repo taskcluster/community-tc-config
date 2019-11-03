@@ -396,7 +396,6 @@ deepspeech:
   grants:
     - grant:
       - queue:create-task:highest:proj-deepspeech/*
-      - queue:create-task:lowest:proj-deepspeech/*
       # decision task:
         # https://github.com/mozilla/tensorflow/blob/master/tc-schedule.sh
         # =>
