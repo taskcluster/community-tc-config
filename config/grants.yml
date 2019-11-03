@@ -61,11 +61,9 @@
     - queue:route:index.project.<..>.*
 
     # project-specific worker pools and workers
-    - worker-manager:create-worker-type:proj-<..>/*  # old, see https://bugzilla.mozilla.org/show_bug.cgi?id=1583935
-    - worker-manager:update-worker-type:proj-<..>/*  # old
-    - worker-manager:create-worker-pool:proj-<..>/*
-    - worker-manager:update-worker-pool:proj-<..>/*
+    - worker-manager:manage-worker-pool:proj-<..>/*
     - worker-manager:create-worker:proj-<..>/*
+    - worker-manager:remove-worker:proj-<..>/*
 
     # project-specific worker pools secrets
     - secrets:get:worker-pool:proj-<..>/*
@@ -81,6 +79,10 @@
 
     # allow purging caches for project worker-pools
     - purge-cache:proj-<..>/*
+
+    # allow use of all providers
+    - worker-manager:provider:null-provider
+    - worker-manager:provider:community-tc-workers-*
   to: project-admin:*
 
 # repo-admin:* parameterized role, defining administrative scopes over a github repo
