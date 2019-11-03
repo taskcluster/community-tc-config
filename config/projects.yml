@@ -179,12 +179,14 @@ servo:
       owner: servo-ops@mozilla.com
       emailOnError: false
       type: standard_gcp_docker_worker
+      machineType: "zones/{zone}/machineTypes/n2-highcpu-16"
       minCapacity: 2
       maxCapacity: 20
     docker-untrusted:
       owner: servo-ops@mozilla.com
       emailOnError: false
       type: standard_gcp_docker_worker
+      machineType: "zones/{zone}/machineTypes/n2-highcpu-16"
       minCapacity: 0
       maxCapacity: 6
   grants:
