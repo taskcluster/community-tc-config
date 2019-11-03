@@ -1,0 +1,83 @@
+version: 1
+reporting: checks-v1
+policy:
+  pullRequests: public
+tasks:
+  $let:
+    owner: taskcluster-internal@mozilla.com
+    repo:
+      $if: 'tasks_for == "github-push"'
+      then:
+        git_url: ${event.repository.url}
+        url: ${event.repository.url}
+        ref: ${event.after}
+      else:
+        $if: 'tasks_for == "github-pull-request"'
+        then:
+          git_url: ${event.pull_request.head.repo.git_url}
+          url: ${event.pull_request.head.repo.url}
+          ref: ${event.pull_request.head.sha}
+        else:
+          git_url: ${event.repository.url}
+          url: ${event.repository.url}
+          ref: ${event.release.tag_name}
+  in:
+    $let:
+      tests:
+        - image: 'python:3.6'
+          name: tc-admin diff
+          command:
+            - /bin/bash
+            - '--login'
+            - '-c'
+            - >-
+              git clone ${repo.git_url} repo &&
+              cd repo &&
+              git config advice.detachedHead false &&
+              git checkout ${repo.ref} &&
+              pip install --no-use-pep517 -e . &&
+              tc-admin generate >/dev/null&&
+              { tc-admin diff | cat; true }
+        - image: 'python:3.6'
+          name: black
+          command:
+            - /bin/bash
+            - '--login'
+            - '-c'
+            - >-
+              git clone ${repo.git_url} repo &&
+              cd repo &&
+              git config advice.detachedHead false &&
+              git checkout ${repo.ref} &&
+              pip install black &&
+              black --check generate
+    in:
+      $let:
+        test_tasks:
+          $map: {$eval: tests}
+          each(test):
+            taskId: {$eval: as_slugid(test.name)}
+            provisionerId: proj-misc
+            workerType: ci
+            created: {$fromNow: ''}
+            deadline: {$fromNow: '60 minutes'}
+            payload:
+              maxRunTime: 3600
+              image: ${test.image}
+              command: {$eval: 'test.command'}
+            metadata:
+              name: ${test.name}
+              description: ${test.name}
+              owner: ${owner}
+              source: ${repo.url}
+
+      in:
+        $flattenDeep:
+        - $if: 'tasks_for == "github-push"'
+          then:
+            - {$eval: test_tasks}
+        - $if: 'tasks_for == "github-pull-request" && event["action"] in ["opened", "reopened", "synchronize"]'
+          then:
+            # We can skip this if pushed to our own repo since push event will get it
+            $if: 'event.pull_request.base.repo.id != event.pull_request.head.repo.id'
+            then: {$eval: test_tasks}
