@@ -4,20 +4,19 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file, You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 
-import jsone
 import attr
 import re
 
-from tcadmin.resources import Role, Client, WorkerPool
+from tcadmin.resources import Role, Client
 from tcadmin.util.config import ConfigDict
 from .loader import loader
 from .workers import build_worker_pool
 from .grants import Grants
 
 ADMIN_ROLE_PREFIXES = [
-    'github-org-admin:',
-    'github-team:',
-    'login-identity:',
+    "github-org-admin:",
+    "github-team:",
+    "login-identity:",
 ]
 
 
@@ -42,40 +41,47 @@ async def update_resources(resources):
     for project in projects.values():
         for roleId in project.adminRoles:
             assert any(roleId.startswith(p) for p in ADMIN_ROLE_PREFIXES)
-            resources.add(Role(
-                roleId=roleId,
-                description="",
-                scopes=['assume:project-admin:{}'.format(project.name)]))
+            resources.add(
+                Role(
+                    roleId=roleId,
+                    description="",
+                    scopes=["assume:project-admin:{}".format(project.name)],
+                )
+            )
         if project.repos:
-            resources.add(Role(
-                roleId='project-admin:{}'.format(project.name),
-                description="",
-                scopes=['assume:repo-admin:{}'.format(repo)
-                    for repo in project.repos]))
+            resources.add(
+                Role(
+                    roleId="project-admin:{}".format(project.name),
+                    description="",
+                    scopes=[
+                        "assume:repo-admin:{}".format(repo) for repo in project.repos
+                    ],
+                )
+            )
         if project.workerPools:
             for name, worker_pool in project.workerPools.items():
-                worker_pool_id = 'proj-{}/{}'.format(project.name, name)
+                worker_pool_id = "proj-{}/{}".format(project.name, name)
                 if project.externallyManaged:
-                    resources.manage('WorkerPool={}'.format(worker_pool_id))
-                worker_pool['description'] = "Workers for " + project.name
+                    resources.manage("WorkerPool={}".format(worker_pool_id))
+                worker_pool["description"] = "Workers for " + project.name
                 resources.add(build_worker_pool(worker_pool_id, worker_pool))
         if project.clients:
             for name, info in project.clients.items():
-                clientId = 'project/{}/{}'.format(project.name, name)
+                clientId = "project/{}/{}".format(project.name, name)
                 if project.externallyManaged:
-                    resources.manage('Client={}'.format(client_id))
-                description = info.get('description', '')
-                scopes = info['scopes']
-                resources.add(Client(
-                    clientId=clientId,
-                    description=description,
-                    scopes=scopes))
+                    resources.manage("Client={}".format(clientId))
+                description = info.get("description", "")
+                scopes = info["scopes"]
+                resources.add(
+                    Client(clientId=clientId, description=description, scopes=scopes)
+                )
         for grant in Grants.from_project(project):
             grant.update_resources(resources)
 
 
 async def get_externally_managed_resource_patterns():
-    "Get a list of regular expressions for resources that are externally managed"
+    """Get a list of regular expressions for resources that are externally
+    managed"""
     projects = await Projects.load(loader)
     patterns = []
     for project in projects.values():
@@ -83,7 +89,8 @@ async def get_externally_managed_resource_patterns():
             continue
         name = re.escape(project.name)
 
-        # this list corresponds to that for project-admin:* in config/grants.yml
+        # this list corresponds to that for project-admin:* in
+        # config/grants.yml
         patterns.append(r"Role=project:{}:.*".format(name))
         patterns.append(r"Client=project/{}/.*".format(name))
         patterns.append(r"WorkerPool=proj-{}/.*".format(name))
@@ -92,7 +99,7 @@ async def get_externally_managed_resource_patterns():
 
         # this corresponds to repo-admin:*
         for repo in project.repos:
-            pat = (re.escape(repo[:-1]) + '.*') if repo[-1] == '*' else re.escape(repo)
+            pat = (re.escape(repo[:-1]) + ".*") if repo[-1] == "*" else re.escape(repo)
             patterns.append(r"Role=repo:" + pat)
 
     return patterns

@@ -10,12 +10,16 @@ from . import projects, grants
 
 
 async def update_resources(resources):
-    # Set up the resources to manage everything *except* externally managed resources
-    externally_managed_patterns = await projects.get_externally_managed_resource_patterns()
-    # ..and except static clients and user-generatd clients
-    externally_managed_patterns.append('Client=(static|github)/.*')
+    # Set up the resources to manage everything *except* externally managed
+    # resources
+    externally_managed_patterns = (
+        await projects.get_externally_managed_resource_patterns()
+    )
 
-    em_bar = '|'.join(externally_managed_patterns)
+    # ..and except static clients and user-generatd clients
+    externally_managed_patterns.append("Client=(static|github)/.*")
+
+    em_bar = "|".join(externally_managed_patterns)
     resources.manage(re.compile(r"(?!{}).*".format(em_bar)))
 
     await projects.update_resources(resources)
