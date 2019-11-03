@@ -12,7 +12,7 @@ setup(
         "tc-admin~=2.2.0",
         "json-e~=3.0.0",
     ],
-    setup_requires=["pytest-runner", "flake8"],
-    tests_require=["pytest-mock", "pytest-asyncio", "flake8"],
+    setup_requires=["pytest-runner"],
+    tests_require=["pytest-mock", "pytest-asyncio"],
     classifiers=("Programming Language :: Python :: 3",),
 )
