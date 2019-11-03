@@ -288,7 +288,9 @@ misc:
       maxCapacity: 20
   grants:
     - grant: queue:create-task:highest:proj-misc/ci
-      to: repo:github.com/mozilla/*
+      to:
+        - repo:github.com/mozilla/*
+        - repo:github.com/djmitche/community-tc-config:*
 
 git-cinnabar:
   adminRoles:
