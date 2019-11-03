@@ -51,6 +51,19 @@ tasks:
               git checkout ${repo.ref} &&
               pip install black &&
               black --check generate
+        - image: 'python:3.6'
+          name: yamllint
+          command:
+            - /bin/bash
+            - '--login'
+            - '-c'
+            - >-
+              git clone ${repo.git_url} repo &&
+              cd repo &&
+              git config advice.detachedHead false &&
+              git checkout ${repo.ref} &&
+              pip install yamllint &&
+              yamllint config
     in:
       $let:
         test_tasks:

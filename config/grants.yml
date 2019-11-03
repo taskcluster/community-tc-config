@@ -9,7 +9,7 @@
 #   github-org-admin:<org> -- admins of the given org
 #   github-team:<org>/<team> -- members of the given team
 #   login-identity:<identity> -- a specfic user (try to avoid this!)
-#   repo:github.com/<org>/<repo>:<event> -- see 
+#   repo:github.com/<org>/<repo>:<event> -- see
 #      https://docs.taskcluster.net/docs/reference/integrations/github/taskcluster-yml-v1#scopes-and-roles
 #
 # Each item has:

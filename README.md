@@ -55,3 +55,15 @@ Such resources will be created and managed by this repository, but if they are r
 ### Code Style
 
 The Python code here follows [Black](https://black.readthedocs.io/en/stable/).
+
+```shell
+pip install black
+black generate
+```
+
+The YAML in `config/` is linted with `yamllint`'s "relaxed" preset, and without checking line length.
+
+```shell
+pip install yamllint
+yamllint config
+```
