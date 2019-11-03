@@ -172,7 +172,7 @@ bors-ng:
 servo:
   adminRoles: [github-team:servo/taskcluster-admins]
   externallyManaged: true
-  repos: 
+  repos:
     - github.com/servo/*
   workerPools:
     docker:
@@ -187,6 +187,13 @@ servo:
       type: standard_gcp_docker_worker
       minCapacity: 0
       maxCapacity: 6
+  grants:
+    - grant:
+        - queue:route:notify.irc-channel.#servo.*
+        - queue:route:tc-treeherder-staging.v2._/servo-*
+        - queue:route:tc-treeherder.v2._/servo-*
+      # Grant to admins, purpose-specific roles are externally managed
+      to: project-admin:servo
 
 firefoxreality:
   adminRoles:
