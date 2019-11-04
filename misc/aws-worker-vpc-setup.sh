@@ -44,7 +44,7 @@ for region in us-{west,east}-{1,2}; do
     done
 
     echo " security groups":
-    for name in no-inbound docker-worker; do
+    for name in no-inbound docker-worker ssh rdp; do
         groupId=$(aws ec2 describe-security-groups --region $region --filter "[{\"Name\": \"vpc-id\", \"Values\": [\"${vpcId}\"]}, {\"Name\": \"group-name\", \"Values\": [\"${name}\"]}]" | jq -r '.SecurityGroups[0].GroupId')
         if [ "$groupId" = "null" ]; then
             groupId=$(aws ec2 create-security-group --region $region --description $name --group-name $name --vpc-id $vpcId | jq -r ".GroupId")
@@ -57,6 +57,14 @@ for region in us-{west,east}-{1,2}; do
                 docker-worker)
                     # docker-worker allows incoming non-priv ports for livelog
                     aws ec2 authorize-security-group-ingress --region $region --group-id $groupId --protocol tcp --port 32768-65535 --cidr 0.0.0.0/0
+                    ;;
+                ssh)
+                    # docker-worker allows incoming non-priv ports for livelog
+                    aws ec2 authorize-security-group-ingress --region $region --group-id $groupId --protocol tcp --port 22 --cidr 0.0.0.0/0
+                    ;;
+                rdp)
+                    # docker-worker allows incoming non-priv ports for livelog
+                    aws ec2 authorize-security-group-ingress --region $region --group-id $groupId --protocol tcp --port 3389 --cidr 0.0.0.0/0
                     ;;
             esac
         fi
