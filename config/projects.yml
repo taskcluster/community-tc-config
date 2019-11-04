@@ -510,61 +510,73 @@ deepspeech:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - queue:claim-work:proj-deepspeech/ds-macos-light
         - queue:worker-id:proj-deepspeech/ds-macos-light-*
+        - auth:sentry:generic-worker
     worker/macos-light-2:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - queue:claim-work:proj-deepspeech/ds-macos-light
         - queue:worker-id:proj-deepspeech/ds-macos-light-*
+        - auth:sentry:generic-worker
     worker/macos-light-3:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - queue:claim-work:proj-deepspeech/ds-macos-light
         - queue:worker-id:proj-deepspeech/ds-macos-light-*
+        - auth:sentry:generic-worker
     worker/macos-light-4:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - queue:claim-work:proj-deepspeech/ds-macos-light
         - queue:worker-id:proj-deepspeech/ds-macos-light-*
+        - auth:sentry:generic-worker
     worker/macos-light-5:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - queue:claim-work:proj-deepspeech/ds-macos-light
         - queue:worker-id:proj-deepspeech/ds-macos-light-*
+        - auth:sentry:generic-worker
     worker/macos-light-6:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - queue:claim-work:proj-deepspeech/ds-macos-light
         - queue:worker-id:proj-deepspeech/ds-macos-light-*
+        - auth:sentry:generic-worker
     worker/macos-light-7:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - queue:claim-work:proj-deepspeech/ds-macos-light
         - queue:worker-id:proj-deepspeech/ds-macos-light-*
+        - auth:sentry:generic-worker
     worker/macos-light-8:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - queue:claim-work:proj-deepspeech/ds-macos-light
         - queue:worker-id:proj-deepspeech/ds-macos-light-*
+        - auth:sentry:generic-worker
     worker/macos-light-9:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - queue:claim-work:proj-deepspeech/ds-macos-light
         - queue:worker-id:proj-deepspeech/ds-macos-light-*
+        - auth:sentry:generic-worker
     worker/macos-light-10:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - queue:claim-work:proj-deepspeech/ds-macos-light
         - queue:worker-id:proj-deepspeech/ds-macos-light-*
+        - auth:sentry:generic-worker
     worker/macos-light-11:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - queue:claim-work:proj-deepspeech/ds-macos-light
         - queue:worker-id:proj-deepspeech/ds-macos-light-*
+        - auth:sentry:generic-worker
     worker/macos-light-12:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - queue:claim-work:proj-deepspeech/ds-macos-light
         - queue:worker-id:proj-deepspeech/ds-macos-light-*
+        - auth:sentry:generic-worker
     worker/pkguploader:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-scriptworker-*
