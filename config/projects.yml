@@ -549,6 +549,7 @@ deepspeech:
       - queue:scheduler-id:taskcluster-github
       - queue:route:index.project.deepspeech.*
       - queue:route:notify.irc-channel.*
+      - generic-worker:cache:deepspeech-*
       to:
         - repo:github.com/mozilla/DeepSpeech:*
         - repo:github.com/mozilla/tensorflow:*
