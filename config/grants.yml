@@ -59,6 +59,8 @@
     # project-specific workers
     - assume:worker-id:proj-<..>/*
     - queue:quarantine-worker:proj-<..>/*
+    - worker-manager:create-worker:proj-<..>/*
+    - worker-manager:remove-worker:proj-<..>/*
 
     # project-specific index routes
     - index:insert-task:project.<..>.*
@@ -66,8 +68,7 @@
 
     # project-specific worker pools and workers
     - worker-manager:manage-worker-pool:proj-<..>/*
-    - worker-manager:create-worker:proj-<..>/*
-    - worker-manager:remove-worker:proj-<..>/*
+    - assume:worker-pool:proj-<..>/*
 
     # project-specific worker pools secrets
     - secrets:get:worker-pool:proj-<..>/*
