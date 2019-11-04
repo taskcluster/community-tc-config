@@ -43,7 +43,7 @@
     - queue:create-task:high:proj-<..>/*
     - queue:create-task:very-high:proj-<..>/*
     - queue:create-task:highest:proj-<..>/*
-    - queue:quarantine-worker:proj-<..>/*
+    - queue:claim-work:proj-<..>/*
 
     # project-specific private artifacts
     - queue:get-artifact:project/<..>/*
@@ -56,14 +56,19 @@
     - hooks:modify-hook:project-<..>/*
     - hooks:trigger-hook:project-<..>/*
 
+    # project-specific workers
+    - assume:worker-id:proj-<..>/*
+    - queue:quarantine-worker:proj-<..>/*
+    - worker-manager:create-worker:proj-<..>/*
+    - worker-manager:remove-worker:proj-<..>/*
+
     # project-specific index routes
     - index:insert-task:project.<..>.*
     - queue:route:index.project.<..>.*
 
     # project-specific worker pools and workers
     - worker-manager:manage-worker-pool:proj-<..>/*
-    - worker-manager:create-worker:proj-<..>/*
-    - worker-manager:remove-worker:proj-<..>/*
+    - assume:worker-pool:proj-<..>/*
 
     # project-specific worker pools secrets
     - secrets:get:worker-pool:proj-<..>/*
@@ -108,6 +113,10 @@
 # workers in all pools
 - grant: auth:websocktunnel-token:communitytc/*
   to: worker-pool:*
+
+# Make assume:worker-id:<id> imply queue:worker-id:<id>
+- grant: "queue:worker-id:<..>"
+  to: "worker-id:*"
 
 # As a temporary measure until we invent a better solution, we allow a number
 # of lucky people to rerun, cancel, and schedule all tasks created by
