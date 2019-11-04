@@ -95,7 +95,7 @@ def build_worker_pool(workerPoolId, cfg):
         **wp)
 
 
-def base_google_config(*, minCapacity=0, maxCapacity=None, **cfg):
+def base_google_config(*, minCapacity=0, maxCapacity=None, machineType="zones/{zone}/machineTypes/n1-standard-4", **cfg):
     """
     Build a base config for a Google instance
 
@@ -111,7 +111,7 @@ def base_google_config(*, minCapacity=0, maxCapacity=None, **cfg):
             "launchConfigs": [
                 {
                     "capacityPerInstance": 1,
-                    "machineType": "zones/{}/machineTypes/n1-standard-4".format(zone),
+                    "machineType": machineType.format(zone=zone),
                     "region": region,
                     "zone": zone,
                     "scheduling": {
