@@ -616,9 +616,3 @@ webrender:
       to:
         - repo:github.com/servo/webrender:*
         - repo:github.com/staktrace/webrender:*
-    - grant:
-        - assume:worker-pool:proj-webrender/macos
-        - auth:sentry:generic-worker
-        - secrets:get:worker-pool:proj-webrender/*
-      to:
-        - project/webrender/macos
