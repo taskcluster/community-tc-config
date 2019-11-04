@@ -180,6 +180,7 @@ servo:
       emailOnError: false
       type: standard_gcp_docker_worker
       machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
+      diskSizeGb: 100
       minCapacity: 2
       maxCapacity: 20
     docker-untrusted:
@@ -187,6 +188,7 @@ servo:
       emailOnError: false
       type: standard_gcp_docker_worker
       machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
+      diskSizeGb: 100
       minCapacity: 0
       maxCapacity: 6
   grants:
