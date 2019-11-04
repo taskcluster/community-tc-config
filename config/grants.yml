@@ -129,3 +129,4 @@
     - github-team:taskcluster/core
     - login-identity:github/1038527|glandium
     - github-team:mozilla/research-machine-learning
+    - github-team:servo/taskcluster-admins
