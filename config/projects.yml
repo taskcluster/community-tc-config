@@ -127,7 +127,29 @@ taskcluster:
         - secrets:get:project/taskcluster/testing/docker-worker/pulse-creds
       to: repo:github.com/taskcluster/docker-worker:*
 
+    - grant:
+        - auth:create-client:project/taskcluster/smoketest/*
+        - auth:create-role:project:taskcluster:smoketest:*
+        - auth:delete-client:project/taskcluster/smoketest/*
+        - auth:delete-role:project:taskcluster:smoketest:*
+        - auth:reset-access-token:project/taskcluster/smoketest/*
+        - auth:update-client:project/taskcluster/smoketest/*
+        - auth:update-role:project:taskcluster:smoketest:*
+        - project:taskcluster:smoketest:*
+        - purge-cache:built-in/succeed:smoketest-cache
+        - queue:create-task:highest:built-in/*
+        - queue:create-task:highest:built-in/fail
+        - queue:create-task:highest:built-in/succeed
+        - queue:route:index.project.taskcluster.smoketest.*
+        - queue:scheduler-id:-
+        - secrets:get:project/taskcluster/smoketest/*
+        - secrets:set:project/taskcluster/smoketest/*
+      to: project:taskcluster:smoketests
+
   clients:
+    smoketests:
+      scopes:
+        - assume:project:taskcluster:smoketests
     docker-worker/ci:
       scopes:
         - assume:repo:github.com/taskcluster/docker-worker:*
@@ -153,12 +175,25 @@ servo:
   repos: 
     - github.com/servo/servo:*
   workerPools:
-    ci:
-      owner: nobody@mozilla.com
+    docker:
+      owner: servo-ops@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 2
+      maxCapacity: 20
+    docker-untrusted:
+      owner: servo-ops@mozilla.com
       emailOnError: false
       type: standard_gcp_docker_worker
       minCapacity: 0
-      maxCapacity: 2
+      maxCapacity: 6
+  grants:
+    - grant:
+        - queue:route:notify.irc-channel.#servo.*
+        - queue:route:tc-treeherder-staging.v2._/servo-*
+        - queue:route:tc-treeherder.v2._/servo-*
+      # Grant to admins, purpose-specific roles are externally managed
+      to: project-admin:servo
 
 firefoxreality:
   adminRoles:
@@ -297,6 +332,25 @@ git-cinnabar:
         - repo:github.com/glandium/git-cinnabar:branch:*
         - repo:github.com/glandium/git-cinnabar:tag:*
 
+    # glandium gets permission to access interactive sessions
+    - grant:
+        - queue:get-artifact:private/docker-worker/*
+      to:
+        - login-identity:github/1038527|glandium
+
+wpt:
+  adminRoles:
+    - github-team:web-platform-tests/admins
+  workerPools:
+    ci:
+      type: standard_gcp_docker_worker
+      maxCapacity: 40
+  repos:
+    - github.com/web-platform-tests/*
+  grants:
+    - grant: queue:create-task:highest:proj-wpt/ci
+      to: repo:github.com/web-platform-tests/wpt:*
+
 relman:
   adminRoles:
     - github-team:mozilla/release-management
@@ -333,6 +387,206 @@ relman:
         - docker-worker:capability:privileged
         - queue:route:statuses
       to: repo:github.com/mozilla/code-review:*
+
+deepspeech:
+  adminRoles:
+    - github-team:mozilla/research-machine-learning
+    # temporary until the mozilla org grants access
+    - login-identity:github/1645737|lissyx
+    - login-identity:github/477142|reuben
+  repos:
+    - github.com/mozilla/deepspeech
+    - github.com/mozilla/tensorflow
+  workerPools:
+    ci:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 0
+      maxCapacity: 3
+    win:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      type: aws_generic_worker_deepspeech_win
+      imageIds:
+        us-east-1: ami-06fe09656e2529efc
+        us-west-1: ami-0fa8f5d5f2441a296
+        us-west-2: ami-008a206b2da4e0a82
+      minCapacity: 0
+      maxCapacity: 5
+    win-b:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      type: aws_generic_worker_deepspeech_win
+      imageIds:
+        us-east-1: ami-0081dc6e528d277f6
+        us-west-1: ami-085a3abd95ca9301d
+        us-west-2: ami-01e9bc39c5157adc1
+      minCapacity: 0
+      maxCapacity: 5
+  clients:
+    worker/rpi3bp-1:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-rpi3-*
+        - queue:claim-work:proj-deepspeech/ds-rpi3
+        - queue:worker-id:proj-deepspeech/ds-rpi3-*
+    worker/rpi3bp-2:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-rpi3-*
+        - queue:claim-work:proj-deepspeech/ds-rpi3
+        - queue:worker-id:proj-deepspeech/ds-rpi3-*
+    worker/rpi3bp-3:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-rpi3-*
+        - queue:claim-work:proj-deepspeech/ds-rpi3
+        - queue:worker-id:proj-deepspeech/ds-rpi3-*
+    worker/rpi3bp-4:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-rpi3-*
+        - queue:claim-work:proj-deepspeech/ds-rpi3
+        - queue:worker-id:proj-deepspeech/ds-rpi3-*
+    worker/rpi3bp-5:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-rpi3-*
+        - queue:claim-work:proj-deepspeech/ds-rpi3
+        - queue:worker-id:proj-deepspeech/ds-rpi3-*
+    worker/rpi3bp-6:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-rpi3-*
+        - queue:claim-work:proj-deepspeech/ds-rpi3
+        - queue:worker-id:proj-deepspeech/ds-rpi3-*
+    worker/lepotato-1:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-lepotato-*
+        - queue:claim-work:proj-deepspeech/ds-lepotato
+        - queue:worker-id:proj-deepspeech/ds-lepotato-*
+    worker/lepotato-2:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-lepotato-*
+        - queue:claim-work:proj-deepspeech/ds-lepotato
+        - queue:worker-id:proj-deepspeech/ds-lepotato-*
+    worker/lepotato-3:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-lepotato-*
+        - queue:claim-work:proj-deepspeech/ds-lepotato
+        - queue:worker-id:proj-deepspeech/ds-lepotato-*
+    worker/lepotato-4:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-lepotato-*
+        - queue:claim-work:proj-deepspeech/ds-lepotato
+        - queue:worker-id:proj-deepspeech/ds-lepotato-*
+    worker/lepotato-5:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-lepotato-*
+        - queue:claim-work:proj-deepspeech/ds-lepotato
+        - queue:worker-id:proj-deepspeech/ds-lepotato-*
+    worker/lepotato-6:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-lepotato-*
+        - queue:claim-work:proj-deepspeech/ds-lepotato
+        - queue:worker-id:proj-deepspeech/ds-lepotato-*
+    worker/macos-heavy-1:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-heavy-*
+        - queue:claim-work:proj-deepspeech/ds-macos-heavy
+        - queue:worker-id:proj-deepspeech/ds-macos-heavy-*
+    worker/macos-heavy-2:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-heavy-*
+        - queue:claim-work:proj-deepspeech/ds-macos-heavy
+        - queue:worker-id:proj-deepspeech/ds-macos-heavy-*
+    worker/macos-heavy-3:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-heavy-*
+        - queue:claim-work:proj-deepspeech/ds-macos-heavy
+        - queue:worker-id:proj-deepspeech/ds-macos-heavy-*
+    worker/macos-heavy-4:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-heavy-*
+        - queue:claim-work:proj-deepspeech/ds-macos-heavy
+        - queue:worker-id:proj-deepspeech/ds-macos-heavy-*
+    worker/macos-light-1:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-2:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-3:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-4:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-5:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-6:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-7:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-8:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-9:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-10:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-11:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-12:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/pkguploader:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-scriptworker-*
+        - queue:claim-work:proj-deepspeech/ds-scriptworker
+        - queue:worker-id:proj-deepspeech/ds-scriptworker-*
+  grants:
+    - grant:
+      - queue:create-task:highest:proj-deepspeech/*
+      # decision task:
+        # https://github.com/mozilla/tensorflow/blob/master/tc-schedule.sh
+        # =>
+        # https://github.com/lissyx/taskcluster-github-decision/blob/master/tc-decision.py
+      - queue:scheduler-id:taskcluster-github
+      - queue:route:index.project.deepspeech.*
+      - queue:route:notify.irc-channel.*
+      to:
+        - repo:github.com/mozilla/deepspeech:*
+        - repo:github.com/mozilla/tensorflow:*
+    - grant:
+      - generic-worker:allow-rdp:proj-deepspeech/*
+      to:
+        - project-admin:deepspeech
 
 webrender:
   adminRoles:
