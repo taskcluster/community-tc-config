@@ -207,8 +207,8 @@ firefoxreality:
   adminRoles:
     - github-org-admin:MozillaReality
   repos:
-    - github.com/MozillaReality/FirefoxReality
-    - github.com/MozillaReality/FirefoxRealityPC
+    - github.com/MozillaReality/FirefoxReality:*
+    - github.com/MozillaReality/FirefoxRealityPC:*
   workerPools:
     ci-linux:
       owner: nobody@mozilla.com
@@ -288,6 +288,8 @@ misc:
 git-cinnabar:
   adminRoles:
     - login-identity:github/1038527|glandium
+  repos:
+    - github.com/glandium/git-cinnabar:*
   workerPools:
     ci:
       type: standard_gcp_docker_worker
