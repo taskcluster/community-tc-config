@@ -425,27 +425,147 @@ deepspeech:
       minCapacity: 0
       maxCapacity: 5
   clients:
-    ds-rpi3:
+    worker/rpi3bp-1:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-rpi3-*
         - queue:claim-work:proj-deepspeech/ds-rpi3
         - queue:worker-id:proj-deepspeech/ds-rpi3-*
-    ds-lepotato:
+    worker/rpi3bp-2:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-rpi3-*
+        - queue:claim-work:proj-deepspeech/ds-rpi3
+        - queue:worker-id:proj-deepspeech/ds-rpi3-*
+    worker/rpi3bp-3:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-rpi3-*
+        - queue:claim-work:proj-deepspeech/ds-rpi3
+        - queue:worker-id:proj-deepspeech/ds-rpi3-*
+    worker/rpi3bp-4:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-rpi3-*
+        - queue:claim-work:proj-deepspeech/ds-rpi3
+        - queue:worker-id:proj-deepspeech/ds-rpi3-*
+    worker/rpi3bp-5:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-rpi3-*
+        - queue:claim-work:proj-deepspeech/ds-rpi3
+        - queue:worker-id:proj-deepspeech/ds-rpi3-*
+    worker/rpi3bp-6:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-rpi3-*
+        - queue:claim-work:proj-deepspeech/ds-rpi3
+        - queue:worker-id:proj-deepspeech/ds-rpi3-*
+    worker/lepotato-1:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-lepotato-*
         - queue:claim-work:proj-deepspeech/ds-lepotato
         - queue:worker-id:proj-deepspeech/ds-lepotato-*
-    ds-macos-heavy:
+    worker/lepotato-2:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-lepotato-*
+        - queue:claim-work:proj-deepspeech/ds-lepotato
+        - queue:worker-id:proj-deepspeech/ds-lepotato-*
+    worker/lepotato-3:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-lepotato-*
+        - queue:claim-work:proj-deepspeech/ds-lepotato
+        - queue:worker-id:proj-deepspeech/ds-lepotato-*
+    worker/lepotato-4:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-lepotato-*
+        - queue:claim-work:proj-deepspeech/ds-lepotato
+        - queue:worker-id:proj-deepspeech/ds-lepotato-*
+    worker/lepotato-5:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-lepotato-*
+        - queue:claim-work:proj-deepspeech/ds-lepotato
+        - queue:worker-id:proj-deepspeech/ds-lepotato-*
+    worker/lepotato-6:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-lepotato-*
+        - queue:claim-work:proj-deepspeech/ds-lepotato
+        - queue:worker-id:proj-deepspeech/ds-lepotato-*
+    worker/macos-heavy-1:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-heavy-*
         - queue:claim-work:proj-deepspeech/ds-macos-heavy
         - queue:worker-id:proj-deepspeech/ds-macos-heavy-*
-    ds-macos-light:
+    worker/macos-heavy-2:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-heavy-*
+        - queue:claim-work:proj-deepspeech/ds-macos-heavy
+        - queue:worker-id:proj-deepspeech/ds-macos-heavy-*
+    worker/macos-heavy-3:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-heavy-*
+        - queue:claim-work:proj-deepspeech/ds-macos-heavy
+        - queue:worker-id:proj-deepspeech/ds-macos-heavy-*
+    worker/macos-heavy-4:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-heavy-*
+        - queue:claim-work:proj-deepspeech/ds-macos-heavy
+        - queue:worker-id:proj-deepspeech/ds-macos-heavy-*
+    worker/macos-light-1:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - queue:claim-work:proj-deepspeech/ds-macos-light
         - queue:worker-id:proj-deepspeech/ds-macos-light-*
-    ds-pkguploader:
+    worker/macos-light-2:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-3:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-4:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-5:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-6:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-7:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-8:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-9:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-10:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-11:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/macos-light-12:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-*
+        - queue:claim-work:proj-deepspeech/ds-macos-light
+        - queue:worker-id:proj-deepspeech/ds-macos-light-*
+    worker/pkguploader:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-scriptworker-*
         - queue:claim-work:proj-deepspeech/ds-scriptworker
