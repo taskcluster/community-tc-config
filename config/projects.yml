@@ -350,7 +350,7 @@ wpt:
 
 relman:
   adminRoles:
-    - github-team:mozilla/release-management
+    - github-team:mozilla/sallt
   workerPools:
     ci:
       owner: mcastelluccio@mozilla.com
