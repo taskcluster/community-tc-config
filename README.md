@@ -25,7 +25,7 @@ Begin by installing this app by running `pip install -e .` in this directory.
 Then, run
 
 ```
-TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com tc-admin diff
+TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com tc-admin diff --without-secrets
 ```
 
 This will show you the current difference between what's defined in your local repository and the runtime configuration of the deployment.
