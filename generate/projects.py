@@ -8,7 +8,7 @@ import jsone
 import attr
 import re
 
-from tcadmin.resources import Role, Client, WorkerPool
+from tcadmin.resources import Role, Client, WorkerPool, Secret
 from tcadmin.util.config import ConfigDict
 from .loader import loader
 from .workers import build_worker_pool
@@ -33,6 +33,7 @@ class Projects(ConfigDict):
         workerPools = attr.ib(type=dict, factory=lambda: {})
         clients = attr.ib(type=dict, factory=lambda: {})
         grants = attr.ib(type=list, factory=lambda: [])
+        secrets = attr.ib(type=dict, factory=lambda: [])
         externallyManaged = attr.ib(type=bool, default=False)
 
 
@@ -60,8 +61,10 @@ async def update_resources(resources):
                 worker_pool_id = 'proj-{}/{}'.format(project.name, name)
                 if project.externallyManaged:
                     resources.manage('WorkerPool={}'.format(worker_pool_id))
+                    resources.manage('Secret=worker-pool:{}'.format(worker_pool_id))
                 worker_pool['description'] = "Workers for " + project.name
                 resources.add(build_worker_pool(worker_pool_id, worker_pool))
+                resources.add(Secret(name='worker-pool:{}'.format(worker_pool_id)))
         if project.clients:
             for name, info in project.clients.items():
                 clientId = 'project/{}/{}'.format(project.name, name)
@@ -73,6 +76,13 @@ async def update_resources(resources):
                     clientId=clientId,
                     description=description,
                     scopes=scopes))
+        if project.secrets:
+            for nameSuffix, info in project.secrets.items():
+                assert info is True, "secrets must have the form <nameSuffix>: true"
+                name = 'project/{}/{}'.format(project.name, nameSuffix)
+                if project.externallyManaged:
+                    resources.manage('Secret={}'.format(name))
+                resources.add(Secret(name=name))
         for grant in Grants.from_project(project):
             grant.update_resources(resources)
 
@@ -90,8 +100,10 @@ async def get_externally_managed_resource_patterns():
         patterns.append(r"Role=project:{}:.*".format(name))
         patterns.append(r"Client=project/{}/.*".format(name))
         patterns.append(r"WorkerPool=proj-{}/.*".format(name))
+        patterns.append(r"Secret=worker-pool:proj-{}/.*".format(name))
         patterns.append(r"Hook=project-{}/.*".format(name))
         patterns.append(r"Role=hook-id:project-{}/.*".format(name))
+        patterns.append(r"Secret=project/{}/.*".format(name))
 
         # this corresponds to repo-admin:*
         for repo in project.repos:

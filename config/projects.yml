@@ -31,6 +31,12 @@
 #       type: <name of a function in `generate/workers.py`)
 #       ..: ..  # arguments to that function
 #
+#   secrets:
+#     # secrets are just asserted to exist; at the moment this repo does not support
+#     # managing secret *values*.  However, this is a great place to comment on the
+#     # content of the secret.
+#     <name-suffix>: true  # suffix after `project/<project-name>/`
+#
 #   clients:
 #     <clientId-suffix>:  # suffix after `project/<project-name>/`
 #       scopes: [ .. ]
@@ -154,6 +160,19 @@ taskcluster:
     docker-worker/ci:
       scopes:
         - assume:repo:github.com/taskcluster/docker-worker:*
+  secrets:
+    # codecov API token
+    testing/codecov: true
+    # client_id/access_token for project/taskcluster/testing/docker-worker/ci-creds
+    testing/docker-worker/ci-creds: true
+    # AZURE_ACCOUNT / AZURE_ACCOUNT_KEY for a testing account
+    testing/azure: true
+    # additional secrets for services' tests (see services/<service>/test/helper.js)
+    testing/taskcluster-auth: true
+    testing/taskcluster-notify: true
+    testing/taskcluster-queue: true
+    # key for deploying json-e docs
+    json-e-deploy: true
 
 bors-ng:
   adminRoles: []
@@ -212,6 +231,16 @@ firefoxreality:
   repos:
     - github.com/MozillaReality/FirefoxReality:*
     - github.com/MozillaReality/FirefoxRealityPC:*
+  secrets:
+    # FirefoxReality secrets
+    fr/github-deploy-key: true
+    fr/release-signing-token: true
+    fr/staging-signing-token: true
+    fr/symbols-token: true
+
+    # FirefoxRealityPC secrets
+    frpc/github-deploy-key: true
+    frpc/unity-config: true
   workerPools:
     ci-linux:
       owner: nobody@mozilla.com
@@ -294,6 +323,8 @@ git-cinnabar:
     - login-identity:github/1038527|glandium
   repos:
     - github.com/glandium/git-cinnabar:*
+  secrets:
+    codecov: true
   workerPools:
     ci:
       type: standard_gcp_docker_worker
@@ -598,3 +629,5 @@ webrender:
       to:
         - repo:github.com/servo/webrender:*
         - repo:github.com/staktrace/webrender:*
+  secrets:
+    wrupdater-github-token: true
