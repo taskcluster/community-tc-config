@@ -355,6 +355,13 @@ wpt:
 relman:
   adminRoles:
     - github-team:mozilla/sallt
+  repos:
+    - github.com/mozilla/bugbug:*
+    - github.com/mozilla/microannotate:*
+    - github.com/mozilla/task-boot:*
+    - github.com/mozilla/code-coverage:*
+    - github.com/mozilla/code-review:*
+    - github.com/mozilla/rust-code-analysis:*
   workerPools:
     ci:
       owner: mcastelluccio@mozilla.com
@@ -370,6 +377,7 @@ relman:
         - repo:github.com/mozilla/task-boot:*
         - repo:github.com/mozilla/code-coverage:*
         - repo:github.com/mozilla/code-review:*
+        - repo:github.com/mozilla/rust-code-analysis:*
     - grant:
         - docker-worker:cache:bugbug-build
         - docker-worker:cache:bugbug-mercurial-repository
