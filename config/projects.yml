@@ -58,7 +58,6 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
       type: standard_gcp_docker_worker
-      image: projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2019-11-04t22-31-35z
       minCapacity: 1
       maxCapacity: 20
       privileged: true

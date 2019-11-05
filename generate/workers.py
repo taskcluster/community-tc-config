@@ -66,7 +66,7 @@ GOOGLE_PROVIDER = "community-tc-workers-google"
 
 DEFAUlT_GOOGLE_DOCKER_WORKER_IMAGE = (
     "projects/taskcluster-imaging/global/images/"
-    + "docker-worker-gcp-googlecompute-2019-10-08t02-31-36z"
+    + "docker-worker-gcp-googlecompute-2019-11-04t22-31-35z"
 )
 
 GOOGLE_REGIONS_ZONES = {
