@@ -147,4 +147,4 @@
     - github-org-admin:MozillaReality
 
     # for servo
-    - github-team:servo/taskcluster-admins
+    - project-admin:servo
