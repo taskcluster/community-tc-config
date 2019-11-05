@@ -370,6 +370,7 @@ relman:
         - repo:github.com/mozilla/task-boot:*
         - repo:github.com/mozilla/code-coverage:*
         - repo:github.com/mozilla/code-review:*
+        - repo:github.com/mozilla/rust-code-analysis:*
     - grant:
         - docker-worker:cache:bugbug-build
         - docker-worker:cache:bugbug-mercurial-repository
