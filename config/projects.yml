@@ -191,7 +191,7 @@ bors-ng:
 servo:
   adminRoles: [github-team:servo/taskcluster-admins]
   externallyManaged: true
-  repos: 
+  repos:
     - github.com/servo/servo:*
   workerPools:
     docker:
@@ -583,20 +583,20 @@ deepspeech:
         - assume:worker-pool:proj-deepspeech/ds-scriptworker
   grants:
     - grant:
-      - queue:create-task:highest:proj-deepspeech/*
-      # decision task:
+        - queue:create-task:highest:proj-deepspeech/*
+        # decision task:
         # https://github.com/mozilla/tensorflow/blob/master/tc-schedule.sh
         # =>
         # https://github.com/lissyx/taskcluster-github-decision/blob/master/tc-decision.py
-      - queue:scheduler-id:taskcluster-github
-      - queue:route:index.project.deepspeech.*
-      - queue:route:notify.irc-channel.*
-      - generic-worker:cache:deepspeech-*
+        - queue:scheduler-id:taskcluster-github
+        - queue:route:index.project.deepspeech.*
+        - queue:route:notify.irc-channel.*
+        - generic-worker:cache:deepspeech-*
       to:
         - repo:github.com/mozilla/DeepSpeech:*
         - repo:github.com/mozilla/tensorflow:*
     - grant:
-      - generic-worker:allow-rdp:proj-deepspeech/*
+        - generic-worker:allow-rdp:proj-deepspeech/*
       to:
         - project-admin:deepspeech
 
