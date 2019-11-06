@@ -123,11 +123,13 @@
 
 # As a temporary measure until we invent a better solution, we allow a number
 # of lucky people to rerun, cancel, and schedule all tasks created by
-# taskcluster-github.
+# taskcluster-github, and to create tasks with that schedulerId (e.g., for
+# interactive)
 - grant:
     - queue:cancel-task:taskcluster-github/*
     - queue:schedule-task:taskcluster-github/*
     - queue:rerun-task:taskcluster-github/*
+    - queue:scheduler-id:taskcluster-github
   to:
     # note, specific users are temporary until mozilla org grants permissions
     # to read teams, https://bugzilla.mozilla.org/show_bug.cgi?id=1593632
@@ -146,5 +148,6 @@
     # for firefoxreality
     - github-org-admin:MozillaReality
 
-    # for servo
+    # for a few project admins
     - project-admin:servo
+    - project-admin:wpt
