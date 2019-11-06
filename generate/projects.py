@@ -7,7 +7,7 @@
 import attr
 import re
 
-from tcadmin.resources import Role, Client, WorkerPool, Secret
+from tcadmin.resources import Role, Client, WorkerPool, Secret, Hook
 from tcadmin.util.config import ConfigDict
 from .loader import loader
 from .workers import build_worker_pool
@@ -32,7 +32,8 @@ class Projects(ConfigDict):
         workerPools = attr.ib(type=dict, factory=lambda: {})
         clients = attr.ib(type=dict, factory=lambda: {})
         grants = attr.ib(type=list, factory=lambda: [])
-        secrets = attr.ib(type=dict, factory=lambda: [])
+        secrets = attr.ib(type=dict, factory=lambda: {})
+        hooks = attr.ib(type=dict, factory=lambda: {})
         externallyManaged = attr.ib(type=bool, default=False)
 
 
@@ -89,6 +90,28 @@ async def update_resources(resources):
                 if project.externallyManaged:
                     resources.manage("Secret={}".format(name))
                 resources.add(Secret(name=name))
+        if project.hooks:
+            for hookId, info in project.hooks.items():
+                hookGroupId = "project-{}".format(project.name)
+                if project.externallyManaged:
+                    resources.manage("Hook={}/{}".format(hookGroupid, hookId))
+                assert (
+                    "bindings" not in info
+                ), "Please add support for bindings to use this feature"
+                resources.add(
+                    Hook(
+                        hookGroupId=hookGroupId,
+                        hookId=hookId,
+                        name=info.get("name", hookId),
+                        description=info.get("description", ""),
+                        owner=info["owner"],
+                        emailOnError=info.get("emailOnError", False),
+                        schedule=info.get("schedule", ()),
+                        bindings=info.get("bindings", ()),
+                        task=info["task"],
+                        triggerSchema=info.get("triggerSchema", {}),
+                    )
+                )
         for grant in Grants.from_project(project):
             grant.update_resources(resources)
 
