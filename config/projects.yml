@@ -443,7 +443,7 @@ deepspeech:
       type: standard_gcp_docker_worker
       minCapacity: 0
       maxCapacity: 96
-      machineType: "zones/{zone}/machineTypes/n1-standard-32"
+      machineType: "zones/{zone}/machineTypes/n2-highcpu-32"
     win:
       owner: deepspeech@mozilla.com
       emailOnError: false
