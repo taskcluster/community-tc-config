@@ -148,5 +148,6 @@
     # for firefoxreality
     - github-org-admin:MozillaReality
 
-    # for servo
+    # for a few project admins
     - project-admin:servo
+    - project-admin:wpt
