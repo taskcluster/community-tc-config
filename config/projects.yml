@@ -625,6 +625,7 @@ webrender:
     - grant:
         - queue:create-task:highest:proj-webrender/ci-linux
         - queue:create-task:highest:proj-webrender/ci-macos
+        - queue:route:index.project.webrender.ci.*
       to:
         - repo:github.com/servo/webrender:*
         - repo:github.com/staktrace/webrender:*
