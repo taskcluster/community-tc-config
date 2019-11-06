@@ -130,6 +130,7 @@
     - queue:schedule-task:taskcluster-github/*
     - queue:rerun-task:taskcluster-github/*
     - queue:scheduler-id:taskcluster-github
+    - queue:get-artifact:private/docker-worker/*
   to:
     # note, specific users are temporary until mozilla org grants permissions
     # to read teams, https://bugzilla.mozilla.org/show_bug.cgi?id=1593632
