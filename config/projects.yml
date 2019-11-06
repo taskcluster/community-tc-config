@@ -397,6 +397,22 @@ relman:
       minCapacity: 1
       maxCapacity: 50
       privileged: true
+    ci-compute:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 1
+      maxCapacity: 25
+      machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
+      privileged: true
+    ci-memory:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 1
+      maxCapacity: 25
+      machineType: "zones/{zone}/machineTypes/n1-highmem-2"
+      privileged: true
   secrets:
     bugbug/deploy: true
     bugbug/integration: true
