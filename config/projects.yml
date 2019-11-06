@@ -212,9 +212,6 @@ servo:
       maxCapacity: 6
   grants:
     - grant:
-        # this is the scheduler-id for basically everything in this deployment
-        - queue:scheduler-id:taskcluster-github
-
         # notification
         - queue:route:notify.irc-channel.#servo.*
 
