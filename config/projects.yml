@@ -708,7 +708,6 @@ deepspeech:
         - repo:github.com/mozilla/tensorflow:*
     - grant:
         - generic-worker:allow-rdp:proj-deepspeech/*
-        - secrets:get:project/deepspeech/ssh-keys/*
       to:
         - project-admin:deepspeech
   secrets:
