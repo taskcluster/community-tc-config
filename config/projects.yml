@@ -578,6 +578,8 @@ deepspeech:
       owner: deepspeech@mozilla.com
       emailOnError: false
       type: aws_generic_worker_deepspeech_win
+      # these were generated from
+      # https://github.com/taskcluster/generic-worker/tree/94da59be253c63aea8f11e0f4929ab74f411f61b/worker_types/deepspeech-win
       imageIds:
         us-east-1: ami-00ac6736f325c15b8
         us-west-1: ami-000f332719212504f
@@ -588,6 +590,8 @@ deepspeech:
       owner: deepspeech@mozilla.com
       emailOnError: false
       type: aws_generic_worker_deepspeech_win
+      # these were generated from
+      # https://github.com/taskcluster/generic-worker/tree/94da59be253c63aea8f11e0f4929ab74f411f61b/worker_types/deepspeech-win
       imageIds:
         us-east-1: ami-00ac6736f325c15b8
         us-west-1: ami-000f332719212504f
