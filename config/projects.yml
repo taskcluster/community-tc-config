@@ -440,6 +440,7 @@ relman:
   repos:
     - github.com/mozilla/bugbug:*
     - github.com/mozilla/microannotate:*
+    - github.com/mozilla/bugzilla-dashboard-backend:*
     - github.com/mozilla/task-boot:*
     - github.com/mozilla/code-coverage:*
     - github.com/mozilla/code-review:*
@@ -495,9 +496,9 @@ relman:
         - repo:github.com/mozilla/code-coverage:*
         - repo:github.com/mozilla/code-review:*
         - repo:github.com/mozilla/rust-code-analysis:*
-        - repo:github.com/mozilla/bugzilla-dashboard-backend-production:*
+        - repo:github.com/mozilla/bugzilla-dashboard-backend:*
 
-    # bugzilla-dashboard-backend-production
+    # bugzilla-dashboard-backend
     - grant: docker-worker:capability:privileged
       to: repo:github.com/mozilla/bugzilla-dashboard-backend:*
     - grant: secrets:get:project/relman/bugzilla-dashboard-backend/deploy-production
