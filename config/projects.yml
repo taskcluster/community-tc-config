@@ -370,7 +370,7 @@ misc:
         - queue:route:index.project.misc.jcristau.*
         - queue:route:notify.email.jcristau@mozilla.com.*
       to:
-        - hook-id:proj-misc/jcristau-fx-release-metrics
+        - hook-id:project-misc/jcristau-fx-release-metrics
 
 git-cinnabar:
   adminRoles:
