@@ -312,6 +312,7 @@ misc:
   repos:
     - github.com/mozilla/*
     - github.com/marco-c/taskcluster_yml_validator:*
+    - github.com/mozilla/one-off-system-add-ons:*
   workerPools:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
