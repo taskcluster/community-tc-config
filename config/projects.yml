@@ -369,6 +369,7 @@ misc:
         - queue:create-task:highest:proj-misc/ci
         - queue:route:index.project.misc.jcristau.*
         - queue:route:notify.email.jcristau@mozilla.com.*
+        - queue:scheduler-id:-
       to:
         - hook-id:project-misc/jcristau-fx-release-metrics
 
