@@ -444,6 +444,7 @@ wpt:
 relman:
   adminRoles:
     - github-team:mozilla/sallt
+  externallyManaged: true # bugbug deploys some hooks into this space
   repos:
     - github.com/mozilla/bugbug:*
     - github.com/mozilla/microannotate:*
