@@ -369,8 +369,14 @@ misc:
         - queue:create-task:highest:proj-misc/ci
         - queue:route:index.project.misc.jcristau.*
         - queue:route:notify.email.jcristau@mozilla.com.*
+        - queue:scheduler-id:-
       to:
         - hook-id:project-misc/jcristau-fx-release-metrics
+    # allow jcristau to trigger the release-metrics hook directly
+    - grant:
+        - hooks:trigger-hook:project-misc/jcristau-fx-release-metrics
+      to:
+        - login-identity:github/3703806|jcristau
 
 git-cinnabar:
   adminRoles:
