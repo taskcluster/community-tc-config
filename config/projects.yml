@@ -341,7 +341,7 @@ misc:
               git clone https://github.com/jcristau/fx-release-metrics/ &&
               cd fx-release-metrics &&
               python3 run-taskcluster.py
-          maxRunTime: 600
+          maxRunTime: 1200
           artifacts:
             public/results.json:
               type: file
