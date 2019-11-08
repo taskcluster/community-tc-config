@@ -372,6 +372,11 @@ misc:
         - queue:scheduler-id:-
       to:
         - hook-id:project-misc/jcristau-fx-release-metrics
+    # allow jcristau to trigger the release-metrics hook directly
+    - grant:
+        - hooks:trigger-hook:project-misc/jcristau-fx-release-metrics
+      to:
+        - login-identity:github/3703806|jcristau
 
 git-cinnabar:
   adminRoles:
