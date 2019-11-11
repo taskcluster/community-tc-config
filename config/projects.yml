@@ -512,6 +512,12 @@ relman:
         - repo:github.com/mozilla/dump_syms:*
         - repo:github.com/mozilla/libmozevent:*
 
+    # all hooks
+    - grant:
+        - queue:scheduler-id:-
+        - queue:create-task:highest:proj-relman/ci
+      to: hook-id:project-relman/*
+
     # bugzilla-dashboard-backend
     - grant: docker-worker:capability:privileged
       to: repo:github.com/mozilla/bugzilla-dashboard-backend:*
@@ -543,6 +549,11 @@ relman:
       to: project:relman:bugbug/deploy
     - grant: assume:project:relman:bugbug/deploy
       to: repo:github.com/mozilla/bugbug:tag:*
+    - grant:
+        - "queue:route:notify.email.release-mgmt-analysis@mozilla.com.on-failed"
+        - "queue:route:notify.irc-channel.#bugbug.on-failed"
+        - "queue:route:index.project.relman.bugbug.data-pipeline-start"
+      to: hook-id:project-relman/bugbug*
 
     # task-boot
     - grant: docker-worker:capability:privileged
