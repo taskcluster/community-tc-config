@@ -445,6 +445,8 @@ wpt:
 relman:
   adminRoles:
     - github-team:mozilla/sallt
+    # temporary until opsec approves the integration for the "mozilla" org
+    - login-identity:github/1616846|marco-c
   externallyManaged: true # bugbug deploys some hooks into this space
   repos:
     - github.com/mozilla/bugbug:*

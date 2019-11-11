@@ -152,3 +152,6 @@
     # for a few project admins
     - project-admin:servo
     - project-admin:wpt
+
+    # for relman
+    - project-admin:relman
