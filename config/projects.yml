@@ -454,6 +454,7 @@ relman:
     - github.com/mozilla/code-review:*
     - github.com/mozilla/rust-code-analysis:*
     - github.com/mozilla/dump_syms:*
+    - github.com/mozilla/libmozevent:*
   workerPools:
     ci:
       owner: mcastelluccio@mozilla.com
@@ -493,6 +494,7 @@ relman:
     code-review/deploy-testing: true
     microannotate/deploy: true
     taskboot/deploy: true
+    libmozevent/deploy: true
   grants:
     # all repos
     - grant:
@@ -507,6 +509,7 @@ relman:
         - repo:github.com/mozilla/rust-code-analysis:*
         - repo:github.com/mozilla/bugzilla-dashboard-backend:*
         - repo:github.com/mozilla/dump_syms:*
+        - repo:github.com/mozilla/libmozevent:*
 
     # bugzilla-dashboard-backend
     - grant: docker-worker:capability:privileged
@@ -567,6 +570,11 @@ relman:
     # micoannotate
     - grant: secrets:get:project/relman/microannotate/deploy
       to: repo:github.com/mozilla/microannotate:tag:*
+
+    # libmozevent
+    - grant: secrets:get:project/relman/libmozevent/deploy
+      to:
+        - repo:github.com/mozilla/libmozevent:tag:*
 
 deepspeech:
   adminRoles:
