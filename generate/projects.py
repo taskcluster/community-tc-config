@@ -115,7 +115,7 @@ async def update_resources(resources):
         for grant in Grants.from_project(project):
             if project.externallyManaged:
                 for role in grant.to:
-                    resources.manage('Role=' + re.escape(role))
+                    resources.manage("Role=" + re.escape(role))
             grant.update_resources(resources)
 
 
