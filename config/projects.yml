@@ -515,7 +515,7 @@ relman:
     # all hooks
     - grant:
         - queue:scheduler-id:-
-        - queue:create-task:highest:proj-relman/ci
+        - queue:create-task:highest:proj-relman/*
       to: hook-id:project-relman/*
 
     # bugzilla-dashboard-backend
@@ -532,8 +532,12 @@ relman:
         - docker-worker:cache:bugbug-mercurial-repository
         - docker-worker:capability:privileged
         - secrets:get:project/relman/bugbug/integration
-      to: repo:github.com/mozilla/bugbug:*
+      to: assume:project:relman:bugbug/build
     - grant:
+        - secrets:get:project/relman/bugbug/deploy
+      to: project:relman:bugbug/deploy
+    - grant:
+        - assume:project:relman:bugbug/deploy
         - assume:hook-id:project-relman/bugbug
         - assume:hook-id:project-relman/bugbug-annotate
         - assume:hook-id:project-relman/bugbug-checks
@@ -543,16 +547,21 @@ relman:
         - hooks:modify-hook:project-relman/bugbug-checks
         - hooks:modify-hook:project-relman/bugbug-classify-patch
         - queue:route:notify.pulse.route.project.relman.bugbug.deploy_ending.*
-        - queue:route:project.relman.bugbug.deploy_ending
-        - queue:route:project.relman.bugbug.deploy_ending.*
-        - secrets:get:project/relman/bugbug/deploy
-      to: project:relman:bugbug/deploy
-    - grant: assume:project:relman:bugbug/deploy
+        - queue:route:project.relman.bugbug.deploy_ending*
+      to: project:relman:bugbug/deploy_taskcluster
+    - grant: assume:project:relman:bugbug/build
+      to: repo:github.com/mozilla/bugbug:*
+    # The build scopes for the tag will come from the previous rule.
+    - grant: assume:project:relman:bugbug/deploy_taskcluster
       to: repo:github.com/mozilla/bugbug:tag:*
     - grant:
-        - "queue:route:notify.email.release-mgmt-analysis@mozilla.com.on-failed"
-        - "queue:route:notify.irc-channel.#bugbug.on-failed"
-        - "queue:route:index.project.relman.bugbug.data-pipeline-start"
+        - assume:project:relman:bugbug/build
+        - assume:project:relman:bugbug/deploy
+        - hooks:trigger-hook:project-relman/bugbug*
+        - queue:route:notify.email.release-mgmt-analysis@mozilla.com.on-failed
+        - queue:route:notify.irc-channel.#bugbug.on-failed
+        - queue:route:index.project.relman.bugbug*
+        - secrets:get:project/relman/bugbug/production
       to: hook-id:project-relman/bugbug*
 
     # task-boot
