@@ -545,8 +545,7 @@ relman:
         - hooks:modify-hook:project-relman/bugbug-checks
         - hooks:modify-hook:project-relman/bugbug-classify-patch
         - queue:route:notify.pulse.route.project.relman.bugbug.deploy_ending.*
-        - queue:route:project.relman.bugbug.deploy_ending
-        - queue:route:project.relman.bugbug.deploy_ending.*
+        - queue:route:project.relman.bugbug.deploy_ending*
         - secrets:get:project/relman/bugbug/deploy
       to: project:relman:bugbug/deploy
     - grant: assume:project:relman:bugbug/build
@@ -560,8 +559,7 @@ relman:
         - hooks:trigger-hook:project-relman/bugbug*
         - queue:route:notify.email.release-mgmt-analysis@mozilla.com.on-failed
         - queue:route:notify.irc-channel.#bugbug.on-failed
-        - queue:route:index.project.relman.bugbug.*
-        - queue:route:index.project.relman.bugbug_annotate.*
+        - queue:route:index.project.relman.bugbug*
         - secrets:get:project/relman/bugbug/production
       to: hook-id:project-relman/bugbug*
 
