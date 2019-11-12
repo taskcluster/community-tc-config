@@ -102,43 +102,30 @@ taskcluster:
     - grant:
         - assume:project:taskcluster:worker-test-scopes
         - assume:worker-id:docker-worker/docker-worker
-        - auth:sentry:test-dummy-worker
-        - auth:statsum:test-dummy-worker
         - aws-provisioner:create-secret:*
         - docker-worker:cache:docker-worker-garbage-*
-        - docker-worker:cache:docker-worker-garbage-caches-test-cache
-        - docker-worker:cache:docker-worker-garbage-caches-tmp-obj-dir
         - docker-worker:capability:device:loopbackAudio
         - docker-worker:capability:device:loopbackVideo
         - docker-worker:capability:privileged
         - docker-worker:feature:balrogStageVPNProxy
         - docker-worker:feature:balrogVPNProxy
         - docker-worker:image:localhost:*
-        - docker-worker:image:localhost:*/testuser/busybox:latest
-        - purge-cache:no-provisioning-nope/*
+        - purge-cache:null-provisioner/*
         - queue:cancel-task
         - queue:cancel-task:docker-worker-tests/*
         - queue:claim-task
         - queue:claim-task:null-provisioner/*
-        - queue:claim-work:no-provisioning-nope/*
-        - queue:claim-work:test-dummy-provisioner/dummy-worker-*
+        - queue:claim-work:null-provisioner/*
         - queue:create-artifact:*
-        - queue:create-artifact:custom
-        - queue:create-task:no-provisioning-nope/*
         - queue:create-task:null-provisioner/*
         - queue:create-task:proj-taskcluster/ci
-        - queue:create-task:test-dummy-provisioner/dummy-worker-*
-        - queue:define-task:test-dummy-provisioner/dummy-worker-*
-        - queue:get-artifact:SampleArtifacts/_/X.txt
         - queue:get-artifact:private/docker-worker-tests/*
-        - queue:poll-task-urls:test-dummy-provisioner/dummy-worker-*
         - queue:resolve-task
-        - queue:schedule-task:test-dummy-scheduler/*
+        - queue:route:statuses
         - queue:scheduler-id:docker-worker-tests
-        - queue:task-group-id:test-dummy-scheduler/*
+        - queue:scheduler-id:taskcluster-github
         - queue:worker-id:docker-worker/docker-worker
         - queue:worker-id:random-local-worker/dummy-worker-*
-        - queue:worker-id:test-dummy-workers/dummy-worker-*
         - secrets:get:project/taskcluster/taskcluster-worker/stateless-dns
         - secrets:get:project/taskcluster/testing/docker-worker/ci-creds
         - secrets:get:project/taskcluster/testing/docker-worker/pulse-creds
