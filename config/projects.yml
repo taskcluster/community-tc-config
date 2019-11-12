@@ -519,7 +519,7 @@ relman:
         - docker-worker:cache:bugbug-mercurial-repository
         - docker-worker:capability:privileged
         - secrets:get:project/relman/bugbug/integration
-      to: assume:project:relman:bugbug/build
+      to: project:relman:bugbug/build
     - grant:
         - secrets:get:project/relman/bugbug/deploy
       to: project:relman:bugbug/deploy
