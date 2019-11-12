@@ -163,6 +163,9 @@ taskcluster:
         - secrets:set:project/taskcluster/smoketest/*
       to: project:taskcluster:smoketests
 
+    - grant: assume:project:taskcluster:smoketests
+      to: github-team:taskcluster/smoketesters
+
   clients:
     smoketests:
       scopes:
