@@ -124,12 +124,18 @@
 # As a temporary measure until we invent a better solution, we allow a number
 # of lucky people to rerun, cancel, and schedule all tasks created by
 # taskcluster-github, and to create tasks with that schedulerId (e.g., for
-# interactive)
+# interactive).  Similarly for the `- schedulerId, the default.
 - grant:
     - queue:cancel-task:taskcluster-github/*
     - queue:schedule-task:taskcluster-github/*
     - queue:rerun-task:taskcluster-github/*
     - queue:scheduler-id:taskcluster-github
+
+    - queue:cancel-task:-/*
+    - queue:schedule-task:-/*
+    - queue:rerun-task:-/*
+
+    # permission to run interactive tsaks
     - queue:get-artifact:private/docker-worker/*
   to:
     # note, specific users are temporary until mozilla org grants permissions
