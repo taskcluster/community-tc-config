@@ -132,6 +132,11 @@ taskcluster:
       to: repo:github.com/taskcluster/docker-worker:*
 
     - grant:
+        - secrets:get:project/taskcluster/monopacker/gcloud_service_account
+        - secrets:get:project/taskcluster/monopacker/worker_secrets_yaml
+      to: repo:github.com/taskcluster/monopacker:branch:master
+
+    - grant:
         - auth:create-client:project/taskcluster/smoketest/*
         - auth:create-role:project:taskcluster:smoketest:*
         - auth:delete-client:project/taskcluster/smoketest/*
@@ -173,6 +178,9 @@ taskcluster:
     testing/taskcluster-queue: true
     # key for deploying json-e docs
     json-e-deploy: true
+    # monopacker image baking secrets
+    monopacker/gcloud_service_account: true
+    monopacker/worker_secrets_yaml: true
 
 bors-ng:
   adminRoles: []
