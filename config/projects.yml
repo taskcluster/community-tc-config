@@ -430,7 +430,7 @@ wpt:
     ci:
       type: standard_gcp_docker_worker
       privileged: true
-      maxCapacity: 40
+      maxCapacity: 80
   repos:
     - github.com/web-platform-tests/*
   grants:
