@@ -52,6 +52,7 @@
 #     <clientId-suffix>:  # suffix after `project/<project-name>/`
 #       scopes: [ .. ]
 #       description: ..   # optional
+#     # when creating a client for a standalone worker, use `assume:worker-id:..` and `assume:worker-pool:..`.
 #
 #   grants:  # (same format as grants.yml)
 #
@@ -394,12 +395,12 @@ git-cinnabar:
   clients:
     worker-osx-10-10:
       scopes:
-        - queue:claim-work:proj-git-cinnabar/osx-10-10
-        - queue:worker-id:proj-git-cinnabar/travis-*
+        - assume:worker-pool:proj-git-cinnabar/osx-10-10
+        - assume:worker-id:proj-git-cinnabar/travis-*
     worker-osx-10-11:
       scopes:
-        - queue:claim-work:proj-git-cinnabar/osx-10-11
-        - queue:worker-id:proj-git-cinnabar/travis-*
+        - assume:worker-pool:proj-git-cinnabar/osx-10-11
+        - assume:worker-id:proj-git-cinnabar/travis-*
   grants:
     - grant:
         - queue:create-task:highest:proj-git-cinnabar/ci
@@ -794,8 +795,8 @@ webrender:
   clients:
     macos:
       scopes:
-        - queue:claim-work:proj-webrender/ci-macos
-        - queue:worker-id:proj-webrender/*
+        - assume:worker-pool:proj-webrender/ci-macos
+        - assume:worker-id:proj-webrender/*
   grants:
     - grant:
         - queue:create-task:highest:proj-webrender/ci-linux
