@@ -20,6 +20,48 @@ ADMIN_ROLE_PREFIXES = [
 ]
 
 
+class ExternallyManaged:
+    def __init__(self, value):
+        if value not in (True, False):
+            if type(value) != list:
+                value = [value]
+        self.value = value
+
+    def manage_individual_resources(self):
+        return self.value is True
+
+    def get_externally_managed_resource_patterns(self, project):
+        if self.value is False:
+            return []
+
+        if self.value is True:
+            patterns = []
+            name = re.escape(project.name)
+
+            # this list corresponds to that for project-admin:* in
+            # config/grants.yml
+            patterns.append(r"Role=project:{}:.*".format(name))
+            patterns.append(r"Client=project/{}/.*".format(name))
+            patterns.append(r"WorkerPool=proj-{}/.*".format(name))
+            patterns.append(r"Secret=worker-pool:proj-{}/.*".format(name))
+            patterns.append(r"Hook=project-{}/.*".format(name))
+            patterns.append(r"Role=hook-id:project-{}/.*".format(name))
+            patterns.append(r"Secret=project/{}/.*".format(name))
+
+            # this corresponds to repo-admin:*
+            for repo in project.repos:
+                pat = (
+                    (re.escape(repo[:-1]) + ".*")
+                    if repo[-1] == "*"
+                    else re.escape(repo)
+                )
+                patterns.append(r"Role=repo:" + pat)
+
+            return patterns
+
+        return self.value
+
+
 class Projects(ConfigDict):
 
     filename = "config/projects.yml"
@@ -34,7 +76,9 @@ class Projects(ConfigDict):
         grants = attr.ib(type=list, factory=lambda: [])
         secrets = attr.ib(type=dict, factory=lambda: {})
         hooks = attr.ib(type=dict, factory=lambda: {})
-        externallyManaged = attr.ib(type=bool, default=False)
+        externallyManaged = attr.ib(
+            type=ExternallyManaged, converter=ExternallyManaged, default=False
+        )
 
 
 async def update_resources(resources):
@@ -67,7 +111,7 @@ async def update_resources(resources):
         if project.workerPools:
             for name, worker_pool in project.workerPools.items():
                 worker_pool_id = "proj-{}/{}".format(project.name, name)
-                if project.externallyManaged:
+                if project.externallyManaged.manage_individual_resources():
                     resources.manage("WorkerPool={}".format(worker_pool_id))
                     resources.manage("Secret=worker-pool:{}".format(worker_pool_id))
                 worker_pool["description"] = "Workers for " + project.name
@@ -76,8 +120,8 @@ async def update_resources(resources):
         if project.clients:
             for name, info in project.clients.items():
                 clientId = "project/{}/{}".format(project.name, name)
-                if project.externallyManaged:
-                    resources.manage("Client={}".format(client_id))
+                if project.externallyManaged.manage_individual_resources():
+                    resources.manage("Client={}".format(clientId))
                 description = info.get("description", "")
                 scopes = info["scopes"]
                 resources.add(
@@ -87,13 +131,13 @@ async def update_resources(resources):
             for nameSuffix, info in project.secrets.items():
                 assert info is True, "secrets must have the form <nameSuffix>: true"
                 name = "project/{}/{}".format(project.name, nameSuffix)
-                if project.externallyManaged:
+                if project.externallyManaged.manage_individual_resources():
                     resources.manage("Secret={}".format(name))
                 resources.add(Secret(name=name))
         if project.hooks:
             for hookId, info in project.hooks.items():
                 hookGroupId = "project-{}".format(project.name)
-                if project.externallyManaged:
+                if project.externallyManaged.manage_individual_resources():
                     resources.manage("Hook={}/{}".format(hookGroupid, hookId))
                 assert (
                     "bindings" not in info
@@ -113,7 +157,7 @@ async def update_resources(resources):
                     )
                 )
         for grant in Grants.from_project(project):
-            if project.externallyManaged:
+            if project.externallyManaged.manage_individual_resources():
                 for role in grant.to:
                     resources.manage("Role=" + re.escape(role))
             grant.update_resources(resources)
@@ -125,23 +169,11 @@ async def get_externally_managed_resource_patterns():
     projects = await Projects.load(loader)
     patterns = []
     for project in projects.values():
-        if not project.externallyManaged:
-            continue
-        name = re.escape(project.name)
-
-        # this list corresponds to that for project-admin:* in
-        # config/grants.yml
-        patterns.append(r"Role=project:{}:.*".format(name))
-        patterns.append(r"Client=project/{}/.*".format(name))
-        patterns.append(r"WorkerPool=proj-{}/.*".format(name))
-        patterns.append(r"Secret=worker-pool:proj-{}/.*".format(name))
-        patterns.append(r"Hook=project-{}/.*".format(name))
-        patterns.append(r"Role=hook-id:project-{}/.*".format(name))
-        patterns.append(r"Secret=project/{}/.*".format(name))
-
-        # this corresponds to repo-admin:*
-        for repo in project.repos:
-            pat = (re.escape(repo[:-1]) + ".*") if repo[-1] == "*" else re.escape(repo)
-            patterns.append(r"Role=repo:" + pat)
+        for (
+            pattern
+        ) in project.externallyManaged.get_externally_managed_resource_patterns(
+            project
+        ):
+            patterns.append(pattern)
 
     return patterns

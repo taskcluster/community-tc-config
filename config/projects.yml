@@ -13,8 +13,11 @@
 #     - ..
 #
 #   # "externally managed" means that the resources in this project are managed outside
-#   # of this repository.  If this is not set, then this repository will try to delete
-#   # any such externally-managed resources.
+#   # of this repository.  If this is false, then all project resources are managed by
+#   # this repo, and anything unrecognized will be deleted.  If this is true, then only
+#   # resources declared here will be managed.  If set to a regular expression or list
+#   # of regular expressions, then resources matching those regular expressions will be
+#   # ignored by this repository, but all others will be managed.
 #   externallyManaged: false
 #
 #   repos:
@@ -65,6 +68,11 @@ taskcluster:
   repos:
     - github.com/taskcluster/*
     - github.com/mozilla/community-tc-config:*
+  externallyManaged:
+    # smoketests create these resources, and also cleans them up, so leave
+    # them alone here...
+    - "Client=project/taskcluster/smoketest/.*"
+    - "Role=project:taskcluster:smoketest:.*"
   workerPools:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
