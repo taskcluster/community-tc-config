@@ -549,10 +549,12 @@ relman:
         - assume:hook-id:project-relman/bugbug-annotate
         - assume:hook-id:project-relman/bugbug-checks
         - assume:hook-id:project-relman/bugbug-classify-patch
+        - assume:hook-id:project-relman/bugbug-test-select
         - hooks:modify-hook:project-relman/bugbug
         - hooks:modify-hook:project-relman/bugbug-annotate
         - hooks:modify-hook:project-relman/bugbug-checks
         - hooks:modify-hook:project-relman/bugbug-classify-patch
+        - hooks:modify-hook:project-relman/bugbug-test-select
         - queue:route:notify.pulse.route.project.relman.bugbug.deploy_ending.*
         - queue:route:project.relman.bugbug.deploy_ending*
       to: project:relman:bugbug/deploy_taskcluster
