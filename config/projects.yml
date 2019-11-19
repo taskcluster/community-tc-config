@@ -452,8 +452,6 @@ wpt:
 relman:
   adminRoles:
     - github-team:mozilla/sallt
-    # temporary until opsec approves the integration for the "mozilla" org
-    - login-identity:github/1616846|marco-c
   externallyManaged: true # bugbug deploys some hooks into this space
   repos:
     - github.com/mozilla/bugbug:*
@@ -609,9 +607,6 @@ relman:
 deepspeech:
   adminRoles:
     - github-team:mozilla/research-machine-learning
-    # temporary until the mozilla org grants access
-    - login-identity:github/1645737|lissyx
-    - login-identity:github/477142|reuben
   repos:
     - github.com/mozilla/DeepSpeech:*
     - github.com/mozilla/tensorflow:*
