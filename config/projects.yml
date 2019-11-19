@@ -555,8 +555,8 @@ relman:
         - hooks:modify-hook:project-relman/bugbug-checks
         - hooks:modify-hook:project-relman/bugbug-classify-patch
         - hooks:modify-hook:project-relman/bugbug-test-select
-        - queue:route:notify.pulse.route.project.relman.bugbug.deploy_ending.*
-        - queue:route:project.relman.bugbug.deploy_ending*
+        - queue:route:notify.pulse.route.project.relman.bugbug.*
+        - queue:route:project.relman.bugbug.*
       to: project:relman:bugbug/deploy_taskcluster
     - grant: assume:project:relman:bugbug/build
       to: repo:github.com/mozilla/bugbug:*
