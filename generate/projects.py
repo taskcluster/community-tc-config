@@ -81,7 +81,7 @@ class Projects(ConfigDict):
         )
 
 
-async def update_resources(resources):
+async def update_resources(resources, secret_values):
     projects = await Projects.load(loader)
 
     for project in projects.values():
@@ -111,12 +111,18 @@ async def update_resources(resources):
         if project.workerPools:
             for name, worker_pool in project.workerPools.items():
                 worker_pool_id = "proj-{}/{}".format(project.name, name)
+                worker_pool["description"] = "Workers for " + project.name
+                worker_pool, secret = build_worker_pool(
+                    worker_pool_id, worker_pool, secret_values
+                )
+
                 if project.externallyManaged.manage_individual_resources():
                     resources.manage("WorkerPool={}".format(worker_pool_id))
-                    resources.manage("Secret=worker-pool:{}".format(worker_pool_id))
-                worker_pool["description"] = "Workers for " + project.name
-                resources.add(build_worker_pool(worker_pool_id, worker_pool))
-                resources.add(Secret(name="worker-pool:{}".format(worker_pool_id)))
+                    if secret:
+                        resources.manage("Secret=worker-pool:{}".format(worker_pool_id))
+                resources.add(worker_pool)
+                if secret:
+                    resources.add(secret)
         if project.clients:
             for name, info in project.clients.items():
                 clientId = "project/{}/{}".format(project.name, name)
@@ -129,11 +135,15 @@ async def update_resources(resources):
                 )
         if project.secrets:
             for nameSuffix, info in project.secrets.items():
-                assert info is True, "secrets must have the form <nameSuffix>: true"
+                if info is True:
+                    continue
                 name = "project/{}/{}".format(project.name, nameSuffix)
                 if project.externallyManaged.manage_individual_resources():
                     resources.manage("Secret={}".format(name))
-                resources.add(Secret(name=name))
+                if secret_values:
+                    resources.add(Secret(name=name, secret=secret_values.render(info)))
+                else:
+                    resources.add(Secret(name=name))
         if project.hooks:
             for hookId, info in project.hooks.items():
                 hookGroupId = "project-{}".format(project.name)
@@ -175,5 +185,8 @@ async def get_externally_managed_resource_patterns():
             project
         ):
             patterns.append(pattern)
+        for secret, info in project.secrets.items():
+            if info is True:
+                patterns.append("Secret=project/{}/{}".format(project.name, secret))
 
     return patterns

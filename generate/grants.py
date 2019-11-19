@@ -36,6 +36,6 @@ class Grants(ConfigList):
         return cls(cls.Item(**g) for g in project.grants)
 
 
-async def update_resources(resources):
+async def update_resources(resources, secret_values):
     for grant in await Grants.load(loader):
         grant.update_resources(resources)

@@ -45,7 +45,15 @@ Repositories are granted scopes via the [Taskcluster-github scheme](https://docs
 Each repository is associated with a project, and scopes granted to the repository should be associated with that project.
 This occurs within `config/projects.yml`.
 
-### Externally Managed Projects
+### Secrets
+
+The tool can manage secrets directly, but this requires access to secret values, and is thus limited to a smaller group of people: the Taskcluster team.
+Those people use `--with-secrets`, which automatically reads from the team's password storage repository.
+
+In general, per-project secrets can either be managed by this tool, or managed directly by the project admins.
+See the comments in `projects.yml` for details.
+
+### Externally Managed Projects and Resources
 
 This respository manages all resources in the deployment *except* those associated with "externally managed" projects.
 Projects that manage their own resources, either by hand or via their own automation, should have the `externallyManaged` attribute set in `config/projects.yml`, otherwise the next run of `tc-admin apply` will delete the project's resources!
