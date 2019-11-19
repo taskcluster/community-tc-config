@@ -104,8 +104,10 @@
     - auth:delete-client:<..>/*
     - auth:update-client:<..>/*
     - auth:reset-access-token:<..>/*
-    # grant all users access to scheduler-id `-`, the default
+    # grant all users access to scheduler-id `-`, the default, as well as
+    # the task-creator default "taskcluster-ui"
     - queue:scheduler-id:-
+    - queue:scheduler-id:taskcluster-ui
   to:
     - login-identity:*
 
