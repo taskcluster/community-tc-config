@@ -5,6 +5,7 @@
 # obtain one at http://mozilla.org/MPL/2.0/.
 
 import attr
+import re
 
 from tcadmin.resources import Role
 from tcadmin.util.config import ConfigList
@@ -29,6 +30,9 @@ class Grants(ConfigList):
         def update_resources(self, resources):
             scopes = self.grant
             for roleId in self.to:
+                id = f"Role={roleId}"
+                if not resources.is_managed(id):
+                    resources.manage(re.escape(id))
                 resources.add(Role(roleId=roleId, description="", scopes=scopes))
 
     @classmethod
