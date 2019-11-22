@@ -219,7 +219,7 @@ servo:
       machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
       diskSizeGb: 100
       minCapacity: 2
-      maxCapacity: 20
+      maxCapacity: 40
     docker-untrusted:
       owner: servo-ops@mozilla.com
       emailOnError: false
@@ -227,7 +227,7 @@ servo:
       machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
       diskSizeGb: 100
       minCapacity: 0
-      maxCapacity: 6
+      maxCapacity: 10
   grants:
     - grant:
         # notification
