@@ -318,6 +318,7 @@ misc:
     - github-team:taskcluster/core
   repos:
     - github.com/mozilla/*
+    - github.com/MozillaSecurity/*
     - github.com/marco-c/taskcluster_yml_validator:*
     - github.com/mozilla/one-off-system-add-ons:*
   workerPools:
@@ -372,6 +373,7 @@ misc:
     - grant: queue:create-task:highest:proj-misc/ci
       to:
         - repo:github.com/mozilla/*
+        - repo:github.com/MozillaSecurity/*
         - repo:github.com/marco-c/taskcluster_yml_validator:*
     - grant:
         - queue:create-task:highest:proj-misc/ci
