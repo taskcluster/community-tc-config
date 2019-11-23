@@ -4,7 +4,7 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file, You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 
-from tcadmin.resources import WorkerPool
+from tcadmin.resources import WorkerPool, Secret
 
 TYPES = {}
 
@@ -82,24 +82,45 @@ GOOGLE_ZONES_REGIONS = [
 
 
 def worker_pool_type(fn):
+    """
+    Register a worker pool generator.  This function takes keyword arguments based on the
+    configuration in `projects.yml`, plus `secret_values`, an instance of SecretValues or
+    None if running without secret.  It should return a dictionary with keys
+     - providerId - passed to worker-manager
+     - config - passed to worker-manager
+     - secret - content of the `worker-pool:<workerPoolId>` secret (optional)
+    """
+
     TYPES[fn.__name__] = fn
     return fn
 
 
-def build_worker_pool(workerPoolId, cfg):
+def build_worker_pool(workerPoolId, cfg, secret_values):
     try:
-        wp = TYPES[cfg["type"]](**cfg)
+        wp = TYPES[cfg["type"]](secret_values=secret_values, **cfg)
     except Exception as e:
         raise RuntimeError(
             "Error generating worker pool configuration for {}".format(workerPoolId)
         ) from e
-    return WorkerPool(
+    if secret_values:
+        if "secret" in wp:
+            secret = Secret(
+                name="worker-pool:{}".format(workerPoolId), secret=wp.pop("secret")
+            )
+        else:
+            secret = None
+    else:
+        secret = Secret(name="worker-pool:{}".format(workerPoolId))
+
+    workerpool = WorkerPool(
         workerPoolId=workerPoolId,
         description=cfg.get("description", ""),
         owner=cfg.get("owner", "nobody@mozilla.com"),
         emailOnError=cfg.get("emailOnError", False),
         **wp,
     )
+
+    return workerpool, secret
 
 
 def base_google_config(
@@ -171,6 +192,18 @@ def standard_gcp_docker_worker(*, image=None, diskSizeGb=50, privileged=False, *
             lc.setdefault("workerConfig", {}).setdefault("dockerConfig", {})[
                 "allowPrivileged"
             ] = True
+
+    if cfg["secret_values"]:
+        rv["secret"] = cfg["secret_values"].render(
+            {
+                "config": {
+                    "statelessHostname": {
+                        "secret": "$stateless-dns-secret",
+                        "domain": "taskcluster-worker.net",
+                    },
+                },
+            }
+        )
 
     return rv
 
@@ -256,6 +289,11 @@ def base_aws_generic_worker_config(**cfg):
                 },
             },
         }
+
+    if cfg["secret_values"]:
+        # generic-worker crashes in the absence of a secret, so create an empty secret
+        rv["secret"] = {"config": {}, "files": []}
+
     return rv
 
 

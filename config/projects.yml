@@ -35,10 +35,16 @@
 #       ..: ..  # arguments to that function
 #
 #   secrets:
-#     # secrets are just asserted to exist; at the moment this repo does not support
-#     # managing secret *values*.  However, this is a great place to comment on the
-#     # content of the secret.
-#     <name-suffix>: true  # suffix after `project/<project-name>/`
+#     # Secrets associated with this project, suffixed to `project/<project-name>/`.
+#     # These secrets can be managed externally by setting the value to `true`:
+#     <name-suffix>: true
+#     # or can be given an explicit value, with interpolation of values from the
+#     # secret-values backend using `$<name>`:
+#     <name-suffix>:
+#       someservice:
+#         hostname: someservice.com
+#         username: $someservice-username
+#         password: $someservice-password
 #
 #   hooks:
 #     # hooks, keyed by hookId.
@@ -179,8 +185,9 @@ taskcluster:
     testing/codecov: true
     # client_id/access_token for project/taskcluster/testing/docker-worker/ci-creds
     testing/docker-worker/ci-creds: true
-    # AZURE_ACCOUNT / AZURE_ACCOUNT_KEY for a testing account
-    testing/azure: true
+    testing/azure:
+      AZURE_ACCOUNT: $taskcluster-azure-account
+      AZURE_ACCOUNT_KEY: $taskcluster-azure-account-key
     # additional secrets for services' tests (see services/<service>/test/helper.js)
     testing/taskcluster-auth: true
     testing/taskcluster-notify: true

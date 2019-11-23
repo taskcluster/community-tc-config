@@ -11,6 +11,7 @@ import sys
 from tcadmin.appconfig import AppConfig
 
 from . import projects, grants
+from .secret_values import SecretValues
 
 
 async def update_resources(resources):
@@ -26,12 +27,9 @@ async def update_resources(resources):
     em_bar = "|".join(externally_managed_patterns)
     resources.manage(re.compile(r"(?!{}).*".format(em_bar)))
 
+    secret_values = None
     if AppConfig.current().options.get("with_secrets"):
-        print(
-            "Use --without-secrets; secret management is not yet supported",
-            file=sys.stderr,
-        )
-        os._exit(1)
+        secret_values = SecretValues()
 
-    await projects.update_resources(resources)
-    await grants.update_resources(resources)
+    await projects.update_resources(resources, secret_values)
+    await grants.update_resources(resources, secret_values)
