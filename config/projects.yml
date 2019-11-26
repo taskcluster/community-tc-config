@@ -325,7 +325,6 @@ misc:
     - github-team:taskcluster/core
   repos:
     - github.com/mozilla/*
-    - github.com/MozillaSecurity/*
     - github.com/marco-c/taskcluster_yml_validator:*
     - github.com/mozilla/one-off-system-add-ons:*
   workerPools:
@@ -380,7 +379,6 @@ misc:
     - grant: queue:create-task:highest:proj-misc/ci
       to:
         - repo:github.com/mozilla/*
-        - repo:github.com/MozillaSecurity/*
         - repo:github.com/marco-c/taskcluster_yml_validator:*
     - grant:
         - queue:create-task:highest:proj-misc/ci
@@ -394,6 +392,27 @@ misc:
         - hooks:trigger-hook:project-misc/jcristau-fx-release-metrics
       to:
         - login-identity:github/3703806|jcristau
+
+fuzzing:
+  adminRoles:
+    - github-org-admin:MozillaSecurity
+  repos:
+    - github.com/MozillaSecurity/*
+  secrets:
+    github-deploy-key: true
+  workerPools:
+    ci:
+      owner: fuzzing+taskcluster@mozilla.com
+      emailOnError: false
+      type: standard_gcp_docker_worker
+      minCapacity: 0
+      maxCapacity: 10
+  grants:
+    - grant:
+        - queue:create-task:highest:proj-fuzzing/ci
+        - secrets:get:project/fuzzing/github-deploy-key
+      to:
+        - repo:github.com/MozillaSecurity/*
 
 git-cinnabar:
   adminRoles:
