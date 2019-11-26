@@ -310,6 +310,5 @@ def aws_generic_worker_deepspeech_win(imageIds={}, **cfg):
     rv = base_aws_generic_worker_config(
         imageIds=imageIds, instanceTypes={"m5d.2xlarge": 1}, **cfg
     )
->>>>>>> adb4ae97e42bcd19cb3b158cc7686607337c895f
 
     return rv
