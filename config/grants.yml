@@ -104,8 +104,10 @@
     - auth:delete-client:<..>/*
     - auth:update-client:<..>/*
     - auth:reset-access-token:<..>/*
-    # grant all users access to scheduler-id `-`, the default
+    # grant all users access to scheduler-id `-`, the default, as well as
+    # the task-creator default "taskcluster-ui"
     - queue:scheduler-id:-
+    - queue:scheduler-id:taskcluster-ui
   to:
     - login-identity:*
 
@@ -124,12 +126,18 @@
 # As a temporary measure until we invent a better solution, we allow a number
 # of lucky people to rerun, cancel, and schedule all tasks created by
 # taskcluster-github, and to create tasks with that schedulerId (e.g., for
-# interactive)
+# interactive).  Similarly for the `- schedulerId, the default.
 - grant:
     - queue:cancel-task:taskcluster-github/*
     - queue:schedule-task:taskcluster-github/*
     - queue:rerun-task:taskcluster-github/*
     - queue:scheduler-id:taskcluster-github
+
+    - queue:cancel-task:-/*
+    - queue:schedule-task:-/*
+    - queue:rerun-task:-/*
+
+    # permission to run interactive tsaks
     - queue:get-artifact:private/docker-worker/*
   to:
     # note, specific users are temporary until mozilla org grants permissions
@@ -152,3 +160,19 @@
     # for a few project admins
     - project-admin:servo
     - project-admin:wpt
+
+    # for relman
+    - project-admin:relman
+
+# One of these routes is added to each task created in reaction to a GitHub event.
+# If such a task in turn creates other tasks, it can add the same route in order to work around
+# https://bugzilla.mozilla.org/show_bug.cgi?id=1548781 or
+# https://bugzilla.mozilla.org/show_bug.cgi?id=1533235
+- grant:
+    # Route names match configuration at
+    # https://github.com/taskcluster/taskcluster/blob/21f257dc8/services/github/config.yml#L13-L14
+    - queue:route:checks
+    - queue:route:statuses
+  to:
+    # Repositories that whish to use this work-around
+    - repo:github.com/servo/servo:*

@@ -13,8 +13,11 @@
 #     - ..
 #
 #   # "externally managed" means that the resources in this project are managed outside
-#   # of this repository.  If this is not set, then this repository will try to delete
-#   # any such externally-managed resources.
+#   # of this repository.  If this is false, then all project resources are managed by
+#   # this repo, and anything unrecognized will be deleted.  If this is true, then only
+#   # resources declared here will be managed.  If set to a regular expression or list
+#   # of regular expressions, then resources matching those regular expressions will be
+#   # ignored by this repository, but all others will be managed.
 #   externallyManaged: false
 #
 #   repos:
@@ -32,10 +35,16 @@
 #       ..: ..  # arguments to that function
 #
 #   secrets:
-#     # secrets are just asserted to exist; at the moment this repo does not support
-#     # managing secret *values*.  However, this is a great place to comment on the
-#     # content of the secret.
-#     <name-suffix>: true  # suffix after `project/<project-name>/`
+#     # Secrets associated with this project, suffixed to `project/<project-name>/`.
+#     # These secrets can be managed externally by setting the value to `true`:
+#     <name-suffix>: true
+#     # or can be given an explicit value, with interpolation of values from the
+#     # secret-values backend using `$<name>`:
+#     <name-suffix>:
+#       someservice:
+#         hostname: someservice.com
+#         username: $someservice-username
+#         password: $someservice-password
 #
 #   hooks:
 #     # hooks, keyed by hookId.
@@ -52,6 +61,7 @@
 #     <clientId-suffix>:  # suffix after `project/<project-name>/`
 #       scopes: [ .. ]
 #       description: ..   # optional
+#     # when creating a client for a standalone worker, use `assume:worker-id:..` and `assume:worker-pool:..`.
 #
 #   grants:  # (same format as grants.yml)
 #
@@ -64,6 +74,11 @@ taskcluster:
   repos:
     - github.com/taskcluster/*
     - github.com/mozilla/community-tc-config:*
+  externallyManaged:
+    # smoketests create these resources, and also cleans them up, so leave
+    # them alone here...
+    - "Client=project/taskcluster/smoketest/.*"
+    - "Role=project:taskcluster:smoketest:.*"
   workerPools:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -151,47 +166,39 @@ taskcluster:
     - grant:
         - assume:project:taskcluster:worker-test-scopes
         - assume:worker-id:docker-worker/docker-worker
-        - auth:sentry:test-dummy-worker
-        - auth:statsum:test-dummy-worker
         - aws-provisioner:create-secret:*
         - docker-worker:cache:docker-worker-garbage-*
-        - docker-worker:cache:docker-worker-garbage-caches-test-cache
-        - docker-worker:cache:docker-worker-garbage-caches-tmp-obj-dir
         - docker-worker:capability:device:loopbackAudio
         - docker-worker:capability:device:loopbackVideo
         - docker-worker:capability:privileged
         - docker-worker:feature:balrogStageVPNProxy
         - docker-worker:feature:balrogVPNProxy
         - docker-worker:image:localhost:*
-        - docker-worker:image:localhost:*/testuser/busybox:latest
-        - purge-cache:no-provisioning-nope/*
+        - purge-cache:null-provisioner/*
         - queue:cancel-task
         - queue:cancel-task:docker-worker-tests/*
         - queue:claim-task
         - queue:claim-task:null-provisioner/*
-        - queue:claim-work:no-provisioning-nope/*
-        - queue:claim-work:test-dummy-provisioner/dummy-worker-*
+        - queue:claim-work:null-provisioner/*
         - queue:create-artifact:*
-        - queue:create-artifact:custom
-        - queue:create-task:no-provisioning-nope/*
         - queue:create-task:null-provisioner/*
         - queue:create-task:proj-taskcluster/ci
-        - queue:create-task:test-dummy-provisioner/dummy-worker-*
-        - queue:define-task:test-dummy-provisioner/dummy-worker-*
-        - queue:get-artifact:SampleArtifacts/_/X.txt
         - queue:get-artifact:private/docker-worker-tests/*
-        - queue:poll-task-urls:test-dummy-provisioner/dummy-worker-*
         - queue:resolve-task
-        - queue:schedule-task:test-dummy-scheduler/*
+        - queue:route:statuses
         - queue:scheduler-id:docker-worker-tests
-        - queue:task-group-id:test-dummy-scheduler/*
+        - queue:scheduler-id:taskcluster-github
         - queue:worker-id:docker-worker/docker-worker
         - queue:worker-id:random-local-worker/dummy-worker-*
-        - queue:worker-id:test-dummy-workers/dummy-worker-*
         - secrets:get:project/taskcluster/taskcluster-worker/stateless-dns
         - secrets:get:project/taskcluster/testing/docker-worker/ci-creds
         - secrets:get:project/taskcluster/testing/docker-worker/pulse-creds
       to: repo:github.com/taskcluster/docker-worker:*
+
+    - grant:
+        - secrets:get:project/taskcluster/monopacker/gcloud_service_account
+        - secrets:get:project/taskcluster/monopacker/worker_secrets_yaml
+      to: repo:github.com/taskcluster/monopacker:branch:master
 
     - grant:
         - auth:create-client:project/taskcluster/smoketest/*
@@ -242,6 +249,9 @@ taskcluster:
         - secrets:get:repo:github.com/taskcluster/generic-worker
       to: repo:github.com/taskcluster/generic-worker:*
 
+    - grant: assume:project:taskcluster:smoketests
+      to: github-team:taskcluster/smoketesters
+
   clients:
     smoketests:
       scopes:
@@ -269,14 +279,18 @@ taskcluster:
     testing/codecov: true
     # client_id/access_token for project/taskcluster/testing/docker-worker/ci-creds
     testing/docker-worker/ci-creds: true
-    # AZURE_ACCOUNT / AZURE_ACCOUNT_KEY for a testing account
-    testing/azure: true
+    testing/azure:
+      AZURE_ACCOUNT: $taskcluster-azure-account
+      AZURE_ACCOUNT_KEY: $taskcluster-azure-account-key
     # additional secrets for services' tests (see services/<service>/test/helper.js)
     testing/taskcluster-auth: true
     testing/taskcluster-notify: true
     testing/taskcluster-queue: true
     # key for deploying json-e docs
     json-e-deploy: true
+    # monopacker image baking secrets
+    monopacker/gcloud_service_account: true
+    monopacker/worker_secrets_yaml: true
 
 bors-ng:
   adminRoles: []
@@ -308,7 +322,7 @@ servo:
       machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
       diskSizeGb: 100
       minCapacity: 2
-      maxCapacity: 20
+      maxCapacity: 40
     docker-untrusted:
       owner: servo-ops@mozilla.com
       emailOnError: false
@@ -317,7 +331,7 @@ servo:
       machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
       diskSizeGb: 100
       minCapacity: 0
-      maxCapacity: 6
+      maxCapacity: 10
   grants:
     - grant:
         # notification
@@ -410,7 +424,9 @@ misc:
     - github-team:taskcluster/core
   repos:
     - github.com/mozilla/*
+    - github.com/MozillaSecurity/*
     - github.com/marco-c/taskcluster_yml_validator:*
+    - github.com/mozilla/one-off-system-add-ons:*
   workerPools:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -441,7 +457,7 @@ misc:
               git clone https://github.com/jcristau/fx-release-metrics/ &&
               cd fx-release-metrics &&
               python3 run-taskcluster.py
-          maxRunTime: 600
+          maxRunTime: 1200
           artifacts:
             public/results.json:
               type: file
@@ -464,13 +480,20 @@ misc:
     - grant: queue:create-task:highest:proj-misc/ci
       to:
         - repo:github.com/mozilla/*
+        - repo:github.com/MozillaSecurity/*
         - repo:github.com/marco-c/taskcluster_yml_validator:*
     - grant:
         - queue:create-task:highest:proj-misc/ci
         - queue:route:index.project.misc.jcristau.*
         - queue:route:notify.email.jcristau@mozilla.com.*
+        - queue:scheduler-id:-
       to:
         - hook-id:project-misc/jcristau-fx-release-metrics
+    # allow jcristau to trigger the release-metrics hook directly
+    - grant:
+        - hooks:trigger-hook:project-misc/jcristau-fx-release-metrics
+      to:
+        - login-identity:github/3703806|jcristau
 
 git-cinnabar:
   adminRoles:
@@ -491,12 +514,12 @@ git-cinnabar:
   clients:
     worker-osx-10-10:
       scopes:
-        - queue:claim-work:proj-git-cinnabar/osx-10-10
-        - queue:worker-id:proj-git-cinnabar/travis-*
+        - assume:worker-pool:proj-git-cinnabar/osx-10-10
+        - assume:worker-id:proj-git-cinnabar/travis-*
     worker-osx-10-11:
       scopes:
-        - queue:claim-work:proj-git-cinnabar/osx-10-11
-        - queue:worker-id:proj-git-cinnabar/travis-*
+        - assume:worker-pool:proj-git-cinnabar/osx-10-11
+        - assume:worker-id:proj-git-cinnabar/travis-*
   grants:
     - grant:
         - queue:create-task:highest:proj-git-cinnabar/ci
@@ -527,7 +550,7 @@ wpt:
     ci:
       imageset: docker-worker
       cloud: gcp
-      maxCapacity: 40
+      maxCapacity: 80
       workerConfig:
         dockerConfig:
           allowPrivileged: true
@@ -537,11 +560,13 @@ wpt:
     - grant:
         - queue:create-task:highest:proj-wpt/ci
         - docker-worker:capability:privileged
+        - queue:scheduler-id:taskcluster-github
       to: repo:github.com/web-platform-tests/wpt:*
 
 relman:
   adminRoles:
     - github-team:mozilla/sallt
+  externallyManaged: true # bugbug deploys some hooks into this space
   repos:
     - github.com/mozilla/bugbug:*
     - github.com/mozilla/microannotate:*
@@ -550,6 +575,8 @@ relman:
     - github.com/mozilla/code-coverage:*
     - github.com/mozilla/code-review:*
     - github.com/mozilla/rust-code-analysis:*
+    - github.com/mozilla/dump_syms:*
+    - github.com/mozilla/libmozevent:*
   workerPools:
     ci:
       owner: mcastelluccio@mozilla.com
@@ -561,25 +588,25 @@ relman:
       workerConfig:
         dockerConfig:
           allowPrivileged: true
-    ci-compute:
+    compute-small:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
       minCapacity: 1
       maxCapacity: 25
-      machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
+      machineType: "zones/{zone}/machineTypes/n1-standard-4"
       workerConfig:
         dockerConfig:
           allowPrivileged: true
-    ci-memory:
+    compute-large:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
       minCapacity: 1
       maxCapacity: 25
-      machineType: "zones/{zone}/machineTypes/n1-highmem-2"
+      machineType: "zones/{zone}/machineTypes/n1-standard-8"
       workerConfig:
         dockerConfig:
           allowPrivileged: true
@@ -598,6 +625,7 @@ relman:
     code-review/deploy-testing: true
     microannotate/deploy: true
     taskboot/deploy: true
+    libmozevent/deploy: true
   grants:
     # all repos
     - grant:
@@ -611,6 +639,14 @@ relman:
         - repo:github.com/mozilla/code-review:*
         - repo:github.com/mozilla/rust-code-analysis:*
         - repo:github.com/mozilla/bugzilla-dashboard-backend:*
+        - repo:github.com/mozilla/dump_syms:*
+        - repo:github.com/mozilla/libmozevent:*
+
+    # all hooks
+    - grant:
+        - queue:scheduler-id:-
+        - queue:create-task:highest:proj-relman/*
+      to: hook-id:project-relman/*
 
     # bugzilla-dashboard-backend
     - grant: docker-worker:capability:privileged
@@ -626,23 +662,39 @@ relman:
         - docker-worker:cache:bugbug-mercurial-repository
         - docker-worker:capability:privileged
         - secrets:get:project/relman/bugbug/integration
-      to: repo:github.com/mozilla/bugbug:*
+      to: project:relman:bugbug/build
     - grant:
+        - secrets:get:project/relman/bugbug/deploy
+      to: project:relman:bugbug/deploy
+    - grant:
+        - assume:project:relman:bugbug/deploy
         - assume:hook-id:project-relman/bugbug
         - assume:hook-id:project-relman/bugbug-annotate
         - assume:hook-id:project-relman/bugbug-checks
         - assume:hook-id:project-relman/bugbug-classify-patch
+        - assume:hook-id:project-relman/bugbug-test-select
         - hooks:modify-hook:project-relman/bugbug
         - hooks:modify-hook:project-relman/bugbug-annotate
         - hooks:modify-hook:project-relman/bugbug-checks
         - hooks:modify-hook:project-relman/bugbug-classify-patch
-        - queue:route:notify.pulse.route.project.relman.bugbug.deploy_ending.*
-        - queue:route:project.relman.bugbug.deploy_ending
-        - queue:route:project.relman.bugbug.deploy_ending.*
-        - secrets:get:project/relman/bugbug/deploy
-      to: project:relman:bugbug/deploy
-    - grant: assume:project:relman:bugbug/deploy
+        - hooks:modify-hook:project-relman/bugbug-test-select
+      to: project:relman:bugbug/deploy_taskcluster
+    - grant: assume:project:relman:bugbug/build
+      to: repo:github.com/mozilla/bugbug:*
+    # The build scopes for the tag will come from the previous rule.
+    - grant: assume:project:relman:bugbug/deploy_taskcluster
       to: repo:github.com/mozilla/bugbug:tag:*
+    - grant:
+        - assume:project:relman:bugbug/build
+        - assume:project:relman:bugbug/deploy
+        - hooks:trigger-hook:project-relman/bugbug*
+        - queue:route:notify.email.release-mgmt-analysis@mozilla.com.on-failed
+        - queue:route:notify.irc-channel.#bugbug.on-failed
+        - queue:route:index.project.relman.bugbug*
+        - queue:route:notify.pulse.route.project.relman.bugbug.*
+        - queue:route:project.relman.bugbug.*
+        - secrets:get:project/relman/bugbug/production
+      to: hook-id:project-relman/bugbug*
 
     # task-boot
     - grant: docker-worker:capability:privileged
@@ -672,12 +724,14 @@ relman:
     - grant: secrets:get:project/relman/microannotate/deploy
       to: repo:github.com/mozilla/microannotate:tag:*
 
+    # libmozevent
+    - grant: secrets:get:project/relman/libmozevent/deploy
+      to:
+        - repo:github.com/mozilla/libmozevent:tag:*
+
 deepspeech:
   adminRoles:
     - github-team:mozilla/research-machine-learning
-    # temporary until the mozilla org grants access
-    - login-identity:github/1645737|lissyx
-    - login-identity:github/477142|reuben
   repos:
     - github.com/mozilla/DeepSpeech:*
     - github.com/mozilla/tensorflow:*
@@ -865,8 +919,8 @@ webrender:
   clients:
     macos:
       scopes:
-        - queue:claim-work:proj-webrender/ci-macos
-        - queue:worker-id:proj-webrender/*
+        - assume:worker-pool:proj-webrender/ci-macos
+        - assume:worker-id:proj-webrender/*
   grants:
     - grant:
         - queue:create-task:highest:proj-webrender/ci-linux
@@ -877,3 +931,20 @@ webrender:
         - repo:github.com/staktrace/webrender:*
   secrets:
     wrupdater-github-token: true
+
+l10n:
+  adminRoles:
+    - github-team:mozilla-l10n/Core
+  repos:
+    - github.com/Pike/user-journey-localized:*
+    - github.com/mozilla-l10n/*
+  workerPools:
+    ci:
+      type: standard_gcp_docker_worker
+      maxCapacity: 5
+  grants:
+    - grant:
+        - queue:create-task:highest:proj-l10n/*
+      to:
+        - repo:github.com/Pike/user-journey-localized:*
+        - repo:github.com/mozilla-l10n/*

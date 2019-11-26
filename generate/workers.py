@@ -4,7 +4,7 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file, You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 
-from tcadmin.resources import WorkerPool
+from tcadmin.resources import WorkerPool, Secret
 
 import hashlib
 
@@ -82,7 +82,7 @@ def imageset_worker_implementation(fn):
     return fn
 
 
-def build_worker_pool(workerPoolId, cfg):
+def build_worker_pool(workerPoolId, cfg, secret_values):
     try:
         wp = IMAGESET_CLOUD_FUNCS[cfg["imageset"]["cloud"]](**cfg)
         wp.update(IMAGESET_WORKER_IMPLEMENTATION[cfg["imageset"]["worker-implementation"]](**cfg))
@@ -90,13 +90,25 @@ def build_worker_pool(workerPoolId, cfg):
         raise RuntimeError(
             "Error generating worker pool configuration for {}".format(workerPoolId)
         ) from e
-    return WorkerPool(
+    if secret_values:
+        if "secret" in wp:
+            secret = Secret(
+                name="worker-pool:{}".format(workerPoolId), secret=wp.pop("secret")
+            )
+        else:
+            secret = None
+    else:
+        secret = Secret(name="worker-pool:{}".format(workerPoolId))
+
+    workerpool = WorkerPool(
         workerPoolId=workerPoolId,
         description=cfg.get("description", ""),
         owner=cfg.get("owner", "nobody@mozilla.com"),
         emailOnError=cfg.get("emailOnError", False),
         **wp,
     )
+
+    return workerpool, secret
 
 
 def base_google_config(
@@ -162,6 +174,18 @@ def gcp(*, image=None, diskSizeGb=50, privileged=False, **cfg):
         lc["workerConfig"] = {
             "shutdown": {"enabled": True, "afterIdleSeconds": 900},
         }
+
+    if cfg["secret_values"]:
+        rv["secret"] = cfg["secret_values"].render(
+            {
+                "config": {
+                    "statelessHostname": {
+                        "secret": "$stateless-dns-secret",
+                        "domain": "taskcluster-worker.net",
+                    },
+                },
+            }
+        )
 
     return rv
 
@@ -251,5 +275,41 @@ def generic_worker(platform, instanceTypes={"m3.2xlarge": 1}, workerConfig={}, *
                 }.update(GENERIC_WORKER_DEFAULT_CONFIG[platform]),
             },
         }.update(workerConfig)
+
+    return rv
+
+
+@worker_pool_type
+def standard_aws_generic_worker_win2012r2(**cfg):
+    """
+    Build a standard Win2012R2 worker instance in AWS
+    """
+    rv = base_aws_generic_worker_config(
+        imageIds=DEFAULT_AWS_WIN2012_GENERIC_WORKER_IMAGES,
+        instanceTypes={"m3.2xlarge": 1},
+        **cfg,
+    )
+
+    # instance type m3.2xlarge isn't available in this us-east-1a, so we filter
+    # out that zone
+    rv["config"]["launchConfigs"] = [
+        lc
+        for lc in rv["config"]["launchConfigs"]
+        if lc["launchConfig"]["Placement"]["AvailabilityZone"] != "us-east-1a"
+    ]
+
+    return rv
+
+
+@worker_pool_type
+def aws_generic_worker_deepspeech_win(imageIds={}, **cfg):
+    """
+    Build a deepspeech windows worker instance in AWS, with images
+    specified in the project config
+    """
+    rv = base_aws_generic_worker_config(
+        imageIds=imageIds, instanceTypes={"m5d.2xlarge": 1}, **cfg
+    )
+>>>>>>> adb4ae97e42bcd19cb3b158cc7686607337c895f
 
     return rv
