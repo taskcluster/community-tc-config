@@ -6,7 +6,10 @@
 
 from tcadmin.resources import WorkerPool, Secret
 
-TYPES = {}
+import hashlib
+
+IMAGESET_CLOUD_FUNCS = {}
+IMAGESET_WORKER_IMPLEMENTATION_FUNCS = {}
 
 AWS_PROVIDER = "community-tc-workers-aws"
 
@@ -55,19 +58,7 @@ AWS_SECURITY_GROUPS = {
     },
 }
 
-DEFAULT_AWS_WIN2012_GENERIC_WORKER_IMAGES = {
-    # from https://bugzilla.mozilla.org/show_bug.cgi?id=1590910
-    "us-east-1": "ami-04ff4e4c220abce54",
-    "us-west-1": "ami-070ee00d395f493d3",
-    "us-west-2": "ami-02161407768d981ea",
-}
-
 GOOGLE_PROVIDER = "community-tc-workers-google"
-
-DEFAUlT_GOOGLE_DOCKER_WORKER_IMAGE = (
-    "projects/taskcluster-imaging/global/images/"
-    + "docker-worker-gcp-googlecompute-2019-11-04t22-31-35z"
-)
 
 GOOGLE_REGIONS_ZONES = {
     "us-east1": ["b", "c", "d"],
@@ -81,23 +72,20 @@ GOOGLE_ZONES_REGIONS = [
 ]
 
 
-def worker_pool_type(fn):
-    """
-    Register a worker pool generator.  This function takes keyword arguments based on the
-    configuration in `projects.yml`, plus `secret_values`, an instance of SecretValues or
-    None if running without secret.  It should return a dictionary with keys
-     - providerId - passed to worker-manager
-     - config - passed to worker-manager
-     - secret - content of the `worker-pool:<workerPoolId>` secret (optional)
-    """
+def imageset_cloud(fn):
+    IMAGESET_CLOUD_FUNCS[fn.__name__] = fn
+    return fn
 
-    TYPES[fn.__name__] = fn
+
+def imageset_worker_implementation(fn):
+    IMAGESET_WORKER_IMPLEMENTATION_FUNCS[fn.__name__] = fn
     return fn
 
 
 def build_worker_pool(workerPoolId, cfg, secret_values):
     try:
-        wp = TYPES[cfg["type"]](secret_values=secret_values, **cfg)
+        wp = IMAGESET_CLOUD_FUNCS[cfg["imageset"]["cloud"]](**cfg)
+        wp.update(IMAGESET_WORKER_IMPLEMENTATION[cfg["imageset"]["worker-implementation"]](**cfg))
     except Exception as e:
         raise RuntimeError(
             "Error generating worker pool configuration for {}".format(workerPoolId)
@@ -167,8 +155,8 @@ def base_google_config(
     }
 
 
-@worker_pool_type
-def standard_gcp_docker_worker(*, image=None, diskSizeGb=50, privileged=False, **cfg):
+@imageset_cloud
+def gcp(*, image=None, diskSizeGb=50, privileged=False, **cfg):
     """
     Build a standard docker-worker instance in Google.
 
@@ -177,8 +165,6 @@ def standard_gcp_docker_worker(*, image=None, diskSizeGb=50, privileged=False, *
       privileged: true if this worker should allow privileged tasks (default false)
       ..in addition to kwargs from base_google_config
     """
-    if image is None:
-        image = DEFAUlT_GOOGLE_DOCKER_WORKER_IMAGE
     rv = base_google_config(**cfg)
     for lc in rv["config"]["launchConfigs"]:
         lc["disks"][0]["initializeParams"] = {
@@ -188,10 +174,6 @@ def standard_gcp_docker_worker(*, image=None, diskSizeGb=50, privileged=False, *
         lc["workerConfig"] = {
             "shutdown": {"enabled": True, "afterIdleSeconds": 900},
         }
-        if privileged:
-            lc.setdefault("workerConfig", {}).setdefault("dockerConfig", {})[
-                "allowPrivileged"
-            ] = True
 
     if cfg["secret_values"]:
         rv["secret"] = cfg["secret_values"].render(
@@ -208,7 +190,8 @@ def standard_gcp_docker_worker(*, image=None, diskSizeGb=50, privileged=False, *
     return rv
 
 
-def base_aws_config(
+@imageset_cloud
+def aws(
     *,
     regions=None,
     imageIds=None,
@@ -239,6 +222,10 @@ def base_aws_config(
         groupId = AWS_SECURITY_GROUPS[region][securityGroup]
         for az, subnetId in AWS_SUBNETS[region].items():
             for instanceType, capacityPerInstance in instanceTypes.items():
+                # Instance type m3.2xlarge isn't available in us-east-1a, so
+                # filter out that combination.
+                if az == "us-east-1a" and instanceType == "m3.2xlarge":
+                    continue
                 launchConfig = {
                     "capacityPerInstance": capacityPerInstance,
                     "region": region,
@@ -262,11 +249,14 @@ def base_aws_config(
         },
     }
 
-
-def base_aws_generic_worker_config(**cfg):
+@imageset_worker_implementation
+def generic_worker(platform, instanceTypes={"m3.2xlarge": 1}, workerConfig={}, **cfg):
     """
     Build a base for generic-worker in AWS
     """
+
+    hashed = hashlib.sha256(json.dumps(configs, sort_keys=True).encode("utf8")).hexdigest()
+    generic_worker_config["deploymentId"] = hashed[:16]
 
     # by default, deploy where there are images
     if "regions" not in cfg and "imageIds" in cfg:
@@ -279,20 +269,12 @@ def base_aws_generic_worker_config(**cfg):
             "genericWorker": {
                 "config": {
                     "deploymentId": "community-tc-config",
-                    "ed25519SigningKeyLocation": "C:\\generic-worker\\generic-worker-ed25519-signing-key.key",
-                    "livelogExecutable": "C:\\generic-worker\\livelog.exe",
                     "sentryProject": "generic-worker",
-                    "taskclusterProxyExecutable": "C:\\generic-worker\\taskcluster-proxy.exe",
-                    "workerTypeMetadata": {},
                     "wstAudience": "communitytc",
                     "wstServerURL": "https://community-websocktunnel.services.mozilla.com",
-                },
+                }.update(GENERIC_WORKER_DEFAULT_CONFIG[platform]),
             },
-        }
-
-    if cfg["secret_values"]:
-        # generic-worker crashes in the absence of a secret, so create an empty secret
-        rv["secret"] = {"config": {}, "files": []}
+        }.update(workerConfig)
 
     return rv
 

@@ -1,0 +1,59 @@
+docker-worker:
+  worker-implementation: docker-worker
+  gcp:
+    image: projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2019-11-04t22-31-35z
+
+generic-worker-win2012r2:
+  worker-implementation: generic-worker
+  aws:
+    amis:
+      us-east-1: ami-04ff4e4c220abce54
+      us-west-1: ami-070ee00d395f493d3
+      us-west-2: ami-02161407768d981ea
+  gcp:
+    image: projects/pmoore-dev/global/images/win2012r2-rzuhq8vonqvbsgvhdqsd
+  workerConfig:
+    generic-worker:
+      config:
+        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
+        livelogExecutable: C:\generic-worker\livelog.exe
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: pmoore@mozilla.com
+            script: https://raw.githubusercontent.com/taskcluster/generic-worker/2509a1f8589b0b536186f5fe8f043385bf67197f/worker_types/win2012r2/bootstrap.ps1
+
+deepspeech-win2012r2:
+  worker-implementation: generic-worker
+  aws:
+    us-east-1: ami-00ac6736f325c15b8
+    us-west-1: ami-000f332719212504f
+    us-west-2: ami-032a6d4f0021ad2a9
+  workerConfig:
+    generic-worker:
+      config:
+        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
+        livelogExecutable: C:\generic-worker\livelog.exe
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: alissy@mozilla.com
+            script: https://raw.githubusercontent.com/taskcluster/generic-worker/2509a1f8589b0b536186f5fe8f043385bf67197f/worker_types/deepspeech-win/bootstrap.ps1
+
+generic-worker-linux:
+  worker-implementation: generic-worker
+  aws:
+    us-east-1: ami-000f78733862c228b
+    us-west-1: ami-0d2bc4a97a0aaa9d3
+    us-west-2: ami-00e7eeb8d7449b1ce
+  workerConfig:
+    generic-worker:
+      config:
+        ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        livelogExecutable: /usr/local/bin/livelog
+        taskclusterProxyExecutable: /usr/local/bin/taskcluster-proxy
+        tasksDir: /home
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: pmoore@mozilla.com
+            script: https://raw.githubusercontent.com/taskcluster/generic-worker/b61e0d09401b0f4c4a8f33a5e2eb239bb90dc7ac/worker_types/gwci-linux/bootstrap.sh
