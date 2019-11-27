@@ -179,7 +179,6 @@ taskcluster:
         - auth:create-client:project/taskcluster:generic-worker-tester/TestReclaimCancelledTask
         - auth:create-client:project/taskcluster:generic-worker-tester/TestResolveResolvedTask
         - auth:sentry:generic-worker-tests
-        - auth:webhooktunnel
         - generic-worker:cache:banana-cache
         - generic-worker:cache:devtools-app
         - generic-worker:cache:test-modifications
@@ -213,8 +212,8 @@ taskcluster:
     # Client for workerpool proj-taskcluster/gw-ci-macos.
     generic-worker/ci-macos:
       scopes:
-        - queue:claim-work:proj-taskcluster/gw-ci-macos
-        - queue:worker-id:proj-taskcluster/*
+        - assume:worker-pool:proj-taskcluster/gw-ci-macos
+        - assume:worker-id:proj-taskcluster/*
     # Client for workerpool proj-taskcluster/gw-ci-macos-staging.
     generic-worker/ci-macos-staging:
       scopes:
