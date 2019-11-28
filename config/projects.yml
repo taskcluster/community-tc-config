@@ -93,10 +93,10 @@ taskcluster:
           allowPrivileged: true
 
     # gw-ci-* worker pools are for generic-worker CI
-    gw-ci-ubuntu-17-10:
+    gw-ci-ubuntu-18-04:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-17-10
+      imageset: generic-worker-ubuntu-18-04
       cloud: aws
       maxCapacity: 10
       workerConfig:
@@ -104,10 +104,10 @@ taskcluster:
           config:
             runTasksAsCurrentUser: true
 
-    gw-ci-ubuntu-17-10-staging:
+    gw-ci-ubuntu-18-04-staging:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-17-10-staging
+      imageset: generic-worker-ubuntu-18-04-staging
       cloud: aws
       maxCapacity: 10
       workerConfig:
