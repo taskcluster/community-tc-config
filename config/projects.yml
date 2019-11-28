@@ -96,7 +96,7 @@ taskcluster:
     gw-ci-linux:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-linux
+      imageset: generic-worker-ubuntu-17-10
       cloud: aws
       maxCapacity: 10
       workerConfig:
@@ -107,7 +107,7 @@ taskcluster:
     gw-ci-linux-staging:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-linux-staging
+      imageset: generic-worker-ubuntu-17-10-staging
       cloud: aws
       maxCapacity: 10
       workerConfig:
