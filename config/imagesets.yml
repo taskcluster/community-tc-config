@@ -43,7 +43,7 @@ generic-worker-win2012r2-staging:
             maintainer: pmoore@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/generic-worker/2509a1f8589b0b536186f5fe8f043385bf67197f/worker_types/win2012r2/bootstrap.ps1
 
-generic-worker-ubuntu-17-10:
+generic-worker-ubuntu-18-04:
   workerImplementation: generic-worker
   aws:
     amis:
@@ -62,13 +62,13 @@ generic-worker-ubuntu-17-10:
             maintainer: pmoore@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/generic-worker/ba5c21e60957f5ed3395f848f975a7ae8b147252/worker_types/gwci-linux/bootstrap.sh
 
-generic-worker-ubuntu-17-10-staging:
+generic-worker-ubuntu-18-04-staging:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-01c4e6a2abb5d8c00
-      us-west-1: ami-02ff90fcf53c8481a
-      us-west-2: ami-01409a9fc7ad58082
+      us-east-1: ami-029a1539ae3ce69b0
+      us-west-1: ami-047fd83611b397644
+      us-west-2: ami-056c7a4b568d09255
   workerConfig:
     genericWorker:
       config:
@@ -79,7 +79,7 @@ generic-worker-ubuntu-17-10-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/generic-worker/122f90ed4c27f2abb0cd839e3944184312ad9590/worker_types/gwci-linux-beta/bootstrap.sh
+            script: https://raw.githubusercontent.com/taskcluster/generic-worker/ba5c21e60957f5ed3395f848f975a7ae8b147252/worker_types/gwci-linux-beta/bootstrap.sh
 
 deepspeech-win2012r2:
   workerImplementation: generic-worker
