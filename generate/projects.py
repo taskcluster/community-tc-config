@@ -12,6 +12,7 @@ from tcadmin.util.config import ConfigDict
 from .loader import loader
 from .workers import build_worker_pool
 from .grants import Grants
+from .imagesets import ImageSets
 
 ADMIN_ROLE_PREFIXES = [
     "github-org-admin:",
@@ -83,6 +84,7 @@ class Projects(ConfigDict):
 
 async def update_resources(resources, secret_values):
     projects = await Projects.load(loader)
+    imageSets = await ImageSets.load(loader)
 
     for project in projects.values():
         for roleId in project.adminRoles:
@@ -112,10 +114,10 @@ async def update_resources(resources, secret_values):
             for name, worker_pool in project.workerPools.items():
                 worker_pool_id = "proj-{}/{}".format(project.name, name)
                 worker_pool["description"] = "Workers for " + project.name
+                image_set = imageSets[worker_pool["imageset"]]
                 worker_pool, secret = build_worker_pool(
-                    worker_pool_id, worker_pool, secret_values
+                    worker_pool_id, worker_pool, secret_values, image_set
                 )
-
                 if project.externallyManaged.manage_individual_resources():
                     resources.manage("WorkerPool={}".format(worker_pool_id))
                     if secret:
