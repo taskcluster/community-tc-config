@@ -89,7 +89,7 @@ taskcluster:
       privileged: true
   grants:
     - grant:
-        - queue:create-task:highest:proj-taskcluster/ci
+        - queue:create-task:highest:proj-taskcluster/*
         # The account and secret for the Azure testing storage account.
         # This is secret but ok for use by PRs.
         - secrets:get:project/taskcluster/testing/azure
@@ -173,6 +173,35 @@ taskcluster:
     - grant: assume:project:taskcluster:smoketests
       to: github-team:taskcluster/smoketesters
 
+    - grant:
+        - assume:worker-id:test-worker-group/test-worker-id
+        - assume:worker-type:test-provisioner/*
+        - auth:create-client:project/taskcluster:generic-worker-tester/TestReclaimCancelledTask
+        - auth:create-client:project/taskcluster:generic-worker-tester/TestResolveResolvedTask
+        - auth:sentry:generic-worker-tests
+        - generic-worker:cache:banana-cache
+        - generic-worker:cache:devtools-app
+        - generic-worker:cache:test-modifications
+        - generic-worker:cache:unknown-issuer-app-cache
+        - generic-worker:os-group:test-provisioner/*
+        - generic-worker:run-as-administrator:test-provisioner/*
+        - queue:cancel-task:test-scheduler/*
+        - assume:worker-pool:test-provisioner/*
+        - queue:create-artifact:public/*
+        - queue:create-task:test-provisioner/*
+        - queue:get-artifact:SampleArtifacts/_/X.txt
+        - queue:get-artifact:SampleArtifacts/_/non-existent-artifact.txt
+        - queue:get-artifact:SampleArtifacts/b/c/d.jpg
+        - queue:resolve-task
+        - assume:worker-id:test-worker-group/*"
+      to: project:taskcluster:generic-worker-tester
+
+    - grant:
+        - assume:project:taskcluster:generic-worker-tester
+        - generic-worker:cache:generic-worker-checkout
+        - secrets:get:repo:github.com/taskcluster/generic-worker
+      to: repo:github.com/taskcluster/generic-worker:*
+
   clients:
     smoketests:
       scopes:
@@ -180,6 +209,32 @@ taskcluster:
     docker-worker/ci:
       scopes:
         - assume:repo:github.com/taskcluster/docker-worker:*
+    # Client for workerpool proj-taskcluster/gw-ci-macos.
+    generic-worker/ci-macos:
+      scopes:
+        - assume:worker-pool:proj-taskcluster/gw-ci-macos
+        - assume:worker-id:proj-taskcluster/*
+    # Client for workerpool proj-taskcluster/gw-ci-macos-staging.
+    generic-worker/ci-macos-staging:
+      scopes:
+        - assume:worker-pool:proj-taskcluster/gw-ci-macos-staging
+        - assume:worker-id:proj-taskcluster/*
+    # A client whose clientId and accessToken are stored in taskcluster secret
+    # `repo:github.com/taskcluster/generic-worker` and used by commands in
+    # generic-worker's .taskcluster.yml to create production tasks that are
+    # then claimed and processed by the generic-worker build under test.
+    generic-worker/taskcluster-ci:
+      scopes:
+        - assume:project:taskcluster:generic-worker-tester
+    # A client whose accessToken is securely stored in travis-ci.org
+    # taskcluster/generic-worker project as encrypted environment variable
+    # TASKCLUSTER_ACCESS_TOKEN, and used by commands in generic-worker's
+    # .travis.yml to create production tasks that are then claimed and
+    # processed by the generic-worker build under test in travis-ci.org.
+    generic-worker/travis-ci:
+      scopes:
+        - assume:project:taskcluster:generic-worker-tester
+
   secrets:
     # codecov API token
     testing/codecov: true
@@ -197,6 +252,7 @@ taskcluster:
     # monopacker image baking secrets
     monopacker/gcloud_service_account: true
     monopacker/worker_secrets_yaml: true
+
 
 bors-ng:
   adminRoles: []
