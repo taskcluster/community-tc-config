@@ -93,7 +93,7 @@ taskcluster:
           allowPrivileged: true
 
     # gw-ci-* worker pools are for generic-worker CI
-    gw-ci-linux:
+    gw-ci-ubuntu-17-10:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-17-10
@@ -104,7 +104,7 @@ taskcluster:
           config:
             runTasksAsCurrentUser: true
 
-    gw-ci-linux-staging:
+    gw-ci-ubuntu-17-10-staging:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-17-10-staging
@@ -115,7 +115,7 @@ taskcluster:
           config:
             runTasksAsCurrentUser: true
 
-    gw-ci-win2012r2:
+    gw-ci-windows2012r2-amd64:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-win2012r2
@@ -126,7 +126,7 @@ taskcluster:
           config:
             runTasksAsCurrentUser: true
 
-    gw-ci-win2012r2-staging:
+    gw-ci-windows2012r2-amd64-staging:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-win2012r2-staging
