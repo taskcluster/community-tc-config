@@ -47,9 +47,9 @@ generic-worker-ubuntu-17-10:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-000f78733862c228b
-      us-west-1: ami-0d2bc4a97a0aaa9d3
-      us-west-2: ami-00e7eeb8d7449b1ce
+      us-east-1: ami-00477f6d6e091167d
+      us-west-1: ami-004d920c923ee252d
+      us-west-2: ami-0cbc5f32c8bbb1ec9
   workerConfig:
     genericWorker:
       config:
@@ -60,7 +60,7 @@ generic-worker-ubuntu-17-10:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/generic-worker/b61e0d09401b0f4c4a8f33a5e2eb239bb90dc7ac/worker_types/gwci-linux/bootstrap.sh
+            script: https://raw.githubusercontent.com/taskcluster/generic-worker/ba5c21e60957f5ed3395f848f975a7ae8b147252/worker_types/gwci-linux/bootstrap.sh
 
 generic-worker-ubuntu-17-10-staging:
   workerImplementation: generic-worker
