@@ -186,14 +186,14 @@ taskcluster:
         - generic-worker:os-group:test-provisioner/*
         - generic-worker:run-as-administrator:test-provisioner/*
         - queue:cancel-task:test-scheduler/*
-        - queue:claim-work:test-provisioner/*
+        - assume:worker-pool:test-provisioner/*
         - queue:create-artifact:public/*
         - queue:create-task:test-provisioner/*
         - queue:get-artifact:SampleArtifacts/_/X.txt
         - queue:get-artifact:SampleArtifacts/_/non-existent-artifact.txt
         - queue:get-artifact:SampleArtifacts/b/c/d.jpg
         - queue:resolve-task
-        - queue:worker-id:test-worker-group/*"
+        - assume:worker-id:test-worker-group/*"
       to: project:taskcluster:generic-worker-tester
 
     - grant:
@@ -217,8 +217,8 @@ taskcluster:
     # Client for workerpool proj-taskcluster/gw-ci-macos-staging.
     generic-worker/ci-macos-staging:
       scopes:
-        - queue:claim-work:proj-taskcluster/gw-ci-macos-staging
-        - queue:worker-id:proj-taskcluster/*
+        - assume:worker-pool:proj-taskcluster/gw-ci-macos-staging
+        - assume:worker-id:proj-taskcluster/*
     # A client whose clientId and accessToken are stored in taskcluster secret
     # `repo:github.com/taskcluster/generic-worker` and used by commands in
     # generic-worker's .taskcluster.yml to create production tasks that are
