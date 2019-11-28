@@ -43,7 +43,7 @@ generic-worker-win2012r2-staging:
             maintainer: pmoore@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/generic-worker/2509a1f8589b0b536186f5fe8f043385bf67197f/worker_types/win2012r2/bootstrap.ps1
 
-generic-worker-linux:
+generic-worker-ubuntu-17-10:
   workerImplementation: generic-worker
   aws:
     amis:
@@ -62,7 +62,7 @@ generic-worker-linux:
             maintainer: pmoore@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/generic-worker/b61e0d09401b0f4c4a8f33a5e2eb239bb90dc7ac/worker_types/gwci-linux/bootstrap.sh
 
-generic-worker-linux-staging:
+generic-worker-ubuntu-17-10-staging:
   workerImplementation: generic-worker
   aws:
     amis:
