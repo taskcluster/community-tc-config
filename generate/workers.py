@@ -249,9 +249,9 @@ def aws(
         groupId = AWS_SECURITY_GROUPS[region][securityGroup]
         for az, subnetId in AWS_SUBNETS[region].items():
             for instanceType, capacityPerInstance in instanceTypes.items():
-                # Instance type m3.2xlarge isn't available in us-east-1a, so
+                # Instance type m3.2xlarge isn't available in us-east-1[a,f], so
                 # filter out that combination.
-                if az == "us-east-1a" and instanceType == "m3.2xlarge":
+                if instanceType == "m3.2xlarge" and az in ["us-east-1a", "us-east-1f"]:
                     continue
                 launchConfig = {
                     "capacityPerInstance": capacityPerInstance,
