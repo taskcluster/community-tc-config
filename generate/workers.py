@@ -251,7 +251,11 @@ def aws(
             for instanceType, capacityPerInstance in instanceTypes.items():
                 # Instance type m3.2xlarge isn't available in us-east-1[a,f], so
                 # filter out that combination.
-                if instanceType == "m3.2xlarge" and az in ["us-east-1a", "us-east-1f", "us-west-2d"]:
+                if instanceType == "m3.2xlarge" and az in [
+                    "us-east-1a",
+                    "us-east-1f",
+                    "us-west-2d",
+                ]:
                     continue
                 launchConfig = {
                     "capacityPerInstance": capacityPerInstance,
