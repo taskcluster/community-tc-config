@@ -14,9 +14,11 @@ WORKER_IMPLEMENTATION_FUNCS = {}
 
 def cloud(fn):
     """
-    Register a cloud config generator. This function takes keyword arguments based on the
-    configuration in `projects.yml`, plus `secret_values`, an instance of SecretValues or
-    None if running without secrets.  It should return a dictionary with keys
+    Register a cloud config generator. This function takes keyword arguments
+    based on the configuration in `projects.yml`, plus `secret_values`; an
+    instance of SecretValues (or `None` if running without secrets), plus
+    `image_set`; an instance of the ImageSets.Item class. It should return a
+    dictionary with keys:
      - providerId - passed to worker-manager
      - config - passed to worker-manager
      - secret - content of the `worker-pool:<workerPoolId>` secret (optional)
@@ -27,10 +29,12 @@ def cloud(fn):
 
 def worker_implementation(fn):
     """
-    Register a worker implementation generator. This function takes keyword arguments
-    based on the configuration in `projects.yml`, plus `secret_values`, an instance of
-    SecretValues
-    or None if running without secrets.  It should return a dictionary with keys
+    Register a worker implementation generator. This function takes keyword
+    arguments based on the configuration in `projects.yml`, plus
+    `secret_values`; an instance of SecretValues (or `None` if running without
+    secrets), plus `image_set`; an instance of the ImageSets.Item class, plus
+    `wp`; the returned value from the cloud generator (see above). It should
+    return a dictionary with keys:
      - providerId - passed to worker-manager
      - config - passed to worker-manager
      - secret - content of the `worker-pool:<workerPoolId>` secret (optional)
@@ -41,7 +45,8 @@ def worker_implementation(fn):
 
 def merge(source, destination):
     """
-    Recursively merges a source and destination dict
+    Recursively merges a source and destination dict. Note, array values are
+    not merged; arrays in source will be replaced by arrays in destination.
     """
     for key, value in source.items():
         if isinstance(value, dict):
@@ -90,7 +95,7 @@ def build_worker_pool(workerPoolId, cfg, secret_values, image_set):
 @cloud
 def gcp(
     *,
-    image_set,
+    image_set=None,
     minCapacity=0,
     maxCapacity=None,
     machineType="zones/{zone}/machineTypes/n1-standard-4",
@@ -100,10 +105,12 @@ def gcp(
     """
     Build a worker pool in Google.
 
-      image: image name (defaults to the standard image)
-      diskSizeGb: boot disk size, in Gb (defaults to 50)
-      privileged: true if this worker should allow privileged tasks (default false)
-      ..in addition to kwargs from base_google_config
+      image_set: ImageSets.Item class instance with worker config, image names etc
+      minCapacity: minimum capacity to run at any time (default 0)
+      maxCapacity: maximum capacity to run at any time (required)
+      machineType: fully qualified gcp machine type name (default
+                   `zones/{zone}/machineTypes/n1-standard-4`)
+      diskSizeGb: boot disk size, in GB (defaults to 50)
     """
 
     image = image_set.gcp["image"]
@@ -165,22 +172,21 @@ def gcp(
 @cloud
 def aws(
     *,
+    image_set=None,
     regions=None,
-    imageIds=None,
     instanceTypes={"m3.2xlarge": 1},
     securityGroup="no-inbound",
     minCapacity=0,
     maxCapacity=None,
-    image_set,
     **cfg,
 ):
     """
-    Build a base for workers in AWS
+    Build a worker pool in AWS.
 
+      image_set: ImageSets.Item class instance with worker config, image names etc
       regions: regions to deploy to (required)
-      imageIds: dict of AMIs, keyed by region (required)
       instanceTypes: dict of instance types to provision, values are
-      capacityPerInstance (required)
+                     capacityPerInstance (required)
       securityGroup: name of the security group to appply (default no-inbound)
       minCapacity: minimum capacity to run at any time (default 0)
       maxCapacity: maximum capacity to run at any time (required)

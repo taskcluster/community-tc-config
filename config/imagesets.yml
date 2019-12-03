@@ -1,3 +1,49 @@
+# Image Sets
+#
+# Worker Manager providers spawn worker instances for a given worker pool from
+# pre-created machine images whose image names are specified in the worker pool
+# definition. Some cloud providers (such as AWS) require region-specific
+# machine images. An image set represents the set of (equivalent) images for a
+# given cloud provider, together with associated worker config.
+#
+#
+# Format of imagesets.yml
+#
+# Each image set is keyed by a consice descriptive name, which is referenced
+# from projects.yml (`imageset` key).
+#
+# The format of the image set configuration is as follows:
+#
+# <image-set-name>:
+#   <cloud>:              <cloud> is the name of a @cloud annotated function in
+#                         `generate/workers.py` (`aws`/`gcp`). The value
+#                         underneath the key depends on the cloud (see below).
+#   workerImplementation: the name of a @worker_pool_type annotated function in
+#                         `generate/workers.py` (with `-`s replaced with `_`s)
+#                         e.g. `docker-worker`/`generic-worker`.
+#   workerConfig:         a dict to merge with generated workerConfig sections
+#                         in generated worker pool definitions.
+#
+#
+# AWS Image Sets
+#
+# AWS image sets must include the following:
+#
+# aws:
+#   amis:
+#     <region1>: <ami1>
+#     <region2>: <ami2>
+#     ...
+#
+#
+# Google (gcp) Image Sets
+#
+# Google image sets include a single image, specified as follows:
+#
+# gcp:
+#   image:                Fully qualified name of the machine image to spawn.
+#                         e.g. `projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2019-11-04t22-31-35z`
+
 docker-worker:
   workerImplementation: docker-worker
   gcp:
