@@ -271,6 +271,16 @@ taskcluster:
       scopes:
         - assume:worker-pool:proj-taskcluster/gw-ci-macos-staging
         - assume:worker-id:proj-taskcluster/*
+    # Client for workerpool proj-taskcluster/gw-ci-raspbian-stretch
+    generic-worker/ci-raspbian-stretch:
+      scopes:
+        - assume:worker-pool:proj-taskcluster/gw-ci-raspbian-stretch
+        - assume:worker-id:proj-taskcluster/*
+    # Client for workerpool proj-taskcluster/gw-ci-windows10-arm
+    generic-worker/ci-windows10-arm:
+      scopes:
+        - assume:worker-pool:proj-taskcluster/gw-ci-windows10-arm
+        - assume:worker-id:proj-taskcluster/*
     # A client whose clientId and accessToken are stored in taskcluster secret
     # `project/taskcluster/testing/generic-worker/ci-creds` and used by
     # commands in generic-worker's .taskcluster.yml to create production tasks
