@@ -651,6 +651,7 @@ relman:
     code-review/deploy-dev: true
     code-review/deploy-production: true
     code-review/deploy-testing: true
+    dump_syms/deploy: true
     microannotate/deploy: true
     taskboot/deploy: true
     libmozevent/deploy: true
@@ -747,6 +748,10 @@ relman:
       to: repo:github.com/mozilla/code-review:branch:production
     - grant: secrets:get:project/relman/code-review/deploy-testing
       to: repo:github.com/mozilla/code-review:branch:testing
+
+    # dump_syms
+    - grant: secrets:get:project/relman/dump_syms/deploy
+      to: repo:github.com/mozilla/dump_syms:tag:*
 
     # micoannotate
     - grant: secrets:get:project/relman/microannotate/deploy
