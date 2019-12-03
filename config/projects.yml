@@ -638,6 +638,14 @@ relman:
       minCapacity: 1
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n1-standard-8"
+    compute-super-large:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 1
+      maxCapacity: 25
+      machineType: "zones/{zone}/machineTypes/n1-standard-16"
   secrets:
     bugbug/deploy: true
     bugbug/integration: true
