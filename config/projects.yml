@@ -251,7 +251,7 @@ taskcluster:
     - grant:
         - assume:project:taskcluster:generic-worker-tester
         - generic-worker:cache:generic-worker-checkout
-        - secrets:get:repo:github.com/taskcluster/generic-worker
+        - secrets:get:project/taskcluster/testing/generic-worker/ci-creds
       to: repo:github.com/taskcluster/generic-worker:*
 
   clients:
@@ -272,9 +272,10 @@ taskcluster:
         - assume:worker-pool:proj-taskcluster/gw-ci-macos-staging
         - assume:worker-id:proj-taskcluster/*
     # A client whose clientId and accessToken are stored in taskcluster secret
-    # `repo:github.com/taskcluster/generic-worker` and used by commands in
-    # generic-worker's .taskcluster.yml to create production tasks that are
-    # then claimed and processed by the generic-worker build under test.
+    # `project/taskcluster/testing/generic-worker/ci-creds` and used by
+    # commands in generic-worker's .taskcluster.yml to create production tasks
+    # that are then claimed and processed by the generic-worker build under
+    # test.
     generic-worker/taskcluster-ci:
       scopes:
         - assume:project:taskcluster:generic-worker-tester
@@ -292,6 +293,8 @@ taskcluster:
     testing/codecov: true
     # client_id/access_token for project/taskcluster/testing/docker-worker/ci-creds
     testing/docker-worker/ci-creds: true
+    # client_id/access_token for generic-worker integration tests
+    testing/generic-worker/ci-creds: true
     testing/azure:
       AZURE_ACCOUNT: $taskcluster-azure-account
       AZURE_ACCOUNT_KEY: $taskcluster-azure-account-key
