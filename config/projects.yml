@@ -31,7 +31,10 @@
 #     <worker-pool-name>:
 #       owner: ..
 #       emailOnError: ..
-#       type: <name of a function in `generate/workers.py`)
+#       instanceTypes: a dict, where each key is an instance type, and the
+#           value is the capacity per instance for that instance type.
+#       imageset: top level key from imagesets.yml
+#       cloud: cloud to deploy in ('aws' or 'gcp')
 #       ..: ..  # arguments to that function
 #
 #   secrets:
@@ -83,10 +86,59 @@ taskcluster:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       minCapacity: 1
       maxCapacity: 20
-      privileged: true
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
+
+    # gw-ci-* worker pools are for generic-worker CI
+    gw-ci-ubuntu-18-04:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-18-04
+      cloud: aws
+      maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
+    gw-ci-ubuntu-18-04-staging:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-18-04-staging
+      cloud: aws
+      maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
+    gw-ci-windows2012r2-amd64:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2012r2
+      cloud: gcp
+      maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
+    gw-ci-windows2012r2-amd64-staging:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2012r2-staging
+      cloud: gcp
+      maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
   grants:
     - grant:
         - queue:create-task:highest:proj-taskcluster/*
@@ -262,7 +314,8 @@ bors-ng:
     ci:
       owner: michael@notriddle.com
       emailOnError: false
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 2
   grants:
@@ -278,7 +331,8 @@ servo:
     docker:
       owner: servo-ops@mozilla.com
       emailOnError: false
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
       diskSizeGb: 100
       minCapacity: 2
@@ -286,7 +340,8 @@ servo:
     docker-untrusted:
       owner: servo-ops@mozilla.com
       emailOnError: false
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
       diskSizeGb: 100
       minCapacity: 0
@@ -322,7 +377,8 @@ firefoxreality:
     ci-linux:
       owner: nobody@mozilla.com
       emailOnError: false
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 6
   grants:
@@ -367,7 +423,8 @@ releng:
     ci:
       owner: release@mozilla.com
       emailOnError: false
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 10
   grants:
@@ -387,7 +444,8 @@ misc:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       minCapacity: 1
       maxCapacity: 20
   hooks:
@@ -460,7 +518,8 @@ fuzzing:
     ci:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 10
   grants:
@@ -479,10 +538,12 @@ git-cinnabar:
     codecov: true
   workerPools:
     ci:
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       maxCapacity: 5
     win2012r2:
-      type: standard_aws_generic_worker_win2012r2
+      imageset: generic-worker-win2012r2
+      cloud: aws
       maxCapacity: 2
   clients:
     worker-osx-10-10:
@@ -521,9 +582,12 @@ wpt:
     - github-team:web-platform-tests/admins
   workerPools:
     ci:
-      type: standard_gcp_docker_worker
-      privileged: true
+      imageset: docker-worker
+      cloud: gcp
       maxCapacity: 80
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
   repos:
     - github.com/web-platform-tests/*
   grants:
@@ -551,21 +615,26 @@ relman:
     ci:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       minCapacity: 1
       maxCapacity: 50
-      privileged: true
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
     compute-small:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       minCapacity: 1
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n1-standard-4"
     compute-large:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       minCapacity: 1
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n1-standard-8"
@@ -698,33 +767,26 @@ deepspeech:
     ci:
       owner: deepspeech@mozilla.com
       emailOnError: false
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 96
       machineType: "zones/{zone}/machineTypes/n1-standard-32"
     win:
       owner: deepspeech@mozilla.com
       emailOnError: false
-      type: aws_generic_worker_deepspeech_win
-      # these were generated from
-      # https://github.com/taskcluster/generic-worker/tree/94da59be253c63aea8f11e0f4929ab74f411f61b/worker_types/deepspeech-win
-      imageIds:
-        us-east-1: ami-00ac6736f325c15b8
-        us-west-1: ami-000f332719212504f
-        us-west-2: ami-032a6d4f0021ad2a9
-      minCapacity: 0
+      imageset: deepspeech-win2012r2
+      cloud: aws
+      instanceTypes:
+        m5d.2xlarge: 1
       maxCapacity: 16
     win-b:
       owner: deepspeech@mozilla.com
       emailOnError: false
-      type: aws_generic_worker_deepspeech_win
-      # these were generated from
-      # https://github.com/taskcluster/generic-worker/tree/94da59be253c63aea8f11e0f4929ab74f411f61b/worker_types/deepspeech-win
-      imageIds:
-        us-east-1: ami-00ac6736f325c15b8
-        us-west-1: ami-000f332719212504f
-        us-west-2: ami-032a6d4f0021ad2a9
-      minCapacity: 0
+      imageset: deepspeech-win2012r2
+      cloud: aws
+      instanceTypes:
+        m5d.2xlarge: 1
       maxCapacity: 16
   clients:
     worker/rpi3bp-1:
@@ -878,7 +940,8 @@ webrender:
     ci-linux:
       owner: kats@mozilla.com
       emailOnError: false
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 2
   clients:
@@ -905,7 +968,8 @@ l10n:
     - github.com/mozilla-l10n/*
   workerPools:
     ci:
-      type: standard_gcp_docker_worker
+      imageset: docker-worker
+      cloud: gcp
       maxCapacity: 5
   grants:
     - grant:
