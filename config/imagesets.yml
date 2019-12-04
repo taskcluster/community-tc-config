@@ -62,8 +62,6 @@ generic-worker-win2012r2:
     genericWorker:
       config:
         ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        livelogExecutable: C:\generic-worker\livelog.exe
-        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
@@ -82,8 +80,6 @@ generic-worker-win2012r2-staging:
     genericWorker:
       config:
         ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        livelogExecutable: C:\generic-worker\livelog.exe
-        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
@@ -100,9 +96,6 @@ generic-worker-ubuntu-18-04:
     genericWorker:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
-        livelogExecutable: /usr/local/bin/livelog
-        taskclusterProxyExecutable: /usr/local/bin/taskcluster-proxy
-        tasksDir: /home
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
@@ -119,9 +112,6 @@ generic-worker-ubuntu-18-04-staging:
     genericWorker:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
-        livelogExecutable: /usr/local/bin/livelog
-        taskclusterProxyExecutable: /usr/local/bin/taskcluster-proxy
-        tasksDir: /home
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
@@ -138,8 +128,6 @@ deepspeech-win2012r2:
     genericWorker:
       config:
         ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        livelogExecutable: C:\generic-worker\livelog.exe
-        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
         workerTypeMetadata:
           machine-setup:
             maintainer: alissy@mozilla.com
