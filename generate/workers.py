@@ -70,19 +70,14 @@ def build_worker_pool(workerPoolId, cfg, secret_values, image_set):
         )
 
         for launchConfig in wp["config"]["launchConfigs"]:
-            launchConfig["workerConfig"] = (
-                image_set.workerConfig
-                if "workerConfig" not in launchConfig
-                else merge(
-                    image_set.workerConfig,  # takes precedence
-                    launchConfig["workerConfig"],
-                )
+            launchConfig["workerConfig"] = merge(
+                image_set.workerConfig,  # takes precedence
+                launchConfig.get("workerConfig", {}),
             )
-            if "workerConfig" in cfg:
-                launchConfig["workerConfig"] = merge(
-                    cfg["workerConfig"],  # takes precedence
-                    launchConfig["workerConfig"],
-                )
+            launchConfig["workerConfig"] = merge(
+                cfg.get("workerConfig", {}),  # takes precedence
+                launchConfig["workerConfig"],
+            )
 
         wp = WORKER_IMPLEMENTATION_FUNCS[
             image_set.workerImplementation.replace("-", "_")
