@@ -45,14 +45,20 @@ def worker_implementation(fn):
     return fn
 
 
-def merge(source, destination):
+def merge(*dicts):
     """
-    Returns deep merge of source and destination dicts. Array values inside
-    dicts are not merged. Values in source take precedence over values in
-    destination. Source and destination dicts are not altered.
+    Returns a new dict containing deep merge of dicts. Source dicts are not
+    altered. Array values inside dicts are not merged. Values in earlier dicts
+    take precedence over values in later dicts. At least two dicts required.
     """
-    result = copy.deepcopy(destination)
-    for key, value in source.items():
+
+    assert len(dicts) >= 2
+
+    if len(dicts) > 2:
+        return merge(dicts[0], merge(*dicts[1:]))
+
+    result = copy.deepcopy(dicts[1])
+    for key, value in dicts[0].items():
         if isinstance(value, dict):
             # get node or create one
             node = result.setdefault(key, {})
@@ -71,12 +77,11 @@ def build_worker_pool(workerPoolId, cfg, secret_values, image_set):
 
         for launchConfig in wp["config"]["launchConfigs"]:
             launchConfig["workerConfig"] = merge(
-                image_set.workerConfig,  # takes precedence
+                # The order is important here: earlier entries take precendence
+                # over later entries.
+                cfg.get("workerConfig", {}),
+                image_set.workerConfig,
                 launchConfig.get("workerConfig", {}),
-            )
-            launchConfig["workerConfig"] = merge(
-                cfg.get("workerConfig", {}),  # takes precedence
-                launchConfig["workerConfig"],
             )
 
         wp = WORKER_IMPLEMENTATION_FUNCS[
@@ -330,13 +335,14 @@ def generic_worker(wp, **cfg):
         )
 
     # Generate unique deployment ID based on hash of launch config. Note, this
-    # isn't perfect, since deploymentId will change even if e.g. maxCapacity
-    # or owner metadata field change, but it is a reasonable approach that will
-    # be over aggressive rather than under aggressive. Note, deploymentId needs
-    # to be the same for all regions, since workers check the deploymentId of
-    # the first launchConfig, regardless of the region they are in.
+    # isn't perfect, since it may not always be necessary to respawn workers in
+    # all regions for any launch config change, but it is a safe approach that
+    # favours over-rotating workers over under-rotating workers in cases of
+    # uncertainty. Note, deploymentId needs to be the same for all regions,
+    # since workers check the deploymentId of the first launchConfig,
+    # regardless of the region they are in.
     hashedConfig = hashlib.sha256(
-        json.dumps(wp["config"], sort_keys=True).encode("utf8")
+        json.dumps(wp["config"]["launchConfigs"], sort_keys=True).encode("utf8")
     ).hexdigest()
 
     for launchConfig in wp["config"]["launchConfigs"]:
