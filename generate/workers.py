@@ -4,9 +4,9 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file, You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 
-from tcadmin.resources import WorkerPool, Secret
+from tcadmin.resources import WorkerPool, Secret, Role
 
-import hashlib
+import copy, hashlib, json
 
 CLOUD_FUNCS = {}
 WORKER_IMPLEMENTATION_FUNCS = {}
@@ -22,6 +22,7 @@ def cloud(fn):
      - providerId - passed to worker-manager
      - config - passed to worker-manager
      - secret - content of the `worker-pool:<workerPoolId>` secret (optional)
+     - scopes - any additional scopes required for workers in this cloud
     """
     CLOUD_FUNCS[fn.__name__] = fn
     return fn
@@ -32,31 +33,40 @@ def worker_implementation(fn):
     Register a worker implementation generator. This function takes keyword
     arguments based on the configuration in `projects.yml`, plus
     `secret_values`; an instance of SecretValues (or `None` if running without
-    secrets), plus `image_set`; an instance of the ImageSets.Item class, plus
-    `wp`; the returned value from the cloud generator (see above). It should
-    return a dictionary with keys:
+    secrets), plus `wp`; the returned value from the cloud generator (see
+    above). It should return a dictionary with keys:
      - providerId - passed to worker-manager
      - config - passed to worker-manager
      - secret - content of the `worker-pool:<workerPoolId>` secret (optional)
+     - scopes - any additional scopes required for workers with this
+                implementation
     """
     WORKER_IMPLEMENTATION_FUNCS[fn.__name__] = fn
     return fn
 
 
-def merge(source, destination):
+def merge(*dicts):
     """
-    Recursively merges a source and destination dict. Note, array values are
-    not merged; arrays in source will be replaced by arrays in destination.
+    Returns a new dict containing deep merge of dicts. Source dicts are not
+    altered. Array values inside dicts are not merged. Values in earlier dicts
+    take precedence over values in later dicts. At least two dicts required.
     """
-    for key, value in source.items():
+
+    assert len(dicts) >= 2
+
+    if len(dicts) > 2:
+        return merge(dicts[0], merge(*dicts[1:]))
+
+    result = copy.deepcopy(dicts[1])
+    for key, value in dicts[0].items():
         if isinstance(value, dict):
             # get node or create one
-            node = destination.setdefault(key, {})
-            merge(value, node)
+            node = result.setdefault(key, {})
+            result[key] = merge(value, node)
         else:
-            destination[key] = value
+            result[key] = value
 
-    return destination
+    return result
 
 
 def build_worker_pool(workerPoolId, cfg, secret_values, image_set):
@@ -64,9 +74,19 @@ def build_worker_pool(workerPoolId, cfg, secret_values, image_set):
         wp = CLOUD_FUNCS[cfg["cloud"]](
             secret_values=secret_values, image_set=image_set, **cfg,
         )
+
+        for launchConfig in wp["config"]["launchConfigs"]:
+            launchConfig["workerConfig"] = merge(
+                # The order is important here: earlier entries take precendence
+                # over later entries.
+                cfg.get("workerConfig", {}),
+                image_set.workerConfig,
+                launchConfig.get("workerConfig", {}),
+            )
+
         wp = WORKER_IMPLEMENTATION_FUNCS[
             image_set.workerImplementation.replace("-", "_")
-        ](secret_values=secret_values, image_set=image_set, wp=wp, **cfg,)
+        ](secret_values=secret_values, wp=wp, **cfg,)
     except Exception as e:
         raise RuntimeError(
             "Error generating worker pool configuration for {}".format(workerPoolId)
@@ -81,6 +101,18 @@ def build_worker_pool(workerPoolId, cfg, secret_values, image_set):
     else:
         secret = Secret(name="worker-pool:{}".format(workerPoolId))
 
+    scopes = wp.pop("scopes")
+    if scopes:
+        role = Role(
+            roleId="worker-pool:{}".format(workerPoolId),
+            description="Scopes for image set `{}` and cloud `{}`.".format(
+                image_set.name, cfg["cloud"]
+            ),
+            scopes=scopes,
+        )
+    else:
+        role = None
+
     workerpool = WorkerPool(
         workerPoolId=workerPoolId,
         description=cfg.get("description", ""),
@@ -89,7 +121,7 @@ def build_worker_pool(workerPoolId, cfg, secret_values, image_set):
         **wp,
     )
 
-    return workerpool, secret
+    return workerpool, secret, role
 
 
 @cloud
@@ -156,14 +188,12 @@ def gcp(
                 for zone, region in GOOGLE_ZONES_REGIONS
             ],
         },
+        "scopes": [],
     }
     for lc in rv["config"]["launchConfigs"]:
         lc["disks"][0]["initializeParams"] = {
             "sourceImage": image,
             "diskSizeGb": diskSizeGb,
-        }
-        lc["workerConfig"] = {
-            "shutdown": {"enabled": True, "afterIdleSeconds": 900},
         }
 
     return rv
@@ -284,48 +314,64 @@ def aws(
             "maxCapacity": maxCapacity,
             "launchConfigs": launchConfigs,
         },
+        "scopes": [],
     }
 
 
 @worker_implementation
-def generic_worker(image_set, wp, **cfg):
-
-    # hashed = hashlib.sha256(json.dumps(configs, sort_keys=True).encode("utf8")).hexdigest()
-    # generic_worker_config["deploymentId"] = hashed[:16]
+def generic_worker(wp, **cfg):
 
     for launchConfig in wp["config"]["launchConfigs"]:
-        launchConfig["workerConfig"] = {
-            "genericWorker": {
-                "config": {
-                    "deploymentId": "community-tc-config",
-                    "sentryProject": "generic-worker",
-                    "wstAudience": "communitytc",
-                    "wstServerURL": "https://community-websocktunnel.services.mozilla.com",
+        launchConfig["workerConfig"] = merge(
+            launchConfig["workerConfig"],  # takes precendence
+            {
+                "genericWorker": {
+                    "config": {
+                        "wstAudience": "communitytc",
+                        "wstServerURL": "https://community-websocktunnel.services.mozilla.com",
+                    },
                 },
             },
-        }
-        launchConfig["workerConfig"] = merge(
-            launchConfig["workerConfig"], image_set.workerConfig
         )
-        if "workerConfig" in cfg:
-            launchConfig["workerConfig"] = merge(
-                launchConfig["workerConfig"], cfg["workerConfig"]
-            )
+
+    # Generate unique deployment ID based on hash of launch config. Note, this
+    # isn't perfect, since it may not always be necessary to respawn workers in
+    # all regions for any launch config change, but it is a safe approach that
+    # favours over-rotating workers over under-rotating workers in cases of
+    # uncertainty. Note, deploymentId needs to be the same for all regions,
+    # since workers check the deploymentId of the first launchConfig,
+    # regardless of the region they are in.
+    hashedConfig = hashlib.sha256(
+        json.dumps(wp["config"]["launchConfigs"], sort_keys=True).encode("utf8")
+    ).hexdigest()
+
+    for launchConfig in wp["config"]["launchConfigs"]:
+        launchConfig["workerConfig"]["genericWorker"]["config"][
+            "deploymentId"
+        ] = hashedConfig[:16]
+
+    # The sentry project may be specified in the image set definition
+    # (/config/imagesets.yml), or in the worker pool definition
+    # (/config/projects.yml) so isn't necessarily "generic-worker". Note, we
+    # don't include "sentryProject": "generic-worker" in fallback settings
+    # above, since generic-worker has this default already, and this keeps the
+    # config sections smaller/simpler.
+    sentryProject = launchConfig["workerConfig"]["genericWorker"]["config"].get(
+        "sentryProject", "generic-worker"
+    )
+    wp["scopes"].append("auth:sentry:" + sentryProject)
 
     return wp
 
 
 @worker_implementation
-def docker_worker(image_set, wp, **cfg):
+def docker_worker(wp, **cfg):
 
     for launchConfig in wp["config"]["launchConfigs"]:
         launchConfig["workerConfig"] = merge(
-            launchConfig["workerConfig"], image_set.workerConfig
+            launchConfig["workerConfig"],  # takes precendence
+            {"shutdown": {"enabled": True, "afterIdleSeconds": 900}},
         )
-        if "workerConfig" in cfg:
-            launchConfig["workerConfig"] = merge(
-                launchConfig["workerConfig"], cfg["workerConfig"]
-            )
 
     if cfg["secret_values"]:
         wp["secret"] = cfg["secret_values"].render(
@@ -338,5 +384,7 @@ def docker_worker(image_set, wp, **cfg):
                 },
             }
         )
+
+    wp["scopes"].append("auth:sentry:docker-worker")
 
     return wp
