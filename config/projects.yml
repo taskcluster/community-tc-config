@@ -276,6 +276,14 @@ taskcluster:
       scopes:
         - assume:worker-pool:proj-taskcluster/gw-ci-raspbian-stretch
         - assume:worker-id:proj-taskcluster/*
+    # Client for proj-taskcluster/gw-ci-windows10-amd64. This client is
+    # currently used by a single manually configured worker, running in Azure.
+    # When we have an azure provider, we can terminate this worker, delete this
+    # client, and use worker manager provisioned instances instead.
+    generic-worker/ci-windows10-amd64:
+      scopes:
+        - assume:worker-pool:proj-taskcluster/gw-ci-windows10-amd64
+        - assume:worker-id:proj-taskcluster/*
     # Client for workerpool proj-taskcluster/gw-ci-windows10-arm
     generic-worker/ci-windows10-arm:
       scopes:
