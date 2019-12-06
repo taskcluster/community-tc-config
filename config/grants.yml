@@ -137,6 +137,10 @@
     - queue:schedule-task:-/*
     - queue:rerun-task:-/*
 
+    - notify:email:*
+    - notify:irc-channel:*
+    - notify:irc-user:*
+
     # permission to run interactive tsaks
     - queue:get-artifact:private/docker-worker/*
   to:

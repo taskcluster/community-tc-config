@@ -640,6 +640,7 @@ relman:
     bugbug/code-review-testing:
       scopes:
         - hooks:trigger-hook:project-relman/bugbug-*
+        - notify:email:*
   workerPools:
     ci:
       owner: mcastelluccio@mozilla.com
