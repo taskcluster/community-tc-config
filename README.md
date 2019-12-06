@@ -60,6 +60,10 @@ Projects that manage their own resources, either by hand or via their own automa
 Note that externally managed projects can still define other resources in their `projects.yml` stanza.
 Such resources will be created and managed by this repository, but if they are removed from `projects.yml`, this repository cannot delete them.
 
+### Image Sets
+
+To build a set of machine images in GCP/AWS, see the [imagesets](/imagesets) subdirectory.
+
 ### Code Style
 
 The Python code here follows [Black](https://black.readthedocs.io/en/stable/).
