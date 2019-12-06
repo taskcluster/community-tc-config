@@ -632,6 +632,15 @@ relman:
     - github.com/mozilla/rust-code-analysis:*
     - github.com/mozilla/dump_syms:*
     - github.com/mozilla/libmozevent:*
+  clients:
+    bugbug/code-review-production:
+      scopes:
+        - hooks:trigger-hook:project-relman/bugbug-*
+        - notify:email:*
+    bugbug/code-review-testing:
+      scopes:
+        - hooks:trigger-hook:project-relman/bugbug-*
+        - notify:email:*
   workerPools:
     ci:
       owner: mcastelluccio@mozilla.com
