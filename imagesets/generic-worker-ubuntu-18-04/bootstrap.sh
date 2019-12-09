@@ -4,7 +4,8 @@ set -exv
 exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
-GENERIC_WORKER_VERSION='v16.5.5'
+WORKER_RUNNER_VERSION='v1.0.0'
+GENERIC_WORKER_VERSION='v16.6.0'
 LIVELOG_VERSION='v1.1.0'
 TASKCLUSTER_PROXY_VERSION='v5.1.0'
 ######################################
@@ -49,9 +50,10 @@ usermod -aG docker ubuntu
 
 cd /usr/local/bin
 retry curl -L "https://github.com/taskcluster/generic-worker/releases/download/${GENERIC_WORKER_VERSION}/generic-worker-multiuser-linux-amd64" > generic-worker
+retry curl -L "https://github.com/taskcluster/taskcluster-worker-runner/releases/download/${WORKER_RUNNER_VERSION}/start-worker-linux-amd64" > start-worker
 retry curl -L "https://github.com/taskcluster/livelog/releases/download/${LIVELOG_VERSION}/livelog-linux-amd64" > livelog
 retry curl -L "https://github.com/taskcluster/taskcluster-proxy/releases/download/${TASKCLUSTER_PROXY_VERSION}/taskcluster-proxy-linux-amd64" > taskcluster-proxy
-chmod a+x generic-worker taskcluster-proxy livelog
+chmod a+x generic-worker start-worker taskcluster-proxy livelog
 
 mkdir -p /etc/generic-worker
 mkdir -p /var/local/generic-worker
@@ -61,7 +63,28 @@ mkdir -p /var/local/generic-worker
 # ensure host 'taskcluster' resolves to localhost
 echo 127.0.1.1 taskcluster >> /etc/hosts
 # configure generic-worker to run on boot
-echo '@reboot cd /var/local/generic-worker && PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin /usr/local/bin/generic-worker run --configure-for-%MY_CLOUD% --config /etc/generic-worker/config >> /var/log/generic-worker.log 2>&1' | crontab -
+echo '@reboot cd /var/local/generic-worker && PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin /usr/local/bin/start-worker /etc/start-worker.yml >> /var/log/generic-worker.log 2>&1' | crontab -
+
+cloud="%MY_CLOUD%"
+if [ -z "$providerType" ]; then
+    if [ "$cloud" = "aws" ]; then
+        providerType=aws
+    elif [ "$cloud" = "gcp" ]; then
+        providerType=google
+    fi
+fi
+if [ -z "$providerType" ]; then
+    echo "No provider type for cloud $cloud"
+fi
+cat > /etc/start-worker.yml <<EOF
+provider:
+    providerType: $providerType
+worker:
+    implementation: generic-worker
+    path: /usr/local/bin/generic-worker
+    configPath: /etc/generic-worker/config
+cacheOverRestarts: /etc/start-worker-cache.json
+EOF
 
 retry apt install -y ubuntu-desktop ubuntu-gnome-desktop
 

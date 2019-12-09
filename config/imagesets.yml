@@ -89,9 +89,9 @@ generic-worker-ubuntu-18-04:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-00477f6d6e091167d
-      us-west-1: ami-004d920c923ee252d
-      us-west-2: ami-0cbc5f32c8bbb1ec9
+      us-east-1: ami-0f82177f332901088
+      us-west-1: ami-0c275313bbdf581ae
+      us-west-2: ami-002ae40b6c3989ce9
   workerConfig:
     genericWorker:
       config:
@@ -105,9 +105,9 @@ generic-worker-ubuntu-18-04-podman:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-05db6b624ab795aad
-      us-west-1: ami-0b0fecce2168e8de7
-      us-west-2: ami-020c516c51444f863
+      us-east-1: ami-0a91fdbb2c4d32234
+      us-west-1: ami-05b9ecab68c7d6fdc
+      us-west-2: ami-082a521473a070e42
   workerConfig:
     genericWorker:
       config:
@@ -121,9 +121,9 @@ generic-worker-ubuntu-18-04-staging:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0ff242b08b0d28f6c
-      us-west-1: ami-0982838b21ddfc280
-      us-west-2: ami-07a761e8aa72c8d7b
+      us-east-1: ami-0f82177f332901088
+      us-west-1: ami-0c275313bbdf581ae
+      us-west-2: ami-002ae40b6c3989ce9
   workerConfig:
     genericWorker:
       config:
