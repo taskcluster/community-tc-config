@@ -547,6 +547,8 @@ fuzzing:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
         - secrets:get:project/fuzzing/github-deploy-key
+        - secrets:get:project/fuzzing/codecov-*
+        - secrets:get:project/fuzzing/pypi
       to:
         - repo:github.com/MozillaSecurity/*
 
