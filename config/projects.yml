@@ -534,7 +534,10 @@ fuzzing:
   repos:
     - github.com/MozillaSecurity/*
   secrets:
+    codecov-fuzzfetch: true
+    codecov-fuzzmanager: true
     github-deploy-key: true
+    pypi: true
   workerPools:
     ci:
       owner: fuzzing+taskcluster@mozilla.com
