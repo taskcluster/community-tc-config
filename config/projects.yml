@@ -549,14 +549,63 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+    decision:
+      owner: fuzzing+taskcluster@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 10
+  hooks:
+    decision:
+      description: Hook to trigger the Fuzzing decision task
+      owner: fuzzing+taskcluster@mozilla.com
+      emailOnError: true
+      schedule:
+        - "0 0 */1 * * *"
+      task:
+        provisionerId: proj-fuzzing
+        workerType: decision
+        payload:
+          image: python:3.7-slim
+          features:
+            taskclusterProxy: true
+          environment:
+            DEPLOY_KEY: project/fuzzing/deploy-fuzzing-tc-config
+            TASKCLUSTER_SECRET: project/fuzzing/decision
+          command:
+            - /bin/bash
+            - -cxe
+            - |
+              apt-get update
+              apt-get install -qq openssh-client curl git > /dev/null
+              mkdir ~/.ssh
+              ssh-keyscan github.com > ~/.ssh/known_hosts
+              cd ~/.ssh
+              curl -L http://taskcluster/api/secrets/v1/secret/$DEPLOY_KEY | python -c 'import json, sys; a = json.load(sys.stdin); open("id_ed25519", "w").write(a["secret"]["key"])'
+              chmod 0400 ~/.ssh/id_ed25519
+              git clone --quiet git@github.com:MozillaSecurity/fuzzing-tc-config.git /src
+              pip install --disable-pip-version-check --no-cache-dir --quiet /src
+              fuzzing-decision
+          maxRunTime: 1200
+        metadata:
+          name: Fuzzing decision task
+          description: Create fuzzing task on Mozilla Firefox builds
+          owner: fuzzing+taskcluster@mozilla.com
+          source: https://github.com/mozillasecurity/fuzzing-tc-config
+
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
         - secrets:get:project/fuzzing/deploy-*
         - secrets:get:project/fuzzing/codecov-*
         - secrets:get:project/fuzzing/pypi
+        - secrets:get:project/fuzzing/ci-*
       to:
         - repo:github.com/MozillaSecurity/*
+    - grant:
+        - secrets:get:project/fuzzing/decision
+      to: hook-id:project-fuzzing/decision
 
 git-cinnabar:
   adminRoles:
