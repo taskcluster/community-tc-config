@@ -800,10 +800,12 @@ relman:
     - grant:
         - notify:email:*
         - secrets:get:project/relman/code-review/integration-testing
+        - docker-worker:cache:code-review-integration-testing
       to: hook-id:project-relman/code-review-integration-testing
     - grant:
         - notify:email:*
         - secrets:get:project/relman/code-review/integration-production
+        - docker-worker:cache:code-review-integration-production
       to: hook-id:project-relman/code-review-integration-production
 
     # dump_syms
