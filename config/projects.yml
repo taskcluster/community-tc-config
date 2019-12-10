@@ -536,7 +536,8 @@ fuzzing:
   secrets:
     codecov-fuzzfetch: true
     codecov-fuzzmanager: true
-    github-deploy-key: true
+    deploy-bearspray: true
+    deploy-fuzzing-tc-config: true
     pypi: true
   workerPools:
     ci:
@@ -549,7 +550,7 @@ fuzzing:
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
-        - secrets:get:project/fuzzing/github-deploy-key
+        - secrets:get:project/fuzzing/deploy-*
         - secrets:get:project/fuzzing/codecov-*
         - secrets:get:project/fuzzing/pypi
       to:
