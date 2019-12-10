@@ -530,7 +530,7 @@ misc:
 
 fuzzing:
   adminRoles:
-    - github-org-admin:MozillaSecurity
+    - github-team:MozillaSecurity/tc-admin
   repos:
     - github.com/MozillaSecurity/*
   secrets:
