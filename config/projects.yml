@@ -536,8 +536,10 @@ fuzzing:
   secrets:
     codecov-fuzzfetch: true
     codecov-fuzzmanager: true
+    credstash-aws-auth: true
     deploy-bearspray: true
     deploy-fuzzing-tc-config: true
+    docker-hub: true
     pypi: true
   workerPools:
     ci:
