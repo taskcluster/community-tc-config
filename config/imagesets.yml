@@ -101,6 +101,22 @@ generic-worker-ubuntu-18-04:
             maintainer: pmoore@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/generic-worker/ba5c21e60957f5ed3395f848f975a7ae8b147252/worker_types/gwci-linux/bootstrap.sh
 
+generic-worker-ubuntu-18-04-podman:
+  workerImplementation: generic-worker
+  aws:
+    amis:
+      us-east-1: ami-05db6b624ab795aad
+      us-west-1: ami-0b0fecce2168e8de7
+      us-west-2: ami-020c516c51444f863
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: pmoore@mozilla.com
+            script: https://github.com/MozillaSecurity
+
 generic-worker-ubuntu-18-04-staging:
   workerImplementation: generic-worker
   aws:
