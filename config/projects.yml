@@ -549,6 +549,9 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
     decision:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
@@ -566,6 +569,11 @@ fuzzing:
       task:
         provisionerId: proj-fuzzing
         workerType: decision
+        scopes:
+          - secrets:get:project/fuzzing/deploy-fuzzing-tc-config
+          - secrets:get:project/fuzzing/decision
+          - queue:scheduler-id:-
+          - queue:create-task:medium:proj-fuzzing/decision
         payload:
           image: python:3.7-slim
           features:
@@ -577,7 +585,7 @@ fuzzing:
             - /bin/bash
             - -cxe
             - |
-              apt-get update
+              apt-get update -qq
               apt-get install -qq openssh-client curl git > /dev/null
               mkdir ~/.ssh
               ssh-keyscan github.com > ~/.ssh/known_hosts
@@ -603,6 +611,11 @@ fuzzing:
       to:
         - repo:github.com/MozillaSecurity/*
     - grant:
+        - docker-worker:capability:privileged
+      to:
+        - repo:github.com/MozillaSecurity/fuzzing-tc
+    - grant:
+        - secrets:get:project/fuzzing/deploy-fuzzing-tc-config
         - secrets:get:project/fuzzing/decision
         - queue:scheduler-id:-
         - queue:create-task:highest:proj-fuzzing/decision
