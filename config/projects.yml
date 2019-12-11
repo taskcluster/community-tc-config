@@ -541,6 +541,7 @@ fuzzing:
     deploy-fuzzing-tc-config: true
     docker-hub: true
     pypi: true
+    decision: true
   workerPools:
     ci:
       owner: fuzzing+taskcluster@mozilla.com
@@ -570,30 +571,15 @@ fuzzing:
         provisionerId: proj-fuzzing
         workerType: decision
         scopes:
-          - secrets:get:project/fuzzing/deploy-fuzzing-tc-config
           - secrets:get:project/fuzzing/decision
           - queue:scheduler-id:-
           - queue:create-task:medium:proj-fuzzing/decision
         payload:
-          image: python:3.7-slim
+          image: mozillasecurity/fuzzing-tc:latest
           features:
             taskclusterProxy: true
           env:
-            DEPLOY_KEY: project/fuzzing/deploy-fuzzing-tc-config
             TASKCLUSTER_SECRET: project/fuzzing/decision
-          command:
-            - /bin/bash
-            - -cxe
-            - |
-              apt-get update -qq
-              apt-get install -qq openssh-client curl git > /dev/null
-              mkdir ~/.ssh
-              ssh-keyscan github.com > ~/.ssh/known_hosts
-              curl -L "$TASKCLUSTER_PROXY_URL/api/secrets/v1/secret/$DEPLOY_KEY" | python -c 'import json, os, sys; a = json.load(sys.stdin); open(os.path.expanduser("~/.ssh/id_ed25519"), "w").write(a["secret"]["key"])'
-              chmod 0400 ~/.ssh/id_ed25519
-              git clone --quiet git@github.com:MozillaSecurity/fuzzing-tc-config.git /src
-              pip install --disable-pip-version-check --no-cache-dir --quiet /src
-              fuzzing-decision
           maxRunTime: 1200
         metadata:
           name: Fuzzing decision task
