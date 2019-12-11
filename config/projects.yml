@@ -790,19 +790,16 @@ relman:
     - grant:
         - secrets:get:project/relman/bugbug/deploy
       to: project:relman:bugbug/deploy
-    - grant:
-        - assume:project:relman:bugbug/deploy
-        - assume:hook-id:project-relman/bugbug*
-        - hooks:modify-hook:project-relman/bugbug*
-      to: project:relman:bugbug/deploy_taskcluster
     - grant: assume:project:relman:bugbug/build
       to: repo:github.com/mozilla/bugbug:*
     # The build scopes for the tag will come from the previous rule.
-    - grant: assume:project:relman:bugbug/deploy_taskcluster
+    - grant:
+        - assume:project:relman:bugbug/deploy
+        - assume:hook-id:project-relman/bugbug
+        - hooks:modify-hook:project-relman/bugbug
       to: repo:github.com/mozilla/bugbug:tag:*
     - grant:
         - assume:project:relman:bugbug/build
-        - assume:project:relman:bugbug/deploy
         - hooks:trigger-hook:project-relman/bugbug*
         - queue:route:notify.email.release-mgmt-analysis@mozilla.com.on-failed
         - queue:route:notify.irc-channel.#bugbug.on-failed
@@ -811,6 +808,19 @@ relman:
         - queue:route:project.relman.bugbug.*
         - secrets:get:project/relman/bugbug/production
       to: hook-id:project-relman/bugbug*
+    - grant:
+        - assume:project:relman:bugbug/deploy
+        - assume:hook-id:project-relman/bugbug-annotate
+        - assume:hook-id:project-relman/bugbug-checks
+        - assume:hook-id:project-relman/bugbug-classify-patch
+        - assume:hook-id:project-relman/bugbug-test-select
+        - assume:hook-id:project-relman/bugbug-past-bugs-by-function
+        - hooks:modify-hook:project-relman/bugbug-annotate
+        - hooks:modify-hook:project-relman/bugbug-checks
+        - hooks:modify-hook:project-relman/bugbug-classify-patch
+        - hooks:modify-hook:project-relman/bugbug-test-select
+        - hooks:modify-hook:project-relman/bugbug-past-bugs-by-function
+      to: hook-id:project-relman/bugbug
 
     # task-boot
     - grant: docker-worker:capability:privileged
