@@ -570,7 +570,7 @@ fuzzing:
           image: python:3.7-slim
           features:
             taskclusterProxy: true
-          environment:
+          env:
             DEPLOY_KEY: project/fuzzing/deploy-fuzzing-tc-config
             TASKCLUSTER_SECRET: project/fuzzing/decision
           command:
