@@ -582,7 +582,7 @@ fuzzing:
               mkdir ~/.ssh
               ssh-keyscan github.com > ~/.ssh/known_hosts
               cd ~/.ssh
-              curl -L http://taskcluster/api/secrets/v1/secret/$DEPLOY_KEY | python -c 'import json, sys; a = json.load(sys.stdin); open("id_ed25519", "w").write(a["secret"]["key"])'
+              curl -L "${TASKCLUSTER_PROXY_URL}/api/secrets/v1/secret/${DEPLOY_KEY}" | python -c 'import json, sys; a = json.load(sys.stdin); open("id_ed25519", "w").write(a["secret"]["key"])'
               chmod 0400 ~/.ssh/id_ed25519
               git clone --quiet git@github.com:MozillaSecurity/fuzzing-tc-config.git /src
               pip install --disable-pip-version-check --no-cache-dir --quiet /src
