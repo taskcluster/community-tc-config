@@ -604,6 +604,8 @@ fuzzing:
         - repo:github.com/MozillaSecurity/*
     - grant:
         - secrets:get:project/fuzzing/decision
+        - queue:scheduler-id:-
+        - queue:create-task:highest:proj-fuzzing/decision
       to: hook-id:project-fuzzing/decision
 
 git-cinnabar:
