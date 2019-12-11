@@ -608,6 +608,10 @@ fuzzing:
       to:
         - repo:github.com/MozillaSecurity/*
     - grant:
+        - docker-worker:capability:privileged
+      to:
+        - repo:github.com/MozillaSecurity/fuzzing-tc
+    - grant:
         - secrets:get:project/fuzzing/deploy-fuzzing-tc-config
         - secrets:get:project/fuzzing/decision
         - queue:scheduler-id:-
