@@ -793,16 +793,8 @@ relman:
       to: project:relman:bugbug/deploy
     - grant:
         - assume:project:relman:bugbug/deploy
-        - assume:hook-id:project-relman/bugbug
-        - assume:hook-id:project-relman/bugbug-annotate
-        - assume:hook-id:project-relman/bugbug-checks
-        - assume:hook-id:project-relman/bugbug-classify-patch
-        - assume:hook-id:project-relman/bugbug-test-select
-        - hooks:modify-hook:project-relman/bugbug
-        - hooks:modify-hook:project-relman/bugbug-annotate
-        - hooks:modify-hook:project-relman/bugbug-checks
-        - hooks:modify-hook:project-relman/bugbug-classify-patch
-        - hooks:modify-hook:project-relman/bugbug-test-select
+        - assume:hook-id:project-relman/bugbug*
+        - hooks:modify-hook:project-relman/bugbug*
       to: project:relman:bugbug/deploy_taskcluster
     - grant: assume:project:relman:bugbug/build
       to: repo:github.com/mozilla/bugbug:*
