@@ -549,6 +549,9 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
     decision:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
