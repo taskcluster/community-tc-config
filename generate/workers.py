@@ -6,7 +6,8 @@
 
 from tcadmin.resources import WorkerPool, Secret, Role
 
-import copy, hashlib, json
+import copy, hashlib, json, os
+import yaml
 
 CLOUD_FUNCS = {}
 WORKER_IMPLEMENTATION_FUNCS = {}
@@ -227,50 +228,12 @@ def aws(
 
     AWS_PROVIDER = "community-tc-workers-aws"
 
-    AWS_SUBNETS = {
-        "us-west-1": {
-            "us-west-1a": "subnet-0e43a99e9c865689e",
-            "us-west-1b": "subnet-0a5344f7003aede7c",
-        },
-        "us-west-2": {
-            "us-west-2a": "subnet-048a61782df5ba378",
-            "us-west-2b": "subnet-05053e2898fc744e9",
-            "us-west-2c": "subnet-036a0812d241733ef",
-            "us-west-2d": "subnet-0fc336d9e5934c913",
-        },
-        "us-east-1": {
-            "us-east-1a": "subnet-0ab0ba0d9836bb7ab",
-            "us-east-1b": "subnet-08c284e43fd180150",
-            "us-east-1c": "subnet-0034e6efd82d24939",
-            "us-east-1d": "subnet-05a055adc7a81adc0",
-            "us-east-1e": "subnet-03bbdcf0ec23f8caa",
-            "us-east-1f": "subnet-0cc340c5cf9346dcc",
-        },
-        "us-east-2": {
-            "us-east-2a": "subnet-05205c91d6a9f06e6",
-            "us-east-2b": "subnet-082be4d0d5e7e4d58",
-            "us-east-2c": "subnet-01eb0c6a5e15846db",
-        },
-    }
-
-    AWS_SECURITY_GROUPS = {
-        "us-west-1": {
-            "no-inbound": "sg-00c4014bc978171d5",
-            "docker-worker": "sg-0d2ff88f36a05b499",
-        },
-        "us-west-2": {
-            "no-inbound": "sg-0659c2937ecbe7254",
-            "docker-worker": "sg-0f8a656368c567425",
-        },
-        "us-east-1": {
-            "no-inbound": "sg-07f7d21a488e192c6",
-            "docker-worker": "sg-08fea1235cf66b102",
-        },
-        "us-east-2": {
-            "no-inbound": "sg-00a9d64b3595c5088",
-            "docker-worker": "sg-0388de36e2f30ced2  u",
-        },
-    }
+    # Use local yaml file for AWS network constants
+    # These constants are set in a separate file to be used by external services
+    # like the fuzzing team decision tasks
+    _config_path = os.path.join(os.path.dirname(__file__), "aws.yml")
+    assert os.path.exists(_config_path), "Missing aws config in {}".format(_config_path)
+    aws_config = yaml.safe_load(open(_config_path))
 
     # by default, deploy where there are images
     if "regions" not in cfg:
@@ -282,8 +245,8 @@ def aws(
 
     launchConfigs = []
     for region in regions:
-        groupId = AWS_SECURITY_GROUPS[region][securityGroup]
-        for az, subnetId in AWS_SUBNETS[region].items():
+        groupId = aws_config["security_groups"][region][securityGroup]
+        for az, subnetId in aws_config["subnets"][region].items():
             for instanceType, capacityPerInstance in instanceTypes.items():
                 # Instance type m3.2xlarge isn't available in us-east-1[a,f], so
                 # filter out that combination.
