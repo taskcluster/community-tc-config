@@ -7,7 +7,7 @@
 # subnets:
 #   <aws-region-name>:
 #     <aws-availability-zone>: <aws-subnet-id>
-# 
+#
 # # List all the available security groups in supported regions
 # security_groups:
 #   <aws-region-name>:
