@@ -231,7 +231,7 @@ def aws(
     # Use local yaml file for AWS network constants
     # These constants are set in a separate file to be used by external services
     # like the fuzzing team decision tasks
-    _config_path = os.path.join(os.path.dirname(__file__), "aws.yml")
+    _config_path = os.path.join(os.path.dirname(__file__), "../config/aws.yml")
     assert os.path.exists(_config_path), "Missing aws config in {}".format(_config_path)
     aws_config = yaml.safe_load(open(_config_path))
 

@@ -1,7 +1,23 @@
 ---
+# This file describes AWS constants used to build worker pools
+# It supports two top level dictionaries:
+#
+# # List all the available subnets in supported regions
+# # and their associated availability zone
+# subnets:
+#   <aws-region-name>:
+#     <aws-availability-zone>: <aws-subnet-id>
+# 
+# # List all the available security groups in supported regions
+# security_groups:
+#   <aws-region-name>:
+#     <network-name>: <aws-security-group-id>
+#
 # Please do not move or edit the structure of that file as
 # it's being actively used by the fuzzing team decision task
 # to manage worker pools
+# If you remove a region, please reach out to fuzzing+taskcluster@mozilla.com
+
 subnets:
   us-west-1:
     us-west-1a: subnet-0e43a99e9c865689e
