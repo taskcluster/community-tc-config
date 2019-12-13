@@ -22,7 +22,9 @@ def cloud(fn):
     dictionary with keys:
      - providerId - passed to worker-manager
      - config - passed to worker-manager
-     - secret - content of the `worker-pool:<workerPoolId>` secret (optional)
+     - secret_tpl - template for the `worker-pool:<workerPoolId>` secret (optional)
+       if secrets are being generated, this will be "rendered" with the SeretValues
+       instance and used as the value of the secret.
      - scopes - any additional scopes required for workers in this cloud
     """
     CLOUD_FUNCS[fn.__name__] = fn
@@ -38,7 +40,9 @@ def worker_implementation(fn):
     above). It should return a dictionary with keys:
      - providerId - passed to worker-manager
      - config - passed to worker-manager
-     - secret - content of the `worker-pool:<workerPoolId>` secret (optional)
+     - secret_tpl - template for the `worker-pool:<workerPoolId>` secret (optional)
+       if secrets are being generated, this will be "rendered" with the SeretValues
+       instance and used as the value of the secret.
      - scopes - any additional scopes required for workers with this
                 implementation
     """
@@ -92,15 +96,17 @@ def build_worker_pool(workerPoolId, cfg, secret_values, image_set):
         raise RuntimeError(
             "Error generating worker pool configuration for {}".format(workerPoolId)
         ) from e
-    if secret_values:
-        if "secret" in wp:
+    if "secret_tpl" in wp:
+        secret_tpl = wp.pop("secret_tpl")
+        if secret_values:
             secret = Secret(
-                name="worker-pool:{}".format(workerPoolId), secret=wp.pop("secret")
+                name="worker-pool:{}".format(workerPoolId),
+                secret=secret_values.render(secret_tpl),
             )
         else:
-            secret = None
+            secret = Secret(name="worker-pool:{}".format(workerPoolId))
     else:
-        secret = Secret(name="worker-pool:{}".format(workerPoolId))
+        secret = None
 
     scopes = wp.pop("scopes")
     if scopes:
@@ -336,18 +342,14 @@ def docker_worker(wp, **cfg):
             {"shutdown": {"enabled": True, "afterIdleSeconds": 900}},
         )
 
-    if cfg["secret_values"]:
-        wp["secret"] = cfg["secret_values"].render(
-            {
-                "config": {
-                    "statelessHostname": {
-                        "secret": "$stateless-dns-secret",
-                        "domain": "taskcluster-worker.net",
-                    },
-                },
+    wp["secret_tpl"] = {
+        "config": {
+            "statelessHostname": {
+                "secret": "$stateless-dns-secret",
+                "domain": "taskcluster-worker.net",
             }
-        )
-
+        }
+    }
     wp["scopes"].append("auth:sentry:docker-worker")
 
     return wp
