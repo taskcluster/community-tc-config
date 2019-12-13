@@ -801,7 +801,7 @@ relman:
     - grant:
         - assume:project:relman:bugbug/build
         - hooks:trigger-hook:project-relman/bugbug*
-        - queue:route:notify.email.release-mgmt-analysis@mozilla.com.on-failed
+        - queue:route:notify.email.*
         - queue:route:notify.irc-channel.#bugbug.on-failed
         - queue:route:index.project.relman.bugbug*
         - queue:route:notify.pulse.route.project.relman.bugbug.*
