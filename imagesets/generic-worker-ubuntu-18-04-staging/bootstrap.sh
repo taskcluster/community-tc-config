@@ -94,20 +94,9 @@ User=root
 RequiredBy=graphical.target
 EOF
 
-cloud="%MY_CLOUD%"
-if [ -z "$providerType" ]; then
-    if [ "$cloud" = "aws" ]; then
-        providerType=aws
-    elif [ "$cloud" = "gcp" ]; then
-        providerType=google
-    fi
-fi
-if [ -z "$providerType" ]; then
-    echo "No provider type for cloud $cloud"
-fi
 cat > /etc/start-worker.yml <<EOF
 provider:
-    providerType: $providerType
+    providerType: %MY_CLOUD%
 worker:
     implementation: generic-worker
     path: /usr/local/bin/generic-worker

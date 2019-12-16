@@ -5,7 +5,7 @@ exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
 WORKER_RUNNER_VERSION='v1.0.0'
-GENERIC_WORKER_VERSION='v16.6.0'
+GENERIC_WORKER_VERSION='v16.5.6'
 LIVELOG_VERSION='v1.1.0'
 TASKCLUSTER_PROXY_VERSION='v5.1.0'
 ######################################
@@ -62,29 +62,36 @@ mkdir -p /var/local/generic-worker
 
 # ensure host 'taskcluster' resolves to localhost
 echo 127.0.1.1 taskcluster >> /etc/hosts
-# configure generic-worker to run on boot
-echo '@reboot cd /var/local/generic-worker && PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin /usr/local/bin/start-worker /etc/start-worker.yml >> /var/log/generic-worker.log 2>&1' | crontab -
 
-cloud="%MY_CLOUD%"
-if [ -z "$providerType" ]; then
-    if [ "$cloud" = "aws" ]; then
-        providerType=aws
-    elif [ "$cloud" = "gcp" ]; then
-        providerType=google
-    fi
-fi
-if [ -z "$providerType" ]; then
-    echo "No provider type for cloud $cloud"
-fi
+# configure generic-worker to run on boot
+cat > /lib/systemd/system/worker.service <<EOF
+[Unit]
+Description=Start TC worker
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/start-worker /etc/start-worker.yml
+# log to console to make output visible in cloud consoles, and syslog for ease of
+# redirecting to external logging services
+StandardOutput=syslog+console
+StandardError=syslog+console
+User=root
+
+[Install]
+RequiredBy=graphical.target
+EOF
+
 cat > /etc/start-worker.yml <<EOF
 provider:
-    providerType: $providerType
+    providerType: %MY_CLOUD%
 worker:
     implementation: generic-worker
     path: /usr/local/bin/generic-worker
     configPath: /etc/generic-worker/config
 cacheOverRestarts: /etc/start-worker-cache.json
 EOF
+
+systemctl enable worker
 
 retry apt install -y ubuntu-desktop ubuntu-gnome-desktop
 
