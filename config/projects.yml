@@ -94,6 +94,13 @@ taskcluster:
         dockerConfig:
           allowPrivileged: true
 
+    windows2012r2-amd64-ci:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2012r2
+      cloud: gcp
+      maxCapacity: 10
+
     # gw-ci-* worker pools are for generic-worker CI
     gw-ci-ubuntu-18-04:
       owner: taskcluster-notifications+workers@mozilla.com
