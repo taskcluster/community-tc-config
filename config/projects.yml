@@ -748,6 +748,7 @@ relman:
     bugbug/testing: true
     bugzilla-dashboard-backend/deploy-production: true
     bugzilla-dashboard-backend/deploy-testing: true
+    code-coverage/release: true
     code-coverage/deploy-production: true
     code-coverage/deploy-testing: true
     code-coverage/dev: true
@@ -837,6 +838,8 @@ relman:
       to: repo:github.com/mozilla/code-coverage:branch:production
     - grant: secrets:get:project/relman/code-coverage/deploy-testing
       to: repo:github.com/mozilla/code-coverage:branch:testing
+    - grant: secrets:get:project/relman/code-coverage/release
+      to: repo:github.com/mozilla/code-coverage:tag:*
 
     # code-review
     - grant: docker-worker:capability:privileged
