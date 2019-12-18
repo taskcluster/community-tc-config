@@ -93,6 +93,7 @@ taskcluster:
       workerConfig:
         dockerConfig:
           allowPrivileged: true
+          disableSeccomp: true
 
     windows2012r2-amd64-ci:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -201,6 +202,7 @@ taskcluster:
         - docker-worker:capability:device:loopbackAudio
         - docker-worker:capability:device:loopbackVideo
         - docker-worker:capability:device:hostSharedMemory
+        - docker-worker:capability:disableSeccomp
         - docker-worker:capability:privileged
         - docker-worker:feature:balrogStageVPNProxy
         - docker-worker:feature:balrogVPNProxy
