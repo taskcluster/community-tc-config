@@ -12,13 +12,13 @@ function deploy {
     log "Checking inputs..."
 
     if [ "${#}" -ne 3 ]; then
-        log "Please specify a cloud (aws/gcp), action (delete|update), and image set (e.g. generic-worker-win2012r2) e.g. ${0} aws update generic-worker-win2012r2" >&2
+        log "Please specify a cloud (aws/google), action (delete|update), and image set (e.g. generic-worker-win2012r2) e.g. ${0} aws update generic-worker-win2012r2" >&2
         exit 64
     fi
 
     export CLOUD="${1}"
-    if [ "${CLOUD}" != "aws" ] && [ "${CLOUD}" != "gcp" ]; then
-        log "provider must be 'aws' or 'gcp' but '${CLOUD}' was specified" >&2
+    if [ "${CLOUD}" != "aws" ] && [ "${CLOUD}" != "google" ]; then
+        log "provider must be 'aws' or 'google' but '${CLOUD}' was specified" >&2
         exit 65
     fi
 
@@ -42,7 +42,7 @@ function deploy {
         aws) 
             echo us-west-1 118 us-west-2 199 us-east-1 100 | xargs -P3 -n2 "${0}" process-region "${CLOUD}_${ACTION}"
             ;;
-        gcp)
+        google)
             if [ "${GCP_PROJECT}" == "" ]; then
                 log "env variable GCP_PROJECT must be exported before calling this script" >&2
                 exit 67
@@ -218,14 +218,14 @@ function aws_update {
 }
 
 
-################## GCP ##################
+################## GOOGLE ##################
 
-function gcp_delete {
-    gcp_find_old_objects
-    gcp_delete_found
+function google_delete {
+    google_find_old_objects
+    google_delete_found
 }
 
-function gcp_find_old_objects {
+function google_find_old_objects {
     log "Querying old instances..."
     OLD_INSTANCES="$(gcloud compute instances list --project="${GCP_PROJECT}" --filter="labels.image-set=${IMAGE_SET} AND zone:${REGION}" --format='table[no-heading](name)')"
     if [ -n "${OLD_INSTANCES}" ]; then
@@ -243,7 +243,7 @@ function gcp_find_old_objects {
     fi
 }
 
-function gcp_delete_found {
+function google_delete_found {
     # terminate old instances
     if [ -n "${OLD_INSTANCES}" ]; then
         log "Now terminating instances" ${OLD_INSTANCES}...
@@ -261,26 +261,26 @@ function gcp_delete_found {
     fi
 }
 
-function gcp_update {
+function google_update {
 
     # NOTE: to grant permission for community-tc worker manager to use images in your GCP project, run: 
     # gcloud projects add-iam-policy-binding "${GCP_PROJECT}" --member serviceAccount:taskcluster-worker-manager@taskcluster-temp-workers.iam.gserviceaccount.com --role roles/compute.imageUser
 
     # Prefer no shh keys, see: https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys
 
-    gcp_find_old_objects
+    google_find_old_objects
 
     TEMP_SETUP_SCRIPT="$(mktemp -t ${UNIQUE_NAME}.XXXXXXXXXX)"
 
     if [ -f "bootstrap.ps1" ]; then
         PLATFORM=windows
         echo '&{' >> "${TEMP_SETUP_SCRIPT}"
-        cat bootstrap.ps1 | sed 's/%MY_CLOUD%/gcp/g' >> "${TEMP_SETUP_SCRIPT}"
-        echo '} 5>&1 4>&1 3>&1 2>&1 > C:\update_gcp.log' >> "${TEMP_SETUP_SCRIPT}"
+        cat bootstrap.ps1 | sed 's/%MY_CLOUD%/google/g' >> "${TEMP_SETUP_SCRIPT}"
+        echo '} 5>&1 4>&1 3>&1 2>&1 > C:\update_google.log' >> "${TEMP_SETUP_SCRIPT}"
         STARTUP_KEY=windows-startup-script-ps1
     else
         PLATFORM=linux
-        cat bootstrap.sh | sed 's/%MY_CLOUD%/gcp/g' >> "${TEMP_SETUP_SCRIPT}"
+        cat bootstrap.sh | sed 's/%MY_CLOUD%/google/g' >> "${TEMP_SETUP_SCRIPT}"
         STARTUP_KEY=startup-script
     fi
 
@@ -322,7 +322,7 @@ function gcp_update {
         sleep 15
     done
 
-    gcp_delete_found
+    google_delete_found
 }
 
 
