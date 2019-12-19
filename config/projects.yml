@@ -180,6 +180,7 @@ taskcluster:
         - docker-worker:cache:docker-worker-garbage-*
         - docker-worker:capability:device:loopbackAudio
         - docker-worker:capability:device:loopbackVideo
+        - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:privileged
         - docker-worker:feature:balrogStageVPNProxy
         - docker-worker:feature:balrogVPNProxy
