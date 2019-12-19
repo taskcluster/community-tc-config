@@ -766,6 +766,7 @@ relman:
     microannotate/deploy: true
     taskboot/deploy: true
     libmozevent/deploy: true
+    rust-code-analysis/deploy: true
   grants:
     # all repos
     - grant:
@@ -884,6 +885,10 @@ relman:
     - grant: secrets:get:project/relman/libmozevent/deploy
       to:
         - repo:github.com/mozilla/libmozevent:tag:*
+
+    # rust-code-analysis
+    - grant: secrets:get:project/relman/rust-code-analysis/deploy
+      to: repo:github.com/mozilla/rust-code-analysis:tag:*
 
 deepspeech:
   adminRoles:
