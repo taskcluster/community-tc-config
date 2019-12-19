@@ -4,7 +4,7 @@ set -exv
 exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
-WORKER_RUNNER_VERSION='v1.0.0'
+WORKER_RUNNER_VERSION='v1.0.1'
 GENERIC_WORKER_VERSION='v16.5.6'
 LIVELOG_VERSION='v1.1.0'
 TASKCLUSTER_PROXY_VERSION='v5.1.0'

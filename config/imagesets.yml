@@ -71,9 +71,9 @@ generic-worker-win2012r2-staging:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0c0a237f391623444
-      us-west-1: ami-05fe270f0f5e45407
-      us-west-2: ami-04560dd7e051c626a
+      us-east-1: ami-0cfff11a1fb99b7a0
+      us-west-1: ami-0851ab8724b908a9e
+      us-west-2: ami-0eef7f0af4d589c4a
   gcp:
     image: projects/pmoore-dev/global/images/generic-worker-win2012r2-staging-6768u5givhm8ubt6r6of
   workerConfig:
@@ -89,9 +89,9 @@ generic-worker-ubuntu-18-04:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0f82177f332901088
-      us-west-1: ami-0c275313bbdf581ae
-      us-west-2: ami-002ae40b6c3989ce9
+      us-east-1: ami-0cfff11a1fb99b7a0
+      us-west-1: ami-0851ab8724b908a9e
+      us-west-2: ami-0eef7f0af4d589c4a
   workerConfig:
     genericWorker:
       config:
@@ -105,9 +105,9 @@ generic-worker-ubuntu-18-04-podman:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0a91fdbb2c4d32234
-      us-west-1: ami-05b9ecab68c7d6fdc
-      us-west-2: ami-082a521473a070e42
+      us-east-1: ami-0ac79688e493d419b
+      us-west-1: ami-094db6aef07587964
+      us-west-2: ami-0e436a638f00d8e06
   workerConfig:
     genericWorker:
       config:
