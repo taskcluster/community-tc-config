@@ -42,23 +42,18 @@ $client.DownloadFile("http://download.microsoft.com/download/2/E/6/2E61CFA4-993B
 Start-Process "C:\vcredist_x86-vs2013.exe" -ArgumentList "/install /passive /norestart /log C:\vcredist_x86-vs2013-install.log" -Wait -PassThru
 
 # install rustc dependencies (64 bit)
-$client.DownloadFile("http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe", "C:\vcredist_x64-vs2013.exe")
 Start-Process "C:\vcredist_x64-vs2013.exe" -ArgumentList "/install /passive /norestart /log C:\vcredist_x64-vs2013-install.log" -Wait -PassThru
 
 # install more rustc dependencies (32 bit)
-$client.DownloadFile("http://download.microsoft.com/download/f/3/9/f39b30ec-f8ef-4ba3-8cb4-e301fcf0e0aa/vc_redist.x86.exe", "C:\vcredist_x86-vs2015.exe")
 Start-Process "C:\vcredist_x86-vs2015.exe" -ArgumentList "/install /passive /norestart /log C:\vcredist_x86-vs2015-install.log" -Wait -PassThru
 
 # install more rustc dependencies (64 bit)
-$client.DownloadFile("http://download.microsoft.com/download/4/c/b/4cbd5757-0dd4-43a7-bac0-2a492cedbacb/vc_redist.x64.exe", "C:\vcredist_x64-vs2015.exe")
 Start-Process "C:\vcredist_x64-vs2015.exe" -ArgumentList "/install /passive /norestart /log C:\vcredist_x64-vs2015-install.log" -Wait -PassThru
 
 # install mozilla-build yasm dependencies (32 bit)
-$client.DownloadFile("http://download.microsoft.com/download/C/6/D/C6D0FD4E-9E53-4897-9B91-836EBA2AACD3/vcredist_x86.exe", "C:\vcredist_x86-vs2010.exe")
 Start-Process "C:\vcredist_x86-vs2010.exe" -ArgumentList "/install /passive /norestart /log C:\vcredist_x86-vs2010-install.log" -Wait -PassThru
 
 # install mozilla-build yasm dependencies (64 bit)
-$client.DownloadFile("http://download.microsoft.com/download/A/8/0/A80747C3-41BD-45DF-B505-E9710D2744E0/vcredist_x64.exe", "C:\vcredist_x64-vs2010.exe")
 Start-Process "C:\vcredist_x64-vs2010.exe" -ArgumentList "/install /passive /norestart /log C:\vcredist_x64-vs2010-install.log" -Wait -PassThru
 
 # download mozilla-build installer
@@ -80,46 +75,73 @@ $client.DownloadFile("https://raw.githubusercontent.com/mozilla/release-services
 # install nssm
 Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "http://www.nssm.cc/release/nssm-2.24.zip"
 
-# Bizarrely, this sets env TEMP/TMP correctly in default user profile, however, if running a
-# task as Administrator, including any subprocesses that creates, even if processes under a
-# different user account, %USERNAME% will be sustituted by 'SYSTEM' rather than the real
-# %USERNAME% which is in the env. Therefore commenting out this section until this is resolved.
-#
-# # utility function to replace/create a registry key, depending on whether it exists already
-# function SetKey($registryPath, $name, $value)
-# {
-#     if (!(Test-Path $registryPath)) {
-#         New-Item -Path $registryPath -Force | Out-Null
-#     }
-#     New-ItemProperty -Path $registryPath -Name $name -Value $value `
-#     -PropertyType ExpandString -Force | Out-Null
-# }
-#
-# # mount default user profile registry hive
-# reg load "HKLM\DefaultUser" "C:\Documents and Settings\Default User\ntuser.dat"
-#
-# # set TMP env var in profile
-# SetKey -registryPath "HKLM:\DefaultUser\Environment" -name "TMP" -value "C:\Users\%USERNAME%\Task\Temp\Dir"
-#
-# # set TEMP env var in profile
-# SetKey -registryPath "HKLM:\DefaultUser\Environment" -name "TEMP" -value "C:\Users\%USERNAME%\Task\Temp\Dir"
-#
-# # clean up handles so we can unmount registry hive
-# [gc]::collect()
-#
-# # unmount registry hive
-# reg unload HKLM\DefaultUser
-
 # download generic-worker
 md C:\generic-worker
-$client.DownloadFile("https://github.com/taskcluster/generic-worker/releases/download/v16.5.5/generic-worker-multiuser-windows-amd64.exe", "C:\generic-worker\generic-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/generic-worker/releases/download/v16.6.0/generic-worker-multiuser-windows-amd64.exe", "C:\generic-worker\generic-worker.exe")
+
+# install generic-worker, using the batch script suggested in https://github.com/taskcluster/taskcluster-worker-runner/blob/master/docs/windows-services.md
+Set-Content -Path c:\generic-worker\install.bat @"
+set nssm=C:\nssm-2.24\win64\nssm.exe
+%nssm% install "Generic Worker" c:\generic-worker\generic-worker.exe
+%nssm% set "Generic Worker" AppDirectory c:\generic-worker
+%nssm% set "Generic Worker" AppParameters run --config c:\generic-worker\generic-worker-config.yml --worker-runner-protocol-pipe \\.\pipe\generic-worker
+%nssm% set "Generic Worker" DisplayName "Generic Worker"
+%nssm% set "Generic Worker" Description "A taskcluster worker that runs on all mainstream platforms"
+%nssm% set "Generic Worker" Start SERVICE_DEMAND_START
+%nssm% set "Generic Worker" Type SERVICE_WIN32_OWN_PROCESS
+%nssm% set "Generic Worker" AppNoConsole 1
+%nssm% set "Generic Worker" AppAffinity All
+%nssm% set "Generic Worker" AppStopMethodSkip 0
+%nssm% set "Generic Worker" AppExit Default Exit
+%nssm% set "Generic Worker" AppRestartDelay 0
+%nssm% set "Generic Worker" AppStdout c:\generic-worker\generic-worker-service.log
+%nssm% set "Generic Worker" AppStderr c:\generic-worker\generic-worker-service.log
+%nssm% set "Generic Worker" AppRotateFiles 0
+"@
+Start-Process C:\generic-worker\install.bat -Wait -NoNewWindow -RedirectStandardOutput C:\generic-worker\install.log -RedirectStandardError C:\generic-worker\install.err
+
+# download tc-worker-runner
+md C:\worker-runner
+$client.DownloadFile("https://github.com/taskcluster/taskcluster-worker-runner/releases/download/v1.0.1/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
+
+# install tc-worker-runner using the batch script suggested in https://github.com/taskcluster/taskcluster-worker-runner/blob/master/docs/deployment.md
+Set-Content -Path c:\worker-runner\install.bat @"
+set nssm=C:\nssm-2.24\win64\nssm.exe
+%nssm% install worker-runner c:\worker-runner\start-worker.exe
+%nssm% set worker-runner AppDirectory c:\worker-runner
+%nssm% set worker-runner AppParameters c:\worker-runner\runner.yml
+%nssm% set worker-runner DisplayName "Worker Runner"
+%nssm% set worker-runner Description "Interface between workers and Taskcluster services"
+%nssm% set worker-runner Start SERVICE_AUTO_START
+%nssm% set worker-runner Type SERVICE_WIN32_OWN_PROCESS
+%nssm% set worker-runner AppNoConsole 1
+%nssm% set worker-runner AppAffinity All
+%nssm% set worker-runner AppStopMethodSkip 0
+%nssm% set worker-runner AppExit Default Exit
+%nssm% set worker-runner AppRestartDelay 0
+%nssm% set worker-runner AppStdout c:\worker-runner\worker-runner-service.log
+%nssm% set worker-runner AppStderr c:\worker-runner\worker-runner-service.log
+%nssm% set worker-runner AppRotateFiles 1
+%nssm% set worker-runner AppRotateOnline 1
+%nssm% set worker-runner AppRotateSeconds 3600
+%nssm% set worker-runner AppRotateBytes 0
+"@
+Start-Process C:\worker-runner\install.bat -Wait -NoNewWindow -RedirectStandardOutput C:\worker-runner\install.log -RedirectStandardError C:\worker-runner\install.err
+
+# configure worker-runner
+Set-Content -Path c:\worker-runner\runner.yml @"
+provider:
+    providerType: %MY_CLOUD%
+worker:
+  implementation: generic-worker
+  service: "Generic Worker"
+  configPath: c:\generic-worker\generic-worker-config.yml
+  protocolPipe: \\.\pipe\generic-worker
+cacheOverRestarts: c:\generic-worker\start-worker-cache.json
+"@
 
 # download livelog
 $client.DownloadFile("https://github.com/taskcluster/livelog/releases/download/v1.1.0/livelog-windows-amd64.exe", "C:\generic-worker\livelog.exe")
-
-# install generic-worker
-Start-Process C:\generic-worker\generic-worker.exe -ArgumentList "install service --configure-for-%MY_CLOUD% --nssm C:\nssm-2.24\win64\nssm.exe --config C:\generic-worker\generic-worker.config" -Wait -NoNewWindow -PassThru -RedirectStandardOutput C:\generic-worker\install.log -RedirectStandardError C:\generic-worker\install.err
-# Start-Process C:\generic-worker\generic-worker.exe -ArgumentList "install startup --config C:\generic-worker\generic-worker.config" -Wait -NoNewWindow -PassThru -RedirectStandardOutput C:\generic-worker\install.log -RedirectStandardError C:\generic-worker\install.err
 
 # initial clone of mozilla-central
 # Start-Process "C:\mozilla-build\python\python.exe" -ArgumentList "C:\mozilla-build\python\Scripts\hg clone -u null https://hg.mozilla.org/mozilla-central C:\gecko" -Wait -NoNewWindow -PassThru -RedirectStandardOutput "C:\hg_initial_clone.log" -RedirectStandardError "C:\hg_initial_clone.err"
