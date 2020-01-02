@@ -178,10 +178,13 @@ taskcluster:
       to: repo:github.com/taskcluster/taskcluster:tag:v*
 
     - grant:
-        # pushes to monorepo master can notify on failure
+        # pushes to master and releases can notify on failure
         - queue:route:notify.email.taskcluster-internal@mozilla.com.*
+        - queue:route:notify.email.taskcluster-notifications@mozilla.com.*
         - queue:route:notify.irc-channel.#taskcluster-bots.*
-      to: repo:github.com/taskcluster/taskcluster:branch:master
+      to:
+        - repo:github.com/taskcluster/taskcluster:branch:master
+        - repo:github.com/taskcluster/taskcluster:tag:v*
 
     - grant:
         # pushes to json-e master can read secrets for deploying the site
