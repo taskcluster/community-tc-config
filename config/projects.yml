@@ -101,6 +101,18 @@ taskcluster:
       cloud: gcp
       maxCapacity: 10
 
+    release:
+      owner: taskcluster-notifications+workers@mozilla.com
+      description: "Trusted worker to build Taskcluster releases (only!)"
+      emailOnError: true
+      imageset: generic-worker-ubuntu-18-04
+      cloud: aws
+      maxCapacity: 1
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
     # gw-ci-* worker pools are for generic-worker CI
     gw-ci-ubuntu-18-04:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -148,7 +160,7 @@ taskcluster:
 
   grants:
     - grant:
-        - queue:create-task:highest:proj-taskcluster/*
+        - queue:create-task:highest:proj-taskcluster/ci
         # The account and secret for the Azure testing storage account.
         # This is secret but ok for use by PRs.
         - secrets:get:project/taskcluster/testing/azure
@@ -159,6 +171,11 @@ taskcluster:
         - secrets:get:project/taskcluster/testing/taskcluster-*
         - docker-worker:cache:taskcluster-*
       to: repo:github.com/taskcluster/taskcluster:*
+
+    - grant:
+        - queue:create-task:highest:proj-taskcluster/release
+        - secrets:get:project/taskcluster/release
+      to: repo:github.com/taskcluster/taskcluster:tag:v*
 
     - grant:
         # pushes to monorepo master can notify on failure
@@ -258,6 +275,7 @@ taskcluster:
 
     - grant:
         - assume:project:taskcluster:generic-worker-tester
+        - queue:create-task:highest:proj-taskcluster/gw-ci-*
         - generic-worker:cache:generic-worker-checkout
         - secrets:get:project/taskcluster/testing/generic-worker/ci-creds
       to: repo:github.com/taskcluster/generic-worker:*
