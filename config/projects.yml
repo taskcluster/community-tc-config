@@ -333,6 +333,13 @@ taskcluster:
     # monopacker image baking secrets
     monopacker/gcloud_service_account: true
     monopacker/worker_secrets_yaml: true
+    release:
+      DOCKER_USERNAME: $taskcluster-release-docker-hub-username
+      DOCKER_PASSWORD: $taskcluster-release-docker-hub-password
+      PYPI_USERNAME: $taskcluster-release-pypi-username
+      PYPI_PASSWORD: $taskcluster-release-pypi-password
+      NPM_TOKEN: $taskcluster-release-npm-token
+      GH_TOKEN: $taskcluster-release-gh-token
 
 
 bors-ng:
