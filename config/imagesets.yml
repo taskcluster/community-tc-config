@@ -57,7 +57,7 @@ generic-worker-win2012r2:
       us-west-1: ami-0dddaece5e367895c
       us-west-2: ami-021217b1d0e9ae6d6
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-win2012r2-7inku1mu0nvci32jpds6
+    image: projects/community-tc-workers/global/images/generic-worker-win2012r2-nefwcpqji22o4upodhz3
   workerConfig:
     genericWorker:
       config:
@@ -77,7 +77,7 @@ generic-worker-win2012r2-staging:
       us-west-1: ami-0f6b26130f2f9ce2c
       us-west-2: ami-0dfd8045878e6cd08
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-win2012r2-staging-exb9wkdxhofcpx5rk195
+    image: projects/community-tc-workers/global/images/generic-worker-win2012r2-staging-hasr18iepqtggvlswlku
   workerConfig:
     genericWorker:
       config:

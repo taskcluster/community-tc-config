@@ -102,7 +102,7 @@ Start-Process C:\generic-worker\install.bat -Wait -NoNewWindow -RedirectStandard
 
 # download tc-worker-runner
 md C:\worker-runner
-$client.DownloadFile("https://github.com/taskcluster/taskcluster-worker-runner/releases/download/v1.0.1/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster-worker-runner/releases/download/v1.0.2/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
 
 # install tc-worker-runner using the batch script suggested in https://github.com/taskcluster/taskcluster-worker-runner/blob/master/docs/deployment.md
 Set-Content -Path c:\worker-runner\install.bat @"
