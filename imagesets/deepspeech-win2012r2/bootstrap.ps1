@@ -124,7 +124,68 @@ Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "http://www.nssm
 
 # download generic-worker
 md C:\generic-worker
-$client.DownloadFile("https://github.com/taskcluster/generic-worker/releases/download/v16.5.5/generic-worker-multiuser-windows-amd64.exe", "C:\generic-worker\generic-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/generic-worker/releases/download/v16.6.0/generic-worker-multiuser-windows-amd64.exe", "C:\generic-worker\generic-worker.exe")
+
+# install generic-worker, using the batch script suggested in https://github.com/taskcluster/taskcluster-worker-runner/blob/master/docs/windows-services.md
+Set-Content -Path c:\generic-worker\install.bat @"
+set nssm=C:\nssm-2.24\win64\nssm.exe
+%nssm% install "Generic Worker" c:\generic-worker\generic-worker.exe
+%nssm% set "Generic Worker" AppDirectory c:\generic-worker
+%nssm% set "Generic Worker" AppParameters run --config c:\generic-worker\generic-worker-config.yml --worker-runner-protocol-pipe \\.\pipe\generic-worker
+%nssm% set "Generic Worker" DisplayName "Generic Worker"
+%nssm% set "Generic Worker" Description "A taskcluster worker that runs on all mainstream platforms"
+%nssm% set "Generic Worker" Start SERVICE_DEMAND_START
+%nssm% set "Generic Worker" Type SERVICE_WIN32_OWN_PROCESS
+%nssm% set "Generic Worker" AppNoConsole 1
+%nssm% set "Generic Worker" AppAffinity All
+%nssm% set "Generic Worker" AppStopMethodSkip 0
+%nssm% set "Generic Worker" AppExit Default Exit
+%nssm% set "Generic Worker" AppRestartDelay 0
+%nssm% set "Generic Worker" AppStdout c:\generic-worker\generic-worker-service.log
+%nssm% set "Generic Worker" AppStderr c:\generic-worker\generic-worker-service.log
+%nssm% set "Generic Worker" AppRotateFiles 0
+"@
+Start-Process C:\generic-worker\install.bat -Wait -NoNewWindow -RedirectStandardOutput C:\generic-worker\install.log -RedirectStandardError C:\generic-worker\install.err
+
+# download tc-worker-runner
+md C:\worker-runner
+$client.DownloadFile("https://github.com/taskcluster/taskcluster-worker-runner/releases/download/v1.0.1/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
+
+# install tc-worker-runner using the batch script suggested in https://github.com/taskcluster/taskcluster-worker-runner/blob/master/docs/deployment.md
+Set-Content -Path c:\worker-runner\install.bat @"
+set nssm=C:\nssm-2.24\win64\nssm.exe
+%nssm% install worker-runner c:\worker-runner\start-worker.exe
+%nssm% set worker-runner AppDirectory c:\worker-runner
+%nssm% set worker-runner AppParameters c:\worker-runner\runner.yml
+%nssm% set worker-runner DisplayName "Worker Runner"
+%nssm% set worker-runner Description "Interface between workers and Taskcluster services"
+%nssm% set worker-runner Start SERVICE_AUTO_START
+%nssm% set worker-runner Type SERVICE_WIN32_OWN_PROCESS
+%nssm% set worker-runner AppNoConsole 1
+%nssm% set worker-runner AppAffinity All
+%nssm% set worker-runner AppStopMethodSkip 0
+%nssm% set worker-runner AppExit Default Exit
+%nssm% set worker-runner AppRestartDelay 0
+%nssm% set worker-runner AppStdout c:\worker-runner\worker-runner-service.log
+%nssm% set worker-runner AppStderr c:\worker-runner\worker-runner-service.log
+%nssm% set worker-runner AppRotateFiles 1
+%nssm% set worker-runner AppRotateOnline 1
+%nssm% set worker-runner AppRotateSeconds 3600
+%nssm% set worker-runner AppRotateBytes 0
+"@
+Start-Process C:\worker-runner\install.bat -Wait -NoNewWindow -RedirectStandardOutput C:\worker-runner\install.log -RedirectStandardError C:\worker-runner\install.err
+
+# configure worker-runner
+Set-Content -Path c:\worker-runner\runner.yml @"
+provider:
+    providerType: %MY_CLOUD%
+worker:
+  implementation: generic-worker
+  service: "Generic Worker"
+  configPath: c:\generic-worker\generic-worker-config.yml
+  protocolPipe: \\.\pipe\generic-worker
+cacheOverRestarts: c:\generic-worker\start-worker-cache.json
+"@
 
 # download livelog
 $client.DownloadFile("https://github.com/taskcluster/livelog/releases/download/v1.1.0/livelog-windows-amd64.exe", "C:\generic-worker\livelog.exe")
@@ -137,20 +198,12 @@ $HostsFile_Base64 = "IyBDb3B5cmlnaHQgKGMpIDE5OTMtMjAwOSBNaWNyb3NvZnQgQ29ycC4NCiM
 $HostsFile_Content = [System.Convert]::FromBase64String($HostsFile_Base64)
 Set-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $HostsFile_Content -Encoding Byte
 
-# install generic-worker
-Start-Process C:\generic-worker\generic-worker.exe -ArgumentList "install service --configure-for-%MY_CLOUD% --nssm C:\nssm-2.24\win64\nssm.exe --config C:\generic-worker\generic-worker.config" -Wait -NoNewWindow -PassThru -RedirectStandardOutput C:\generic-worker\install.log -RedirectStandardError C:\generic-worker\install.err
-# Start-Process C:\generic-worker\generic-worker.exe -ArgumentList "install startup --config C:\generic-worker\generic-worker.config" -Wait -NoNewWindow -PassThru -RedirectStandardOutput C:\generic-worker\install.log -RedirectStandardError C:\generic-worker\install.err
-
 # download Windows Server 2003 Resource Kit Tools
 $client.DownloadFile("https://download.microsoft.com/download/8/e/c/8ec3a7d8-05b4-440a-a71e-ca3ee25fe057/rktools.exe", "C:\rktools.exe")
 
 # open up firewall for livelog (both PUT and GET interfaces)
 New-NetFirewallRule -DisplayName "Allow livelog PUT requests" -Direction Inbound -LocalPort 60022 -Protocol TCP -Action Allow
 New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound -LocalPort 60023 -Protocol TCP -Action Allow
-
-# install PSTools
-# md "C:\PSTools"
-# Expand-ZIPFile -File "C:\PSTools\PSTools.zip" -Destination "C:\PSTools" -Url "https://download.sysinternals.com/files/PSTools.zip"
 
 # generate OpenPGP key
 Start-Process C:\generic-worker\generic-worker.exe -ArgumentList "new-openpgp-keypair --file C:\generic-worker\generic-worker-gpg-signing-key.key" -Wait -NoNewWindow -PassThru -RedirectStandardOutput C:\generic-worker\generate-gpg-signing-key.log -RedirectStandardError C:\generic-worker\generate-gpg-signing-key.err
