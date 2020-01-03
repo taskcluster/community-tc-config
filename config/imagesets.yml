@@ -53,11 +53,11 @@ generic-worker-win2012r2:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-04ff4e4c220abce54
-      us-west-1: ami-070ee00d395f493d3
-      us-west-2: ami-02161407768d981ea
+      us-east-1: ami-0f1fe72cbcabc5891
+      us-west-1: ami-0dddaece5e367895c
+      us-west-2: ami-021217b1d0e9ae6d6
   gcp:
-    image: projects/pmoore-dev/global/images/win2012r2-rzuhq8vonqvbsgvhdqsd
+    image: projects/community-tc-workers/global/images/generic-worker-win2012r2-nefwcpqji22o4upodhz3
   workerConfig:
     genericWorker:
       config:
@@ -73,11 +73,11 @@ generic-worker-win2012r2-staging:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0c0a237f391623444
-      us-west-1: ami-05fe270f0f5e45407
-      us-west-2: ami-04560dd7e051c626a
+      us-east-1: ami-0162f92052875bf7e
+      us-west-1: ami-0f6b26130f2f9ce2c
+      us-west-2: ami-0dfd8045878e6cd08
   gcp:
-    image: projects/pmoore-dev/global/images/generic-worker-win2012r2-staging-6768u5givhm8ubt6r6of
+    image: projects/community-tc-workers/global/images/generic-worker-win2012r2-staging-hasr18iepqtggvlswlku
   workerConfig:
     genericWorker:
       config:
@@ -147,9 +147,9 @@ deepspeech-win2012r2:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-00ac6736f325c15b8
-      us-west-1: ami-000f332719212504f
-      us-west-2: ami-032a6d4f0021ad2a9
+      us-east-1: ami-09dd57282215e42ba
+      us-west-1: ami-05696eedcf5032c65
+      us-west-2: ami-02dfb5adb48a2032f
   workerConfig:
     genericWorker:
       config:
