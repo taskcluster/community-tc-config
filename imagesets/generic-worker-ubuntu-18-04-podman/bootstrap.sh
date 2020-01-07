@@ -36,7 +36,7 @@ start_time="$(date '+%s')"
 
 retry apt update
 DEBIAN_FRONTEND=noninteractive apt upgrade -yq
-retry apt install -y apt-transport-https ca-certificates curl gzip
+retry apt install -y apt-transport-https ca-certificates curl gzip python3-venv python-virtualenv
 
 apt-get update -qq
 apt-get install -qq -y software-properties-common uidmap
