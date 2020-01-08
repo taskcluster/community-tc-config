@@ -36,7 +36,7 @@ start_time="$(date '+%s')"
 
 retry apt update
 DEBIAN_FRONTEND=noninteractive apt upgrade -yq
-retry apt install -y apt-transport-https ca-certificates curl software-properties-common git tar
+retry apt install -y apt-transport-https ca-certificates curl software-properties-common git tar python3-venv python-virtualenv
 
 # install docker
 retry curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
