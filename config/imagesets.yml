@@ -63,6 +63,7 @@ generic-worker-win2012r2:
       config:
         ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
         shutdownMachineOnIdle: true
+        idleTimeoutSecs: 90
         shutdownMachineOnInternalError: true
         workerTypeMetadata:
           machine-setup:
@@ -83,6 +84,7 @@ generic-worker-win2012r2-staging:
       config:
         ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
         shutdownMachineOnIdle: true
+        idleTimeoutSecs: 90
         shutdownMachineOnInternalError: true
         workerTypeMetadata:
           machine-setup:
@@ -101,6 +103,7 @@ generic-worker-ubuntu-18-04:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
         shutdownMachineOnIdle: true
+        idleTimeoutSecs: 90
         shutdownMachineOnInternalError: true
         workerTypeMetadata:
           machine-setup:
@@ -119,6 +122,7 @@ generic-worker-ubuntu-18-04-podman:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
         shutdownMachineOnIdle: true
+        idleTimeoutSecs: 90
         shutdownMachineOnInternalError: true
         workerTypeMetadata:
           machine-setup:
@@ -137,6 +141,7 @@ generic-worker-ubuntu-18-04-staging:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
         shutdownMachineOnIdle: true
+        idleTimeoutSecs: 90
         shutdownMachineOnInternalError: true
         workerTypeMetadata:
           machine-setup:
@@ -155,6 +160,7 @@ deepspeech-win2012r2:
       config:
         ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
         shutdownMachineOnIdle: true
+        idleTimeoutSecs: 90
         shutdownMachineOnInternalError: true
         workerTypeMetadata:
           machine-setup:
