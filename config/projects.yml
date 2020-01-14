@@ -198,6 +198,7 @@ taskcluster:
     - grant:
         - assume:project:taskcluster:worker-test-scopes
         - assume:worker-id:docker-worker/docker-worker
+        - assume:worker-id:random-local-worker/docker-worker
         - aws-provisioner:create-secret:*
         - docker-worker:cache:docker-worker-garbage-*
         - docker-worker:capability:device:loopbackAudio
@@ -224,6 +225,7 @@ taskcluster:
         - queue:scheduler-id:taskcluster-github
         - queue:worker-id:docker-worker/docker-worker
         - queue:worker-id:random-local-worker/dummy-worker-*
+        - queue:worker-id:random-local-worker/docker-worker
         - secrets:get:project/taskcluster/taskcluster-worker/stateless-dns
         - secrets:get:project/taskcluster/testing/docker-worker/ci-creds
         - secrets:get:project/taskcluster/testing/docker-worker/pulse-creds
