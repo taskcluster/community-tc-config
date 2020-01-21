@@ -250,7 +250,7 @@ taskcluster:
         - queue:create-task:highest:built-in/fail
         - queue:create-task:highest:built-in/succeed
         - queue:route:index.project.taskcluster.smoketest.*
-        - queue:scheduler-id:-
+        - queue:scheduler-id:smoketest
         - secrets:get:project/taskcluster/smoketest/*
         - secrets:set:project/taskcluster/smoketest/*
       to: project:taskcluster:smoketests
