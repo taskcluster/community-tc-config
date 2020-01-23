@@ -6,11 +6,27 @@
 
 from tcadmin.resources import WorkerPool, Secret, Role
 
-import copy, hashlib, json, os
+import copy, hashlib, json, os, asyncio
 import yaml
+
+from .imagesets import ImageSets
+from .loader import loader
 
 CLOUD_FUNCS = {}
 WORKER_IMPLEMENTATION_FUNCS = {}
+
+
+async def get_image_set(name, _cache={}, _lock=asyncio.Lock()):
+    """
+    Get an image_set from image_sets.yml.  This loads the file on first call and
+    can thus be called repeatedly.
+    """
+    async with _lock:
+        if "image_sets" not in _cache:
+            _cache["image_sets"] = await ImageSets.load(loader)
+        image_sets = _cache["image_sets"]
+
+    return image_sets[name]
 
 
 def cloud(fn):
@@ -74,8 +90,9 @@ def merge(*dicts):
     return result
 
 
-def build_worker_pool(workerPoolId, cfg, secret_values, image_set):
+async def build_worker_pool(workerPoolId, cfg, secret_values):
     try:
+        image_set = await get_image_set(cfg["imageset"])
         wp = CLOUD_FUNCS[cfg["cloud"]](
             secret_values=secret_values, image_set=image_set, **cfg,
         )
