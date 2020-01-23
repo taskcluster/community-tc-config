@@ -35,13 +35,7 @@ def cloud(fn):
     based on the configuration in `projects.yml`, plus `secret_values`; an
     instance of SecretValues (or `None` if running without secrets), plus
     `image_set`; an instance of the ImageSets.Item class. It should return a
-    dictionary with keys:
-     - providerId - passed to worker-manager
-     - config - passed to worker-manager
-     - secret_tpl - template for the `worker-pool:<workerPoolId>` secret (optional)
-       if secrets are being generated, this will be "rendered" with the SeretValues
-       instance and used as the value of the secret.
-     - scopes - any additional scopes required for workers in this cloud
+    WorkerPoolSettings instance.
     """
     CLOUD_FUNCS[fn.__name__] = fn
     return fn
@@ -53,14 +47,7 @@ def worker_implementation(fn):
     arguments based on the configuration in `projects.yml`, plus
     `secret_values`; an instance of SecretValues (or `None` if running without
     secrets), plus `wp`; the returned value from the cloud generator (see
-    above). It should return a dictionary with keys:
-     - providerId - passed to worker-manager
-     - config - passed to worker-manager
-     - secret_tpl - template for the `worker-pool:<workerPoolId>` secret (optional)
-       if secrets are being generated, this will be "rendered" with the SeretValues
-       instance and used as the value of the secret.
-     - scopes - any additional scopes required for workers with this
-                implementation
+    above). It should return a WorkerPoolSettings instance (often just wp, modified)
     """
     WORKER_IMPLEMENTATION_FUNCS[fn.__name__] = fn
     return fn
@@ -90,6 +77,63 @@ def merge(*dicts):
     return result
 
 
+class WorkerPoolSettings:
+
+    # sentinel value (see below)
+    class EXISTING_CONFIG:
+        pass
+
+    def __init__(self, provider_id):
+        # provider_id - passed to worker-manager
+        self.provider_id = provider_id
+
+        # config - passed to worker-manager
+        self.config = {}
+
+        # secret_tpl - template for the `worker-pool:<workerPoolId>` secret (optional)
+        # if secrets are being generated, this will be "rendered" with the SeretValues
+        # instance and used as the value of the secret.
+        self.secret_tpl = {}
+
+        # scopes - any additional scopes required for workers in this cloud
+        self.scopes = []
+
+    def supports_worker_config(self):
+        """
+        Returns true if this worker pool supports setting worker configuration
+        values.
+        """
+        return False
+
+    def merge_worker_config(self, *configDictionaries):
+        """
+        Merge the given dictionaries into the worker pool's worker
+        configuration.  Earlier entries take precedence over later entries.
+        The constant WorkerPoolSettings.EXISTING_CONFIG is replaced with the
+        existing config.
+        """
+        raise NotImplementedError
+
+
+class DynamicWorkerPoolSettings(WorkerPoolSettings):
+
+    supports_worker_config = True
+
+    def supports_worker_config(self):
+        return True
+
+    def merge_worker_config(self, *configDictionaries):
+        assert WorkerPoolSettings.EXISTING_CONFIG in configDictionaries
+        for launchConfig in self.config["launchConfigs"]:
+            existing = launchConfig.get("workerConfig", {})
+            launchConfig["workerConfig"] = merge(
+                *[
+                    existing if d is WorkerPoolSettings.EXISTING_CONFIG else d
+                    for d in configDictionaries
+                ]
+            )
+
+
 async def build_worker_pool(workerPoolId, cfg, secret_values):
     try:
         image_set = await get_image_set(cfg["imageset"])
@@ -97,13 +141,13 @@ async def build_worker_pool(workerPoolId, cfg, secret_values):
             secret_values=secret_values, image_set=image_set, **cfg,
         )
 
-        for launchConfig in wp["config"]["launchConfigs"]:
-            launchConfig["workerConfig"] = merge(
+        if wp.supports_worker_config():
+            wp.merge_worker_config(
                 # The order is important here: earlier entries take precendence
                 # over later entries.
                 cfg.get("workerConfig", {}),
                 image_set.workerConfig,
-                launchConfig.get("workerConfig", {}),
+                WorkerPoolSettings.EXISTING_CONFIG,
             )
 
         wp = WORKER_IMPLEMENTATION_FUNCS[
@@ -113,26 +157,24 @@ async def build_worker_pool(workerPoolId, cfg, secret_values):
         raise RuntimeError(
             "Error generating worker pool configuration for {}".format(workerPoolId)
         ) from e
-    if "secret_tpl" in wp:
-        secret_tpl = wp.pop("secret_tpl")
+    if wp.secret_tpl:
         if secret_values:
             secret = Secret(
                 name="worker-pool:{}".format(workerPoolId),
-                secret=secret_values.render(secret_tpl),
+                secret=secret_values.render(wp.secret_tpl),
             )
         else:
             secret = Secret(name="worker-pool:{}".format(workerPoolId))
     else:
         secret = None
 
-    scopes = wp.pop("scopes")
-    if scopes:
+    if wp.scopes:
         role = Role(
             roleId="worker-pool:{}".format(workerPoolId),
             description="Scopes for image set `{}` and cloud `{}`.".format(
                 image_set.name, cfg["cloud"]
             ),
-            scopes=scopes,
+            scopes=wp.scopes,
         )
     else:
         role = None
@@ -142,7 +184,8 @@ async def build_worker_pool(workerPoolId, cfg, secret_values):
         description=cfg.get("description", ""),
         owner=cfg.get("owner", "nobody@mozilla.com"),
         emailOnError=cfg.get("emailOnError", False),
-        **wp,
+        providerId=wp.provider_id,
+        config=wp.config,
     )
 
     return workerpool, secret, role
@@ -185,42 +228,35 @@ def gcp(
     ]
 
     assert maxCapacity, "must give a maxCapacity"
-    rv = {
-        "providerId": GOOGLE_PROVIDER,
-        "config": {
-            "maxCapacity": maxCapacity,
-            "minCapacity": minCapacity,
-            "launchConfigs": [
-                {
-                    "capacityPerInstance": 1,
-                    "machineType": machineType.format(zone=zone),
-                    "region": region,
-                    "zone": zone,
-                    "scheduling": {"onHostMaintenance": "terminate"},
-                    "disks": [
-                        {
-                            "type": "PERSISTENT",
-                            "boot": True,
-                            "autoDelete": True,
-                            # "initializeParams": ..
-                        }
-                    ],
-                    "networkInterfaces": [
-                        {"accessConfigs": [{"type": "ONE_TO_ONE_NAT"}]}
-                    ],
-                }
-                for zone, region in GOOGLE_ZONES_REGIONS
-            ],
-        },
-        "scopes": [],
+    wp = DynamicWorkerPoolSettings(GOOGLE_PROVIDER)
+    wp.config = {
+        "maxCapacity": maxCapacity,
+        "minCapacity": minCapacity,
+        "launchConfigs": [
+            {
+                "capacityPerInstance": 1,
+                "machineType": machineType.format(zone=zone),
+                "region": region,
+                "zone": zone,
+                "scheduling": {"onHostMaintenance": "terminate"},
+                "disks": [
+                    {
+                        "type": "PERSISTENT",
+                        "boot": True,
+                        "autoDelete": True,
+                        "initializeParams": {
+                            "sourceImage": image,
+                            "diskSizeGb": diskSizeGb,
+                        },
+                    },
+                ],
+                "networkInterfaces": [{"accessConfigs": [{"type": "ONE_TO_ONE_NAT"}]}],
+            }
+            for zone, region in GOOGLE_ZONES_REGIONS
+        ],
     }
-    for lc in rv["config"]["launchConfigs"]:
-        lc["disks"][0]["initializeParams"] = {
-            "sourceImage": image,
-            "diskSizeGb": diskSizeGb,
-        }
 
-    return rv
+    return wp
 
 
 @cloud
@@ -293,23 +329,20 @@ def aws(
                 }
                 launchConfigs.append(launchConfig)
 
-    return {
-        "providerId": AWS_PROVIDER,
-        "config": {
-            "minCapacity": minCapacity,
-            "maxCapacity": maxCapacity,
-            "launchConfigs": launchConfigs,
-        },
-        "scopes": [],
+    wp = DynamicWorkerPoolSettings(AWS_PROVIDER)
+    wp.config = {
+        "minCapacity": minCapacity,
+        "maxCapacity": maxCapacity,
+        "launchConfigs": launchConfigs,
     }
+    return wp
 
 
 @worker_implementation
 def generic_worker(wp, **cfg):
-
-    for launchConfig in wp["config"]["launchConfigs"]:
-        launchConfig["workerConfig"] = merge(
-            launchConfig["workerConfig"],  # takes precendence
+    if wp.supports_worker_config():
+        wp.merge_worker_config(
+            WorkerPoolSettings.EXISTING_CONFIG,
             {
                 "genericWorker": {
                     "config": {
@@ -320,32 +353,33 @@ def generic_worker(wp, **cfg):
             },
         )
 
-    # Generate unique deployment ID based on hash of launch config. Note, this
-    # isn't perfect, since it may not always be necessary to respawn workers in
-    # all regions for any launch config change, but it is a safe approach that
-    # favours over-rotating workers over under-rotating workers in cases of
-    # uncertainty. Note, deploymentId needs to be the same for all regions,
-    # since workers check the deploymentId of the first launchConfig,
-    # regardless of the region they are in.
-    hashedConfig = hashlib.sha256(
-        json.dumps(wp["config"]["launchConfigs"], sort_keys=True).encode("utf8")
-    ).hexdigest()
+        # Generate unique deployment ID based on hash of launch config. Note, this
+        # isn't perfect, since it may not always be necessary to respawn workers in
+        # all regions for any launch config change, but it is a safe approach that
+        # favours over-rotating workers over under-rotating workers in cases of
+        # uncertainty. Note, deploymentId needs to be the same for all regions,
+        # since workers check the deploymentId of the first launchConfig,
+        # regardless of the region they are in.
+        hashedConfig = hashlib.sha256(
+            json.dumps(wp.config["launchConfigs"], sort_keys=True).encode("utf8")
+        ).hexdigest()
 
-    for launchConfig in wp["config"]["launchConfigs"]:
-        launchConfig["workerConfig"]["genericWorker"]["config"][
-            "deploymentId"
-        ] = hashedConfig[:16]
+        for launchConfig in wp.config["launchConfigs"]:
+            launchConfig["workerConfig"]["genericWorker"]["config"][
+                "deploymentId"
+            ] = hashedConfig[:16]
 
-    # The sentry project may be specified in the image set definition
-    # (/config/imagesets.yml), or in the worker pool definition
-    # (/config/projects.yml) so isn't necessarily "generic-worker". Note, we
-    # don't include "sentryProject": "generic-worker" in fallback settings
-    # above, since generic-worker has this default already, and this keeps the
-    # config sections smaller/simpler.
-    sentryProject = launchConfig["workerConfig"]["genericWorker"]["config"].get(
-        "sentryProject", "generic-worker"
-    )
-    wp["scopes"].append("auth:sentry:" + sentryProject)
+        # The sentry project may be specified in the image set definition
+        # (/config/imagesets.yml), or in the worker pool definition
+        # (/config/projects.yml) so isn't necessarily "generic-worker". Note, we
+        # don't include "sentryProject": "generic-worker" in fallback settings
+        # above, since generic-worker has this default already, and this keeps the
+        # config sections smaller/simpler.
+        sentryProject = launchConfig["workerConfig"]["genericWorker"]["config"].get(
+            "sentryProject", "generic-worker"
+        )
+
+        wp.scopes.append("auth:sentry:" + sentryProject)
 
     return wp
 
@@ -353,13 +387,13 @@ def generic_worker(wp, **cfg):
 @worker_implementation
 def docker_worker(wp, **cfg):
 
-    for launchConfig in wp["config"]["launchConfigs"]:
-        launchConfig["workerConfig"] = merge(
-            launchConfig["workerConfig"],  # takes precendence
-            {"shutdown": {"enabled": True, "afterIdleSeconds": 900}},
+    if wp.supports_worker_config():
+        wp.merge_worker_config(
+            WorkerPoolSettings.EXISTING_CONFIG,
+            {"shutdown": {"enabled": True, "afterIdleSeconds": 900,},},
         )
 
-    wp["secret_tpl"] = {
+    wp.secret_tpl = {
         "config": {
             "statelessHostname": {
                 "secret": "$stateless-dns-secret",
@@ -367,6 +401,6 @@ def docker_worker(wp, **cfg):
             }
         }
     }
-    wp["scopes"].append("auth:sentry:docker-worker")
+    wp.scopes.append("auth:sentry:docker-worker")
 
     return wp
