@@ -624,7 +624,7 @@ fuzzing:
         scopes:
           - secrets:get:project/fuzzing/decision
           - queue:scheduler-id:-
-          - queue:create-task:medium:proj-fuzzing/decision
+          - queue:create-task:highest:proj-fuzzing/decision
         payload:
           image: mozillasecurity/fuzzing-tc:latest
           features:
