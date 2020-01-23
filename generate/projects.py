@@ -116,11 +116,13 @@ async def update_resources(resources, secret_values):
                 )
                 if project.externallyManaged.manage_individual_resources():
                     resources.manage("WorkerPool={}".format(worker_pool_id))
-                    resources.manage("Role=" + re.escape(role.roleId))
+                    if role:
+                        resources.manage("Role=" + re.escape(role.roleId))
                     if secret:
                         resources.manage("Secret=worker-pool:{}".format(worker_pool_id))
                 resources.add(worker_pool)
-                resources.add(role)
+                if role:
+                    resources.add(role)
                 if secret:
                     resources.add(secret)
         if project.clients:

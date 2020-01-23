@@ -44,6 +44,10 @@
 #   image:                Fully qualified name of the machine image to spawn.
 #                         e.g. `projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2019-11-04t22-31-35z`
 
+generic-worker:
+  workerImplementation: generic-worker
+  # (this is intended for use with static workers)
+
 docker-worker:
   workerImplementation: docker-worker
   gcp:

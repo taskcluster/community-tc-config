@@ -103,7 +103,7 @@ class WorkerPoolSettings:
         Returns true if this worker pool supports setting worker configuration
         values.
         """
-        return False
+        raise NotImplementedError
 
     def merge_worker_config(self, *configDictionaries):
         """
@@ -113,6 +113,16 @@ class WorkerPoolSettings:
         existing config.
         """
         raise NotImplementedError
+
+
+class StaticWorkerPoolSettings(WorkerPoolSettings):
+    def supports_worker_config(self):
+        return False
+
+    def merge_worker_config(self, *configDictionaries):
+        raise RuntimeError(
+            "static worker pools do not allow setting worker configuration"
+        )
 
 
 class DynamicWorkerPoolSettings(WorkerPoolSettings):
@@ -189,6 +199,11 @@ async def build_worker_pool(workerPoolId, cfg, secret_values):
     )
 
     return workerpool, secret, role
+
+
+@cloud
+def static(**cfg):
+    return StaticWorkerPoolSettings("static")
 
 
 @cloud
