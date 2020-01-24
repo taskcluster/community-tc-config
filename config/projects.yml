@@ -582,6 +582,7 @@ fuzzing:
     credstash-aws-auth: true
     deploy-bearspray: true
     deploy-fuzzing-tc-config: true
+    deploy-octo-private: true
     docker-hub: true
     pypi: true
     decision: true
