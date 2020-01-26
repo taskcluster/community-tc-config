@@ -1,0 +1,201 @@
+relman:
+  adminRoles:
+    - github-team:mozilla/sallt
+  externallyManaged: true # bugbug deploys some hooks into this space
+  repos:
+    - github.com/mozilla/bugbug:*
+    - github.com/mozilla/microannotate:*
+    - github.com/mozilla/bugzilla-dashboard-backend:*
+    - github.com/mozilla/task-boot:*
+    - github.com/mozilla/code-coverage:*
+    - github.com/mozilla/code-review:*
+    - github.com/mozilla/rust-code-analysis:*
+    - github.com/mozilla/dump_syms:*
+    - github.com/mozilla/libmozevent:*
+  clients:
+    bugbug/code-review-production:
+      scopes:
+        - hooks:trigger-hook:project-relman/bugbug-*
+        - notify:email:*
+    bugbug/code-review-testing:
+      scopes:
+        - hooks:trigger-hook:project-relman/bugbug-*
+        - notify:email:*
+  workerPools:
+    ci:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 1
+      maxCapacity: 50
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
+    compute-small:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 1
+      maxCapacity: 25
+      machineType: "zones/{zone}/machineTypes/n1-standard-4"
+    compute-large:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 1
+      maxCapacity: 25
+      machineType: "zones/{zone}/machineTypes/n1-standard-8"
+    compute-super-large:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 1
+      maxCapacity: 25
+      machineType: "zones/{zone}/machineTypes/n1-standard-16"
+  secrets:
+    bugbug/deploy: true
+    bugbug/integration: true
+    bugbug/production: true
+    bugbug/testing: true
+    bugzilla-dashboard-backend/deploy-production: true
+    bugzilla-dashboard-backend/deploy-testing: true
+    code-coverage/release: true
+    code-coverage/deploy-production: true
+    code-coverage/deploy-testing: true
+    code-coverage/dev: true
+    code-review/deploy-dev: true
+    code-review/deploy-production: true
+    code-review/deploy-testing: true
+    code-review/release: true
+    dump_syms/deploy: true
+    microannotate/deploy: true
+    taskboot/deploy: true
+    libmozevent/deploy: true
+    rust-code-analysis/deploy: true
+  grants:
+    # all repos
+    - grant:
+        - queue:create-task:highest:proj-relman/ci
+        - queue:route:statuses
+      to:
+        - repo:github.com/mozilla/bugbug:*
+        - repo:github.com/mozilla/microannotate:*
+        - repo:github.com/mozilla/task-boot:*
+        - repo:github.com/mozilla/code-coverage:*
+        - repo:github.com/mozilla/code-review:*
+        - repo:github.com/mozilla/rust-code-analysis:*
+        - repo:github.com/mozilla/bugzilla-dashboard-backend:*
+        - repo:github.com/mozilla/dump_syms:*
+        - repo:github.com/mozilla/libmozevent:*
+
+    # all hooks
+    - grant:
+        - queue:scheduler-id:-
+        - queue:create-task:highest:proj-relman/*
+      to: hook-id:project-relman/*
+
+    # bugzilla-dashboard-backend
+    - grant: docker-worker:capability:privileged
+      to: repo:github.com/mozilla/bugzilla-dashboard-backend:*
+    - grant: secrets:get:project/relman/bugzilla-dashboard-backend/deploy-production
+      to: repo:github.com/mozilla/bugzilla-dashboard-backend:branch:production
+    - grant: secrets:get:project/relman/bugzilla-dashboard-backend/deploy-testing
+      to: repo:github.com/mozilla/bugzilla-dashboard-backend:branch:testing
+
+    # bugbug
+    - grant:
+        - docker-worker:cache:bugbug-*
+        - docker-worker:capability:privileged
+        - secrets:get:project/relman/bugbug/integration
+      to: project:relman:bugbug/build
+    - grant:
+        - secrets:get:project/relman/bugbug/deploy
+      to: project:relman:bugbug/deploy
+    - grant: assume:project:relman:bugbug/build
+      to: repo:github.com/mozilla/bugbug:*
+    # The build scopes for the tag will come from the previous rule.
+    - grant:
+        - assume:project:relman:bugbug/deploy
+        - assume:hook-id:project-relman/bugbug
+        - hooks:modify-hook:project-relman/bugbug
+      to: repo:github.com/mozilla/bugbug:tag:*
+    - grant:
+        - assume:project:relman:bugbug/build
+        - hooks:trigger-hook:project-relman/bugbug*
+        - queue:route:notify.email.*
+        - queue:route:notify.irc-channel.#bugbug.on-failed
+        - queue:route:index.project.relman.bugbug*
+        - queue:route:notify.pulse.route.project.relman.bugbug.*
+        - queue:route:project.relman.bugbug.*
+        - secrets:get:project/relman/bugbug/production
+      to: hook-id:project-relman/bugbug*
+    - grant:
+        - assume:project:relman:bugbug/deploy
+        - assume:hook-id:project-relman/bugbug-*
+        - hooks:modify-hook:project-relman/bugbug-*
+      to: hook-id:project-relman/bugbug
+
+    # task-boot
+    - grant: docker-worker:capability:privileged
+      to: repo:github.com/mozilla/task-boot:*
+    - grant: secrets:get:project/relman/taskboot/deploy
+      to:
+        - repo:github.com/mozilla/task-boot:branch:master
+        - repo:github.com/mozilla/task-boot:tag:*
+
+    # code-coverage
+    - grant: docker-worker:capability:privileged
+      to: repo:github.com/mozilla/code-coverage:*
+    - grant: secrets:get:project/relman/code-coverage/deploy-production
+      to: repo:github.com/mozilla/code-coverage:branch:production
+    - grant: secrets:get:project/relman/code-coverage/deploy-testing
+      to: repo:github.com/mozilla/code-coverage:branch:testing
+    - grant: secrets:get:project/relman/code-coverage/release
+      to: repo:github.com/mozilla/code-coverage:tag:*
+
+    # code-review
+    - grant: docker-worker:capability:privileged
+      to: repo:github.com/mozilla/code-review:*
+    - grant:
+        - secrets:get:project/relman/code-review/deploy-production
+        - assume:hook-id:project-relman/code-review-integration-production
+        - hooks:modify-hook:project-relman/code-review-integration-production
+      to: repo:github.com/mozilla/code-review:branch:production
+    - grant:
+        - secrets:get:project/relman/code-review/deploy-testing
+        - assume:hook-id:project-relman/code-review-integration-testing
+        - hooks:modify-hook:project-relman/code-review-integration-testing
+      to: repo:github.com/mozilla/code-review:branch:testing
+    - grant: secrets:get:project/relman/code-review/release
+      to: repo:github.com/mozilla/code-review:tag:*
+    - grant:
+        - notify:email:*
+        - secrets:get:project/relman/code-review/integration-testing
+        - docker-worker:cache:code-review-integration-testing
+      to: hook-id:project-relman/code-review-integration-testing
+    - grant:
+        - notify:email:*
+        - secrets:get:project/relman/code-review/integration-production
+        - docker-worker:cache:code-review-integration-production
+      to: hook-id:project-relman/code-review-integration-production
+
+    # dump_syms
+    - grant: secrets:get:project/relman/dump_syms/deploy
+      to: repo:github.com/mozilla/dump_syms:tag:*
+
+    # micoannotate
+    - grant: secrets:get:project/relman/microannotate/deploy
+      to: repo:github.com/mozilla/microannotate:tag:*
+
+    # libmozevent
+    - grant: secrets:get:project/relman/libmozevent/deploy
+      to:
+        - repo:github.com/mozilla/libmozevent:tag:*
+
+    # rust-code-analysis
+    - grant: secrets:get:project/relman/rust-code-analysis/deploy
+      to: repo:github.com/mozilla/rust-code-analysis:tag:*

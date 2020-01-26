@@ -1,0 +1,15 @@
+bors-ng:
+  adminRoles: []
+  repos:
+    - github.com/bors-ng/bors-ng:*
+  workerPools:
+    ci:
+      owner: michael@notriddle.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 2
+  grants:
+    - grant: queue:create-task:highest:proj-bors-ng/ci
+      to: repo:github.com/bors-ng/bors-ng:*

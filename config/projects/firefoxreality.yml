@@ -1,0 +1,56 @@
+firefoxreality:
+  adminRoles:
+    - github-org-admin:MozillaReality
+  repos:
+    - github.com/MozillaReality/FirefoxReality:*
+    - github.com/MozillaReality/FirefoxRealityPC:*
+  secrets:
+    # FirefoxReality secrets
+    fr/github-deploy-key: true
+    fr/release-signing-token: true
+    fr/staging-signing-token: true
+    fr/symbols-token: true
+
+    # FirefoxRealityPC secrets
+    frpc/github-deploy-key: true
+    frpc/unity-config: true
+  workerPools:
+    ci-linux:
+      owner: nobody@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 6
+  grants:
+    # General repo permissions
+    - grant:
+        - queue:create-task:highest:proj-firefoxreality/ci-linux
+        - queue:route:notify.email.fxr-releng@mozilla.com.*
+      to:
+        - repo:github.com/MozillaReality/FirefoxReality:*
+        - repo:github.com/MozillaReality/FirefoxRealityPC:*
+
+    # Firefox Reality
+    - grant:
+        - secrets:get:project/firefoxreality/fr/github-deploy-key
+        - secrets:get:project/firefoxreality/fr/key-password
+        - secrets:get:project/firefoxreality/fr/keystore-password
+        - secrets:get:project/firefoxreality/fr/preview-keystore
+        - secrets:get:project/firefoxreality/fr/symbols-token
+      to: project:firefoxreality:common-secrets
+    - grant:
+        - assume:project:firefoxreality:common-secrets
+        - secrets:get:project/firefoxreality/fr/staging-signing-token
+      to:
+        - repo:github.com/MozillaReality/FirefoxReality:branch:master
+        - repo:github.com/MozillaReality/FirefoxReality:branch:feature/*
+    - grant:
+        - assume:project:firefoxreality:common-secrets
+        - secrets:get:project/firefoxreality/fr/release-signing-token
+      to:
+        - repo:github.com/MozillaReality/FirefoxReality:release
+
+    # Firefox Reality PC
+    - grant: secrets:get:project/firefoxreality/frpc/github-deploy-key
+      to: repo:github.com/MozillaReality/FirefoxRealityPC:branch:*
