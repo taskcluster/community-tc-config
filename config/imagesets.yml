@@ -47,7 +47,7 @@
 docker-worker:
   workerImplementation: docker-worker
   gcp:
-    image: projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2020-01-21t19-12-31z
+    image: projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2020-02-03t18-37-30z
 
 generic-worker-win2012r2:
   workerImplementation: generic-worker
