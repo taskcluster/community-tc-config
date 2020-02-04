@@ -86,6 +86,12 @@ taskcluster:
           config:
             runTasksAsCurrentUser: true
 
+    generic-worker/ci-macos:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker
+      cloud: static
+
   grants:
     - grant:
         - queue:create-task:highest:proj-taskcluster/ci
