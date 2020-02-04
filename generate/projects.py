@@ -8,8 +8,7 @@ import attr
 import re
 
 from tcadmin.resources import Role, Client, WorkerPool, Secret, Hook
-from tcadmin.util.config import ConfigDict
-from .loader import loader
+from .loader import loader, YamlDirectory
 from .workers import build_worker_pool
 from .grants import Grants
 from .imagesets import ImageSets
@@ -63,9 +62,9 @@ class ExternallyManaged:
         return self.value
 
 
-class Projects(ConfigDict):
+class Projects(YamlDirectory):
 
-    filename = "config/projects.yml"
+    directory = "config/projects"
 
     @attr.s
     class Item:

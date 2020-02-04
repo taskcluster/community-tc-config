@@ -1,0 +1,34 @@
+servo:
+  adminRoles: [github-team:servo/taskcluster-admins]
+  externallyManaged: true
+  repos:
+    - github.com/servo/servo:*
+  workerPools:
+    docker:
+      owner: servo-ops@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
+      diskSizeGb: 100
+      minCapacity: 2
+      maxCapacity: 40
+    docker-untrusted:
+      owner: servo-ops@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
+      diskSizeGb: 100
+      minCapacity: 0
+      maxCapacity: 10
+  grants:
+    - grant:
+        # notification
+        - queue:route:notify.irc-channel.#servo.*
+
+        # treeherder submission
+        - queue:route:tc-treeherder-staging.v2._/servo-*
+        - queue:route:tc-treeherder.v2._/servo-*
+      # Grant to admins, purpose-specific roles are externally managed
+      to: project-admin:servo

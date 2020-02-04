@@ -1,0 +1,75 @@
+# catch-all repo for simple mozilla projects
+# if you need more complexity, talk to the taskcluster team!
+misc:
+  adminRoles:
+    - github-team:taskcluster/core
+  repos:
+    - github.com/mozilla/*
+    - github.com/marco-c/taskcluster_yml_validator:*
+    - github.com/mozilla/one-off-system-add-ons:*
+  workerPools:
+    ci:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 1
+      maxCapacity: 20
+  hooks:
+    jcristau-fx-release-metrics:
+      description: Taskcluster hook to run fx release metrics
+      owner: jcristau@mozilla.com
+      emailOnError: true
+      schedule: ['0 0 8 * * *']
+      task:
+        provisionerId: proj-misc
+        workerType: ci
+        payload:
+          image: debian:10
+          features:
+            taskclusterProxy: true
+          command:
+            - /bin/bash
+            - -c
+            - >-
+              apt-get update &&
+              apt-get -y install git mercurial python3-requests &&
+              git clone https://github.com/jcristau/fx-release-metrics/ &&
+              cd fx-release-metrics &&
+              python3 run-taskcluster.py
+          maxRunTime: 1200
+          artifacts:
+            public/results.json:
+              type: file
+              path: "/results.json"
+          env:
+            PREVIOUS_RESULTS: https://community-tc.services.mozilla.com/api/index/v1/task/project.misc.jcristau.fx-release-metrics.latest/artifacts/public/results.json
+        routes:
+          - index.project.misc.jcristau.fx-release-metrics.latest
+          - notify.email.jcristau@mozilla.com.on-failed
+        scopes:
+          - queue:route:index.project.misc.jcristau.fx-release-metrics.latest
+          - queue:route:notify.email.jcristau@mozilla.com.*
+        metadata:
+          name: fx release metrics
+          description: Taskcluster hook to run fx release metrics
+          owner: jcristau@mozilla.com
+          source: https://github.com/jcristau/fx-release-metrics/blob/master/hook.json
+
+  grants:
+    - grant: queue:create-task:highest:proj-misc/ci
+      to:
+        - repo:github.com/mozilla/*
+        - repo:github.com/marco-c/taskcluster_yml_validator:*
+    - grant:
+        - queue:create-task:highest:proj-misc/ci
+        - queue:route:index.project.misc.jcristau.*
+        - queue:route:notify.email.jcristau@mozilla.com.*
+        - queue:scheduler-id:-
+      to:
+        - hook-id:project-misc/jcristau-fx-release-metrics
+    # allow jcristau to trigger the release-metrics hook directly
+    - grant:
+        - hooks:trigger-hook:project-misc/jcristau-fx-release-metrics
+      to:
+        - login-identity:github/3703806|jcristau

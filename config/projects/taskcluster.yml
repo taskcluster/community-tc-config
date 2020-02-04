@@ -1,0 +1,297 @@
+taskcluster:
+  adminRoles:
+    - github-team:taskcluster/core
+  repos:
+    - github.com/taskcluster/*
+    - github.com/mozilla/community-tc-config:*
+  externallyManaged:
+    # smoketests create these resources, and also cleans them up, so leave
+    # them alone here...
+    - "Client=project/taskcluster/smoketest/.*"
+    - "Role=project:taskcluster:smoketest:.*"
+  workerPools:
+    ci:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 1
+      maxCapacity: 20
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
+          disableSeccomp: true
+
+    windows2012r2-amd64-ci:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2012r2
+      cloud: gcp
+      maxCapacity: 10
+
+    release:
+      owner: taskcluster-notifications+workers@mozilla.com
+      description: "Trusted worker to build Taskcluster releases (only!)"
+      emailOnError: true
+      imageset: generic-worker-ubuntu-18-04
+      cloud: aws
+      maxCapacity: 1
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
+    # gw-ci-* worker pools are for generic-worker CI
+    gw-ci-ubuntu-18-04:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-18-04
+      cloud: aws
+      maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
+    gw-ci-ubuntu-18-04-staging:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-18-04-staging
+      cloud: aws
+      maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
+    gw-ci-windows2012r2-amd64:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2012r2
+      cloud: gcp
+      maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
+    gw-ci-windows2012r2-amd64-staging:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2012r2-staging
+      cloud: gcp
+      maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
+  grants:
+    - grant:
+        - queue:create-task:highest:proj-taskcluster/ci
+        - queue:create-task:highest:proj-taskcluster/windows2012r2-amd64-ci
+        # The account and secret for the Azure testing storage account.
+        # This is secret but ok for use by PRs.
+        - secrets:get:project/taskcluster/testing/azure
+      to: repo:github.com/taskcluster/*
+
+    - grant:
+        - secrets:get:project/taskcluster/testing/codecov
+        - secrets:get:project/taskcluster/testing/taskcluster-*
+        - docker-worker:cache:taskcluster-*
+      to: repo:github.com/taskcluster/taskcluster:*
+
+    - grant:
+        - queue:create-task:highest:proj-taskcluster/release
+        - secrets:get:project/taskcluster/release
+      to: repo:github.com/taskcluster/taskcluster:tag:v*
+
+    - grant:
+        # pushes to master and releases can notify on failure
+        - queue:route:notify.email.taskcluster-internal@mozilla.com.*
+        - queue:route:notify.email.taskcluster-notifications@mozilla.com.*
+        - queue:route:notify.irc-channel.#taskcluster-bots.*
+      to:
+        - repo:github.com/taskcluster/taskcluster:branch:master
+        - repo:github.com/taskcluster/taskcluster:tag:v*
+
+    - grant:
+        # pushes to json-e master can read secrets for deploying the site
+        - secrets:get:project/taskcluster/json-e-deploy
+        # ..and notify on failure
+        - queue:route:notify.email.taskcluster-notifications@mozilla.com.*
+      to: repo:github.com/taskcluster/json-e:branch:master
+
+    - grant:
+        - assume:project:taskcluster:worker-test-scopes
+        - assume:worker-id:docker-worker/docker-worker
+        - assume:worker-id:random-local-worker/docker-worker
+        - aws-provisioner:create-secret:*
+        - docker-worker:cache:docker-worker-garbage-*
+        - docker-worker:capability:device:loopbackAudio
+        - docker-worker:capability:device:loopbackVideo
+        - docker-worker:capability:device:hostSharedMemory
+        - docker-worker:capability:disableSeccomp
+        - docker-worker:capability:privileged
+        - docker-worker:feature:balrogStageVPNProxy
+        - docker-worker:feature:balrogVPNProxy
+        - docker-worker:image:localhost:*
+        - purge-cache:null-provisioner/*
+        - queue:cancel-task
+        - queue:cancel-task:docker-worker-tests/*
+        - queue:claim-task
+        - queue:claim-task:null-provisioner/*
+        - queue:claim-work:null-provisioner/*
+        - queue:create-artifact:*
+        - queue:create-task:null-provisioner/*
+        - queue:create-task:proj-taskcluster/ci
+        - queue:get-artifact:private/docker-worker-tests/*
+        - queue:resolve-task
+        - queue:route:statuses
+        - queue:scheduler-id:docker-worker-tests
+        - queue:scheduler-id:taskcluster-github
+        - queue:worker-id:docker-worker/docker-worker
+        - queue:worker-id:random-local-worker/dummy-worker-*
+        - queue:worker-id:random-local-worker/docker-worker
+        - secrets:get:project/taskcluster/taskcluster-worker/stateless-dns
+        - secrets:get:project/taskcluster/testing/docker-worker/ci-creds
+        - secrets:get:project/taskcluster/testing/docker-worker/pulse-creds
+      to: repo:github.com/taskcluster/docker-worker:*
+
+    - grant:
+        - secrets:get:project/taskcluster/monopacker/gcloud_service_account
+        - secrets:get:project/taskcluster/monopacker/worker_secrets_yaml
+      to: repo:github.com/taskcluster/monopacker:branch:master
+
+    - grant:
+        - auth:create-client:project/taskcluster/smoketest/*
+        - auth:create-role:project:taskcluster:smoketest:*
+        - auth:delete-client:project/taskcluster/smoketest/*
+        - auth:delete-role:project:taskcluster:smoketest:*
+        - auth:reset-access-token:project/taskcluster/smoketest/*
+        - auth:update-client:project/taskcluster/smoketest/*
+        - auth:update-role:project:taskcluster:smoketest:*
+        - project:taskcluster:smoketest:*
+        - purge-cache:built-in/succeed:smoketest-cache
+        - queue:create-task:highest:built-in/*
+        - queue:create-task:highest:built-in/fail
+        - queue:create-task:highest:built-in/succeed
+        - queue:route:index.project.taskcluster.smoketest.*
+        - queue:scheduler-id:smoketest
+        - secrets:get:project/taskcluster/smoketest/*
+        - secrets:set:project/taskcluster/smoketest/*
+      to: project:taskcluster:smoketests
+
+    - grant: assume:project:taskcluster:smoketests
+      to: github-team:taskcluster/smoketesters
+
+    - grant:
+        - assume:worker-id:test-worker-group/test-worker-id
+        - assume:worker-type:test-provisioner/*
+        - auth:create-client:project/taskcluster:generic-worker-tester/TestReclaimCancelledTask
+        - auth:create-client:project/taskcluster:generic-worker-tester/TestResolveResolvedTask
+        - auth:sentry:generic-worker-tests
+        - generic-worker:cache:banana-cache
+        - generic-worker:cache:devtools-app
+        - generic-worker:cache:test-modifications
+        - generic-worker:cache:unknown-issuer-app-cache
+        - generic-worker:os-group:test-provisioner/*
+        - generic-worker:run-as-administrator:test-provisioner/*
+        - queue:cancel-task:test-scheduler/*
+        - assume:worker-pool:test-provisioner/*
+        - queue:create-artifact:public/*
+        - queue:create-task:test-provisioner/*
+        - queue:get-artifact:SampleArtifacts/_/X.txt
+        - queue:get-artifact:SampleArtifacts/_/non-existent-artifact.txt
+        - queue:get-artifact:SampleArtifacts/b/c/d.jpg
+        - queue:resolve-task
+        - assume:worker-id:test-worker-group/*"
+      to: project:taskcluster:generic-worker-tester
+
+    - grant:
+        - assume:project:taskcluster:generic-worker-tester
+        - queue:create-task:highest:proj-taskcluster/gw-ci-*
+        - generic-worker:cache:generic-worker-checkout
+        - secrets:get:project/taskcluster/testing/generic-worker/ci-creds
+      to:
+        - repo:github.com/taskcluster/generic-worker:*
+        - repo:github.com/taskcluster/taskcluster:*
+
+  clients:
+    smoketests:
+      scopes:
+        - assume:project:taskcluster:smoketests
+    docker-worker/ci:
+      scopes:
+        - assume:repo:github.com/taskcluster/docker-worker:*
+    # Client for workerpool proj-taskcluster/gw-ci-macos.
+    generic-worker/ci-macos:
+      scopes:
+        - assume:worker-pool:proj-taskcluster/gw-ci-macos
+        - assume:worker-id:proj-taskcluster/*
+    # Client for workerpool proj-taskcluster/gw-ci-macos-staging.
+    generic-worker/ci-macos-staging:
+      scopes:
+        - assume:worker-pool:proj-taskcluster/gw-ci-macos-staging
+        - assume:worker-id:proj-taskcluster/*
+    # Client for workerpool proj-taskcluster/gw-ci-raspbian-stretch
+    generic-worker/ci-raspbian-stretch:
+      scopes:
+        - assume:worker-pool:proj-taskcluster/gw-ci-raspbian-stretch
+        - assume:worker-id:proj-taskcluster/*
+    # Client for proj-taskcluster/gw-ci-windows10-amd64. This client is
+    # currently used by a single manually configured worker, running in Azure.
+    # When we have an azure provider, we can terminate this worker, delete this
+    # client, and use worker manager provisioned instances instead.
+    generic-worker/ci-windows10-amd64:
+      scopes:
+        - assume:worker-pool:proj-taskcluster/gw-ci-windows10-amd64
+        - assume:worker-id:proj-taskcluster/*
+    # Client for workerpool proj-taskcluster/gw-ci-windows10-arm
+    generic-worker/ci-windows10-arm:
+      scopes:
+        - assume:worker-pool:proj-taskcluster/gw-ci-windows10-arm
+        - assume:worker-id:proj-taskcluster/*
+    # A client whose clientId and accessToken are stored in taskcluster secret
+    # `project/taskcluster/testing/generic-worker/ci-creds` and used by
+    # commands in generic-worker's .taskcluster.yml to create production tasks
+    # that are then claimed and processed by the generic-worker build under
+    # test.
+    generic-worker/taskcluster-ci:
+      scopes:
+        - assume:project:taskcluster:generic-worker-tester
+    # A client whose accessToken is securely stored in travis-ci.org
+    # taskcluster/generic-worker project as encrypted environment variable
+    # TASKCLUSTER_ACCESS_TOKEN, and used by commands in generic-worker's
+    # .travis.yml to create production tasks that are then claimed and
+    # processed by the generic-worker build under test in travis-ci.org.
+    generic-worker/travis-ci:
+      scopes:
+        - assume:project:taskcluster:generic-worker-tester
+
+  secrets:
+    # codecov API token
+    testing/codecov: true
+    # client_id/access_token for project/taskcluster/testing/docker-worker/ci-creds
+    testing/docker-worker/ci-creds: true
+    # client_id/access_token for generic-worker integration tests
+    testing/generic-worker/ci-creds: true
+    testing/azure:
+      AZURE_ACCOUNT: $taskcluster-azure-account
+      AZURE_ACCOUNT_KEY: $taskcluster-azure-account-key
+    # additional secrets for services' tests (see services/<service>/test/helper.js)
+    testing/taskcluster-auth: true
+    testing/taskcluster-notify: true
+    testing/taskcluster-queue: true
+    # key for deploying json-e docs
+    json-e-deploy: true
+    # monopacker image baking secrets
+    monopacker/gcloud_service_account: true
+    monopacker/worker_secrets_yaml: true
+    release:
+      DOCKER_USERNAME: $taskcluster-release-docker-hub-username
+      DOCKER_PASSWORD: $taskcluster-release-docker-hub-password
+      PYPI_USERNAME: $taskcluster-release-pypi-username
+      PYPI_PASSWORD: $taskcluster-release-pypi-password
+      NPM_TOKEN: $taskcluster-release-npm-token
+      GH_TOKEN: $taskcluster-release-gh-token
