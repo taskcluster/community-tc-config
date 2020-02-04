@@ -74,11 +74,12 @@ generic-worker-win2012r2-staging:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0162f92052875bf7e
-      us-west-1: ami-0f6b26130f2f9ce2c
-      us-west-2: ami-0dfd8045878e6cd08
-  gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-win2012r2-staging-hasr18iepqtggvlswlku
+      us-east-1: ami-0f892d6ff7cdc52e7
+      us-west-1: ami-0cf711badfa2f50fc
+      us-west-2: ami-02ed2a69fdfdef0bc
+# Currently not deployed in gcp...
+# gcp:
+#   image: projects/community-tc-workers/global/images/generic-worker-win2012r2-staging-hasr18iepqtggvlswlku
   workerConfig:
     genericWorker:
       config:

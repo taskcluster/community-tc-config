@@ -5,9 +5,10 @@ exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
 WORKER_RUNNER_VERSION='v1.0.1'
+# GENERIC_WORKER_REF='v16.5.6'
+GENERIC_WORKER_VERSION='v16.5.6'
 LIVELOG_VERSION='v1.1.0'
 TASKCLUSTER_PROXY_VERSION='v5.1.0'
-GENERIC_WORKER_REF='v16.5.6'
 ######################################
 
 function retry {
@@ -36,7 +37,8 @@ start_time="$(date '+%s')"
 
 retry apt update
 DEBIAN_FRONTEND=noninteractive apt upgrade -yq
-retry apt install -y apt-transport-https ca-certificates curl software-properties-common git tar python3-venv python-virtualenv build-essential
+# retry apt install -y apt-transport-https ca-certificates curl software-properties-common git tar python3-venv python-virtualenv build-essential
+retry apt install -y apt-transport-https ca-certificates curl software-properties-common gzip python3-venv python-virtualenv build-essential
 
 # install docker
 retry curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
@@ -48,25 +50,28 @@ sleep 5
 systemctl status docker | grep "Started Docker Application Container Engine"
 usermod -aG docker ubuntu
 
-# build generic-worker from ${GENERIC_WORKER_REF} commit / branch / tag etc
-retry curl -L 'https://dl.google.com/go/go1.12.9.linux-amd64.tar.gz' > go.tar.gz
-tar xvfz go.tar.gz -C /usr/local
-export HOME=/root
-export GOPATH=~/go
-export GOROOT=/usr/local/go
-export PATH="${GOROOT}/bin:${GOPATH}/bin:${PATH}"
-go get -d github.com/taskcluster/generic-worker
-cd "${GOPATH}/src/github.com/taskcluster/generic-worker"
-git checkout "${GENERIC_WORKER_REF}"
-CGO_ENABLED=0 go install -tags multiuser -ldflags "-X main.revision=$(git rev-parse HEAD)" github.com/taskcluster/generic-worker
-mv "${GOPATH}/bin/generic-worker" /usr/local/bin/
-
-# install livelog and taskcluster-proxy
+# # build generic-worker from ${GENERIC_WORKER_REF} commit / branch / tag etc
+# retry curl -L 'https://dl.google.com/go/go1.12.9.linux-amd64.tar.gz' > go.tar.gz
+# tar xvfz go.tar.gz -C /usr/local
+# export HOME=/root
+# export GOPATH=~/go
+# export GOROOT=/usr/local/go
+# export PATH="${GOROOT}/bin:${GOPATH}/bin:${PATH}"
+# go get -d github.com/taskcluster/generic-worker
+# cd "${GOPATH}/src/github.com/taskcluster/generic-worker"
+# git checkout "${GENERIC_WORKER_REF}"
+# CGO_ENABLED=0 go install -tags multiuser -ldflags "-X main.revision=$(git rev-parse HEAD)" github.com/taskcluster/generic-worker
+# mv "${GOPATH}/bin/generic-worker" /usr/local/bin/
+#
+# # install livelog and taskcluster-proxy
 cd /usr/local/bin
+# next line can be removed if building generic-worker...
+retry curl -L "https://github.com/taskcluster/generic-worker/releases/download/${GENERIC_WORKER_VERSION}/generic-worker-multiuser-linux-amd64" > generic-worker
 retry curl -L "https://github.com/taskcluster/taskcluster-worker-runner/releases/download/${WORKER_RUNNER_VERSION}/start-worker-linux-amd64" > start-worker
 retry curl -L "https://github.com/taskcluster/livelog/releases/download/${LIVELOG_VERSION}/livelog-linux-amd64" > livelog
 retry curl -L "https://github.com/taskcluster/taskcluster-proxy/releases/download/${TASKCLUSTER_PROXY_VERSION}/taskcluster-proxy-linux-amd64" > taskcluster-proxy
-chmod a+x start-worker taskcluster-proxy livelog
+# chmod a+x start-worker taskcluster-proxy livelog
+chmod a+x generic-worker start-worker taskcluster-proxy livelog
 
 mkdir -p /etc/generic-worker
 mkdir -p /var/local/generic-worker
