@@ -134,9 +134,9 @@ generic-worker-ubuntu-18-04-staging:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-06ce1a5f3039ac646
-      us-west-1: ami-0bd5b1b63c47a7b65
-      us-west-2: ami-0a396cff215e28640
+      us-east-1: ami-0e785d8c0d91ba485
+      us-west-1: ami-03b04649c13e7ec0c
+      us-west-2: ami-021550227b98d65e7
   workerConfig:
     genericWorker:
       config:
