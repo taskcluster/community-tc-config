@@ -39,33 +39,6 @@ fuzzing:
       minCapacity: 0
       maxCapacity: 10
 
-  hooks:
-    decision:
-      description: Hook to trigger the Fuzzing decision task
-      owner: fuzzing+taskcluster@mozilla.com
-      emailOnError: true
-      schedule:
-        - "0 0 */1 * * *"
-      task:
-        provisionerId: proj-fuzzing
-        workerType: decision
-        scopes:
-          - secrets:get:project/fuzzing/decision
-          - queue:scheduler-id:-
-          - queue:create-task:highest:proj-fuzzing/decision
-        payload:
-          image: mozillasecurity/fuzzing-tc:latest
-          features:
-            taskclusterProxy: true
-          env:
-            TASKCLUSTER_SECRET: project/fuzzing/decision
-          maxRunTime: 1200
-        metadata:
-          name: Fuzzing decision task
-          description: Create fuzzing task on Mozilla Firefox builds
-          owner: fuzzing+taskcluster@mozilla.com
-          source: https://github.com/mozillasecurity/fuzzing-tc-config
-
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
@@ -80,8 +53,7 @@ fuzzing:
       to:
         - repo:github.com/MozillaSecurity/fuzzing-tc:*
     - grant:
-        - secrets:get:project/fuzzing/deploy-fuzzing-tc-config
         - secrets:get:project/fuzzing/decision
-        - queue:scheduler-id:-
         - queue:create-task:highest:proj-fuzzing/decision
-      to: hook-id:project-fuzzing/decision
+      to:
+        - repo:github.com/MozillaSecurity/fuzzing-tc-config
