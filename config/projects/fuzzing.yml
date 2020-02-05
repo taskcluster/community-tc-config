@@ -56,4 +56,4 @@ fuzzing:
         - secrets:get:project/fuzzing/decision
         - queue:create-task:highest:proj-fuzzing/decision
       to:
-        - repo:github.com/MozillaSecurity/fuzzing-tc-config
+        - repo:github.com/MozillaSecurity/fuzzing-tc-config:*
