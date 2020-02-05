@@ -86,7 +86,7 @@ taskcluster:
           config:
             runTasksAsCurrentUser: true
 
-    generic-worker/ci-macos:
+    gw-ci-macos:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker
