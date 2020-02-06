@@ -132,6 +132,7 @@ relman:
         - queue:route:notify.pulse.route.project.relman.bugbug.*
         - queue:route:project.relman.bugbug.*
         - secrets:get:project/relman/bugbug/production
+        - auth:aws-s3:read-write:cloudops-taskcluster-bugbug/*
       to: hook-id:project-relman/bugbug*
     - grant:
         - assume:project:relman:bugbug/deploy
