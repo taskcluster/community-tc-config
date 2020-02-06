@@ -50,6 +50,7 @@ fuzzing:
         - repo:github.com/MozillaSecurity/*
     - grant:
         - docker-worker:capability:privileged
+        - queue:route:index.project.fuzzing.config.*
       to:
         - repo:github.com/MozillaSecurity/fuzzing-tc:*
     - grant:
