@@ -28,6 +28,13 @@ taskcluster:
       imageset: generic-worker-win2012r2
       cloud: gcp
       maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            # Default timeout is 90s, but pool keeps emptying during working
+            # hours. Useful to keep alive to reduce pending time for the
+            # generic-worker decision task in monorepo.
+            idleTimeoutSecs: 3600
 
     release:
       owner: taskcluster-notifications+workers@mozilla.com
