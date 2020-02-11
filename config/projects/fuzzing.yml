@@ -47,3 +47,10 @@ fuzzing:
         - secrets:get:project/fuzzing/decision
       to:
         - repo:github.com/MozillaSecurity/fuzzing-tc-config:*
+
+    # fuzzing-tc-config code on master can run tc-admin apply to manage worker pools
+    - grant:
+       - worker-manager:manage-worker-pool:proj-fuzzing/*
+       - worker-manager:provider:community-tc-workers-*
+      to:
+       - repo:github.com/MozillaSecurity/fuzzing-tc-config:branch:master
