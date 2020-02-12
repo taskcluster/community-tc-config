@@ -1,0 +1,11 @@
+telemetry:
+  adminRoles:
+    - github-team:mozilla/telemetry
+  workerPools:
+    compute-small:
+      owner: wlachance@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      maxCapacity: 5
+      machineType: "zones/{zone}/machineTypes/n1-standard-4"
