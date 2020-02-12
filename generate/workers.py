@@ -231,15 +231,17 @@ def gcp(
 
     GOOGLE_PROVIDER = "community-tc-workers-google"
 
-    GOOGLE_REGIONS_ZONES = {
-        "us-east1": ["b", "c", "d"],
-        "us-east4": ["a", "b", "c"],
-    }
+    # Use local yaml file for GCP network constants
+    # These constants are set in a separate file to be used by external services
+    # like the fuzzing team decision tasks
+    _config_path = os.path.join(os.path.dirname(__file__), "../config/gcp.yml")
+    assert os.path.exists(_config_path), "Missing gcp config in {}".format(_config_path)
+    gcp_config = yaml.safe_load(open(_config_path))
 
     GOOGLE_ZONES_REGIONS = [
         ("{}-{}".format(region, zone), region)
-        for region, zones in sorted(GOOGLE_REGIONS_ZONES.items())
-        for zone in zones
+        for region, zones in sorted(gcp_config["regions"].items())
+        for zone in zones["zones"]
     ]
 
     assert maxCapacity, "must give a maxCapacity"
