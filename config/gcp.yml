@@ -1,0 +1,21 @@
+---
+# This file describes GCP constants used to build worker pools
+# It supports one top level dictionaries:
+#
+# # List all the available regions and their associated availability zone
+# regions:
+#   <gcp-region-name>:
+#     zones:
+#       - <gcp-availability-zone>
+#
+# Please do not move or edit the structure of that file as
+# it's being actively used by the fuzzing team decision task
+# to manage worker pools
+# If you remove a region, please reach out to fuzzing+taskcluster@mozilla.com
+
+regions:
+  us-east1:
+    zones: ["b", "c", "d"]
+
+  us-east4:
+    zones: ["a", "b", "c"]
