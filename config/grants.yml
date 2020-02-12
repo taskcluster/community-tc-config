@@ -168,6 +168,9 @@
     # for relman
     - project-admin:relman
 
+    # for telemetry
+    - github-team:mozilla/telemetry
+
 # One of these routes is added to each task created in reaction to a GitHub event.
 # If such a task in turn creates other tasks, it can add the same route in order to work around
 # https://bugzilla.mozilla.org/show_bug.cgi?id=1548781 or
