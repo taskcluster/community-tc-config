@@ -19,9 +19,9 @@ git-cinnabar:
       scopes:
         - assume:worker-pool:proj-git-cinnabar/osx-10-10
         - assume:worker-id:proj-git-cinnabar/travis-*
-    worker-osx-10-11:
+    worker-osx:
       scopes:
-        - assume:worker-pool:proj-git-cinnabar/osx-10-11
+        - assume:worker-pool:proj-git-cinnabar/osx
         - assume:worker-id:proj-git-cinnabar/travis-*
   grants:
     - grant:
@@ -29,7 +29,7 @@ git-cinnabar:
         - queue:create-task:highest:proj-git-cinnabar/win2012r2
         # these two workerTypes are implemented in Travis-CI (!)
         - queue:create-task:highest:proj-git-cinnabar/osx-10-10
-        - queue:create-task:highest:proj-git-cinnabar/osx-10-11
+        - queue:create-task:highest:proj-git-cinnabar/osx
         - queue:scheduler-id:taskcluster-github
       to:
         - repo:github.com/glandium/git-cinnabar:decision-task
