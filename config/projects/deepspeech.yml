@@ -155,7 +155,7 @@ deepspeech:
         # https://github.com/lissyx/taskcluster-github-decision/blob/master/tc-decision.py
         - queue:scheduler-id:taskcluster-github
         - queue:route:index.project.deepspeech.*
-        - index:insert-task:index.project.deepspeech.*
+        - index:insert-task:project.deepspeech.*
         - queue:route:notify.irc-channel.*
         - generic-worker:cache:deepspeech-*
       to:
