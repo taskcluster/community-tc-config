@@ -211,7 +211,6 @@ taskcluster:
         - queue:get-artifact:SampleArtifacts/_/non-existent-artifact.txt
         - queue:get-artifact:SampleArtifacts/b/c/d.jpg
         - queue:resolve-task
-        - assume:worker-id:test-worker-group/*"
       to: project:taskcluster:generic-worker-tester
 
     - grant:
