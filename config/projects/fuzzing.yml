@@ -1,6 +1,7 @@
 fuzzing:
   adminRoles:
     - github-team:MozillaSecurity/tc-admin
+  externallyManaged: true # Fuzzing hooks are deployed through another repo
   repos:
     - github.com/MozillaSecurity/*
   secrets:
