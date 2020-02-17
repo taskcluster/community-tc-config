@@ -119,6 +119,10 @@ taskcluster:
       to: repo:github.com/taskcluster/taskcluster:tag:v*
 
     - grant:
+        - queue:create-task:highest:proj-taskcluster/release
+      to: repo:github.com/taskcluster/taskcluster:branch:staging-release/*
+
+    - grant:
         # pushes to master and releases can notify on failure
         - queue:route:notify.email.taskcluster-internal@mozilla.com.*
         - queue:route:notify.email.taskcluster-notifications@mozilla.com.*
