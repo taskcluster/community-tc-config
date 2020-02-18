@@ -87,6 +87,7 @@ relman:
   grants:
     # all repos
     - grant:
+        - queue:create-task:highest:proj-relman/batch
         - queue:create-task:highest:proj-relman/ci
         - queue:route:statuses
       to:
