@@ -26,7 +26,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-win2012r2
-      cloud: gcp
+      cloud: aws
       maxCapacity: 10
 
     release:
@@ -71,7 +71,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-win2012r2
-      cloud: gcp
+      cloud: aws
       maxCapacity: 10
       workerConfig:
         genericWorker:
@@ -85,7 +85,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-win2012r2-staging
-      cloud: gcp
+      cloud: aws
       maxCapacity: 10
       workerConfig:
         genericWorker:
