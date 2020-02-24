@@ -1,0 +1,5 @@
+# RTEMS (https://www.rtems.org/) is experimenting with using Taskcluster.
+rtems:
+  adminRoles:
+    - login-identity:github/28673|djmitche
+    - login-identity:github/174336|verm
