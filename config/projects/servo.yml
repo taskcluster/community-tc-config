@@ -26,6 +26,8 @@ servo:
     - grant:
         # notification
         - queue:route:notify.irc-channel.#servo.*
+        - queue:route:notify.matrix-room.#servo:mozilla.org.*
+        - queue:route:notify.matrix-room.!crXxRMedJXFPxKffWI:mozilla.org.*
 
         # treeherder submission
         - queue:route:tc-treeherder-staging.v2._/servo-*
