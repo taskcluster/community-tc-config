@@ -158,6 +158,7 @@ deepspeech:
         - index:insert-task:project.deepspeech.*
         - queue:route:notify.irc-channel.*
         - generic-worker:cache:deepspeech-*
+        - docker-worker:capability:device:kvm
       to:
         - repo:github.com/mozilla/DeepSpeech:*
         - repo:github.com/mozilla/tensorflow:*
