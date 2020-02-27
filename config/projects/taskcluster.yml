@@ -100,6 +100,11 @@ taskcluster:
 
   grants:
     - grant:
+        - notify:manage-denylist
+      to:
+        - project-admin:taskcluster
+
+    - grant:
         - queue:create-task:highest:proj-taskcluster/ci
         - queue:create-task:highest:proj-taskcluster/windows2012r2-amd64-ci
         # The account and secret for the Azure testing storage account.
