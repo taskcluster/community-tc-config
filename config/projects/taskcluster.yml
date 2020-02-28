@@ -164,8 +164,8 @@ taskcluster:
         - queue:claim-task:null-provisioner/*
         - queue:claim-work:null-provisioner/*
         - queue:create-artifact:*
-        - queue:create-task:null-provisioner/*
-        - queue:create-task:proj-taskcluster/ci
+        - queue:create-task:lowest:null-provisioner/*
+        - queue:create-task:lowest:proj-taskcluster/ci
         - queue:get-artifact:private/docker-worker-tests/*
         - queue:resolve-task
         - queue:route:statuses
