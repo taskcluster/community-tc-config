@@ -46,6 +46,8 @@ fuzzing:
         - repo:github.com/MozillaSecurity/fuzzing-tc:*
     - grant:
         - secrets:get:project/fuzzing/decision
+        - secrets:get:project/fuzzing/deploy-*
+        - secrets:get:project/fuzzing/credstash-aws-auth
       to:
         - repo:github.com/MozillaSecurity/fuzzing-tc-config:*
 
