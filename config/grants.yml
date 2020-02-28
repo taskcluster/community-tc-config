@@ -114,6 +114,8 @@
 - grant:
     # worker pool implies claiming work
     - "queue:claim-work:<..>"
+    # Get any necessary secrets for this worker pool
+    - "secrets:get:worker-pool:<..>"
     # Grant permission to use websocktunnel with audience `communitytc` to all
     # workers in all pools
     - "auth:websocktunnel-token:communitytc/*"
