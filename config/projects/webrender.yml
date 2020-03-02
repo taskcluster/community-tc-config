@@ -28,5 +28,3 @@ webrender:
       to:
         - repo:github.com/servo/webrender:*
         - repo:github.com/staktrace/webrender:*
-  secrets:
-    wrupdater-github-token: true
