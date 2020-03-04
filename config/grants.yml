@@ -164,6 +164,7 @@
     - github-org-admin:MozillaReality
 
     # for a few project admins
+    - project-admin:fuzzing
     - project-admin:servo
     - project-admin:wpt
 
