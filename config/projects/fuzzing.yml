@@ -46,14 +46,20 @@ fuzzing:
         - repo:github.com/MozillaSecurity/fuzzing-tc:*
     - grant:
         - secrets:get:project/fuzzing/decision
-        - secrets:get:project/fuzzing/deploy-*
-        - secrets:get:project/fuzzing/credstash-aws-auth
       to:
         - repo:github.com/MozillaSecurity/fuzzing-tc-config:*
 
     # fuzzing-tc-config code on master can run tc-admin apply to manage worker pools
     - grant:
-       - worker-manager:manage-worker-pool:proj-fuzzing/*
-       - worker-manager:provider:community-tc-workers-*
+        - assume:hook-id:project-fuzzing/*
+        - auth:create-role:hook-id:project-fuzzing/*
+        - auth:update-role:hook-id:project-fuzzing/*
+        - hooks:modify-hook:project-fuzzing/*
+        - hooks:trigger-hook:project-fuzzing/*
+        - queue:scheduler-id:-
+        - secrets:get:project/fuzzing/credstash-aws-auth
+        - secrets:get:project/fuzzing/deploy-*
+        - worker-manager:manage-worker-pool:proj-fuzzing/*
+        - worker-manager:provider:community-tc-workers-*
       to:
-       - repo:github.com/MozillaSecurity/fuzzing-tc-config:branch:master
+        - repo:github.com/MozillaSecurity/fuzzing-tc-config:branch:master
