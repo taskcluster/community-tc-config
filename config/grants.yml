@@ -183,3 +183,7 @@
   to:
     # Repositories that whish to use this work-around
     - repo:github.com/servo/servo:*
+
+# Allow the taskcluster team to handle the denylist
+- grant: notify:manage-denylist
+  to: github-team:taskcluster/core
