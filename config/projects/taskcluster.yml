@@ -221,7 +221,7 @@ taskcluster:
         - queue:cancel-task:test-scheduler/*
         - assume:worker-pool:test-provisioner/*
         - queue:create-artifact:public/*
-        - queue:create-task:test-provisioner/*
+        - queue:create-task:highest:test-provisioner/*
         - queue:get-artifact:SampleArtifacts/_/X.txt
         - queue:get-artifact:SampleArtifacts/_/non-existent-artifact.txt
         - queue:get-artifact:SampleArtifacts/b/c/d.jpg
