@@ -222,6 +222,7 @@ taskcluster:
         - assume:worker-pool:test-provisioner/*
         - queue:create-artifact:public/*
         - queue:create-task:highest:test-provisioner/*
+        - queue:scheduler-id:test-scheduler
         - queue:get-artifact:SampleArtifacts/_/X.txt
         - queue:get-artifact:SampleArtifacts/_/non-existent-artifact.txt
         - queue:get-artifact:SampleArtifacts/b/c/d.jpg
