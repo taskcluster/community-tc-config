@@ -29,6 +29,14 @@ deepspeech:
       instanceTypes:
         m5d.2xlarge: 1
       maxCapacity: 16
+    win-gpu:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: deepspeech-win2012r2
+      cloud: aws
+      instanceTypes:
+        g3s.xlarge: 1
+      maxCapacity: 4
   clients:
     worker/rpi3bp-1:
       scopes:
@@ -169,3 +177,4 @@ deepspeech:
   secrets:
     ssh-keys/deepspeech-win: true
     ssh-keys/deepspeech-win-b: true
+    ssh-keys/deepspeech-win-gpu: true
