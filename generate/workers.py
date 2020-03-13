@@ -98,6 +98,13 @@ class WorkerPoolSettings:
         # scopes - any additional scopes required for workers in this cloud
         self.scopes = []
 
+    def supports_lifecycle_config(self):
+        """
+        Returns true if this worker pool supports lifecycle configuration.
+        """
+        # all providers do support it at the moment
+        return True
+
     def supports_worker_config(self):
         """
         Returns true if this worker pool supports setting worker configuration
@@ -160,6 +167,13 @@ async def build_worker_pool(workerPoolId, cfg, secret_values):
                 WorkerPoolSettings.EXISTING_CONFIG,
             )
 
+        if "lifecycle" in cfg:
+            if not wp.supports_lifecycle_config():
+                raise RuntimeError("lifecycle not supported for this provider")
+            wp.config["lifecycle"] = merge(
+                cfg["lifecycle"], wp.config.get("lifecycle", {})
+            )
+
         wp = WORKER_IMPLEMENTATION_FUNCS[
             image_set.workerImplementation.replace("-", "_")
         ](secret_values=secret_values, wp=wp, **cfg,)
@@ -167,6 +181,7 @@ async def build_worker_pool(workerPoolId, cfg, secret_values):
         raise RuntimeError(
             "Error generating worker pool configuration for {}".format(workerPoolId)
         ) from e
+
     if wp.secret_tpl:
         if secret_values:
             secret = Secret(
