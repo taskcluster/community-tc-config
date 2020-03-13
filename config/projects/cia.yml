@@ -17,5 +17,5 @@ cia:
   grants:
     # smart-scheduling
     - grant:
-      - secrets:get:project/cia/garbage/foo
+        - secrets:get:project/cia/garbage/foo
       to: repo:github.com/armenzg/smart-scheduling:*
