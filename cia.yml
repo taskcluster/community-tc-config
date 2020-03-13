@@ -1,0 +1,21 @@
+cia:
+  adminRoles:
+    - github-team:mozilla/cia
+  externallyManaged: false
+  repos:
+    - github.com/armenzg/smart-scheduling:*
+  workerPools:
+    ci:
+      owner: armenzg@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 1
+      maxCapacity: 10
+  secrets:
+    garbage/foo: true
+  grants:
+    # smart-scheduling
+    - grant:
+      - secrets:get:project/cia/garbage/foo
+      to: repo:github.com/armenzg/smart-scheduling:*
