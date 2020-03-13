@@ -15,7 +15,16 @@ cia:
   secrets:
     garbage/foo: true
   grants:
+    # all hooks
+    - grant:
+        - queue:scheduler-id:-
+        - queue:create-task:low:proj-cia/*
+      to: hook-id:project-cia/*
     # smart-scheduling
     - grant:
         - secrets:get:project/cia/garbage/foo
       to: repo:github.com/armenzg/smart-scheduling:*
+    # Grant a hook the capacity to fetch a secret
+    - grant:
+        - secrets:get:project/cia/garbage/foo
+      to: hook-id:project-cia/hello-world
