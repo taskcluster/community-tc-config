@@ -1,4 +1,6 @@
-"Projects", as defined in https://docs.taskcluster.net/docs/manual/using/namespaces#projects
+# Defining projects
+
+"Projects", as defined in <https://docs.taskcluster.net/docs/manual/using/namespaces#projects>
 
 Each project is a distinct namespace within the deployment, with access to its own resources.
 In particular, each project has its own workers. A project also has a set of administrators
