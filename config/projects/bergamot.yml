@@ -1,0 +1,25 @@
+bergamot:
+  adminRoles:
+    - github-team:mozilla/bergamot
+  repos:
+    - github.com/mozilla/marian-dev:*
+  workerPools:
+    ci-linux:
+      owner: nobody@mozilla.org
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 10
+    ci-windows:
+      owner: nobody@mozilla.org
+      emailOnError: false
+      imageset: generic-worker-win2012r2
+      cloud: aws
+      minCapacity: 1
+      maxCapacity: 10
+  grants:
+    - grant:
+        - queue:create-task:highest:proj-bergamot/ci-*
+      to:
+        - repo:github.com/mozilla/marian-dev:*
