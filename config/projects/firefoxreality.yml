@@ -10,6 +10,7 @@ firefoxreality:
     fr/release-signing-token: true
     fr/staging-signing-token: true
     fr/symbols-token: true
+    fr/mls-key: true
 
     # FirefoxRealityPC secrets
     frpc/github-deploy-key: true
@@ -38,6 +39,7 @@ firefoxreality:
         - secrets:get:project/firefoxreality/fr/keystore-password
         - secrets:get:project/firefoxreality/fr/preview-keystore
         - secrets:get:project/firefoxreality/fr/symbols-token
+        - secrets:get:project/firefoxreality/fr/mls-key
       to: project:firefoxreality:common-secrets
     - grant:
         - assume:project:firefoxreality:common-secrets
