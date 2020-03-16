@@ -172,6 +172,7 @@ deepspeech:
         - repo:github.com/mozilla/tensorflow:*
     - grant:
         - generic-worker:allow-rdp:proj-deepspeech/*
+        - generic-worker:os-group:proj-deepspeech/*
       to:
         - project-admin:deepspeech
   secrets:
