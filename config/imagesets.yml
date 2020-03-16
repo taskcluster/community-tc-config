@@ -170,3 +170,22 @@ deepspeech-win2012r2:
           machine-setup:
             maintainer: alissy@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/generic-worker/2509a1f8589b0b536186f5fe8f043385bf67197f/worker_types/deepspeech-win/bootstrap.ps1
+
+deepspeech-win2012r2-gpu:
+  workerImplementation: generic-worker
+  aws:
+    amis:
+      us-east-1: ami-09dd57282215e42ba
+      us-west-1: ami-05696eedcf5032c65
+      us-west-2: ami-02dfb5adb48a2032f
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
+        shutdownMachineOnIdle: true
+        idleTimeoutSecs: 90
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: alissy@mozilla.com
+            script: https://raw.githubusercontent.com/taskcluster/generic-worker/2509a1f8589b0b536186f5fe8f043385bf67197f/worker_types/deepspeech-win/bootstrap.ps1

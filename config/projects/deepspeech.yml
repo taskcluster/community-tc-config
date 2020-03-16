@@ -32,7 +32,7 @@ deepspeech:
     win-gpu:
       owner: deepspeech@mozilla.com
       emailOnError: false
-      imageset: deepspeech-win2012r2
+      imageset: deepspeech-win2012r2-gpu
       cloud: aws
       instanceTypes:
         g3s.xlarge: 1
