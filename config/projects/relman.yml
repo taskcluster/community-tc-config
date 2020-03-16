@@ -64,6 +64,12 @@ relman:
       minCapacity: 1
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n1-standard-16"
+    win2012r2:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-win2012r2
+      cloud: aws
+      maxCapacity: 10
   secrets:
     bugbug/deploy: true
     bugbug/integration: true
@@ -89,6 +95,7 @@ relman:
     - grant:
         - queue:create-task:highest:proj-relman/batch
         - queue:create-task:highest:proj-relman/ci
+        - queue:create-task:highest:proj-relman/win2012r2
         - queue:route:statuses
       to:
         - repo:github.com/mozilla/bugbug:*
