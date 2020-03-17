@@ -1,6 +1,6 @@
 # community-tc-config
 
-This repository defines a tool to manage the runtime configuration for the Taskcluster deployment at https://community-tc.services.mozilla.com/.
+This repository defines a tool to manage the runtime configuration for the Taskcluster deployment at <https://community-tc.services.mozilla.com/>.
 It uses [tc-admin](https://github.com/taskcluster/tc-admin) to examine and update the deployment.
 See that library's documentation for background on how the process works.
 
