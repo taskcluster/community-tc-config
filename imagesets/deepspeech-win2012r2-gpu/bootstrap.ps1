@@ -229,7 +229,7 @@ $pagefile.Put();
 # NVIDIA Tesla M60 drivers for g3s.xlarge
 # Just before reboot because ... it might reboot
 $client.DownloadFile("http://us.download.nvidia.com/tesla/412.36/412.36-tesla-desktop-winserver2012r2-64bit-international.exe", "C:\412.36-tesla-desktop-winserver2012r2-64bit-international.exe")
-Start-Process -FilePath "C:\412.36-tesla-desktop-winserver2012r2-64bit-international.exe" -ArgumentList "-s -i -noreboot -noeula" -Wait -NoNewWindow
+Start-Process -FilePath "C:\412.36-tesla-desktop-winserver2012r2-64bit-international.exe" -ArgumentList "-s -i -noreboot -noeula" -Wait -NoNewWindow -RedirectStandardOutput C:\tesla-install.log -RedirectStandardError C:\tesla-install.err
 
 # now shutdown, in preparation for creating an image
 # Stop-Computer isn't working, also not when specifying -AsJob, so reverting to using `shutdown` command instead
