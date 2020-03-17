@@ -71,10 +71,6 @@ choco install -y nuget.commandline --version 4.9.3
 # Carbon for later
 choco install -y carbon --version 2.5.0
 
-# NVIDIA Tesla M60 drivers for g3s.xlarge
-$client.DownloadFile("http://us.download.nvidia.com/tesla/412.36/412.36-tesla-desktop-winserver2012r2-64bit-international.exe", "C:\412.36-tesla-desktop-winserver2012r2-64bit-international.exe")
-Start-Process -FilePath "C:\412.36-tesla-desktop-winserver2012r2-64bit-international.exe" -ArgumentList "-s" -Wait -NoNewWindow
-
 # Prepare CUDA v10.0
 #$client.DownloadFile("https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_411.31_win10", "C:\cuda_10.0.130_411.31_win10.exe")
 #Start-Process -FilePath "C:\cuda_10.0.130_411.31_win10.exe" -ArgumentList "-s nvcc_10.0 cublas_dev_10.0 cudart_10.0 cufft_dev_10.0 curand_dev_10.0 cusolver_dev_10.0 cusparse_dev_10.0" -Wait -NoNewWindow
@@ -218,7 +214,6 @@ md "C:\Handle"
 Expand-ZIPFile -File "C:\Handle.zip" -Destination "C:\Handle" -Url "https://download.sysinternals.com/files/Handle.zip"
 
 # Free some space
-Start-Process "cmd.exe" -ArgumentList "/c del C:\412.36-tesla*" -Wait -NoNewWindow
 Start-Process "cmd.exe" -ArgumentList "/c del C:\cuda_*" -Wait -NoNewWindow
 Start-Process "cmd.exe" -ArgumentList "/c del C:\cudnn*" -Wait -NoNewWindow
 Start-Process "cmd.exe" -ArgumentList "/c del C:\CUDNN*" -Wait -NoNewWindow
@@ -230,6 +225,11 @@ $pagefile = Get-WmiObject -Query "Select * From Win32_PageFileSetting Where Name
 $pagefile.InitialSize = 512;
 $pagefile.MaximumSize = 2048;
 $pagefile.Put();
+
+# NVIDIA Tesla M60 drivers for g3s.xlarge
+# Just before reboot because ... it might reboot
+$client.DownloadFile("http://us.download.nvidia.com/tesla/412.36/412.36-tesla-desktop-winserver2012r2-64bit-international.exe", "C:\412.36-tesla-desktop-winserver2012r2-64bit-international.exe")
+Start-Process -FilePath "C:\412.36-tesla-desktop-winserver2012r2-64bit-international.exe" -ArgumentList "-s -i -noreboot -noeula" -Wait -NoNewWindow
 
 # now shutdown, in preparation for creating an image
 # Stop-Computer isn't working, also not when specifying -AsJob, so reverting to using `shutdown` command instead
