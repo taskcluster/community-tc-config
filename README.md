@@ -24,7 +24,7 @@ See the [Taskcluster Documentation](https://community-tc.services.mozilla.com/do
 Begin by installing this app by running `pip install -e .` in this directory.
 Then, run
 
-```
+```shell
 TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com tc-admin diff --without-secrets
 ```
 
@@ -79,3 +79,7 @@ The YAML in `config/` is linted with `yamllint`'s "relaxed" preset, and without 
 pip install yamllint
 yamllint config
 ```
+
+### Pre-commit checks
+
+If you would like your staged files to be checked for errors you can do so by installing `pre-commit` with: `pip install pre-commit` and `pre-commit install`.
