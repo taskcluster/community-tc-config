@@ -108,6 +108,9 @@
     # the task-creator default "taskcluster-ui"
     - queue:scheduler-id:-
     - queue:scheduler-id:taskcluster-ui
+    - queue:create-task:highest:built-in/fail
+    - queue:create-task:highest:built-in/succeed
+    - queue:get-artifact:login-identity/<..>/*
   to:
     - login-identity:*
 
