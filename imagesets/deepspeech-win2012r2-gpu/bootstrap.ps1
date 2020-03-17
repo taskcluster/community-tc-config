@@ -226,6 +226,11 @@ $pagefile.InitialSize = 512;
 $pagefile.MaximumSize = 2048;
 $pagefile.Put();
 
+# NVIDIA Tesla M60 drivers for g3s.xlarge
+# Just before reboot because ... it might reboot
+$client.DownloadFile("http://us.download.nvidia.com/tesla/412.36/412.36-tesla-desktop-winserver2012r2-64bit-international.exe", "C:\412.36-tesla-desktop-winserver2012r2-64bit-international.exe")
+Start-Process -FilePath "C:\412.36-tesla-desktop-winserver2012r2-64bit-international.exe" -ArgumentList "-s -i -noreboot -noeula" -Wait -NoNewWindow -RedirectStandardOutput C:\tesla-install.log -RedirectStandardError C:\tesla-install.err
+
 # now shutdown, in preparation for creating an image
 # Stop-Computer isn't working, also not when specifying -AsJob, so reverting to using `shutdown` command instead
 #   * https://www.reddit.com/r/PowerShell/comments/65250s/windows_10_creators_update_stopcomputer_not/dgfofug/?st=j1o3oa29&sh=e0c29c6d

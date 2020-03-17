@@ -97,6 +97,8 @@ taskcluster:
       emailOnError: true
       imageset: generic-worker
       cloud: static
+      lifecycle:
+        reregistrationTimeout: 2592000 # 30 days
 
   grants:
     - grant:
