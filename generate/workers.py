@@ -339,13 +339,12 @@ def aws(
         groupId = aws_config["security_groups"][region][securityGroup]
         for az, subnetId in aws_config["subnets"][region].items():
             for instanceType, capacityPerInstance in instanceTypes.items():
-                # Instance type m3.2xlarge isn't available in us-east-1[a,f], so
-                # filter out that combination.
-                if instanceType == "m3.2xlarge" and az in [
-                    "us-east-1a",
-                    "us-east-1f",
-                    "us-west-2d",
-                ]:
+                # Filter out availability zones where the required instance type
+                # is not available.
+                if (
+                    instanceType == "m3.2xlarge"
+                    and az in ["us-east-1a", "us-east-1f", "us-west-2d"]
+                ) or (instanceType == "g3s.xlarge" and az.startswith("us-west-1")):
                     continue
                 launchConfig = {
                     "capacityPerInstance": capacityPerInstance,
