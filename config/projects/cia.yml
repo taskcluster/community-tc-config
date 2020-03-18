@@ -1,7 +1,7 @@
 cia:
   adminRoles:
     - github-team:mozilla/cia
-  externallyManaged: false
+  externallyManaged: true
   repos:
     - github.com/armenzg/smart-scheduling:*
   workerPools:
