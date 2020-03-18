@@ -5,7 +5,7 @@ exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
 WORKER_RUNNER_VERSION='v1.0.1'
-GENERIC_WORKER_VERSION='v16.5.6'
+GENERIC_WORKER_VERSION='v28.0.0'
 LIVELOG_VERSION='v1.1.0'
 TASKCLUSTER_PROXY_VERSION='v5.1.0'
 ######################################
@@ -45,7 +45,7 @@ apt-get update -qq
 apt-get -qq -y install podman
 
 cd /usr/local/bin
-retry curl -L "https://github.com/taskcluster/generic-worker/releases/download/${GENERIC_WORKER_VERSION}/generic-worker-multiuser-linux-amd64" > generic-worker
+retry curl -L "https://github.com/taskcluster/taskcluster/releases/download/${GENERIC_WORKER_VERSION}/generic-worker-multiuser-linux-amd64" > generic-worker
 retry curl -L "https://github.com/taskcluster/taskcluster-worker-runner/releases/download/${WORKER_RUNNER_VERSION}/start-worker-linux-amd64" > start-worker
 retry curl -L "https://github.com/taskcluster/livelog/releases/download/${LIVELOG_VERSION}/livelog-linux-amd64" > livelog
 retry curl -L "https://github.com/taskcluster/taskcluster-proxy/releases/download/${TASKCLUSTER_PROXY_VERSION}/taskcluster-proxy-linux-amd64" > taskcluster-proxy
