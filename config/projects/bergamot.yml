@@ -21,5 +21,8 @@ bergamot:
   grants:
     - grant:
         - queue:create-task:highest:proj-bergamot/ci-*
+        - queue:route:index.project.bergamot.*
+        - queue:scheduler-id:taskcluster-github
+        - index:insert-task:project.bergamot.*
       to:
         - repo:github.com/mozilla/marian-dev:*
