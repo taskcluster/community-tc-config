@@ -34,7 +34,7 @@ Set-Acl "C:\builds" $acl
 $client.DownloadFile("https://raw.githubusercontent.com/mozilla/release-services/master/src/tooltool/client/tooltool.py", "C:\builds\tooltool.py")
 Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "http://www.nssm.cc/release/nssm-2.24.zip"
 md C:\generic-worker
-$client.DownloadFile("https://github.com/taskcluster/generic-worker/releases/download/v16.6.0/generic-worker-multiuser-windows-amd64.exe", "C:\generic-worker\generic-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v28.0.0/generic-worker-multiuser-windows-amd64", "C:\generic-worker\generic-worker.exe")
 Set-Content -Path c:\generic-worker\install.bat @"
 set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% install "Generic Worker" c:\generic-worker\generic-worker.exe

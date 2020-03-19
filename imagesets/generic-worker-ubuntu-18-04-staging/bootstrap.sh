@@ -7,7 +7,7 @@ exec &> /var/log/bootstrap.log
 WORKER_RUNNER_VERSION='v1.0.1'
 LIVELOG_VERSION='v1.1.0'
 TASKCLUSTER_PROXY_VERSION='v5.1.0'
-GENERIC_WORKER_REF='v16.5.6'
+GENERIC_WORKER_REF='v28.0.0'
 ######################################
 
 function retry {
@@ -49,16 +49,17 @@ systemctl status docker | grep "Started Docker Application Container Engine"
 usermod -aG docker ubuntu
 
 # build generic-worker from ${GENERIC_WORKER_REF} commit / branch / tag etc
-retry curl -L 'https://dl.google.com/go/go1.12.9.linux-amd64.tar.gz' > go.tar.gz
+retry curl -L 'https://dl.google.com/go/go1.13.7.linux-amd64.tar.gz' > go.tar.gz
 tar xvfz go.tar.gz -C /usr/local
 export HOME=/root
 export GOPATH=~/go
 export GOROOT=/usr/local/go
 export PATH="${GOROOT}/bin:${GOPATH}/bin:${PATH}"
-go get -d github.com/taskcluster/generic-worker
-cd "${GOPATH}/src/github.com/taskcluster/generic-worker"
+go get -d github.com/taskcluster/taskcluster
+cd "${GOPATH}/src/github.com/taskcluster/taskcluster"
 git checkout "${GENERIC_WORKER_REF}"
-CGO_ENABLED=0 go install -tags multiuser -ldflags "-X main.revision=$(git rev-parse HEAD)" github.com/taskcluster/generic-worker
+cd workers/generic-worker
+CGO_ENABLED=0 go install -tags multiuser -ldflags "-X main.revision=$(git rev-parse HEAD)"
 mv "${GOPATH}/bin/generic-worker" /usr/local/bin/
 
 # install livelog and taskcluster-proxy
