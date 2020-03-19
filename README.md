@@ -60,6 +60,14 @@ Projects that manage their own resources, either by hand or via their own automa
 Note that externally managed projects can still define other resources in their `projects.yml` stanza.
 Such resources will be created and managed by this repository, but if they are removed from `projects.yml`, this repository cannot delete them.
 
+The `externallyManaged` attribute can be set to `true` (only resources explicitly mentioned should be managed by this repo; unknown resources will not be deleted) or `false` (all resources are managed by this repo; unknown resources will be deleted), or to a regular expression or list of regular expressions.
+These regular expressions describe resource IDs of resources that are managed externally.  For example, if the project `darjeeling` dynamically creates hooks with prefix `project-darjeeling/dynamic-`, it it would set
+
+```yaml
+  externallyManaged:
+    - "Hook=project-darjeeling/dynamic-.*"
+```
+
 ### Image Sets
 
 To build a set of machine images in GCP/AWS, see the [imagesets](/imagesets) subdirectory.
