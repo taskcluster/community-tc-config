@@ -67,7 +67,7 @@ relman:
     win2012r2:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: generic-worker-win2012r2
+      imageset: deepspeech-win2012r2
       cloud: aws
       maxCapacity: 10
   secrets:
