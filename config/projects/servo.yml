@@ -24,6 +24,7 @@ servo:
       maxCapacity: 10
   grants:
     - grant:
+        - generic-worker:allow-rdp:proj-servo/*
         # notification
         - queue:route:notify.irc-channel.#servo.*
         - queue:route:notify.matrix-room.#servo:mozilla.org.*
