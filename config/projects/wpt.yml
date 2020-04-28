@@ -3,7 +3,7 @@ wpt:
     - github-team:web-platform-tests/admins
   workerPools:
     ci:
-      imageset: docker-worker-with-iptables-fix
+      imageset: docker-worker
       cloud: gcp
       maxCapacity: 80
       workerConfig:
