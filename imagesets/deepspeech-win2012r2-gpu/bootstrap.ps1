@@ -34,11 +34,11 @@ Invoke-Expression ($client.DownloadString('https://chocolatey.org/install.ps1'))
 # install Windows 10 SDK
 choco install -y windows-sdk-10.0
 
-# install NodeJS v8
-choco install -y nodejs --version 8.15.0
+# install NodeJS LTS v12
+choco install -y nodejs --version 12.16.3
 
 # install git
-choco install -y git --version 2.21.0
+choco install -y git --version 2.26.2
 
 # install python2 as well for node-gyp later
 choco install -y python2 --version 2.7.16
@@ -49,9 +49,9 @@ choco install -y python --version 3.6.8
 # install 7zip, since msys2 p7zip behaves erratically
 choco install -y 7zip --version 19.0
 
-# install VisualStudio 2017 Community
-choco install -y visualstudio2017community --version 15.9.7.0 --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.140 --passive --locale en-US"
-choco install -y visualstudio2017buildtools --version 15.9.7.0 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.140 --add Microsoft.VisualStudio.Component.NuGet.BuildTools  --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US"
+# install VisualStudio 2019 Community
+choco install -y visualstudio2019community --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.150 --passive --locale en-US"
+choco install -y visualstudio2019buildtools --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.150 --add Microsoft.VisualStudio.Component.NuGet.BuildTools  --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US"
 
 # vcredist140 required at least for bazel
 choco install -y vcredist140 --version 14.16.27027.1
@@ -84,10 +84,10 @@ Start-Process -FilePath "C:\cuda_10.1.168_425.25_win10.exe" -ArgumentList "-s nv
 mv "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\bin\cudafe++.exe" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\bin\cudafe++.exe.v10.0"
 cp "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\bin\cudafe++.exe" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\bin\cudafe++.exe"
 
-# CuDNN v7.5.0 for CUDA 10.0
-#Expand-ZIPFile -File "C:\cudnn-10.0-windows10-x64-v7.5.0.56.zip" -Destination "C:\CUDNN-10.0\" -Url "http://developer.download.nvidia.com/compute/redist/cudnn/v7.5.0/cudnn-10.0-windows10-x64-v7.5.0.56.zip"
+# CuDNN v7.6.0 for CUDA 10.0
+#Expand-ZIPFile -File "C:\cudnn-10.0-windows10-x64-v7.6.0.64.zip" -Destination "C:\CUDNN-10.0\" -Url "http://developer.download.nvidia.com/compute/redist/cudnn/v7.6.0/cudnn-10.0-windows10-x64-v7.6.0.64.zip"
 md "C:\CUDNN-10.0"
-Expand-ZIPFile -File "C:\cudnn-10.0-windows7-x64-v7.5.0.56.zip" -Destination "C:\CUDNN-10.0\" -Url "http://developer.download.nvidia.com/compute/redist/cudnn/v7.5.0/cudnn-10.0-windows7-x64-v7.5.0.56.zip"
+Expand-ZIPFile -File "C:\cudnn-10.0-windows7-x64-v7.6.0.64.zip" -Destination "C:\CUDNN-10.0\" -Url "http://developer.download.nvidia.com/compute/redist/cudnn/v7.6.0/cudnn-10.0-windows7-x64-v7.6.0.64.zip"
 cp "C:\CUDNN-10.0\cuda\include\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\include\"
 cp "C:\CUDNN-10.0\cuda\lib\x64\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\lib\x64\"
 cp "C:\CUDNN-10.0\cuda\bin\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\bin\"
