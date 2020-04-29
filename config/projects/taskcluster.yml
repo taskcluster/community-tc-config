@@ -13,7 +13,7 @@ taskcluster:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
-      imageset: docker-worker-with-iptables-fix
+      imageset: docker-worker
       cloud: gcp
       minCapacity: 1
       maxCapacity: 20

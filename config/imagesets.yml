@@ -48,16 +48,10 @@ generic-worker:
   workerImplementation: generic-worker
   # (this is intended for use with static workers)
 
-# If you are updating this after April 27, 2020 please remove the iptables-fix version of this and port everyhing back to normal docker-worker
 docker-worker:
   workerImplementation: docker-worker
   gcp:
-    image: projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2020-03-12t12-33-33z
-
-docker-worker-with-iptables-fix:
-  workerImplementation: docker-worker
-  gcp:
-    image: projects/taskcluster-imaging/global/images/docker-worker-gcp-community-googlecompute-2020-04-27t21-26-52z
+    image: projects/taskcluster-imaging/global/images/docker-worker-gcp-community-googlecompute-2020-04-28t17-41-18z
 
 generic-worker-win2012r2:
   workerImplementation: generic-worker
