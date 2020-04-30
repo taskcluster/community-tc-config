@@ -73,7 +73,7 @@ choco install -y carbon --version 2.5.0
 
 # Install CUDA v10.1
 $client.DownloadFile("https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.168_425.25_win10.exe", "C:\cuda_10.1.168_425.25_win10.exe")
-Start-Process -FilePath "C:\cuda_10.1.168_425.25_win10.exe" -ArgumentList "-s nvcc_10.1 nvprune_10.1 cupti_10.1 gpu_library_advisor_10.1 memcheck_10.1 cublas_10.1 cudart_10.1 cufft_10.1 curand_10.1 cusolver_10.1 cusparse_10.1" -Wait -NoNewWindow
+Start-Process -FilePath "C:\cuda_10.1.168_425.25_win10.exe" -ArgumentList "-s nvcc_10.1 nvprune_10.1 cupti_10.1 gpu_library_advisor_10.1 memcheck_10.1 cublas_dev_10.1 cudart_10.1 cufft_dev_10.1 curand_dev_10.1 cusolver_dev_10.1 cusparse_dev_10.1" -Wait -NoNewWindow
 
 # CuDNN v7.6.0 for CUDA 10.1
 #Expand-ZIPFile -File "C:\cudnn-10.1-windows10-x64-v7.6.0.64.zip" -Destination "C:\CUDNN-10.1\" -Url "http://developer.download.nvidia.com/compute/redist/cudnn/v7.6.0/cudnn-10.1-windows10-x64-v7.6.0.64.zip"
