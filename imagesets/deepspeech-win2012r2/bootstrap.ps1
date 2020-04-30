@@ -101,7 +101,7 @@ Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "http://www.nssm
 
 # download generic-worker
 md C:\generic-worker
-$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v28.0.0/generic-worker-multiuser-windows-amd64", "C:\generic-worker\generic-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v29.2.0/generic-worker-multiuser-windows-amd64", "C:\generic-worker\generic-worker.exe")
 
 # install generic-worker, using the batch script suggested in https://github.com/taskcluster/taskcluster-worker-runner/blob/master/docs/windows-services.md
 Set-Content -Path c:\generic-worker\install.bat @"
@@ -165,7 +165,7 @@ cacheOverRestarts: c:\generic-worker\start-worker-cache.json
 "@
 
 # download livelog
-$client.DownloadFile("https://github.com/taskcluster/livelog/releases/download/v1.1.0/livelog-windows-amd64.exe", "C:\generic-worker\livelog.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v29.2.0/livelog-windows-amd64", "C:\generic-worker\livelog.exe")
 
 # download taskcluster-proxy
 $client.DownloadFile("https://github.com/taskcluster/taskcluster-proxy/releases/download/v5.1.0/taskcluster-proxy-windows-amd64.exe", "C:\generic-worker\taskcluster-proxy.exe")
