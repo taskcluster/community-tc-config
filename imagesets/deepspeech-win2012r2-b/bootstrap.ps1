@@ -73,9 +73,8 @@ choco install -y carbon --version 2.5.0
 
 # Prepare CUDA v10.0
 #$client.DownloadFile("https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_411.31_win10", "C:\cuda_10.0.130_411.31_win10.exe")
-#Start-Process -FilePath "C:\cuda_10.0.130_411.31_win10.exe" -ArgumentList "-s nvcc_10.0 cublas_dev_10.0 cudart_10.0 cufft_dev_10.0 curand_dev_10.0 cusolver_dev_10.0 cusparse_dev_10.0" -Wait -NoNewWindow
 $client.DownloadFile("https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_411.31_windows", "C:\cuda_10.0.130_411.31_windows.exe")
-Start-Process -FilePath "C:\cuda_10.0.130_411.31_windows.exe" -ArgumentList "-s nvcc_10.0 nvprune_10.0 cupti_10.0 gpu_library_advisor_10.0 memcheck_10.0 cublas_10.0 cudart_10.0 cufft_10.0 curand_10.0 cusolver_10.0 cusparse_10.0" -Wait -NoNewWindow
+Start-Process -FilePath "C:\cuda_10.0.130_411.31_windows.exe" -ArgumentList "-s nvcc_10.0 nvprune_10.0 cupti_10.0 gpu_library_advisor_10.0 memcheck_10.0 cublas_dev_10.0 cudart_10.0 cufft_dev_10.0 curand_dev_10.0 cusolver_dev_10.0 cusparse_dev_10.0" -Wait -NoNewWindow
 
 # Install CUDA v10.1 as well so we can patch v10.0 cudafe++.exe
 # https://github.com/tensorflow/tensorflow/issues/27576#issuecomment-504703397
