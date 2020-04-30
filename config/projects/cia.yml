@@ -4,6 +4,7 @@ cia:
   externallyManaged: true
   repos:
     - github.com/armenzg/smart-scheduling:*
+    - github.com/mozilla/cia-tasks:*
   workerPools:
     ci:
       owner: armenzg@mozilla.com
@@ -24,6 +25,10 @@ cia:
     - grant:
         - secrets:get:project/cia/garbage/foo
       to: repo:github.com/armenzg/smart-scheduling:*
+    # CI-A tasks
+    - grant:
+        - secrets:get:project/cia/garbage/foo
+      to: repo:github.com/mozilla/cia-tasks:*
     # Grant a hook the capacity to fetch a secret
     - grant:
         - secrets:get:project/cia/garbage/foo
