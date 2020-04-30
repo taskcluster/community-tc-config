@@ -212,8 +212,9 @@ deepspeech-win2012r2-gpu-b:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0f1267d9cdf794096
-      us-west-2: ami-0a5f02525bf6c69de
+      us-east-1: ami-05bd9cebd114ec1b5
+      us-west-1: ami-0b83f7ef881600fff
+      us-west-2: ami-0af05bbfe5ef2b411
   workerConfig:
     genericWorker:
       config:
