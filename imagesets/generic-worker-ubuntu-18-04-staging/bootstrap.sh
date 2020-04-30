@@ -52,7 +52,7 @@ export HOME=/root
 export GOPATH=~/go
 export GOROOT=/usr/local/go
 export PATH="${GOROOT}/bin:${GOPATH}/bin:${PATH}"
-git clone github.com/taskcluster/taskcluster
+git clone https://github.com/taskcluster/taskcluster
 cd taskcluster
 git checkout "${TASKCLUSTER_REF}"
 CGO_ENABLED=0 go install -tags multiuser -ldflags "-X main.revision=$(git rev-parse HEAD)" ./...
