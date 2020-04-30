@@ -4,10 +4,7 @@ set -exv
 exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
-WORKER_RUNNER_VERSION='v1.0.1'
-LIVELOG_VERSION='v1.1.0'
-TASKCLUSTER_PROXY_VERSION='v5.1.0'
-GENERIC_WORKER_REF='v28.0.0'
+TASKCLUSTER_REF='v29.2.0'
 ######################################
 
 function retry {
@@ -48,31 +45,23 @@ sleep 5
 systemctl status docker | grep "Started Docker Application Container Engine"
 usermod -aG docker ubuntu
 
-# build generic-worker from ${GENERIC_WORKER_REF} commit / branch / tag etc
+# build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
 retry curl -L 'https://dl.google.com/go/go1.13.7.linux-amd64.tar.gz' > go.tar.gz
 tar xvfz go.tar.gz -C /usr/local
 export HOME=/root
 export GOPATH=~/go
 export GOROOT=/usr/local/go
 export PATH="${GOROOT}/bin:${GOPATH}/bin:${PATH}"
-go get -d github.com/taskcluster/taskcluster
-cd "${GOPATH}/src/github.com/taskcluster/taskcluster"
-git checkout "${GENERIC_WORKER_REF}"
-cd workers/generic-worker
-CGO_ENABLED=0 go install -tags multiuser -ldflags "-X main.revision=$(git rev-parse HEAD)"
-mv "${GOPATH}/bin/generic-worker" /usr/local/bin/
-
-# install livelog and taskcluster-proxy
-cd /usr/local/bin
-retry curl -L "https://github.com/taskcluster/taskcluster-worker-runner/releases/download/${WORKER_RUNNER_VERSION}/start-worker-linux-amd64" > start-worker
-retry curl -L "https://github.com/taskcluster/livelog/releases/download/${LIVELOG_VERSION}/livelog-linux-amd64" > livelog
-retry curl -L "https://github.com/taskcluster/taskcluster-proxy/releases/download/${TASKCLUSTER_PROXY_VERSION}/taskcluster-proxy-linux-amd64" > taskcluster-proxy
-chmod a+x start-worker taskcluster-proxy livelog
+git clone github.com/taskcluster/taskcluster
+cd taskcluster
+git checkout "${TASKCLUSTER_REF}"
+CGO_ENABLED=0 go install -tags multiuser -ldflags "-X main.revision=$(git rev-parse HEAD)" ./...
+mv "${GOPATH}/bin"/* /usr/local/bin/
 
 mkdir -p /etc/generic-worker
 mkdir -p /var/local/generic-worker
-./generic-worker --version
-./generic-worker new-ed25519-keypair --file /etc/generic-worker/ed25519_key
+/usr/local/bin/generic-worker --version
+/usr/local/bin/generic-worker new-ed25519-keypair --file /etc/generic-worker/ed25519_key
 
 # ensure host 'taskcluster' resolves to localhost
 echo 127.0.1.1 taskcluster >> /etc/hosts
