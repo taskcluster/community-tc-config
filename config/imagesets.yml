@@ -171,7 +171,44 @@ deepspeech-win2012r2:
             maintainer: alissy@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/generic-worker/2509a1f8589b0b536186f5fe8f043385bf67197f/worker_types/deepspeech-win/bootstrap.ps1
 
+deepspeech-win2012r2-b:
+  workerImplementation: generic-worker
+  aws:
+    amis:
+      us-east-1: ami-0e97b06932499ec98
+      us-west-1: ami-0cfbdc02cc4ca14ba
+      us-west-2: ami-0f514b399e2e28f58
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
+        shutdownMachineOnIdle: true
+        idleTimeoutSecs: 90
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: alissy@mozilla.com
+            script: https://raw.githubusercontent.com/taskcluster/generic-worker/2509a1f8589b0b536186f5fe8f043385bf67197f/worker_types/deepspeech-win/bootstrap.ps1
+
 deepspeech-win2012r2-gpu:
+  workerImplementation: generic-worker
+  aws:
+    amis:
+      us-east-1: ami-0f1267d9cdf794096
+      us-west-2: ami-0a5f02525bf6c69de
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
+        shutdownMachineOnIdle: true
+        idleTimeoutSecs: 90
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: alissy@mozilla.com
+            script: https://github.com/mozilla/community-tc-config/blob/5d7c08a762b49d173007f12a7bfda6575f00576e/imagesets/deepspeech-win2012r2-gpu/bootstrap.ps1
+
+deepspeech-win2012r2-gpu-b:
   workerImplementation: generic-worker
   aws:
     amis:

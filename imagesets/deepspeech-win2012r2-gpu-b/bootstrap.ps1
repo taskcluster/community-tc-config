@@ -34,7 +34,7 @@ Invoke-Expression ($client.DownloadString('https://chocolatey.org/install.ps1'))
 # install Windows 10 SDK
 choco install -y windows-sdk-10.0
 
-# install NodeJS v8
+# install NodeJS LTS v12
 choco install -y nodejs --version 12.16.3
 
 # install git
@@ -216,6 +216,11 @@ $pagefile = Get-WmiObject -Query "Select * From Win32_PageFileSetting Where Name
 $pagefile.InitialSize = 512;
 $pagefile.MaximumSize = 2048;
 $pagefile.Put();
+
+# NVIDIA Tesla M60 drivers for g3s.xlarge
+# Just before reboot because ... it might reboot
+$client.DownloadFile("http://us.download.nvidia.com/tesla/426.32/426.32-tesla-desktop-winserver2008-2012r2-64bit-international.exe", "C:\426.32-tesla-desktop-winserver2012r2-64bit-international.exe")
+Start-Process -FilePath "C:\426.32-tesla-desktop-winserver2012r2-64bit-international.exe" -ArgumentList "-s -i -noreboot -noeula" -Wait -NoNewWindow -RedirectStandardOutput C:\tesla-install.log -RedirectStandardError C:\tesla-install.err
 
 # now shutdown, in preparation for creating an image
 # Stop-Computer isn't working, also not when specifying -AsJob, so reverting to using `shutdown` command instead

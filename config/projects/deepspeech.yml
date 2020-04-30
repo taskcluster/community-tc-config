@@ -24,7 +24,7 @@ deepspeech:
     win-b:
       owner: deepspeech@mozilla.com
       emailOnError: false
-      imageset: deepspeech-win2012r2
+      imageset: deepspeech-win2012r2-b
       cloud: aws
       instanceTypes:
         m5d.2xlarge: 1
@@ -33,6 +33,14 @@ deepspeech:
       owner: deepspeech@mozilla.com
       emailOnError: false
       imageset: deepspeech-win2012r2-gpu
+      cloud: aws
+      instanceTypes:
+        g3s.xlarge: 1
+      maxCapacity: 4
+    win-gpu-b:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: deepspeech-win2012r2-gpu-b
       cloud: aws
       instanceTypes:
         g3s.xlarge: 1
@@ -179,3 +187,4 @@ deepspeech:
     ssh-keys/deepspeech-win: true
     ssh-keys/deepspeech-win-b: true
     ssh-keys/deepspeech-win-gpu: true
+    ssh-keys/deepspeech-win-gpu-b: true
