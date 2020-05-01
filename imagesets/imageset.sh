@@ -148,7 +148,12 @@ function aws_update {
     done
 
     # Create new base AMI, and apply user-data filter output, to get instance ID.
-    INSTANCE_ID="$(aws --region "${REGION}" ec2 run-instances --image-id "${AMI}" --key-name "${IMAGE_SET}_${REGION}" --security-groups "rdp-only" "ssh-only" --user-data "$(cat "${TEMP_SETUP_SCRIPT}")" --instance-type c4.2xlarge --block-device-mappings DeviceName=/dev/sda1,Ebs='{VolumeSize=75,DeleteOnTermination=true,VolumeType=gp2}' --instance-initiated-shutdown-behavior stop --client-token "${UNIQUE_NAME}" --query 'Instances[*].InstanceId' --output text)"
+    INSTANCE_ID="$(aws --region "${REGION}" ec2 run-instances --image-id "${AMI}" --key-name "${IMAGE_SET}_${REGION}" --security-groups "rdp-only" "ssh-only" --user-data "$(cat "${TEMP_SETUP_SCRIPT}")" --instance-type $(cat aws_base_instance_type) --block-device-mappings DeviceName=/dev/sda1,Ebs='{VolumeSize=75,DeleteOnTermination=true,VolumeType=gp2}' --instance-initiated-shutdown-behavior stop --client-token "${UNIQUE_NAME}" --query 'Instances[*].InstanceId' --output text 2>&1)"
+
+    if grep -Fq "not supported" "${INSTANCE_ID}"; then
+        log "Cannot deploy in ${REGION} since instance type $(cat aws_base_instance_type) is not supported; skipping."
+        return 0
+    fi
 
     log "I've triggered the creation of instance ${INSTANCE_ID} - it can take a \x1B[4mVery Long Time™\x1B[24m for it to be created and bootstrapped..."
     aws --region "${REGION}" ec2 create-tags --resources "${INSTANCE_ID}" --tags "Key=ImageSet,Value=${IMAGE_SET}" "Key=Name,Value=${IMAGE_SET} base instance ${IMAGE_SET_COMMIT_SHA}" "Key=TC-Windows-Base,Value=true"
