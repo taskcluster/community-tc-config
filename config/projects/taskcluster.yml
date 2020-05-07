@@ -183,7 +183,9 @@ taskcluster:
         - secrets:get:project/taskcluster/taskcluster-worker/stateless-dns
         - secrets:get:project/taskcluster/testing/docker-worker/ci-creds
         - secrets:get:project/taskcluster/testing/docker-worker/pulse-creds
-      to: repo:github.com/taskcluster/docker-worker:*
+      to:
+        - repo:github.com/taskcluster/docker-worker:* # This can be removed after 1635985 is resolved
+        - repo:github.com/taskcluster/taskcluster:branch:master # We leave this as master push only until we've audited permissions
 
     - grant:
         - secrets:get:project/taskcluster/monopacker/gcloud_service_account
