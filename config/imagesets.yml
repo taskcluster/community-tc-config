@@ -57,11 +57,9 @@ generic-worker-win2012r2:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0f1fe72cbcabc5891
-      us-west-1: ami-0dddaece5e367895c
-      us-west-2: ami-021217b1d0e9ae6d6
-  gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-win2012r2-nefwcpqji22o4upodhz3
+      us-east-1: ami-0e25602446699a013
+      us-west-1: ami-0360493dcdb36682e
+      us-west-2: ami-0f8c71fac9219169c
   workerConfig:
     genericWorker:
       config:
@@ -99,9 +97,9 @@ generic-worker-ubuntu-18-04:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-02b7e7e5f63ce7dc3
-      us-west-1: ami-005fd1b44bd56a762
-      us-west-2: ami-0a77c8ffdc1f4fb5e
+      us-east-1: ami-0b9e052beaf5738c5
+      us-west-1: ami-0e3ee2d095f50facd
+      us-west-2: ami-09b6663bf10cb7237
   workerConfig:
     genericWorker:
       config:
@@ -118,9 +116,9 @@ generic-worker-ubuntu-18-04-podman:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-079804c1ddb8cc957
-      us-west-1: ami-0fa4594e78ca9c339
-      us-west-2: ami-03c48f54cd54091c2
+      us-east-1: ami-00e3c8fc6fd4b185a
+      us-west-1: ami-07e52123a8cbe7fd5
+      us-west-2: ami-079a6da57f57b2cbe
   workerConfig:
     genericWorker:
       config:
