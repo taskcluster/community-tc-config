@@ -40,6 +40,14 @@ relman:
       minCapacity: 1
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n1-standard-1"
+    compute-smaller:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 1
+      maxCapacity: 25
+      machineType: "zones/{zone}/machineTypes/n1-standard-2"
     compute-small:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
