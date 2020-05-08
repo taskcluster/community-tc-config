@@ -101,9 +101,7 @@ relman:
   grants:
     # all repos
     - grant:
-        - queue:create-task:highest:proj-relman/batch
-        - queue:create-task:highest:proj-relman/ci
-        - queue:create-task:highest:proj-relman/win2012r2
+        - queue:create-task:highest:proj-relman/*
         - queue:route:statuses
       to:
         - repo:github.com/mozilla/bugbug:*
