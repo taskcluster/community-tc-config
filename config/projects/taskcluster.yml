@@ -17,6 +17,17 @@ taskcluster:
       cloud: gcp
       minCapacity: 1
       maxCapacity: 20
+
+    dw-ci:
+      # docker-worker's CI requires the 'privileged' scope, so run
+      # it on another worker.  Such workers are "untrusted" as this
+      # might allow one task to interfere with another.
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 1
+      maxCapacity: 10
       workerConfig:
         dockerConfig:
           allowPrivileged: true
@@ -184,8 +195,7 @@ taskcluster:
         - secrets:get:project/taskcluster/testing/docker-worker/ci-creds
         - secrets:get:project/taskcluster/testing/docker-worker/pulse-creds
       to:
-        - repo:github.com/taskcluster/docker-worker:* # This can be removed after 1635985 is resolved
-        - repo:github.com/taskcluster/taskcluster:branch:master # We leave this as master push only until we've audited permissions
+        - repo:github.com/taskcluster/taskcluster:*
 
     - grant:
         - secrets:get:project/taskcluster/monopacker/gcloud_service_account
@@ -240,10 +250,10 @@ taskcluster:
     - grant:
         - assume:project:taskcluster:generic-worker-tester
         - queue:create-task:highest:proj-taskcluster/gw-ci-*
+        - queue:create-task:highest:proj-taskcluster/dw-ci-*
         - generic-worker:cache:generic-worker-checkout
         - secrets:get:project/taskcluster/testing/generic-worker/ci-creds
       to:
-        - repo:github.com/taskcluster/generic-worker:*
         - repo:github.com/taskcluster/taskcluster:*
 
   clients:
