@@ -186,6 +186,7 @@
   to:
     # Repositories that whish to use this work-around
     - repo:github.com/servo/servo:*
+    - repo:github.com/web-platform-tests/wpt-tc-checks:*
 
 # Allow the taskcluster team to handle the denylist
 - grant: notify:manage-denylist
