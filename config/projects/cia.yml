@@ -20,6 +20,7 @@ cia:
     - grant:
         - queue:scheduler-id:-
         - queue:create-task:low:proj-cia/*
+        - auth:aws-s3:read-write:communitytc-bugbug/data/adr_cache/*
       to: hook-id:project-cia/*
     # smart-scheduling
     - grant:
