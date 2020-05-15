@@ -64,6 +64,11 @@ relman:
       minCapacity: 1
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n1-standard-8"
+      workerConfig:
+        genericWorker:
+          config:
+            # Tasks using this worker pool are triggered rarely.
+            idleTimeoutSecs: 0
     compute-super-large:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
@@ -72,6 +77,11 @@ relman:
       minCapacity: 1
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n1-standard-16"
+      workerConfig:
+        genericWorker:
+          config:
+            # Tasks using this worker pool are triggered rarely.
+            idleTimeoutSecs: 0
     win2012r2:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
