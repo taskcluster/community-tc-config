@@ -198,6 +198,9 @@ taskcluster:
         - repo:github.com/taskcluster/taskcluster:*
         - project:taskcluster:docker-worker-tester
 
+    - grant: assume:project:taskcluster:docker-worker-tester
+      to: login-identity:github/54458|catlee
+
     - grant:
         - secrets:get:project/taskcluster/monopacker/gcloud_service_account
         - secrets:get:project/taskcluster/monopacker/worker_secrets_yaml
