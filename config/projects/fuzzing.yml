@@ -56,6 +56,7 @@ fuzzing:
         - auth:update-role:hook-id:project-fuzzing/*
         - hooks:modify-hook:project-fuzzing/*
         - hooks:trigger-hook:project-fuzzing/*
+        - queue:create-task:highest:proj-fuzzing/*
         - queue:scheduler-id:-
         - secrets:get:project/fuzzing/credstash-aws-auth
         - secrets:get:project/fuzzing/deploy-*
