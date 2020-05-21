@@ -18,6 +18,14 @@ taskcluster:
       minCapacity: 1
       maxCapacity: 20
 
+    aws-test:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: aws
+      minCapacity: 1
+      maxCapacity: 1
+
     dw-ci:
       # docker-worker's CI requires the 'privileged' scope, so run
       # it on another worker.  Such workers are "untrusted" as this
