@@ -27,8 +27,8 @@ relman:
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
-      minCapacity: 1
-      maxCapacity: 50
+      minCapacity: 0
+      maxCapacity: 10
       workerConfig:
         dockerConfig:
           allowPrivileged: true
@@ -37,32 +37,32 @@ relman:
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
-      minCapacity: 1
-      maxCapacity: 25
+      minCapacity: 0
+      maxCapacity: 10
       machineType: "zones/{zone}/machineTypes/n1-standard-1"
     compute-smaller:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
-      minCapacity: 1
-      maxCapacity: 25
+      minCapacity: 0
+      maxCapacity: 10
       machineType: "zones/{zone}/machineTypes/n1-standard-2"
     compute-small:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
-      minCapacity: 1
-      maxCapacity: 25
+      minCapacity: 0
+      maxCapacity: 10
       machineType: "zones/{zone}/machineTypes/n1-standard-4"
     compute-large:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
-      minCapacity: 1
-      maxCapacity: 25
+      minCapacity: 0
+      maxCapacity: 10
       machineType: "zones/{zone}/machineTypes/n1-standard-8"
       workerConfig:
         genericWorker:
@@ -74,8 +74,8 @@ relman:
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
-      minCapacity: 1
-      maxCapacity: 25
+      minCapacity: 0
+      maxCapacity: 10
       machineType: "zones/{zone}/machineTypes/n1-standard-16"
       workerConfig:
         genericWorker:
@@ -87,6 +87,7 @@ relman:
       emailOnError: false
       imageset: deepspeech-win2012r2
       cloud: aws
+      minCapacity: 0
       maxCapacity: 10
   secrets:
     bugbug/deploy: true

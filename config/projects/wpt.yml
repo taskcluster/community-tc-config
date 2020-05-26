@@ -5,7 +5,8 @@ wpt:
     ci:
       imageset: docker-worker
       cloud: gcp
-      maxCapacity: 80
+      minCapacity: 0
+      maxCapacity: 10
       workerConfig:
         dockerConfig:
           allowPrivileged: true
