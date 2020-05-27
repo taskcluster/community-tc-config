@@ -20,10 +20,11 @@ taskcluster:
 
     aws-test:
       owner: taskcluster-notifications+workers@mozilla.com
+      description: not actively used, but useful for testing docker-worker on AWS
       emailOnError: false
       imageset: docker-worker
       cloud: aws
-      minCapacity: 1
+      minCapacity: 0
       maxCapacity: 1
 
     dw-ci:
