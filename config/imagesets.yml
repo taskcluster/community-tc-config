@@ -51,7 +51,12 @@ generic-worker:
 docker-worker:
   workerImplementation: docker-worker
   gcp:
-    image: projects/taskcluster-imaging/global/images/docker-worker-gcp-community-googlecompute-2020-04-28t17-41-18z
+    image: projects/taskcluster-imaging/global/images/docker-worker-gcp-community-googlecompute-2020-05-27t20-17-36z
+  aws:
+    amis:
+      us-east-1: ami-014262058c8107f42
+      us-west-1: ami-031735e42c674a004
+      us-west-2: ami-044da0efafea304d6
 
 generic-worker-win2012r2:
   workerImplementation: generic-worker
