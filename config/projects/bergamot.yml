@@ -16,7 +16,7 @@ bergamot:
       emailOnError: false
       imageset: generic-worker-win2012r2
       cloud: aws
-      minCapacity: 1
+      minCapacity: 0
       maxCapacity: 10
   grants:
     - grant:

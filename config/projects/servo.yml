@@ -11,7 +11,7 @@ servo:
       cloud: gcp
       machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
       diskSizeGb: 100
-      minCapacity: 2
+      minCapacity: 0
       maxCapacity: 40
     docker-untrusted:
       owner: servo-ops@mozilla.com

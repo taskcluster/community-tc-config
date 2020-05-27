@@ -5,6 +5,7 @@ wpt:
     ci:
       imageset: docker-worker
       cloud: gcp
+      minCapacity: 0
       maxCapacity: 80
       workerConfig:
         dockerConfig:

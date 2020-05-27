@@ -13,7 +13,7 @@ misc:
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
-      minCapacity: 1
+      minCapacity: 0
       maxCapacity: 20
   hooks:
     jcristau-fx-release-metrics:
