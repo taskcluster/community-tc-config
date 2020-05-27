@@ -10,14 +10,14 @@ bergamot:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 5
+      maxCapacity: 10
     ci-windows:
       owner: nobody@mozilla.org
       emailOnError: false
       imageset: generic-worker-win2012r2
       cloud: aws
       minCapacity: 0
-      maxCapacity: 5
+      maxCapacity: 10
   grants:
     - grant:
         - queue:create-task:highest:proj-bergamot/ci-*

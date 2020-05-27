@@ -28,7 +28,7 @@ relman:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 50
       workerConfig:
         dockerConfig:
           allowPrivileged: true
@@ -38,7 +38,7 @@ relman:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n1-standard-1"
     compute-smaller:
       owner: mcastelluccio@mozilla.com
@@ -46,7 +46,7 @@ relman:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n1-standard-2"
     compute-small:
       owner: mcastelluccio@mozilla.com
@@ -54,7 +54,7 @@ relman:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n1-standard-4"
     compute-large:
       owner: mcastelluccio@mozilla.com
@@ -62,7 +62,7 @@ relman:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n1-standard-8"
       workerConfig:
         genericWorker:
@@ -75,7 +75,7 @@ relman:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n1-standard-16"
       workerConfig:
         genericWorker:

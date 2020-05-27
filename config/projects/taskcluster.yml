@@ -16,7 +16,7 @@ taskcluster:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 20
 
     dw-ci:
       # docker-worker's CI requires the 'privileged' scope, so run

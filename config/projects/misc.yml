@@ -14,7 +14,7 @@ misc:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 20
   hooks:
     jcristau-fx-release-metrics:
       description: Taskcluster hook to run fx release metrics
