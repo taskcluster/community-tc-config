@@ -9,7 +9,7 @@ setup(
     url="https://github.com/djmitche/community-tc-config",
     packages=find_packages("."),
     install_requires=[
-        "tc-admin~=2.2.0",
+        "tc-admin~=2.5.1",
         "json-e~=3.0.0",
     ],
     setup_requires=["pytest-runner"],
