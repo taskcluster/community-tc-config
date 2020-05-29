@@ -421,7 +421,7 @@ def docker_worker(wp, **cfg):
     if wp.supports_worker_config():
         wp.merge_worker_config(
             WorkerPoolSettings.EXISTING_CONFIG,
-            {"shutdown": {"enabled": True, "afterIdleSeconds": 900,},},
+            {"shutdown": {"enabled": True, "afterIdleSeconds": 1,},},
         )
 
     wp.secret_tpl = {

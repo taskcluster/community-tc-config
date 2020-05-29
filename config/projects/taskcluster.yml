@@ -75,9 +75,6 @@ taskcluster:
         genericWorker:
           config:
             runTasksAsCurrentUser: true
-            # Default timeout is 90s, but pool keeps emptying during working
-            # hours. Useful to keep alive to reduce pending time for CI tasks.
-            idleTimeoutSecs: 3600
 
     gw-ci-ubuntu-18-04-staging:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -102,9 +99,6 @@ taskcluster:
         genericWorker:
           config:
             runTasksAsCurrentUser: true
-            # Default timeout is 90s, but pool keeps emptying during working
-            # hours. Useful to keep alive to reduce pending time for CI tasks.
-            idleTimeoutSecs: 3600
 
     gw-ci-windows2012r2-amd64-staging:
       owner: taskcluster-notifications+workers@mozilla.com
