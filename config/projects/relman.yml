@@ -68,7 +68,7 @@ relman:
         genericWorker:
           config:
             # Tasks using this worker pool are triggered rarely.
-            idleTimeoutSecs: 1
+            idleTimeoutSecs: 15
     compute-super-large:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
@@ -81,7 +81,7 @@ relman:
         genericWorker:
           config:
             # Tasks using this worker pool are triggered rarely.
-            idleTimeoutSecs: 1
+            idleTimeoutSecs: 15
     win2012r2:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
