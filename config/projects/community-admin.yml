@@ -1,0 +1,6 @@
+community-admin:
+  clients:
+    audit-worker-versions:
+      scopes:
+        - queue:create-task:highest:*
+      description: "Client used for [worker version](https://github.com/taskcluster/community-history/tree/master/WorkerVersions) reports."
