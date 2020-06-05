@@ -8,6 +8,7 @@ fuzzing:
     codecov-fuzzfetch: true
     codecov-fuzzmanager: true
     credstash-aws-auth: true
+    credstash-ro-aflfuzz-rw-aws-auth: true
     deploy-bearspray: true
     deploy-fuzzing-tc-config: true
     deploy-octo-private: true
@@ -61,6 +62,7 @@ fuzzing:
         - queue:create-task:highest:proj-fuzzing/*
         - queue:scheduler-id:-
         - secrets:get:project/fuzzing/credstash-aws-auth
+        - secrets:get:project/fuzzing/credstash-ro-aflfuzz-rw-aws-auth
         - secrets:get:project/fuzzing/deploy-*
         - worker-manager:manage-worker-pool:proj-fuzzing/*
         - worker-manager:provider:community-tc-workers-*
