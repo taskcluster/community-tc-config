@@ -147,7 +147,7 @@ taskcluster:
     - grant:
         - queue:create-task:highest:proj-taskcluster/release
         - secrets:get:project/taskcluster/release
-      to: repo:github.com/taskcluster/taskcluster:branch:refs/tags/v*
+      to: repo:github.com/taskcluster/taskcluster:tag:v*
 
     - grant:
         - queue:create-task:highest:proj-taskcluster/release
@@ -160,7 +160,7 @@ taskcluster:
         - queue:route:notify.irc-channel.#taskcluster-bots.*
       to:
         - repo:github.com/taskcluster/taskcluster:branch:master
-        - repo:github.com/taskcluster/taskcluster:branch:refs/tags/v*
+        - repo:github.com/taskcluster/taskcluster:tag:v*
 
     - grant:
         # pushes to json-e master can read secrets for deploying the site
