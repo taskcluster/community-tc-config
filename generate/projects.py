@@ -150,7 +150,7 @@ async def update_resources(resources, secret_values):
             for hookId, info in project.hooks.items():
                 hookGroupId = "project-{}".format(project.name)
                 if project.externallyManaged.manage_individual_resources():
-                    resources.manage("Hook={}/{}".format(hookGroupid, hookId))
+                    resources.manage("Hook={}/{}".format(hookGroupId, hookId))
                 assert (
                     "bindings" not in info
                 ), "Please add support for bindings to use this feature"
