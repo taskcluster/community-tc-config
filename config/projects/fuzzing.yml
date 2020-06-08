@@ -30,7 +30,46 @@ fuzzing:
       cloud: aws
       minCapacity: 0
       maxCapacity: 10
-
+  hooks:
+    domino-web-tests:
+      description: Domino Web Tests trigger
+      owner: jkratzer@mozilla.com
+      emailOnError: true
+      bindings:
+        - exchange: exchange/taskcluster-github/v1/push
+          routingKeyPattern: primary.MozillaSecurity.domino
+        - exchange: exchange/taskcluster-github/v1/push
+          routingKeyPattern: primary.MozillaSecurity.GrIDL
+      task:
+        provisionerId: proj-fuzzing
+        workerType: ci
+        payload:
+          image: 'mozillasecurity/domino-web-tests:latest'
+          features:
+            taskclusterProxy: true
+          maxRunTime: 600
+        metadata:
+          name: Domino Web Tests
+          description: Domino Web Tests
+          owner: jkratzer@mozilla.com
+          source: 'https://github.com/MozillaSecurity/domino-web-tests'
+        expires:
+          $fromNow: 3 months
+        deadline:
+          $fromNow: 6 hours
+        scopes:
+          - queue:create-task:highest:proj-fuzzing/ci
+          - secrets:get:project/fuzzing/deploy-domino-web-tests
+          - secrets:get:project/fuzzing/deploy-domino
+          - secrets:get:project/fuzzing/deploy-gridl
+          - secrets:get:project/fuzzing/deploy-octo-private
+      triggerSchema:
+        type: object
+        properties:
+          branch:
+            type: string
+            default: master
+        additionalProperties: true
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
