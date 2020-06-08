@@ -7,7 +7,7 @@
 import attr
 import re
 
-from tcadmin.resources import Role, Client, WorkerPool, Secret, Hook
+from tcadmin.resources import Role, Client, WorkerPool, Secret, Hook, Binding
 from .loader import loader, YamlDirectory
 from .workers import build_worker_pool
 from .grants import Grants
@@ -150,10 +150,7 @@ async def update_resources(resources, secret_values):
             for hookId, info in project.hooks.items():
                 hookGroupId = "project-{}".format(project.name)
                 if project.externallyManaged.manage_individual_resources():
-                    resources.manage("Hook={}/{}".format(hookGroupid, hookId))
-                assert (
-                    "bindings" not in info
-                ), "Please add support for bindings to use this feature"
+                    resources.manage("Hook={}/{}".format(hookGroupId, hookId))
                 resources.add(
                     Hook(
                         hookGroupId=hookGroupId,
@@ -163,7 +160,7 @@ async def update_resources(resources, secret_values):
                         owner=info["owner"],
                         emailOnError=info.get("emailOnError", False),
                         schedule=info.get("schedule", ()),
-                        bindings=info.get("bindings", ()),
+                        bindings=[Binding(**b) for b in info.get("bindings", [])],
                         task=info["task"],
                         triggerSchema=info.get("triggerSchema", {}),
                     )
