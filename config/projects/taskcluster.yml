@@ -151,7 +151,10 @@ taskcluster:
 
     - grant:
         - queue:create-task:highest:proj-taskcluster/release
-      to: repo:github.com/taskcluster/taskcluster:branch:staging-release/*
+      to:
+        # both pre- and post-bug-1635455
+        - repo:github.com/taskcluster/taskcluster:branch:staging-release/*
+        - repo:github.com/taskcluster/staging-releases:*
 
     - grant:
         # pushes to master and releases can notify on failure
@@ -270,6 +273,7 @@ taskcluster:
         - queue:route:checks
       to:
         - repo:github.com/taskcluster/taskcluster:*
+        - repo:github.com/taskcluster/staging-releases:*
 
   clients:
     smoketests:
