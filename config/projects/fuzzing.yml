@@ -48,8 +48,8 @@ fuzzing:
           features:
             taskclusterProxy: true
           maxRunTime: 3600
-        env:
-          ACTION: trigger
+          env:
+            ACTION: trigger
         metadata:
           name: Domino Web Tests
           description: Domino Web Tests
