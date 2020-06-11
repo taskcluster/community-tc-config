@@ -47,7 +47,9 @@ fuzzing:
           image: 'mozillasecurity/domino-web-tests:latest'
           features:
             taskclusterProxy: true
-          maxRunTime: 600
+          maxRunTime: 3600
+        env:
+          ACTION: trigger
         metadata:
           name: Domino Web Tests
           description: Domino Web Tests
@@ -88,7 +90,15 @@ fuzzing:
         - secrets:get:project/fuzzing/decision
       to:
         - repo:github.com/MozillaSecurity/fuzzing-tc-config:*
-
+    - grant:
+        - queue:create-task:highest:proj-fuzzing/ci
+        - queue:scheduler-id:-
+        - secrets:get:project/fuzzing/deploy-domino
+        - secrets:get:project/fuzzing/deploy-domino-web-tests
+        - secrets:get:project/fuzzing/deploy-gridl
+        - secrets:get:project/fuzzing/deploy-octo-private
+      to:
+        - hook-id:project-fuzzing/domino-web-tests
     # fuzzing-tc-config code on master can run tc-admin apply to manage worker pools
     - grant:
         - assume:hook-id:project-fuzzing/*
