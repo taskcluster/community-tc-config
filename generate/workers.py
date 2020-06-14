@@ -270,7 +270,11 @@ def gcp(
                 "machineType": machineType.format(zone=zone),
                 "region": region,
                 "zone": zone,
-                "scheduling": {"onHostMaintenance": "terminate"},
+                "scheduling": {
+                    "onHostMaintenance": "terminate",
+                    "preemptible": True,
+                    "automaticRestart": False,
+                },
                 "disks": [
                     {
                         "type": "PERSISTENT",
