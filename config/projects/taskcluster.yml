@@ -27,6 +27,15 @@ taskcluster:
       minCapacity: 0
       maxCapacity: 1
 
+    gcp-test:
+      owner: taskcluster-notifications+workers@mozilla.com
+      description: not actively used, but useful for testing docker-worker on AWS
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 1
+
     dw-ci:
       # docker-worker's CI requires the 'privileged' scope, so run
       # it on another worker.  Such workers are "untrusted" as this
