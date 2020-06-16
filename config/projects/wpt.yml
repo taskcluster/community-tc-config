@@ -15,7 +15,7 @@ wpt:
   grants:
     - grant:
         - queue:create-task:highest:proj-wpt/ci
-        - queue:create-task:highest:built-in/succeed
+        - queue:create-task:highest:built-in/*
         - docker-worker:capability:privileged
         - queue:scheduler-id:taskcluster-github
       to:
