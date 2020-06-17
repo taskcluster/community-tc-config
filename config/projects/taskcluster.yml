@@ -362,3 +362,5 @@ taskcluster:
       PYPI_PASSWORD: $taskcluster-release-pypi-password
       NPM_TOKEN: $taskcluster-release-npm-token
       GH_TOKEN: $taskcluster-release-gh-token
+    staging-release:
+      GH_TOKEN: $taskcluster-staging-release-gh-token
