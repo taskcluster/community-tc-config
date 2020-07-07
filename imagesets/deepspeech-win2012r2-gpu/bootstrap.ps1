@@ -34,11 +34,11 @@ Invoke-Expression ($client.DownloadString('https://chocolatey.org/install.ps1'))
 # install Windows 10 SDK
 choco install -y windows-sdk-10.0
 
-# install NodeJS v8
-choco install -y nodejs --version 8.15.0
+# install NodeJS LTS v12
+choco install -y nodejs --version 12.16.3
 
 # install git
-choco install -y git --version 2.21.0
+choco install -y git --version 2.26.2
 
 # install python2 as well for node-gyp later
 choco install -y python2 --version 2.7.16
@@ -49,9 +49,9 @@ choco install -y python --version 3.6.8
 # install 7zip, since msys2 p7zip behaves erratically
 choco install -y 7zip --version 19.0
 
-# install VisualStudio 2017 Community
-choco install -y visualstudio2017community --version 15.9.7.0 --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.140 --passive --locale en-US"
-choco install -y visualstudio2017buildtools --version 15.9.7.0 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.140 --add Microsoft.VisualStudio.Component.NuGet.BuildTools  --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US"
+# install VisualStudio 2019 Community
+choco install -y visualstudio2019community --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Workload.Universal;includeRecommended --passive --locale en-US"
+choco install -y visualstudio2019buildtools --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Component.NuGet.BuildTools  --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US"
 
 # vcredist140 required at least for bazel
 choco install -y vcredist140 --version 14.16.27027.1
@@ -71,25 +71,17 @@ choco install -y nuget.commandline --version 4.9.3
 # Carbon for later
 choco install -y carbon --version 2.5.0
 
-# Prepare CUDA v10.0
-#$client.DownloadFile("https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_411.31_win10", "C:\cuda_10.0.130_411.31_win10.exe")
-$client.DownloadFile("https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_411.31_windows", "C:\cuda_10.0.130_411.31_windows.exe")
-Start-Process -FilePath "C:\cuda_10.0.130_411.31_windows.exe" -ArgumentList "-s nvcc_10.0 nvprune_10.0 cupti_10.0 gpu_library_advisor_10.0 memcheck_10.0 cublas_10.0 cudart_10.0 cufft_10.0 curand_10.0 cusolver_10.0 cusparse_10.0" -Wait -NoNewWindow
-
-# Install CUDA v10.1 as well so we can patch v10.0 cudafe++.exe
-# https://github.com/tensorflow/tensorflow/issues/27576#issuecomment-504703397
+# Install CUDA v10.1
 $client.DownloadFile("https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.168_425.25_win10.exe", "C:\cuda_10.1.168_425.25_win10.exe")
 Start-Process -FilePath "C:\cuda_10.1.168_425.25_win10.exe" -ArgumentList "-s nvcc_10.1 nvprune_10.1 cupti_10.1 gpu_library_advisor_10.1 memcheck_10.1 cublas_10.1 cudart_10.1 cufft_10.1 curand_10.1 cusolver_10.1 cusparse_10.1" -Wait -NoNewWindow
-mv "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\bin\cudafe++.exe" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\bin\cudafe++.exe.v10.0"
-cp "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\bin\cudafe++.exe" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\bin\cudafe++.exe"
 
-# CuDNN v7.5.0 for CUDA 10.0
-#Expand-ZIPFile -File "C:\cudnn-10.0-windows10-x64-v7.5.0.56.zip" -Destination "C:\CUDNN-10.0\" -Url "http://developer.download.nvidia.com/compute/redist/cudnn/v7.5.0/cudnn-10.0-windows10-x64-v7.5.0.56.zip"
-md "C:\CUDNN-10.0"
-Expand-ZIPFile -File "C:\cudnn-10.0-windows7-x64-v7.5.0.56.zip" -Destination "C:\CUDNN-10.0\" -Url "http://developer.download.nvidia.com/compute/redist/cudnn/v7.5.0/cudnn-10.0-windows7-x64-v7.5.0.56.zip"
-cp "C:\CUDNN-10.0\cuda\include\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\include\"
-cp "C:\CUDNN-10.0\cuda\lib\x64\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\lib\x64\"
-cp "C:\CUDNN-10.0\cuda\bin\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\bin\"
+# CuDNN v7.6.0 for CUDA 10.1
+#Expand-ZIPFile -File "C:\cudnn-10.1-windows10-x64-v7.6.0.64.zip" -Destination "C:\CUDNN-10.1\" -Url "http://developer.download.nvidia.com/compute/redist/cudnn/v7.6.0/cudnn-10.1-windows10-x64-v7.6.0.64.zip"
+md "C:\CUDNN-10.1"
+Expand-ZIPFile -File "C:\cudnn-10.1-windows7-x64-v7.6.0.64.zip" -Destination "C:\CUDNN-10.1\" -Url "http://developer.download.nvidia.com/compute/redist/cudnn/v7.6.0/cudnn-10.1-windows7-x64-v7.6.0.64.zip"
+cp "C:\CUDNN-10.1\cuda\include\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\include\"
+cp "C:\CUDNN-10.1\cuda\lib\x64\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\lib\x64\"
+cp "C:\CUDNN-10.1\cuda\bin\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\bin\"
 
 # Create C:\builds and give full access to all users (for hg-shared, tooltool_cache, etc)
 md "C:\builds"
@@ -227,8 +219,8 @@ $pagefile.Put();
 
 # NVIDIA Tesla M60 drivers for g3s.xlarge
 # Just before reboot because ... it might reboot
-$client.DownloadFile("http://us.download.nvidia.com/tesla/412.36/412.36-tesla-desktop-winserver2012r2-64bit-international.exe", "C:\412.36-tesla-desktop-winserver2012r2-64bit-international.exe")
-Start-Process -FilePath "C:\412.36-tesla-desktop-winserver2012r2-64bit-international.exe" -ArgumentList "-s -i -noreboot -noeula" -Wait -NoNewWindow -RedirectStandardOutput C:\tesla-install.log -RedirectStandardError C:\tesla-install.err
+$client.DownloadFile("http://us.download.nvidia.com/tesla/426.32/426.32-tesla-desktop-winserver2008-2012r2-64bit-international.exe", "C:\426.32-tesla-desktop-winserver2012r2-64bit-international.exe")
+Start-Process -FilePath "C:\426.32-tesla-desktop-winserver2012r2-64bit-international.exe" -ArgumentList "-s -i -noreboot -noeula" -Wait -NoNewWindow -RedirectStandardOutput C:\tesla-install.log -RedirectStandardError C:\tesla-install.err
 
 # now shutdown, in preparation for creating an image
 # Stop-Computer isn't working, also not when specifying -AsJob, so reverting to using `shutdown` command instead
