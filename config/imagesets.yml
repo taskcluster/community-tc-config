@@ -64,9 +64,9 @@ generic-worker-win2012r2:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0e25602446699a013
-      us-west-1: ami-0360493dcdb36682e
-      us-west-2: ami-0f8c71fac9219169c
+      us-east-1: ami-0e62fbaf25d83c44b
+      us-west-1: ami-0958b2c69b4ed2611
+      us-west-2: ami-06e878f5fa9fc3ad0
   workerConfig:
     genericWorker:
       config:
@@ -77,17 +77,15 @@ generic-worker-win2012r2:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/generic-worker/2509a1f8589b0b536186f5fe8f043385bf67197f/worker_types/win2012r2/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/bdb75beb514c89526422ee45a3de2f421a12c92e/imagesets/generic-worker-win2012r2/bootstrap.ps1
 
 generic-worker-win2012r2-staging:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0f3df2bd13de80a39
-      us-west-1: ami-0060b73fb4d9c6256
-      us-west-2: ami-0f4944078691b0096
-  gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-win2012r2-staging-hasr18iepqtggvlswlku
+      us-east-1: ami-05fc030625c147df0
+      us-west-1: ami-008386b04799074b0
+      us-west-2: ami-0bb2b343b8f81f320
   workerConfig:
     genericWorker:
       config:
@@ -98,15 +96,15 @@ generic-worker-win2012r2-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/mozilla/community-tc-config/ab5c8405d85c10ab7bc59c95d01463396fa3c623/imagesets/generic-worker-win2012r2-staging/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/bdb75beb514c89526422ee45a3de2f421a12c92e/imagesets/generic-worker-win2012r2-staging/bootstrap.ps1
 
 generic-worker-ubuntu-18-04:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0b9e052beaf5738c5
-      us-west-1: ami-0e3ee2d095f50facd
-      us-west-2: ami-09b6663bf10cb7237
+      us-east-1: ami-01bd01b28254e5a56
+      us-west-1: ami-02e4b726d0345d08d
+      us-west-2: ami-0ba12100c15b123a9
   workerConfig:
     genericWorker:
       config:
@@ -117,15 +115,15 @@ generic-worker-ubuntu-18-04:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/generic-worker/ba5c21e60957f5ed3395f848f975a7ae8b147252/worker_types/gwci-linux/bootstrap.sh
+            script: https://github.com/mozilla/community-tc-config/blob/bdb75beb514c89526422ee45a3de2f421a12c92e/imagesets/generic-worker-ubuntu-18-04/bootstrap.ps1
 
 generic-worker-ubuntu-18-04-podman:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-00e3c8fc6fd4b185a
-      us-west-1: ami-07e52123a8cbe7fd5
-      us-west-2: ami-079a6da57f57b2cbe
+      us-east-1: ami-007d2656f20ae9682
+      us-west-1: ami-0128237e2d2dd20f9
+      us-west-2: ami-0f8273badc7fa90eb
   workerConfig:
     genericWorker:
       config:
@@ -136,15 +134,15 @@ generic-worker-ubuntu-18-04-podman:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://github.com/MozillaSecurity
+            script: https://github.com/mozilla/community-tc-config/blob/bdb75beb514c89526422ee45a3de2f421a12c92e/imagesets/generic-worker-ubuntu-18-04-podman/bootstrap.ps1
 
 generic-worker-ubuntu-18-04-staging:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-002495dba2e7cf687
-      us-west-1: ami-007b53ac7c08420bd
-      us-west-2: ami-025672f8a7fd91c1b
+      us-east-1: ami-0bfbcea1e13dfdb8a
+      us-west-1: ami-0b9d053fd6a809c8c
+      us-west-2: ami-0f402ebee06e1d5c9
   workerConfig:
     genericWorker:
       config:
@@ -155,7 +153,7 @@ generic-worker-ubuntu-18-04-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/generic-worker/ba5c21e60957f5ed3395f848f975a7ae8b147252/worker_types/gwci-linux-beta/bootstrap.sh
+            script: https://github.com/mozilla/community-tc-config/blob/bdb75beb514c89526422ee45a3de2f421a12c92e/imagesets/generic-worker-ubuntu-18-04-staging/bootstrap.ps1
 
 deepspeech-win2012r2:
   workerImplementation: generic-worker
@@ -174,7 +172,7 @@ deepspeech-win2012r2:
         workerTypeMetadata:
           machine-setup:
             maintainer: alissy@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/generic-worker/2509a1f8589b0b536186f5fe8f043385bf67197f/worker_types/deepspeech-win/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/bdb75beb514c89526422ee45a3de2f421a12c92e/imagesets/deepspeech-win2012r2/bootstrap.ps1
 
 deepspeech-win2012r2-b:
   workerImplementation: generic-worker
@@ -193,7 +191,7 @@ deepspeech-win2012r2-b:
         workerTypeMetadata:
           machine-setup:
             maintainer: alissy@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/generic-worker/2509a1f8589b0b536186f5fe8f043385bf67197f/worker_types/deepspeech-win/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/bdb75beb514c89526422ee45a3de2f421a12c92e/imagesets/deepspeech-win2012r2-b/bootstrap.ps1
 
 deepspeech-win2012r2-gpu:
   workerImplementation: generic-worker
@@ -211,7 +209,7 @@ deepspeech-win2012r2-gpu:
         workerTypeMetadata:
           machine-setup:
             maintainer: alissy@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/5d7c08a762b49d173007f12a7bfda6575f00576e/imagesets/deepspeech-win2012r2-gpu/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/bdb75beb514c89526422ee45a3de2f421a12c92e/imagesets/deepspeech-win2012r2-gpu/bootstrap.ps1
 
 deepspeech-win2012r2-gpu-b:
   workerImplementation: generic-worker
@@ -229,4 +227,23 @@ deepspeech-win2012r2-gpu-b:
         workerTypeMetadata:
           machine-setup:
             maintainer: alissy@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/5d7c08a762b49d173007f12a7bfda6575f00576e/imagesets/deepspeech-win2012r2-gpu/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/bdb75beb514c89526422ee45a3de2f421a12c92e/imagesets/deepspeech-win2012r2-gpu-b/bootstrap.ps1
+
+generic-worker-win2016:
+  workerImplementation: generic-worker
+  aws:
+    amis:
+      us-east-1: ami-0804934b530c176ec
+      us-west-1: ami-0064e0c8eaea8b432
+      us-west-2: ami-0eadb98acb7628735
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
+        shutdownMachineOnIdle: true
+        idleTimeoutSecs: 15
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: pmoore@mozilla.com
+            script: https://github.com/mozilla/community-tc-config/blob/bdb75beb514c89526422ee45a3de2f421a12c92e/imagesets/generic-worker-win2016/bootstrap.ps1
