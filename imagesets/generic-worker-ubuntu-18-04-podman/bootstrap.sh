@@ -5,7 +5,6 @@ exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
 TASKCLUSTER_VERSION='v32.0.0'
-TASKCLUSTER_PROXY_VERSION='v5.1.0'
 ######################################
 
 function retry {
@@ -46,7 +45,7 @@ cd /usr/local/bin
 retry curl -L "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/generic-worker-multiuser-linux-amd64" > generic-worker
 retry curl -L "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/start-worker-linux-amd64" > start-worker
 retry curl -L "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/livelog-linux-amd64" > livelog
-retry curl -L "https://github.com/taskcluster/taskcluster-proxy/releases/download/${TASKCLUSTER_PROXY_VERSION}/taskcluster-proxy-linux-amd64" > taskcluster-proxy
+retry curl -L "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/taskcluster-proxy-linux-amd64" > taskcluster-proxy
 chmod a+x generic-worker start-worker taskcluster-proxy livelog
 
 mkdir -p /etc/generic-worker
