@@ -103,7 +103,7 @@ Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "http://www.nssm
 md C:\generic-worker
 $client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v32.0.0/generic-worker-multiuser-windows-amd64", "C:\generic-worker\generic-worker.exe")
 
-# install generic-worker, using the batch script suggested in https://github.com/taskcluster/taskcluster-worker-runner/blob/master/docs/windows-services.md
+# install generic-worker, using the steps suggested in https://docs.taskcluster.net/docs/reference/workers/worker-runner/deployment#recommended-setup
 Set-Content -Path c:\generic-worker\install.bat @"
 set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% install "Generic Worker" c:\generic-worker\generic-worker.exe
@@ -126,9 +126,9 @@ Start-Process C:\generic-worker\install.bat -Wait -NoNewWindow -RedirectStandard
 
 # download tc-worker-runner
 md C:\worker-runner
-$client.DownloadFile("https://github.com/taskcluster/taskcluster-worker-runner/releases/download/v1.0.1/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v32.0.0/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
 
-# install tc-worker-runner using the batch script suggested in https://github.com/taskcluster/taskcluster-worker-runner/blob/master/docs/deployment.md
+# install tc-worker-runner
 Set-Content -Path c:\worker-runner\install.bat @"
 set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% install worker-runner c:\worker-runner\start-worker.exe

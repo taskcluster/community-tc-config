@@ -55,7 +55,7 @@ set nssm=C:\nssm-2.24\win64\nssm.exe
 "@
 Start-Process C:\generic-worker\install.bat -Wait -NoNewWindow -RedirectStandardOutput C:\generic-worker\install.log -RedirectStandardError C:\generic-worker\install.err
 md C:\worker-runner
-$client.DownloadFile("https://github.com/taskcluster/taskcluster-worker-runner/releases/download/v1.0.1/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v32.0.0/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
 Set-Content -Path c:\worker-runner\install.bat @"
 set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% install worker-runner c:\worker-runner\start-worker.exe
