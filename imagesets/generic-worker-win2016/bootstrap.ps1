@@ -77,9 +77,9 @@ Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "http://www.nssm
 
 # download generic-worker
 md C:\generic-worker
-$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v29.2.0/generic-worker-multiuser-windows-amd64", "C:\generic-worker\generic-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v32.0.0/generic-worker-multiuser-windows-amd64", "C:\generic-worker\generic-worker.exe")
 
-# install generic-worker, using the batch script suggested in https://github.com/taskcluster/taskcluster-worker-runner/blob/master/docs/windows-services.md
+# install generic-worker, using the steps suggested in https://docs.taskcluster.net/docs/reference/workers/worker-runner/deployment#recommended-setup
 Set-Content -Path c:\generic-worker\install.bat @"
 set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% install "Generic Worker" c:\generic-worker\generic-worker.exe
@@ -102,9 +102,9 @@ Start-Process C:\generic-worker\install.bat -Wait -NoNewWindow -RedirectStandard
 
 # download tc-worker-runner
 md C:\worker-runner
-$client.DownloadFile("https://github.com/taskcluster/taskcluster-worker-runner/releases/download/v1.0.2/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v32.0.0/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
 
-# install tc-worker-runner using the batch script suggested in https://github.com/taskcluster/taskcluster-worker-runner/blob/master/docs/deployment.md
+# install tc-worker-runner
 Set-Content -Path c:\worker-runner\install.bat @"
 set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% install worker-runner c:\worker-runner\start-worker.exe
@@ -141,7 +141,7 @@ cacheOverRestarts: c:\generic-worker\start-worker-cache.json
 "@
 
 # download livelog
-$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v29.2.0/livelog-windows-amd64", "C:\generic-worker\livelog.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v32.0.0/livelog-windows-amd64", "C:\generic-worker\livelog.exe")
 
 # initial clone of mozilla-central
 # Start-Process "C:\mozilla-build\python\python.exe" -ArgumentList "C:\mozilla-build\python\Scripts\hg clone -u null https://hg.mozilla.org/mozilla-central C:\gecko" -Wait -NoNewWindow -PassThru -RedirectStandardOutput "C:\hg_initial_clone.log" -RedirectStandardError "C:\hg_initial_clone.err"

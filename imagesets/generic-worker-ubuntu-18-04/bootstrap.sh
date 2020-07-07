@@ -4,7 +4,7 @@ set -exv
 exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
-TASKCLUSTER_VERSION='v29.2.0'
+TASKCLUSTER_VERSION='v32.0.0'
 TASKCLUSTER_PROXY_VERSION='v5.1.0'
 ######################################
 
