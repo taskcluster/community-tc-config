@@ -77,7 +77,7 @@ Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "http://www.nssm
 
 # download generic-worker
 md C:\generic-worker
-$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v29.2.0/generic-worker-multiuser-windows-amd64", "C:\generic-worker\generic-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v32.0.0/generic-worker-multiuser-windows-amd64", "C:\generic-worker\generic-worker.exe")
 
 # install generic-worker, using the batch script suggested in https://github.com/taskcluster/taskcluster-worker-runner/blob/master/docs/windows-services.md
 Set-Content -Path c:\generic-worker\install.bat @"
@@ -141,7 +141,7 @@ cacheOverRestarts: c:\generic-worker\start-worker-cache.json
 "@
 
 # download livelog
-$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v29.2.0/livelog-windows-amd64", "C:\generic-worker\livelog.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v32.0.0/livelog-windows-amd64", "C:\generic-worker\livelog.exe")
 
 # initial clone of mozilla-central
 # Start-Process "C:\mozilla-build\python\python.exe" -ArgumentList "C:\mozilla-build\python\Scripts\hg clone -u null https://hg.mozilla.org/mozilla-central C:\gecko" -Wait -NoNewWindow -PassThru -RedirectStandardOutput "C:\hg_initial_clone.log" -RedirectStandardError "C:\hg_initial_clone.err"
