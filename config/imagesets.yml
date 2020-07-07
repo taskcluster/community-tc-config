@@ -161,9 +161,9 @@ deepspeech-win2012r2:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-034d956b2bc6814ca
-      us-west-1: ami-0daeb6855843297af
-      us-west-2: ami-0cb880d23e4cee86e
+      us-east-1: ami-0c5cea59ad500f24f
+      us-west-1: ami-09261ce2c40527cc4
+      us-west-2: ami-0d97c9d49aaed6e19
   workerConfig:
     genericWorker:
       config:
@@ -180,9 +180,9 @@ deepspeech-win2012r2-b:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0872341d0c628f6cc
-      us-west-1: ami-09ffad815d651720d
-      us-west-2: ami-098978bbb14097810
+      us-east-1: ami-00367cbb3f36fda6f
+      us-west-1: ami-09106451125a1660b
+      us-west-2: ami-08e209baf9788f3d8
   workerConfig:
     genericWorker:
       config:
@@ -199,8 +199,8 @@ deepspeech-win2012r2-gpu:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0b45eef050836e1af
-      us-west-2: ami-0ad20a403c0cc04a4
+      us-east-1: ami-0a61f644615594e90
+      us-west-2: ami-0e917d503a92d04af
   workerConfig:
     genericWorker:
       config:
@@ -217,8 +217,8 @@ deepspeech-win2012r2-gpu-b:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0ded0a4e7ec799a7d
-      us-west-2: ami-047cf51b693ad7c3a
+      us-east-1: ami-04245d88ef5f32b85
+      us-west-2: ami-01a6caff9a80fccfd
   workerConfig:
     genericWorker:
       config:
