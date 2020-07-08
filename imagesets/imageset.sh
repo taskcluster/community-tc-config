@@ -12,7 +12,7 @@ function deploy {
 
     log "Checking system dependencies..."
 
-    for command in aws cat cd chmod cut echo find git grep head pass read rm sed sleep sort tail touch tr true which xargs; do
+    for command in aws cat cd chmod cut echo find git grep head pass read rm sed sleep sort tail touch tr true which xargs yq; do
         if ! which "${command}" >/dev/null; then
             log "  \xE2\x9D\x8C ${command}"
             log "${0} requires ${command} to be installed and available in your PATH - please fix and rerun" >&2
@@ -57,6 +57,8 @@ function deploy {
             log "Fetching secrets..."
             pass git pull
             for REGION in us-west-1 us-west-2 us-east-1; do
+              IMAGE_ID="$(cat "${IMAGE_SET}/aws.${REGION}.secrets" | sed -n 's/^AMI: *//p')"
+              yq w -i ../config/imagesets.yml "${IMAGE_SET}.aws.amis.${REGION}" "${IMAGE_ID}"
               pass insert -m -f "community-tc/imagesets/${IMAGE_SET}/${REGION}" < "${IMAGE_SET}/aws.${REGION}.secrets"
               pass insert -m -f "community-tc/imagesets/${IMAGE_SET}/${CLOUD}.${REGION}.id_rsa" < "${IMAGE_SET}/${CLOUD}.${REGION}.id_rsa"
             done
@@ -69,10 +71,23 @@ function deploy {
                 exit 67
             fi
             echo us-central1-a 118 | xargs -P1 -n2 "${0}" process-region "${CLOUD}_${ACTION}"
+            log "Updating config/imagesets.yml..."
+            IMAGE_NAME="$(cat "${IMAGE_SET}/gcp.secrets")"
+            yq w -i ../config/imagesets.yml "${IMAGE_SET}.gcp" "${IMAGE_NAME}"
             ;;
     esac
 
+    # Link to bootstrap script in worker type metadata, if generic-worker worker type
+    if [ "$(yq r ../config/imagesets.yml "${IMAGE_SET}.workerImplementation")" == "generic-worker" ]; then
+      BOOTSTRAP_SCRIPT="$(echo "${IMAGE_SET}"/bootstrap.*)"
+      yq w -i ../config/imagesets.yml "${IMAGE_SET}.workerConfig.genericWorker.config.workerTypeMetadata.machine-setup.script" "https://github.com/mozilla/community-tc-config/blob/${IMAGE_SET_COMMIT_SHA}/imagesets/${BOOTSTRAP_SCRIPT}"
+    fi
+
+    git reset
+    git add ../config/imagesets.yml
+    git commit -m "Built new machine images for imageset ${IMAGE_SET}"
     log 'Deployment of image sets successful!'
+    log 'Be sure to push changes to community-tc-config repo'
 }
 
 ################## AWS ##################
@@ -361,9 +376,9 @@ function google_update {
 if [ "${1}" == "process-region" ]; then
     # Step into directory containing image set definition.
     cd "$(dirname "${0}")/${IMAGE_SET}"
-    if [ -n "$(git status --porcelain)" ]; then
+    if [ -n "$(git status --porcelain . ../config/imagesets.yml)" ]; then
       log "The following local changes need to be committed/stashed/discarded before running this script:" >&2
-      git status 2>&1 | sed 's/^/    /' >&2
+      git status . ../../config/imagesets.yml 2>&1 | sed 's/^/    /' >&2
       exit 68
     fi
     REGION="${3}"
