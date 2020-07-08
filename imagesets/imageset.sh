@@ -9,6 +9,19 @@ function log {
 }
 
 function deploy {
+
+    log "Checking system dependencies..."
+
+    for command in aws cat cd chmod cut echo find git grep head pass read rm sed sleep sort tail touch tr true which xargs yq; do
+        if ! which "${command}" >/dev/null; then
+            log "  \xE2\x9D\x8C ${command}"
+            log "${0} requires ${command} to be installed and available in your PATH - please fix and rerun" >&2
+            exit 65
+        else
+            log "  \xE2\x9C\x94 ${command}"
+        fi
+    done
+
     log "Checking inputs..."
 
     if [ "${#}" -ne 3 ]; then
@@ -18,13 +31,13 @@ function deploy {
 
     export CLOUD="${1}"
     if [ "${CLOUD}" != "aws" ] && [ "${CLOUD}" != "google" ]; then
-        log "provider must be 'aws' or 'google' but '${CLOUD}' was specified" >&2
+        log "Provider must be 'aws' or 'google' but '${CLOUD}' was specified" >&2
         exit 65
     fi
 
     ACTION="${2}"
     if [ "${ACTION}" != "update" ] && [ "${ACTION}" != "delete" ]; then
-        log "action must be 'delete' or 'update' but '${ACTION}' was specified" >&2
+        log "Action must be 'delete' or 'update' but '${ACTION}' was specified" >&2
         exit 66
     fi
 
@@ -41,17 +54,40 @@ function deploy {
     case "${CLOUD}" in
         aws) 
             echo us-west-1 118 us-west-2 199 us-east-1 100 | xargs -P3 -n2 "${0}" process-region "${CLOUD}_${ACTION}"
+            log "Fetching secrets..."
+            pass git pull
+            for REGION in us-west-1 us-west-2 us-east-1; do
+              IMAGE_ID="$(cat "${IMAGE_SET}/aws.${REGION}.secrets" | sed -n 's/^AMI: *//p')"
+              yq w -i ../config/imagesets.yml "${IMAGE_SET}.aws.amis.${REGION}" "${IMAGE_ID}"
+              pass insert -m -f "community-tc/imagesets/${IMAGE_SET}/${REGION}" < "${IMAGE_SET}/aws.${REGION}.secrets"
+              pass insert -m -f "community-tc/imagesets/${IMAGE_SET}/${CLOUD}.${REGION}.id_rsa" < "${IMAGE_SET}/${CLOUD}.${REGION}.id_rsa"
+            done
+            log "Pushing new secrets..."
+            pass git push
             ;;
         google)
             if [ "${GCP_PROJECT}" == "" ]; then
-                log "env variable GCP_PROJECT must be exported before calling this script" >&2
+                log "Environment variable GCP_PROJECT must be exported before calling this script" >&2
                 exit 67
             fi
             echo us-central1-a 118 | xargs -P1 -n2 "${0}" process-region "${CLOUD}_${ACTION}"
+            log "Updating config/imagesets.yml..."
+            IMAGE_NAME="$(cat "${IMAGE_SET}/gcp.secrets")"
+            yq w -i ../config/imagesets.yml "${IMAGE_SET}.gcp" "${IMAGE_NAME}"
             ;;
     esac
 
+    # Link to bootstrap script in worker type metadata, if generic-worker worker type
+    if [ "$(yq r ../config/imagesets.yml "${IMAGE_SET}.workerImplementation")" == "generic-worker" ]; then
+      BOOTSTRAP_SCRIPT="$(echo "${IMAGE_SET}"/bootstrap.*)"
+      yq w -i ../config/imagesets.yml "${IMAGE_SET}.workerConfig.genericWorker.config.workerTypeMetadata.machine-setup.script" "https://github.com/mozilla/community-tc-config/blob/${IMAGE_SET_COMMIT_SHA}/imagesets/${BOOTSTRAP_SCRIPT}"
+    fi
+
+    git reset
+    git add ../config/imagesets.yml
+    git commit -m "Built new machine images for imageset ${IMAGE_SET}"
     log 'Deployment of image sets successful!'
+    log 'Be sure to push changes to community-tc-config repo'
 }
 
 ################## AWS ##################
@@ -79,7 +115,9 @@ function aws_delete_found {
     # terminate old instances
     if [ -n "${OLD_INSTANCES}" ]; then
         log "Now terminating instances" ${OLD_INSTANCES}...
-        aws --region "${REGION}" ec2 terminate-instances --instance-ids ${OLD_INSTANCES} >/dev/null 2>&1
+        for instance in ${OLD_INSTANCES}; do
+          aws --region "${REGION}" ec2 terminate-instances --instance-ids "${instance}" >/dev/null 2>&1 || log "WARNING: Could not terminate instance ${instance}"
+        done
     else
         log "No previous instances to terminate."
     fi
@@ -89,7 +127,7 @@ function aws_delete_found {
         log "Deregistering the old AMI(s) ("${OLD_AMIS}")..."
         # note this can fail if it is already in process of being deregistered, so allow to fail...
         for image in ${OLD_AMIS}; do
-            aws --region "${REGION}" ec2 deregister-image --image-id "${image}" 2>/dev/null || true
+            aws --region "${REGION}" ec2 deregister-image --image-id "${image}" >/dev/null 2>&1 || log "WARNING: Could not deregister image ${image}"
         done
     else
         log "No old AMI to deregister."
@@ -99,7 +137,7 @@ function aws_delete_found {
     if [ -n "${OLD_SNAPSHOTS}" ]; then
         log "Deleting the old snapshot(s) ("${OLD_SNAPSHOTS}")..."
         for snapshot in ${OLD_SNAPSHOTS}; do
-            aws --region "${REGION}" ec2 delete-snapshot --snapshot-id ${snapshot}
+            aws --region "${REGION}" ec2 delete-snapshot --snapshot-id ${snapshot} >/dev/null 2>&1 || log "WARNING: Could not delete snapshot ${snapshot}"
         done
     else
         log "No old snapshot to delete."
@@ -208,14 +246,15 @@ function aws_update {
         sleep 30
     done
 
-    touch "${REGION}.${IMAGE_ID}.latest-image"
-
     {
-            echo "Instance:    ${INSTANCE_ID}"
-            echo "Public IP: ${PUBLIC_IP}"
-            [ -n "${PASSWORD}" ] && echo "Password:    ${PASSWORD}"
-            echo "AMI:             ${IMAGE_ID}"
-    } > "${REGION}.secrets"
+        echo "Instance:    ${INSTANCE_ID}"
+        echo "Public IP:   ${PUBLIC_IP}"
+        if [ -n "${PASSWORD}" ]; then
+            echo "Username:    Administrator"
+            echo "Password:    ${PASSWORD}"
+        fi
+        echo "AMI:         ${IMAGE_ID}"
+    } > "aws.${REGION}.secrets"
 
     aws_delete_found
 }
@@ -325,6 +364,8 @@ function google_update {
         sleep 15
     done
 
+    echo "${GCP_PROJECT}/global/images/${UNIQUE_NAME}" > gcp.secrets
+
     google_delete_found
 }
 
@@ -335,10 +376,16 @@ function google_update {
 if [ "${1}" == "process-region" ]; then
     # Step into directory containing image set definition.
     cd "$(dirname "${0}")/${IMAGE_SET}"
+    if [ -n "$(git status --porcelain . ../config/imagesets.yml)" ]; then
+      log "The following local changes need to be committed/stashed/discarded before running this script:" >&2
+      git status . ../../config/imagesets.yml 2>&1 | sed 's/^/    /' >&2
+      exit 68
+    fi
     REGION="${3}"
     COLOUR="${4}"
     "${2}"
     exit 0
 fi
 
+cd "$(dirname "${0}")"
 deploy "${@}"

@@ -105,5 +105,4 @@ venv.bak/
 
 # Added by imageset.sh
 *.id_rsa
-*.latest-image
 *.secrets
