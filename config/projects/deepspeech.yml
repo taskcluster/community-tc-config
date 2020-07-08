@@ -110,6 +110,10 @@ deepspeech:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-heavy-*
         - assume:worker-pool:proj-deepspeech/ds-macos-heavy
+    worker/macos-heavy-b-1:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-heavy-b-*
+        - assume:worker-pool:proj-deepspeech/ds-macos-heavy-b
     worker/macos-light-1:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
@@ -158,6 +162,10 @@ deepspeech:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-light-*
         - assume:worker-pool:proj-deepspeech/ds-macos-light
+    worker/macos-light-b-1:
+      scopes:
+        - assume:worker-id:proj-deepspeech/ds-macos-light-b-*
+        - assume:worker-pool:proj-deepspeech/ds-macos-light-b
     worker/pkguploader:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-scriptworker-*
