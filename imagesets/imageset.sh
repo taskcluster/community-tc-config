@@ -353,6 +353,11 @@ function google_update {
 if [ "${1}" == "process-region" ]; then
     # Step into directory containing image set definition.
     cd "$(dirname "${0}")/${IMAGE_SET}"
+    if [ -n "$(git status --porcelain)" ]; then
+      log "The following local changes need to be committed/stashed/discarded before running this script:" >&2
+      git status 2>&1 | sed 's/^/    /' >&2
+      exit 68
+    fi
     REGION="${3}"
     COLOUR="${4}"
     "${2}"
