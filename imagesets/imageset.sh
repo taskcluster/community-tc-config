@@ -54,6 +54,14 @@ function deploy {
     case "${CLOUD}" in
         aws) 
             echo us-west-1 118 us-west-2 199 us-east-1 100 | xargs -P3 -n2 "${0}" process-region "${CLOUD}_${ACTION}"
+            log "Fetching secrets..."
+            pass git pull
+            for REGION in us-west-1 us-west-2 us-east-1; do
+              pass insert -m -f "community-tc/imagesets/${IMAGE_SET}/${REGION}" < "${IMAGE_SET}/aws.${REGION}.secrets"
+              pass insert -m -f "community-tc/imagesets/${IMAGE_SET}/${CLOUD}.${REGION}.id_rsa" < "${IMAGE_SET}/${CLOUD}.${REGION}.id_rsa"
+            done
+            log "Pushing new secrets..."
+            pass git push
             ;;
         google)
             if [ "${GCP_PROJECT}" == "" ]; then
