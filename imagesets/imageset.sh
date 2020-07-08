@@ -364,4 +364,5 @@ if [ "${1}" == "process-region" ]; then
     exit 0
 fi
 
+cd "$(dirname "${0}")"
 deploy "${@}"
