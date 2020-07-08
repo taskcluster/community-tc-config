@@ -92,7 +92,9 @@ function aws_delete_found {
     # terminate old instances
     if [ -n "${OLD_INSTANCES}" ]; then
         log "Now terminating instances" ${OLD_INSTANCES}...
-        aws --region "${REGION}" ec2 terminate-instances --instance-ids ${OLD_INSTANCES} >/dev/null 2>&1
+        for instance in ${OLD_INSTANCES}; do
+          aws --region "${REGION}" ec2 terminate-instances --instance-ids "${instance}" >/dev/null 2>&1 || log "WARNING: Could not terminate instance ${instance}"
+        done
     else
         log "No previous instances to terminate."
     fi
@@ -102,7 +104,7 @@ function aws_delete_found {
         log "Deregistering the old AMI(s) ("${OLD_AMIS}")..."
         # note this can fail if it is already in process of being deregistered, so allow to fail...
         for image in ${OLD_AMIS}; do
-            aws --region "${REGION}" ec2 deregister-image --image-id "${image}" 2>/dev/null || true
+            aws --region "${REGION}" ec2 deregister-image --image-id "${image}" >/dev/null 2>&1 || log "WARNING: Could not deregister image ${image}"
         done
     else
         log "No old AMI to deregister."
@@ -112,7 +114,7 @@ function aws_delete_found {
     if [ -n "${OLD_SNAPSHOTS}" ]; then
         log "Deleting the old snapshot(s) ("${OLD_SNAPSHOTS}")..."
         for snapshot in ${OLD_SNAPSHOTS}; do
-            aws --region "${REGION}" ec2 delete-snapshot --snapshot-id ${snapshot}
+            aws --region "${REGION}" ec2 delete-snapshot --snapshot-id ${snapshot} >/dev/null 2>&1 || log "WARNING: Could not delete snapshot ${snapshot}"
         done
     else
         log "No old snapshot to delete."
