@@ -31,13 +31,13 @@ function deploy {
 
     export CLOUD="${1}"
     if [ "${CLOUD}" != "aws" ] && [ "${CLOUD}" != "google" ]; then
-        log "provider must be 'aws' or 'google' but '${CLOUD}' was specified" >&2
+        log "Provider must be 'aws' or 'google' but '${CLOUD}' was specified" >&2
         exit 65
     fi
 
     ACTION="${2}"
     if [ "${ACTION}" != "update" ] && [ "${ACTION}" != "delete" ]; then
-        log "action must be 'delete' or 'update' but '${ACTION}' was specified" >&2
+        log "Action must be 'delete' or 'update' but '${ACTION}' was specified" >&2
         exit 66
     fi
 
@@ -57,7 +57,7 @@ function deploy {
             ;;
         google)
             if [ "${GCP_PROJECT}" == "" ]; then
-                log "env variable GCP_PROJECT must be exported before calling this script" >&2
+                log "Environment variable GCP_PROJECT must be exported before calling this script" >&2
                 exit 67
             fi
             echo us-central1-a 118 | xargs -P1 -n2 "${0}" process-region "${CLOUD}_${ACTION}"
