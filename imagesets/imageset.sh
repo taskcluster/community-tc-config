@@ -223,14 +223,15 @@ function aws_update {
         sleep 30
     done
 
-    touch "${REGION}.${IMAGE_ID}.latest-image"
-
     {
-            echo "Instance:    ${INSTANCE_ID}"
-            echo "Public IP: ${PUBLIC_IP}"
-            [ -n "${PASSWORD}" ] && echo "Password:    ${PASSWORD}"
-            echo "AMI:             ${IMAGE_ID}"
-    } > "${REGION}.secrets"
+        echo "Instance:    ${INSTANCE_ID}"
+        echo "Public IP:   ${PUBLIC_IP}"
+        if [ -n "${PASSWORD}" ]; then
+            echo "Username:    Administrator"
+            echo "Password:    ${PASSWORD}"
+        fi
+        echo "AMI:         ${IMAGE_ID}"
+    } > "aws.${REGION}.secrets"
 
     aws_delete_found
 }
@@ -339,6 +340,8 @@ function google_update {
         log "    Waiting for image ${UNIQUE_NAME} to be created..."
         sleep 15
     done
+
+    echo "${GCP_PROJECT}/global/images/${UNIQUE_NAME}" > gcp.secrets
 
     google_delete_found
 }
