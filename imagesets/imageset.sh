@@ -9,6 +9,19 @@ function log {
 }
 
 function deploy {
+
+    log "Checking system dependencies..."
+
+    for command in aws cat cd chmod cut echo find git grep head pass read rm sed sleep sort tail touch tr true which xargs; do
+        if ! which "${command}" >/dev/null; then
+            log "  \xE2\x9D\x8C ${command}"
+            log "${0} requires ${command} to be installed and available in your PATH - please fix and rerun" >&2
+            exit 65
+        else
+            log "  \xE2\x9C\x94 ${command}"
+        fi
+    done
+
     log "Checking inputs..."
 
     if [ "${#}" -ne 3 ]; then
