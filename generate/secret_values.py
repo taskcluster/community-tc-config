@@ -19,6 +19,7 @@ class SecretValues:
         print("Fetching secrets with passwordstore", file=sys.stderr)
         secret_values_yml = subprocess.check_output(["pass", PASSWORDSTORE_NAME])
         self.values = yaml.safe_load(secret_values_yml)
+        print("Secrets fetched", file=sys.stderr)
 
     def get(self, name, default=None):
         return self.values.get(name, default)
