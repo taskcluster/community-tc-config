@@ -97,6 +97,18 @@ taskcluster:
           config:
             runTasksAsCurrentUser: true
 
+    podman-playground:
+      owner: pmoore@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-18-04-podman
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 3
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: false
+
     gw-ci-windows2012r2-amd64:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
