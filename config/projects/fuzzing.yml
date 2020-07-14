@@ -12,6 +12,13 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+    grizzly-reduce:
+      owner: fuzzing+grizzly@mozilla.com
+      emailOnError: true
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 20
   hooks:
     domino-web-tests:
       description: Domino Web Tests trigger
