@@ -170,9 +170,9 @@ deepspeech-win2012r2-b:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-00367cbb3f36fda6f
-      us-west-1: ami-09106451125a1660b
-      us-west-2: ami-08e209baf9788f3d8
+      us-east-1: ami-0278191232a1beec3
+      us-west-1: ami-091da09481078cd8f
+      us-west-2: ami-0dd58442a534e696b
   workerConfig:
     genericWorker:
       config:
@@ -183,7 +183,7 @@ deepspeech-win2012r2-b:
         workerTypeMetadata:
           machine-setup:
             maintainer: alissy@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/bdb75beb514c89526422ee45a3de2f421a12c92e/imagesets/deepspeech-win2012r2-b/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/99e12476a6555a147c218407dfcef82e1d1a7f82/imagesets/deepspeech-win2012r2-b/bootstrap.ps1
 deepspeech-win2012r2-gpu:
   workerImplementation: generic-worker
   aws:
