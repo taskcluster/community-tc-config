@@ -36,6 +36,9 @@ Invoke-Expression ($client.DownloadString('https://chocolatey.org/install.ps1'))
 # install Windows 10 SDK
 choco install -y windows-sdk-10.0
 
+# install Windows 10 SDK version 2004 required by UWP builds
+choco install -y windows-sdk-10-version-2004-all
+
 # install NodeJS v8
 choco install -y nodejs --version 12.16.3
 
@@ -52,8 +55,8 @@ choco install -y python --version 3.6.8
 choco install -y 7zip --version 19.0
 
 # install VisualStudio 2019 Community
-choco install -y visualstudio2019community --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Workload.Universal;includeRecommended --passive --locale en-US"
-choco install -y visualstudio2019buildtools --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Component.NuGet.BuildTools  --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US"
+choco install -y visualstudio2019community --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.160 --passive --locale en-US"
+choco install -y visualstudio2019buildtools --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Component.NuGet.BuildTools --add Microsoft.VisualStudio.Workload.UniversalBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.NetCoreBuildTools;includeRecommended --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US"
 
 # vcredist140 required at least for bazel
 choco install -y vcredist140 --version 14.16.27027.1
