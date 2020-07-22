@@ -93,6 +93,7 @@ fuzzing:
         - assume:hook-id:project-fuzzing/*
         - auth:create-role:hook-id:project-fuzzing/*
         - auth:update-role:hook-id:project-fuzzing/*
+        - auth:delete-role:hook-id:project-fuzzing/*
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
         - docker-worker:capability:privileged
