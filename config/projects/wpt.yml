@@ -20,4 +20,3 @@ wpt:
         - queue:scheduler-id:taskcluster-github
       to:
         - repo:github.com/web-platform-tests/wpt:*
-        - repo:github.com/web-platform-tests/wpt-tc-checks:*
