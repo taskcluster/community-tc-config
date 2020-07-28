@@ -86,7 +86,7 @@ tasks:
 
       in:
         $flattenDeep:
-        - $if: 'tasks_for == "github-push" && event["ref"] == "refs/heads/master"'
+        - $if: 'tasks_for == "github-push" && event["ref"] == "refs/heads/main"'
           then: {$eval: test_tasks}
         - $if: 'tasks_for == "github-pull-request" && event["action"] in ["opened", "reopened", "synchronize"]'
           then: {$eval: test_tasks}
