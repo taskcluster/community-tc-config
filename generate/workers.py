@@ -259,6 +259,17 @@ def gcp(
         for zone in zones["zones"]
     ]
 
+    # some machine types aren't available in some zones..
+    # https://cloud.google.com/compute/docs/regions-zones#available
+    def machine_in_zone(machineType, zone):
+        if machineType.startswith("zones/{zone}/machineTypes/n2-"):
+            if zone.startswith("us-east1"):
+                return zone[-1] in "cd"
+            if zone.startswith("us-east4"):
+                return True
+            return False
+        return True
+
     assert maxCapacity, "must give a maxCapacity"
     wp = DynamicWorkerPoolSettings(GOOGLE_PROVIDER)
     wp.config = {
@@ -285,8 +296,13 @@ def gcp(
                 "networkInterfaces": [{"accessConfigs": [{"type": "ONE_TO_ONE_NAT"}]}],
             }
             for zone, region in GOOGLE_ZONES_REGIONS
+            if machine_in_zone(machineType, zone)
         ],
     }
+
+    assert (
+        len(wp.config["launchConfigs"]) != 0
+    ), "No configured GCP zones support that machine type"
 
     return wp
 
