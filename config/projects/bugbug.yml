@@ -74,7 +74,7 @@ bugbug:
   grants:
     # all repos
     - grant:
-        - queue:create-task:highest:proj-relman/*
+        - queue:create-task:highest:proj-bugbug/*
         - queue:route:statuses
       to:
         - repo:github.com/mozilla/bugbug:*
@@ -82,7 +82,7 @@ bugbug:
     # all hooks
     - grant:
         - queue:scheduler-id:-
-        - queue:create-task:highest:proj-relman/*
+        - queue:create-task:highest:proj-bugbug/*
       to: hook-id:project-relman/*
 
     # bugbug
