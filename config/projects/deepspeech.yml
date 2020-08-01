@@ -13,6 +13,7 @@ deepspeech:
       minCapacity: 0
       maxCapacity: 96
       machineType: "zones/{zone}/machineTypes/n2-highcpu-32"
+      diskSizeGb: 100
     win:
       owner: deepspeech@mozilla.com
       emailOnError: false
