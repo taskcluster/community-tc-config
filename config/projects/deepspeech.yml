@@ -12,8 +12,97 @@ deepspeech:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 96
-      machineType: "zones/{zone}/machineTypes/n2-highcpu-32"
-      diskSizeGb: 100
+      machineType: "zones/{zone}/machineTypes/n1-standard-32"
+    # Machine type for running Decision Task
+    ci-decision-task:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 4
+      machineType: "zones/{zone}/machineTypes/n2-standard-2"
+    # BETA Machine type for running Decision Task
+    ci-decision-task-b:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 4
+      machineType: "zones/{zone}/machineTypes/n2-standard-2"
+    # Machine type for running TensorFlow/Linux + CUDA builds
+    ci-tf-build:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 8
+      machineType: "zones/{zone}/machineTypes/n2-standard-48"
+    # BETA Machine type for running TensorFlow/Linux + CUDA builds
+    ci-tf-build-b:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 8
+      machineType: "zones/{zone}/machineTypes/n2-standard-48"
+    # Machine type for running DeepSpeech builds
+    ci-ds-build:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 12
+      machineType: "zones/{zone}/machineTypes/n2-highcpu-16"
+    # BETA Machine type for running DeepSpeech builds
+    ci-ds-build-b:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 12
+      machineType: "zones/{zone}/machineTypes/n2-highcpu-16"
+    # Machine type for running DeepSpeech tests
+    ci-ds-tests:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 32
+      machineType: "zones/{zone}/machineTypes/n2-highcpu-4"
+    # BETA Machine type for running DeepSpeech tests
+    ci-ds-tests-b:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 32
+      machineType: "zones/{zone}/machineTypes/n2-highcpu-4"
+    # Machine type for running memory-intensive DeepSpeech tests (Android)
+    ci-ds-mem-tests:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 6
+      machineType: "zones/{zone}/machineTypes/n2-highmem-4"
+    # BETA Machine type for running memory-intensive DeepSpeech tests (Android)
+    ci-ds-mem-tests-b:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 6
+      machineType: "zones/{zone}/machineTypes/n2-highmem-4"
     win:
       owner: deepspeech@mozilla.com
       emailOnError: false
