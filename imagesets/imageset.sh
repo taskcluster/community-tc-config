@@ -12,7 +12,7 @@ function deploy {
 
     log "Checking system dependencies..."
 
-    for command in aws cat cd chmod cut echo find git grep head pass read rm sed sleep sort tail touch tr true which xargs yq; do
+    for command in aws cat chmod cut find git grep head pass rm sed sleep sort tail touch tr which xargs yq; do
         if ! which "${command}" >/dev/null; then
             log "  \xE2\x9D\x8C ${command}"
             log "${0} requires ${command} to be installed and available in your PATH - please fix and rerun" >&2
