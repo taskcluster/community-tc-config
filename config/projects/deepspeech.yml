@@ -20,7 +20,7 @@ deepspeech:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 4
+      maxCapacity: 6
       machineType: "zones/{zone}/machineTypes/n2-standard-2"
     # BETA Machine type for running Decision Task
     ci-decision-task-b:
@@ -29,7 +29,7 @@ deepspeech:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 4
+      maxCapacity: 6
       machineType: "zones/{zone}/machineTypes/n2-standard-2"
     # Machine type for running TensorFlow/Linux + CUDA builds
     ci-tf-build:
@@ -56,7 +56,7 @@ deepspeech:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 12
+      maxCapacity: 32
       machineType: "zones/{zone}/machineTypes/n2-highcpu-16"
     # BETA Machine type for running DeepSpeech builds
     ci-ds-build-b:
@@ -65,7 +65,7 @@ deepspeech:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 12
+      maxCapacity: 32
       machineType: "zones/{zone}/machineTypes/n2-highcpu-16"
     # Machine type for running DeepSpeech tests
     ci-ds-tests:
@@ -74,7 +74,7 @@ deepspeech:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 32
+      maxCapacity: 64
       machineType: "zones/{zone}/machineTypes/n2-highcpu-4"
     # BETA Machine type for running DeepSpeech tests
     ci-ds-tests-b:
@@ -83,7 +83,7 @@ deepspeech:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 32
+      maxCapacity: 64
       machineType: "zones/{zone}/machineTypes/n2-highcpu-4"
     # Machine type for running memory-intensive DeepSpeech tests (Android)
     ci-ds-mem-tests:
@@ -92,7 +92,7 @@ deepspeech:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 6
+      maxCapacity: 12
       machineType: "zones/{zone}/machineTypes/n2-highmem-4"
     # BETA Machine type for running memory-intensive DeepSpeech tests (Android)
     ci-ds-mem-tests-b:
@@ -101,7 +101,7 @@ deepspeech:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 6
+      maxCapacity: 12
       machineType: "zones/{zone}/machineTypes/n2-highmem-4"
     win:
       owner: deepspeech@mozilla.com
