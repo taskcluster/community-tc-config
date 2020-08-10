@@ -3,6 +3,7 @@ deepspeech:
     - github-team:mozilla/research-machine-learning
   repos:
     - github.com/mozilla/DeepSpeech:*
+    - github.com/mozilla/STT:*
     - github.com/mozilla/tensorflow:*
   workerPools:
     ci:
@@ -269,12 +270,15 @@ deepspeech:
         # https://github.com/lissyx/taskcluster-github-decision/blob/master/tc-decision.py
         - queue:scheduler-id:taskcluster-github
         - queue:route:index.project.deepspeech.*
+        - queue:route:index.project.mozilla-voice-stt.*
         - index:insert-task:project.deepspeech.*
+        - index:insert-task:project.mozilla-voice-stt.*
         - queue:route:notify.irc-channel.*
         - generic-worker:cache:deepspeech-*
         - docker-worker:capability:device:kvm
       to:
         - repo:github.com/mozilla/DeepSpeech:*
+        - repo:github.com/mozilla/STT:*
         - repo:github.com/mozilla/tensorflow:*
     - grant:
         - generic-worker:allow-rdp:proj-deepspeech/*
