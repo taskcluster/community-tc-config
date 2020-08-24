@@ -5,6 +5,20 @@ fuzzing:
   repos:
     - github.com/MozillaSecurity/*
   workerPools:
+    bugmon-monitor:
+      owner: jkratzer@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 5
+    bugmon-processor:
+      owner: jkratzer@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 10
     ci:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
@@ -61,6 +75,40 @@ fuzzing:
             type: string
             default: master
         additionalProperties: true
+    bugmon:
+      description: Hook for triggering bugmon monitor tasks
+      owner: jkratzer@mozilla.com
+      emailOnError: true
+      task:
+        provisionerId: proj-fuzzing
+        workerType: bugmon-monitor
+        payload:
+          image: 'mozillasecurity/bugmon:latest'
+          features:
+            taskclusterProxy: true
+          maxRunTime: 3600
+          env:
+            BUG_ACTION: monitor
+          artifacts:
+            project/fuzzing/bugmon:
+              path: /bugmon-artifacts
+              type: directory
+        metadata:
+          name: bugmon
+          description: Hook for triggering bugmon monitor tasks
+          owner: jkratzer@mozilla.com
+          source: 'https://github.com/MozillaSecurity/bugmon'
+        expires:
+          $fromNow: 3 months
+        deadline:
+          $fromNow: 6 hours
+        scopes:
+          - queue:create-task:highest:proj-fuzzing/bugmon-monitor
+          - queue:create-task:highest:proj-fuzzing/bugmon-processor
+          - queue:get-artifact:project/fuzzing/bugmon/*
+          - secrets:get:project/fuzzing/bz-api-key
+      schedule:
+        - "0 8 * * * *"
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
@@ -107,3 +155,10 @@ fuzzing:
         - worker-manager:provider:community-tc-workers-*
       to:
         - repo:github.com/MozillaSecurity/fuzzing-tc-config:branch:master
+    - grant:
+        - queue:create-task:highest:proj-fuzzing/ci
+        - queue:create-task:highest:proj-fuzzing/bugmon-processor
+        - queue:get-artifact:project/fuzzing/bugmon/*
+        - secrets:get:project/fuzzing/bz-api-key
+      to:
+        - hook-id:project-fuzzing/bugmon
