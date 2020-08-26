@@ -155,7 +155,9 @@ async def build_worker_pool(workerPoolId, cfg, secret_values):
     try:
         image_set = await get_image_set(cfg["imageset"])
         wp = CLOUD_FUNCS[cfg["cloud"]](
-            secret_values=secret_values, image_set=image_set, **cfg,
+            secret_values=secret_values,
+            image_set=image_set,
+            **cfg,
         )
 
         if wp.supports_worker_config():
@@ -176,7 +178,11 @@ async def build_worker_pool(workerPoolId, cfg, secret_values):
 
         wp = WORKER_IMPLEMENTATION_FUNCS[
             image_set.workerImplementation.replace("-", "_")
-        ](secret_values=secret_values, wp=wp, **cfg,)
+        ](
+            secret_values=secret_values,
+            wp=wp,
+            **cfg,
+        )
     except Exception as e:
         raise RuntimeError(
             "Error generating worker pool configuration for {}".format(workerPoolId)
@@ -437,7 +443,12 @@ def docker_worker(wp, **cfg):
     if wp.supports_worker_config():
         wp.merge_worker_config(
             WorkerPoolSettings.EXISTING_CONFIG,
-            {"shutdown": {"enabled": True, "afterIdleSeconds": 15,},},
+            {
+                "shutdown": {
+                    "enabled": True,
+                    "afterIdleSeconds": 15,
+                },
+            },
         )
 
     wp.secret_tpl = {
