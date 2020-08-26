@@ -353,11 +353,9 @@ taskcluster:
     testing/taskcluster-auth: true
     testing/taskcluster-notify: true
     testing/taskcluster-queue: true
-    # key for deploying json-e docs
+    # key for deploying json-e docs; this corresponds to a "deploy key" on the
+    # taskcluster/json-e github repo.
     json-e-deploy: true
-    # monopacker image baking secrets
-    monopacker/gcloud_service_account: true
-    monopacker/worker_secrets_yaml: true
     release:
       DOCKER_USERNAME: $taskcluster-release-docker-hub-username
       DOCKER_PASSWORD: $taskcluster-release-docker-hub-password
