@@ -104,6 +104,48 @@ deepspeech:
       minCapacity: 0
       maxCapacity: 12
       machineType: "zones/{zone}/machineTypes/n2-highmem-4"
+    ds-macos-tf-build:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: generic-worker
+      cloud: static
+      lifecycle:
+        reregistrationTimeout: 2592000 # 30 days
+    ds-macos-tf-build-b:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: generic-worker
+      cloud: static
+      lifecycle:
+        reregistrationTimeout: 2592000 # 30 days
+    ds-macos-ds-build:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: generic-worker
+      cloud: static
+      lifecycle:
+        reregistrationTimeout: 2592000 # 30 days
+    ds-macos-ds-build-b:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: generic-worker
+      cloud: static
+      lifecycle:
+        reregistrationTimeout: 2592000 # 30 days
+    ds-macos-ds-tests:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: generic-worker
+      cloud: static
+      lifecycle:
+        reregistrationTimeout: 2592000 # 30 days
+    ds-macos-ds-tests-b:
+      owner: deepspeech@mozilla.com
+      emailOnError: false
+      imageset: generic-worker
+      cloud: static
+      lifecycle:
+        reregistrationTimeout: 2592000 # 30 days
     win:
       owner: deepspeech@mozilla.com
       emailOnError: false
