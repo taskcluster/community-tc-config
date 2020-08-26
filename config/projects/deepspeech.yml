@@ -262,191 +262,31 @@ deepspeech:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
         - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-tf-build-1:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-tf-build-2:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-tf-build-3:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-tf-build-4:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
     # BETA Machine type for running TensorFlow builds
     worker/macos-tf-build-b:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-tf-build-b-1:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-tf-build-b-2:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-tf-build-b-3:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-tf-build-b-4:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
         - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
     # Machine type for running DeepSpeech builds
     worker/macos-ds-build:
       scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-build-1:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-build-2:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-build-3:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-build-4:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-build-5:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-build-6:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
+        - assume:worker-id:proj-deepspeech/ds-macos-ds-build-*
+        - assume:worker-pool:proj-deepspeech/ds-macos-ds-build
     # BETA Machine type for running DeepSpeech builds
     worker/macos-ds-build-b:
       scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-build-b-1:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-build-b-2:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-build-b-3:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-build-b-4:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-build-b-5:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-build-b-6:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
+        - assume:worker-id:proj-deepspeech/ds-macos-ds-build-b-*
+        - assume:worker-pool:proj-deepspeech/ds-macos-ds-build-b
     # Machine type for running DeepSpeech tests
     worker/macos-ds-tests:
       scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-tests-1:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-tests-2:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-tests-3:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-tests-4:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-tests-5:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-tests-6:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-tests-7:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-tests-8:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-tests-9:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
-    worker/macos-ds-tests-10:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build
+        - assume:worker-id:proj-deepspeech/ds-macos-ds-tests-*
+        - assume:worker-pool:proj-deepspeech/ds-macos-ds-tests
     # BETA Machine type for running DeepSpeech tests
     worker/macos-ds-tests-b:
       scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-tests-b-1:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-tests-b-2:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-tests-b-3:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-tests-b-4:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-tests-b-5:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-tests-b-6:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-tests-b-7:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-tests-b-8:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-tests-b-9:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
-    worker/macos-ds-tests-b-10:
-      scopes:
-        - assume:worker-id:proj-deepspeech/ds-macos-tf-build-b-*
-        - assume:worker-pool:proj-deepspeech/ds-macos-tf-build-b
+        - assume:worker-id:proj-deepspeech/ds-macos-ds-tests-b-*
+        - assume:worker-pool:proj-deepspeech/ds-macos-ds-tests-b
     worker/pkguploader:
       scopes:
         - assume:worker-id:proj-deepspeech/ds-scriptworker-*
