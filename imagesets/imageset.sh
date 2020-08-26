@@ -1,4 +1,5 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+set -e
 
 function log {
     if [ -n "${REGION}" ]; then
@@ -12,7 +13,10 @@ function deploy {
 
     log "Checking system dependencies..."
 
-    for command in aws cat chmod cut find git grep head pass rm sed sleep sort tail touch tr which xargs yq; do
+    # Presumably bash and env must already be in the PATH to reach this point,
+    # but let's keep them in the dependency list in case this list is
+    # copy/pasted to any docs, etc. Having them here doesn't do any harm.
+    for command in aws basename bash cat chmod cut date dirname env find gcloud git grep head mktemp pass rm sed signin-aws sleep sort tail touch tr which xargs yq; do
         if ! which "${command}" >/dev/null; then
             log "  \xE2\x9D\x8C ${command}"
             log "${0} requires ${command} to be installed and available in your PATH - please fix and rerun" >&2
@@ -51,8 +55,18 @@ function deploy {
     UUID="$(LC_CTYPE=C </dev/urandom tr -dc "a-z0-9" | head -c 20)"
     export UNIQUE_NAME="${IMAGE_SET}-${UUID}"
 
+    export TEMP_DIR="$(mktemp -d -t password-store.XXXXXXXXXX)"
+    export PASSWORD_STORE_DIR="${TEMP_DIR}/.password-store"
+    git clone ssh://gitolite3@git-internal.mozilla.org/taskcluster/secrets.git "${PASSWORD_STORE_DIR}"
+    git -C "${PASSWORD_STORE_DIR}" config pass.signcommits false
+    git -C "${PASSWORD_STORE_DIR}" config commit.gpgsign false
+
     case "${CLOUD}" in
         aws) 
+            if [ -z "${AWS_ACCESS_KEY_ID}" ] || [ -z "${AWS_SECRET_ACCESS_KEY}" ] || [ -z "${AWS_SESSION_TOKEN}" ]; then
+              log "Need AWS credentials..."
+              eval $(signin-aws)
+            fi
             echo us-west-1 118 us-west-2 199 us-east-1 100 | xargs -P3 -n2 "${0}" process-region "${CLOUD}_${ACTION}"
             log "Fetching secrets..."
             pass git pull
@@ -80,6 +94,8 @@ function deploy {
             ;;
     esac
 
+    rm -rf "${TEMP_DIR}"
+
     # Link to bootstrap script in worker type metadata, if generic-worker worker type
     if [ "$(yq r ../config/imagesets.yml "${IMAGE_SET}.workerImplementation")" == "generic-worker" ]; then
       BOOTSTRAP_SCRIPT="$(echo "${IMAGE_SET}"/bootstrap.*)"
@@ -88,7 +104,7 @@ function deploy {
 
     git reset
     git add ../config/imagesets.yml
-    git commit -m "Built new machine images for imageset ${IMAGE_SET}"
+    git commit --no-gpg-sign -m "Built new machine images for imageset ${IMAGE_SET}"
     log 'Deployment of image sets successful!'
     log 'Be sure to push changes to community-tc-config repo'
 }
@@ -233,7 +249,7 @@ function aws_update {
 
     log "Now snapshotting the instance to create an AMI..."
     # now capture the AMI
-    IMAGE_ID="$(aws --region "${REGION}" ec2 create-image --instance-id "${INSTANCE_ID}" --name "${IMAGE_SET} version ${IMAGE_SET_COMMIT_SHA}" --description "${IMAGE_SET} version ${IMAGE_SET_COMMIT_SHA}" --output text)"
+    IMAGE_ID="$(aws --region "${REGION}" ec2 create-image --instance-id "${INSTANCE_ID}" --name "${IMAGE_SET} version ${IMAGE_SET_COMMIT_SHA} (${UUID})" --description "${IMAGE_SET} version ${IMAGE_SET_COMMIT_SHA} (${UUID})" --output text)"
 
     log "The AMI is currently being created: ${IMAGE_ID}"
 
