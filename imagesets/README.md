@@ -2,8 +2,8 @@
 
 ## Prerequisite Steps
 
-In order to build a set of gcp/aws machine images, you will require several
-privileges. The following configuration will be required:
+The AWS/GCP image set building machinery requires the following configuration
+to be present:
 
 1) You will need an AWS access key configured under `~/.aws` on your host, and
    2FA should be enabled on your AWS account.
@@ -12,18 +12,22 @@ privileges. The following configuration will be required:
    a valid user/email, for committing changes to community-tc-config repo and the
    taskcluster team password store.
 
-3) You will require the ssh private key for your git account to be available
-   under `~/.ssh`.
-
-4) You will either need to be connected to the Mozilla VPN in order to access
-   git-internal.mozilla.org or you will need to have a proxy configured in your
+3) You will either need to be connected to the Mozilla VPN in order to access
+   `git-internal.mozilla.org` or you will need to have a proxy configured in your
    `~/.ssh/config` file, such as:
 
   ```
   Host git-internal.mozilla.org
       User gitolite3
+      # IdentityFile ~/.ssh/my-lovely-rsa-key
       ProxyCommand ssh -W %h:%p -oProxyCommand=none ssh.mozilla.com
   ```
+
+4) The ssh key for pushing to `git-internal.mozilla.org` should be in a file
+   somewhere underneath `~/.ssh` on your host. This directory is mounted in to the
+   docker container. If it is not in a standard location (e.g. `~/.ssh/id_rsa`,
+   `~/.ssh/id_ed25519`, ...) then the location should be explicitly specified with
+   an `IdentityFile` directive in the `~/.ssh/config` file (see point 3 above).
 
 5) You will need your gpg account to be configured under `~/.gnupg` on your host,
    with a valid key that is authorised in the taskcluster team password store.
