@@ -172,16 +172,15 @@ taskcluster:
         - queue:route:notify.email.taskcluster-notifications@mozilla.com.*
         - queue:route:notify.irc-channel.#taskcluster-bots.*
       to:
-        - repo:github.com/taskcluster/taskcluster:branch:master
         - repo:github.com/taskcluster/taskcluster:branch:main
         - repo:github.com/taskcluster/taskcluster:tag:v*
 
     - grant:
-        # pushes to json-e master can read secrets for deploying the site
+        # pushes to json-e main can read secrets for deploying the site
         - secrets:get:project/taskcluster/json-e-deploy
         # ..and notify on failure
         - queue:route:notify.email.taskcluster-notifications@mozilla.com.*
-      to: repo:github.com/taskcluster/json-e:branch:master
+      to: repo:github.com/taskcluster/json-e:branch:main
 
     - grant:
         - assume:project:taskcluster:worker-test-scopes
@@ -224,11 +223,6 @@ taskcluster:
 
     - grant: assume:project:taskcluster:docker-worker-tester
       to: login-identity:github/54458|catlee
-
-    - grant:
-        - secrets:get:project/taskcluster/monopacker/gcloud_service_account
-        - secrets:get:project/taskcluster/monopacker/worker_secrets_yaml
-      to: repo:github.com/taskcluster/monopacker:branch:master
 
     - grant:
         - auth:create-client:project/taskcluster/smoketest/*
