@@ -1,6 +1,7 @@
 relman:
   adminRoles:
     - github-team:mozilla/sallt
+  externallyManaged: true # some hooks are deployed into this space
   repos:
     - github.com/mozilla/microannotate:*
     - github.com/mozilla/bugzilla-dashboard-backend:*
