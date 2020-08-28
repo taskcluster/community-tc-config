@@ -13,11 +13,11 @@ relman:
   clients:
     bugbug/code-review-production:
       scopes:
-        - hooks:trigger-hook:project-relman/bugbug-*
+        - hooks:trigger-hook:project-bugbug/bugbug-*
         - notify:email:*
     bugbug/code-review-testing:
       scopes:
-        - hooks:trigger-hook:project-relman/bugbug-*
+        - hooks:trigger-hook:project-bugbug/bugbug-*
         - notify:email:*
   workerPools:
     ci:
