@@ -1,6 +1,7 @@
 relman:
   adminRoles:
     - github-team:mozilla/sallt
+  externallyManaged: true # some hooks are deployed into this space
   repos:
     - github.com/mozilla/microannotate:*
     - github.com/mozilla/bugzilla-dashboard-backend:*
@@ -13,11 +14,11 @@ relman:
   clients:
     bugbug/code-review-production:
       scopes:
-        - hooks:trigger-hook:project-relman/bugbug-*
+        - hooks:trigger-hook:project-bugbug/bugbug-*
         - notify:email:*
     bugbug/code-review-testing:
       scopes:
-        - hooks:trigger-hook:project-relman/bugbug-*
+        - hooks:trigger-hook:project-bugbug/bugbug-*
         - notify:email:*
   workerPools:
     ci:
