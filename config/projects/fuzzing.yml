@@ -108,7 +108,7 @@ fuzzing:
           - queue:get-artifact:project/fuzzing/bugmon/*
           - secrets:get:project/fuzzing/bz-api-key
       schedule:
-        - "0 8 * * * *"
+        - "0 */8 * * *"
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
