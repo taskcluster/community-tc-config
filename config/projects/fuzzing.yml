@@ -160,5 +160,6 @@ fuzzing:
         - queue:create-task:highest:proj-fuzzing/bugmon-processor
         - queue:get-artifact:project/fuzzing/bugmon/*
         - secrets:get:project/fuzzing/bz-api-key
+        - queue:scheduler-id:-
       to:
         - hook-id:project-fuzzing/bugmon
