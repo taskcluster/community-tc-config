@@ -103,9 +103,13 @@ fuzzing:
         deadline:
           $fromNow: 6 hours
         scopes:
+          - docker-worker:capability:device:hostSharedMemory
+          - docker-worker:capability:device:loopbackAudio
+          - docker-worker:capability:privileged
           - queue:create-task:highest:proj-fuzzing/bugmon-monitor
           - queue:create-task:highest:proj-fuzzing/bugmon-processor
           - queue:get-artifact:project/fuzzing/bugmon/*
+          - queue:scheduler-id:-
           - secrets:get:project/fuzzing/bz-api-key
       schedule:
         - "0 */8 * * *"
@@ -156,10 +160,13 @@ fuzzing:
       to:
         - repo:github.com/MozillaSecurity/fuzzing-tc-config:branch:master
     - grant:
+        - docker-worker:capability:device:hostSharedMemory
+        - docker-worker:capability:device:loopbackAudio
+        - docker-worker:capability:privileged
         - queue:create-task:highest:proj-fuzzing/bugmon-monitor
         - queue:create-task:highest:proj-fuzzing/bugmon-processor
         - queue:get-artifact:project/fuzzing/bugmon/*
-        - secrets:get:project/fuzzing/bz-api-key
         - queue:scheduler-id:-
+        - secrets:get:project/fuzzing/bz-api-key
       to:
         - hook-id:project-fuzzing/bugmon
