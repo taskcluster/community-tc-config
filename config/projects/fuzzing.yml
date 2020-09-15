@@ -109,11 +109,11 @@ fuzzing:
           - queue:create-task:highest:proj-fuzzing/bugmon-monitor
           - queue:create-task:highest:proj-fuzzing/bugmon-processor
           - queue:get-artifact:project/fuzzing/bugmon/*
-          - queue:route:notify.email.<jkratzer@mozilla.com>.on-failed
+          - queue:route:notify.email.jkratzer@mozilla.com.on-failed
           - queue:scheduler-id:-
           - secrets:get:project/fuzzing/bz-api-key
       routes:
-        - notify.email.<jkratzer@mozilla.com>.on-failed
+        - notify.email.jkratzer@mozilla.com.on-failed
       schedule:
         - "0 */8 * * *"
   grants:
@@ -169,7 +169,7 @@ fuzzing:
         - queue:create-task:highest:proj-fuzzing/bugmon-monitor
         - queue:create-task:highest:proj-fuzzing/bugmon-processor
         - queue:get-artifact:project/fuzzing/bugmon/*
-        - queue:route:notify.email.<jkratzer@mozilla.com>.on-failed
+        - queue:route:notify.email.jkratzer@mozilla.com.on-failed
         - queue:scheduler-id:-
         - secrets:get:project/fuzzing/bz-api-key
       to:
