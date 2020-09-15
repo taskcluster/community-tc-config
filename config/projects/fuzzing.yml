@@ -112,6 +112,8 @@ fuzzing:
           - queue:route:notify.email.<jkratzer@mozilla.com>.on-failed
           - queue:scheduler-id:-
           - secrets:get:project/fuzzing/bz-api-key
+      routes:
+        - notify.email.<jkratzer@mozilla.com>.on-failed
       schedule:
         - "0 */8 * * *"
   grants:
