@@ -51,13 +51,13 @@ docker-worker:
   workerImplementation: docker-worker
   gcp:
     # built with the `docker_worker_gcp_community` builder in monopacker
-    image: projects/taskcluster-imaging/global/images/docker-worker-gcp-community-googlecompute-2020-06-12t17-25-46z
+    image: projects/taskcluster-imaging/global/images/docker-worker-gcp-community-googlecompute-2020-09-16t20-20-13z
   aws:
     # built with the `docker_worker_aws` builder in monopacker
     amis:
-      us-east-1: ami-005cff3ff8491780e
-      us-west-1: ami-0ce5b2d9acbd9b924
-      us-west-2: ami-0dd3c7aae136f0a60
+      us-east-1: ami-0e7d0d2209afd2133
+      us-west-1: ami-00aec9cd6ca43f5be
+      us-west-2: ami-01c0f8add25a71fd8
 generic-worker-win2012r2:
   workerImplementation: generic-worker
   aws:
