@@ -1,6 +1,6 @@
 firefoxreality:
   adminRoles:
-    - github-org-admin:MozillaReality
+    - github-team:MozillaReality/fxr-eng-tc
   repos:
     - github.com/MozillaReality/FirefoxReality:*
     - github.com/MozillaReality/FirefoxRealityPC:*

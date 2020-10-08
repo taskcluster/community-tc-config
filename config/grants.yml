@@ -169,7 +169,7 @@
     - login-identity:github/477142|reuben
 
     # for firefoxreality
-    - github-org-admin:MozillaReality
+    - github-team:MozillaReality/fxr-eng-tc
 
     # for a few project admins
     - project-admin:fuzzing
