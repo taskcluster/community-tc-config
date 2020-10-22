@@ -4,6 +4,7 @@ taskcluster:
   repos:
     - github.com/taskcluster/*
     - github.com/mozilla/community-tc-config:*
+    - github.com/mozilla/hawk:*
   externallyManaged:
     # smoketests create these resources, and also cleans them up, so leave
     # them alone here...
@@ -146,6 +147,10 @@ taskcluster:
         # This is the taskcluster channel
         - queue:route:notify.matrix-room.!whDRjjSmICCgrhFHsQ:mozilla.org.*
       to: repo:github.com/taskcluster/*
+
+    - grant:
+        - queue:create-task:highest:proj-taskcluster/ci
+      to: repo:github.com/mozilla/hawk:*
 
     - grant:
         - secrets:get:project/taskcluster/testing/codecov
