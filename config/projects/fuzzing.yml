@@ -26,8 +26,15 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
-    grizzly-reduce:
-      owner: fuzzing+grizzly@mozilla.com
+    grizzly-reduce-monitor:
+      owner: truber@mozilla.com
+      emailOnError: true
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 5
+    grizzly-reduce-worker:
+      owner: truber@mozilla.com
       emailOnError: true
       imageset: docker-worker
       cloud: gcp
@@ -75,6 +82,82 @@ fuzzing:
             type: string
             default: master
         additionalProperties: true
+    grizzly-reduce-monitor:
+      description: Hook for triggering Grizzly reduce monitor tasks
+      owner: truber@mozilla.com
+      emailOnError: true
+      task:
+        provisionerId: proj-fuzzing
+        workerType: grizzly-reduce-monitor
+        payload:
+          image:
+            type: indexed-image
+            path: public/grizzly-reduce-tc-monitor.tar
+            namespace: project.fuzzing.reduce-monitor.main
+          features:
+            taskclusterProxy: true
+          maxRunTime: 3600
+          command:
+            - '/usr/bin/grizzly-reduce-tc-monitor'
+        metadata:
+          name: grizzly-reduce-monitor
+          description: Hook for triggering grizzly reduce monitor tasks
+          owner: truber@mozilla.com
+          source: 'https://github.com/MozillaSecurity/grizzly'
+        expires:
+          $fromNow: 2 weeks
+        deadline:
+          $fromNow: 3 hours
+        scopes:
+          - docker-worker:capability:device:hostSharedMemory
+          - docker-worker:capability:device:loopbackAudio
+          - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker
+          - queue:route:notify.email.truber@mozilla.com.on-failed
+          - queue:scheduler-id:fuzzing
+          - secrets:get:project/fuzzing/credstash-aws-auth
+          - secrets:get:project/fuzzing/fuzzmanagerconf
+          - secrets:get:project/fuzzing/grizzly-reduce-tool-list
+      routes:
+        - notify.email.truber@mozilla.com.on-failed
+    grizzly-reduce-reset-error:
+      description: Hook for resetting Grizzly reduce tasks on error
+      owner: truber@mozilla.com
+      emailOnError: true
+      bindings:
+        - exchange: exchange/taskcluster-queue/v1/task-exception
+          routingKeyPattern: primary.#.#.#.#.#.grizzly-reduce-worker.fuzzing.#
+      task:
+        provisionerId: proj-fuzzing
+        workerType: grizzly-reduce-monitor
+        payload:
+          image:
+            type: indexed-image
+            path: public/grizzly-reduce-tc-monitor.tar
+            namespace: project.fuzzing.reduce-monitor.main
+          features:
+            taskclusterProxy: true
+          maxRunTime: 600
+          command:
+            - '/usr/bin/grizzly-reduce-tc-update'
+            - '--crash-from-reduce-task'
+            - '${taskId}'
+            - '--quality'
+            - '5'
+        metadata:
+          name: grizzly-reduce-monitor
+          description: Hook for triggering grizzly reduce monitor tasks
+          owner: truber@mozilla.com
+          source: 'https://github.com/MozillaSecurity/grizzly'
+        expires:
+          $fromNow: 2 weeks
+        deadline:
+          $fromNow: 1 hour
+        scopes:
+          - queue:route:notify.email.truber@mozilla.com.on-failed
+          - queue:scheduler-id:fuzzing
+          - secrets:get:project/fuzzing/fuzzmanagerconf
+      routes:
+        - notify.email.truber@mozilla.com.on-failed
     bugmon:
       description: Hook for triggering bugmon monitor tasks
       owner: jkratzer@mozilla.com
@@ -174,3 +257,25 @@ fuzzing:
         - secrets:get:project/fuzzing/bz-api-key
       to:
         - hook-id:project-fuzzing/bugmon
+    - grant:
+        - docker-worker:capability:device:hostSharedMemory
+        - docker-worker:capability:device:loopbackAudio
+        - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker
+        - queue:route:notify.email.truber@mozilla.com.on-failed
+        - queue:scheduler-id:fuzzing
+        - secrets:get:project/fuzzing/credstash-aws-auth
+        - secrets:get:project/fuzzing/fuzzmanagerconf
+        - secrets:get:project/fuzzing/grizzly-reduce-tool-list
+      to:
+        - hook-id:project-fuzzing/grizzly-reduce-monitor
+    - grant:
+        - queue:route:notify.email.truber@mozilla.com.on-failed
+        - queue:scheduler-id:fuzzing
+        - secrets:get:project/fuzzing/fuzzmanagerconf
+      to:
+        - hook-id:project-fuzzing/grizzly-reduce-reset-error
+    - grant:
+        - docker-worker:capability:privileged
+        - queue:route:index.project.fuzzing.reduce-monitor.*
+      to:
+        - repo:github.com/MozillaSecurity/grizzly-reduce-tc:*
