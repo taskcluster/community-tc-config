@@ -197,7 +197,7 @@
 - grant: notify:manage-denylist
   to: github-team:taskcluster/core
 
-# Make all endpoints public by default
+# Make read-only endpoints public by default
 - grant:
     - auth:current-scopes
     - auth:expand-scopes
@@ -239,4 +239,3 @@
     - worker-manager:list-worker-pools
     - worker-manager:list-workers:*
   to: anonymous
-
