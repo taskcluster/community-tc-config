@@ -196,3 +196,8 @@
 # Allow the taskcluster team to handle the denylist
 - grant: notify:manage-denylist
   to: github-team:taskcluster/core
+
+# Make all endpoints public by default
+- grant: assume:anonymous
+  to: *
+
