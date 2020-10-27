@@ -448,6 +448,7 @@ def docker_worker(wp, **cfg):
                     "enabled": True,
                     "afterIdleSeconds": 15,
                 },
+                "deviceManagement": {"loopbackVideo": {"enabled": False}},
             },
         )
 
