@@ -15,6 +15,14 @@ misc:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
+      # basically everyone has access to this worker (see grants below)
+    tutorial:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 2
   hooks:
     jcristau-fx-release-metrics:
       description: Taskcluster hook to run fx release metrics
@@ -57,10 +65,19 @@ misc:
           source: https://github.com/jcristau/fx-release-metrics/blob/master/hook.json
 
   grants:
+    # allow all mozilla projects, and the yml validator, to use proj-misc/ci
     - grant: queue:create-task:highest:proj-misc/ci
       to:
         - repo:github.com/mozilla/*
         - repo:github.com/marco-c/taskcluster_yml_validator:*
+
+    # allow all mozilla projects, as well as all anyone with a github login, to
+    # use the tutorial worker pool
+    - grant: queue:create-task:highest:proj-misc/tutorial
+      to:
+        - login-identity:github/*
+        - repo:github.com/mozilla/*
+
     - grant:
         - queue:create-task:highest:proj-misc/ci
         - queue:route:index.project.misc.jcristau.*
@@ -68,6 +85,7 @@ misc:
         - queue:scheduler-id:-
       to:
         - hook-id:project-misc/jcristau-fx-release-metrics
+
     # allow jcristau to trigger the release-metrics hook directly
     - grant:
         - hooks:trigger-hook:project-misc/jcristau-fx-release-metrics
