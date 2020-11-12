@@ -26,6 +26,13 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+    ci-windows:
+      owner: fuzzing+taskcluster@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-win2012r2
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 10
     grizzly-reduce-monitor:
       owner: truber@mozilla.com
       emailOnError: true
@@ -202,6 +209,7 @@ fuzzing:
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
+        - queue:create-task:highest:proj-fuzzing/ci-*
         - secrets:get:project/fuzzing/deploy-*
         - secrets:get:project/fuzzing/codecov-*
         - secrets:get:project/fuzzing/pypi-*
@@ -279,3 +287,7 @@ fuzzing:
         - queue:route:index.project.fuzzing.reduce-monitor.*
       to:
         - repo:github.com/MozillaSecurity/grizzly-reduce-tc:*
+    - grant:
+        - generic-worker:allow-rdp:proj-fuzzing/*
+      to:
+        - project-admin:fuzzing
