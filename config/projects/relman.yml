@@ -11,6 +11,9 @@ relman:
     - github.com/mozilla/rust-code-analysis:*
     - github.com/mozilla/dump_syms:*
     - github.com/mozilla/libmozevent:*
+    - github.com/mozilla/rust-analysis:*
+    - github.com/mozilla/rust-parsepatch:*
+    - github.com/mozilla/pyo3-parsepatch:*
   clients:
     bugbug/code-review-production:
       scopes:
@@ -54,6 +57,8 @@ relman:
     taskboot/deploy: true
     libmozevent/deploy: true
     rust-code-analysis/deploy: true
+    rust-parsepatch/deploy: true
+    pyo3-parsepatch/deploy: true
   grants:
     # all repos
     - grant:
@@ -65,6 +70,8 @@ relman:
         - repo:github.com/mozilla/code-coverage:*
         - repo:github.com/mozilla/code-review:*
         - repo:github.com/mozilla/rust-code-analysis:*
+        - repo:github.com/mozilla/rust-parsepatch:*
+        - repo:github.com/mozilla/pyo3-parsepatch:*
         - repo:github.com/mozilla/bugzilla-dashboard-backend:*
         - repo:github.com/mozilla/dump_syms:*
         - repo:github.com/mozilla/libmozevent:*
@@ -145,3 +152,11 @@ relman:
       to: repo:github.com/mozilla/rust-code-analysis:*
     - grant: secrets:get:project/relman/rust-code-analysis/deploy
       to: repo:github.com/mozilla/rust-code-analysis:tag:*
+
+    # rust-parsepatch
+    - grant: secrets:get:project/relman/rust-parsepatch/deploy
+      to: repo:github.com/mozilla/rust-parsepatch:tag:*
+
+    # pyo3-parsepatch
+    - grant: secrets:get:project/relman/pyo3-parsepatch/deploy
+      to: repo:github.com/mozilla/pyo3-parsepatch:tag:*
