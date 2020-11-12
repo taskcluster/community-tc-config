@@ -204,7 +204,7 @@ fuzzing:
         - queue:create-task:highest:proj-fuzzing/ci
         - secrets:get:project/fuzzing/deploy-*
         - secrets:get:project/fuzzing/codecov-*
-        - secrets:get:project/fuzzing/pypi
+        - secrets:get:project/fuzzing/pypi-*
         - secrets:get:project/fuzzing/ci-*
       to:
         - repo:github.com/MozillaSecurity/*
