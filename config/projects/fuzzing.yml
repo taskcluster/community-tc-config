@@ -284,6 +284,11 @@ fuzzing:
         - hook-id:project-fuzzing/grizzly-reduce-reset-error
     - grant:
         - docker-worker:capability:privileged
+        - queue:route:index.project.fuzzing.orion.*
+      to:
+        - repo:github.com/MozillaSecurity/orion:*
+    - grant:
+        - docker-worker:capability:privileged
         - queue:route:index.project.fuzzing.reduce-monitor.*
       to:
         - repo:github.com/MozillaSecurity/grizzly-reduce-tc:*
