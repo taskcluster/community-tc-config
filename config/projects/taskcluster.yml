@@ -352,6 +352,7 @@ taskcluster:
     testing/taskcluster-auth: true
     testing/taskcluster-notify: true
     testing/taskcluster-queue: true
+    testing/taskcluster-object: true
     # key for deploying json-e docs; this corresponds to a "deploy key" on the
     # taskcluster/json-e github repo.
     json-e-deploy: true
