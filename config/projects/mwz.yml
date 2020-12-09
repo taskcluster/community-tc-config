@@ -1,0 +1,14 @@
+# https://github.com/MasterWayZ is experimenting with TC workers and jobs
+mwz:
+  adminRoles:
+    - login-identity:github/28673|djmitche
+    - login-identity:github/11596690|MasterWayZ
+  workerPools:
+    testing:
+      owner: nobody@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 1
+      machineType: "zones/{zone}/machineTypes/n1-standard-1"
