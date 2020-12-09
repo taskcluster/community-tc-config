@@ -1,0 +1,5 @@
+# https://github.com/MasterWayZ is experimenting with TC workers and jobs
+mwz:
+  adminRoles:
+    - login-identity:github/28673|djmitche
+    - login-identity:github/11596690|MasterWayZ
