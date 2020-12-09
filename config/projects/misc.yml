@@ -69,7 +69,7 @@ misc:
     - grant: queue:create-task:highest:proj-misc/ci
       to:
         - repo:github.com/mozilla/*
-        - repo:github.com/djmtiche/taskchampion
+        - repo:github.com/djmtiche/taskchampion:*
         - repo:github.com/marco-c/taskcluster_yml_validator:*
 
     # allow all mozilla projects, as well as all anyone with a github login, to
