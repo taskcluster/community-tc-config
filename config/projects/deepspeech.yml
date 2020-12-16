@@ -1,13 +1,15 @@
 deepspeech:
   adminRoles:
     - github-team:mozilla/research-machine-learning
+    - github-team:coqui-ai/deepspeech-ci-owners
   repos:
     - github.com/mozilla/DeepSpeech:*
-    - github.com/mozilla/STT:*
     - github.com/mozilla/tensorflow:*
+    - github.com/coqui-ai/DeepSpeech:*
+    - github.com/coqui-ai/tensorflow:*
   workerPools:
     ci:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
@@ -16,7 +18,7 @@ deepspeech:
       machineType: "zones/{zone}/machineTypes/n1-standard-32"
     # Machine type for running Decision Task
     ci-decision-task:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
@@ -25,7 +27,7 @@ deepspeech:
       machineType: "zones/{zone}/machineTypes/n2-standard-2"
     # BETA Machine type for running Decision Task
     ci-decision-task-b:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
@@ -34,7 +36,7 @@ deepspeech:
       machineType: "zones/{zone}/machineTypes/n2-standard-2"
     # Machine type for running TensorFlow/Linux + CUDA builds
     ci-tf-build:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
@@ -43,7 +45,7 @@ deepspeech:
       machineType: "zones/{zone}/machineTypes/n2-standard-48"
     # BETA Machine type for running TensorFlow/Linux + CUDA builds
     ci-tf-build-b:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
@@ -52,7 +54,7 @@ deepspeech:
       machineType: "zones/{zone}/machineTypes/n2-standard-48"
     # Machine type for running DeepSpeech builds
     ci-ds-build:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
@@ -61,7 +63,7 @@ deepspeech:
       machineType: "zones/{zone}/machineTypes/n2-highcpu-16"
     # BETA Machine type for running DeepSpeech builds
     ci-ds-build-b:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
@@ -70,7 +72,7 @@ deepspeech:
       machineType: "zones/{zone}/machineTypes/n2-highcpu-16"
     # Machine type for running DeepSpeech tests
     ci-ds-tests:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
@@ -79,7 +81,7 @@ deepspeech:
       machineType: "zones/{zone}/machineTypes/n2-highcpu-4"
     # BETA Machine type for running DeepSpeech tests
     ci-ds-tests-b:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
@@ -88,7 +90,7 @@ deepspeech:
       machineType: "zones/{zone}/machineTypes/n2-highcpu-4"
     # Machine type for running memory-intensive DeepSpeech tests (Android)
     ci-ds-mem-tests:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
@@ -97,7 +99,7 @@ deepspeech:
       machineType: "zones/{zone}/machineTypes/n2-highmem-4"
     # BETA Machine type for running memory-intensive DeepSpeech tests (Android)
     ci-ds-mem-tests-b:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
@@ -105,49 +107,49 @@ deepspeech:
       maxCapacity: 12
       machineType: "zones/{zone}/machineTypes/n2-highmem-4"
     ds-macos-tf-build:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: generic-worker
       cloud: static
       lifecycle:
         reregistrationTimeout: 2592000 # 30 days
     ds-macos-tf-build-b:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: generic-worker
       cloud: static
       lifecycle:
         reregistrationTimeout: 2592000 # 30 days
     ds-macos-ds-build:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: generic-worker
       cloud: static
       lifecycle:
         reregistrationTimeout: 2592000 # 30 days
     ds-macos-ds-build-b:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: generic-worker
       cloud: static
       lifecycle:
         reregistrationTimeout: 2592000 # 30 days
     ds-macos-ds-tests:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: generic-worker
       cloud: static
       lifecycle:
         reregistrationTimeout: 2592000 # 30 days
     ds-macos-ds-tests-b:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: generic-worker
       cloud: static
       lifecycle:
         reregistrationTimeout: 2592000 # 30 days
     win:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: deepspeech-win2012r2
       cloud: aws
@@ -155,7 +157,7 @@ deepspeech:
         m5d.2xlarge: 1
       maxCapacity: 16
     win-b:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: deepspeech-win2012r2-b
       cloud: aws
@@ -163,7 +165,7 @@ deepspeech:
         m5d.2xlarge: 1
       maxCapacity: 16
     win-gpu:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: deepspeech-win2012r2-gpu
       cloud: aws
@@ -171,7 +173,7 @@ deepspeech:
         g3s.xlarge: 1
       maxCapacity: 4
     win-gpu-b:
-      owner: deepspeech@mozilla.com
+      owner: taskcluster@deep-speech.org
       emailOnError: false
       imageset: deepspeech-win2012r2-gpu-b
       cloud: aws
@@ -270,16 +272,15 @@ deepspeech:
         # https://github.com/lissyx/taskcluster-github-decision/blob/master/tc-decision.py
         - queue:scheduler-id:taskcluster-github
         - queue:route:index.project.deepspeech.*
-        - queue:route:index.project.mozilla-voice-stt.*
         - index:insert-task:project.deepspeech.*
-        - index:insert-task:project.mozilla-voice-stt.*
         - queue:route:notify.irc-channel.*
         - generic-worker:cache:deepspeech-*
         - docker-worker:capability:device:kvm
       to:
         - repo:github.com/mozilla/DeepSpeech:*
-        - repo:github.com/mozilla/STT:*
         - repo:github.com/mozilla/tensorflow:*
+        - repo:github.com/coqui-ai/DeepSpeech:*
+        - repo:github.com/coqui-ai/tensorflow:*
     - grant:
         - generic-worker:allow-rdp:proj-deepspeech/*
         - generic-worker:os-group:proj-deepspeech/*
