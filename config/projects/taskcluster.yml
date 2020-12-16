@@ -352,7 +352,18 @@ taskcluster:
     testing/taskcluster-auth: true
     testing/taskcluster-notify: true
     testing/taskcluster-queue: true
-    testing/taskcluster-object: true
+    testing/taskcluster-object:
+      # Note, test bucket was created manually, tests do not dynamically create buckets.
+      AWS_ACCESS_KEY_ID: $aws-access-key-id
+      AWS_SECRET_ACCESS_KEY: $aws-secret-access-key
+      AWS_TEST_BUCKET: $aws-test-bucket
+      # Google backend stores objects using Amazon S3 protocol via interoperability API
+      # See https://cloud.google.com/storage/docs/interoperability
+      # These credentials are used for object service google backend unit tests.
+      # Note, test bucket was created manually, tests do not dynamically create buckets.
+      GOOGLE_ACCESS_KEY_ID: $google-access-key-id
+      GOOGLE_SECRET_ACCESS_KEY: $google-secret-access-key
+      GOOGLE_TEST_BUCKET: $google-test-bucket
     # key for deploying json-e docs; this corresponds to a "deploy key" on the
     # taskcluster/json-e github repo.
     json-e-deploy: true
