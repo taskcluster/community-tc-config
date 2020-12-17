@@ -69,6 +69,7 @@ misc:
     - grant: queue:create-task:highest:proj-misc/ci
       to:
         - repo:github.com/mozilla/*
+        - repo:github.com/mozilla-services/*
         - repo:github.com/djmitche/taskchampion:*
         - repo:github.com/marco-c/taskcluster_yml_validator:*
 
@@ -78,6 +79,7 @@ misc:
       to:
         - login-identity:github/*
         - repo:github.com/mozilla/*
+        - repo:github.com/mozilla-services/*
 
     - grant:
         - queue:create-task:highest:proj-misc/ci
