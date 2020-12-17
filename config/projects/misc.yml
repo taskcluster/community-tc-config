@@ -70,6 +70,7 @@ misc:
       to:
         - repo:github.com/mozilla/*
         - repo:github.com/djmitche/taskchampion:*
+        - repo:github.com/djmitche/console-taskgraph:*
         - repo:github.com/marco-c/taskcluster_yml_validator:*
 
     # allow all mozilla projects, as well as all anyone with a github login, to
