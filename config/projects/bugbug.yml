@@ -104,6 +104,7 @@ bugbug:
       to: repo:github.com/mozilla/bugbug:tag:*
     - grant:
         - assume:project:bugbug/build
+        - assume:project:bugbug/deploy
         - hooks:trigger-hook:project-bugbug/bugbug*
         - queue:route:notify.email.*
         - queue:route:notify.irc-channel.#bugbug.on-failed
@@ -114,7 +115,6 @@ bugbug:
         - auth:aws-s3:read-write:communitytc-bugbug/*
       to: hook-id:project-bugbug/bugbug*
     - grant:
-        - assume:project:bugbug/deploy
         - assume:hook-id:project-bugbug/bugbug-*
         - hooks:modify-hook:project-bugbug/bugbug-*
       to: hook-id:project-bugbug/bugbug
