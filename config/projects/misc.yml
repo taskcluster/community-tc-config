@@ -71,6 +71,7 @@ misc:
         - repo:github.com/mozilla/*
         - repo:github.com/mozilla-services/*
         - repo:github.com/djmitche/taskchampion:*
+        - repo:github.com/mozilla-frontend-infra/codetribute:*
         - repo:github.com/djmitche/console-taskgraph:*
         - repo:github.com/marco-c/taskcluster_yml_validator:*
 
