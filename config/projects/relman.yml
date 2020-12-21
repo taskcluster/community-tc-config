@@ -11,9 +11,15 @@ relman:
     - github.com/mozilla/rust-code-analysis:*
     - github.com/mozilla/dump_syms:*
     - github.com/mozilla/libmozevent:*
-    - github.com/mozilla/rust-analysis:*
     - github.com/mozilla/rust-parsepatch:*
     - github.com/mozilla/pyo3-parsepatch:*
+    - github.com/mozilla/libmozdata:*
+    - github.com/mozilla/relman-auto-nag:*
+    - github.com/mozilla/coverage-crawler:*
+    - github.com/mozilla/stab-crashes:*
+    - github.com/mozilla/grcov:*
+    - github.com/mozilla/adr:*
+    - github.com/mozilla/mozci:*
   clients:
     bugbug/code-review-production:
       scopes:
@@ -59,6 +65,7 @@ relman:
     rust-code-analysis/deploy: true
     rust-parsepatch/deploy: true
     pyo3-parsepatch/deploy: true
+    grcov/deploy: true
   grants:
     # all repos
     - grant:
@@ -75,6 +82,13 @@ relman:
         - repo:github.com/mozilla/bugzilla-dashboard-backend:*
         - repo:github.com/mozilla/dump_syms:*
         - repo:github.com/mozilla/libmozevent:*
+        - repo:github.com/mozilla/libmozdata:*
+        - repo:github.com/mozilla/relman-auto-nag:*
+        - repo:github.com/mozilla/coverage-crawler:*
+        - repo:github.com/mozilla/stab-crashes:*
+        - repo:github.com/mozilla/grcov:*
+        - repo:github.com/mozilla/adr:*
+        - repo:github.com/mozilla/mozci:*
 
     # all hooks
     - grant:
@@ -160,3 +174,7 @@ relman:
     # pyo3-parsepatch
     - grant: secrets:get:project/relman/pyo3-parsepatch/deploy
       to: repo:github.com/mozilla/pyo3-parsepatch:tag:*
+
+    # grcov
+    - grant: secrets:get:project/relman/grcov/deploy
+      to: repo:github.com/mozilla/grcov:tag:*
