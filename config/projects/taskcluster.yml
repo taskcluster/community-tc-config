@@ -348,22 +348,32 @@ taskcluster:
     testing/azure:
       AZURE_ACCOUNT: $taskcluster-azure-account
       AZURE_ACCOUNT_KEY: $taskcluster-azure-account-key
-    # additional secrets for services' tests (see services/<service>/test/helper.js)
+
     testing/taskcluster-auth: true
-    testing/taskcluster-notify: true
-    testing/taskcluster-queue: true
+      # auth's secrets contain a GCP credential which has too many parts
+      # to try to encode in secret values
+    testing/taskcluster-notify:
+      AWS_ACCESS_KEY_ID: $taskcluster-notify-aws-access-key-id
+      AWS_SECRET_ACCESS_KEY: $taskcluster-notify-aws-secret-access-key
+    testing/taskcluster-queue:
+      AWS_ACCESS_KEY_ID: $taskcluster-queue-aws-access-key-id
+      AWS_SECRET_ACCESS_KEY: $taskcluster-queue-aws-secret-access-key
+      PUBLIC_ARTIFACT_BUCKET: $taskcluster-queue-public-bucket
+      PRIVATE_ARTIFACT_BUCKET: $taskcluster-queue-private-bucket
+      ARTIFACT_REGION: $taskcluster-queue-region
+
     testing/taskcluster-object:
       # Note, test bucket was created manually, tests do not dynamically create buckets.
-      AWS_ACCESS_KEY_ID: $aws-access-key-id
-      AWS_SECRET_ACCESS_KEY: $aws-secret-access-key
-      AWS_TEST_BUCKET: $aws-test-bucket
+      AWS_ACCESS_KEY_ID: $taskcluster-object-aws-access-key-id
+      AWS_SECRET_ACCESS_KEY: $taskcluster-object-aws-secret-access-key
+      AWS_TEST_BUCKET: $taskcluster-object-aws-test-bucket
       # Google backend stores objects using Amazon S3 protocol via interoperability API
       # See https://cloud.google.com/storage/docs/interoperability
       # These credentials are used for object service google backend unit tests.
       # Note, test bucket was created manually, tests do not dynamically create buckets.
-      GOOGLE_ACCESS_KEY_ID: $google-access-key-id
-      GOOGLE_SECRET_ACCESS_KEY: $google-secret-access-key
-      GOOGLE_TEST_BUCKET: $google-test-bucket
+      GOOGLE_ACCESS_KEY_ID: $taskcluster-object-google-access-key-id
+      GOOGLE_SECRET_ACCESS_KEY: $taskcluster-object-google-secret-access-key
+      GOOGLE_TEST_BUCKET: $taskcluster-object-google-test-bucket
     # key for deploying json-e docs; this corresponds to a "deploy key" on the
     # taskcluster/json-e github repo.
     json-e-deploy: true
