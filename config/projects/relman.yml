@@ -45,6 +45,7 @@ relman:
       emailOnError: false
       imageset: deepspeech-win2012r2
       cloud: aws
+      securityGroup: rdp
       minCapacity: 0
       maxCapacity: 10
   secrets:
