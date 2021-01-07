@@ -67,6 +67,11 @@ relman:
     pyo3-parsepatch/deploy: true
     grcov/deploy: true
   grants:
+    - grant:
+        - generic-worker:allow-rdp:proj-relman/*
+      to:
+        - project-admin:relman
+
     # all repos
     - grant:
         - queue:create-task:highest:proj-relman/*
