@@ -116,7 +116,7 @@ fuzzing:
               type: directory
         metadata:
           name: grizzly-reduce-monitor
-          description: Hook for triggering grizzly reduce monitor tasks
+          description: Create grizzly testcases reduction tasks
           owner: truber@mozilla.com
           source: 'https://github.com/MozillaSecurity/grizzly'
         expires:
@@ -133,7 +133,7 @@ fuzzing:
           - secrets:get:project/fuzzing/fuzzmanagerconf
           - secrets:get:project/fuzzing/grizzly-reduce-tool-list
       schedule:
-        - 0 */2 * * *
+        - "0 */2 * * *"
       routes:
         - notify.email.truber@mozilla.com.on-failed
     grizzly-reduce-reset-error:
@@ -142,7 +142,9 @@ fuzzing:
       emailOnError: true
       bindings:
         - exchange: exchange/taskcluster-queue/v1/task-exception
-          routingKeyPattern: primary.#.#.#.#.#.grizzly-reduce-worker.fuzzing.#
+          routingKeyPattern: primary.#.grizzly-reduce-worker.fuzzing.#
+        - exchange: exchange/taskcluster-queue/v1/task-failed
+          routingKeyPattern: primary.#.grizzly-reduce-worker.fuzzing.#
       task:
         provisionerId: proj-fuzzing
         schedulerId: fuzzing
@@ -158,12 +160,18 @@ fuzzing:
           command:
             - '/usr/bin/grizzly-reduce-tc-update'
             - '--crash-from-reduce-task'
-            - '${taskId}'
+            - '${payload.status.taskId}'
             - '--quality'
             - '5'
+            - '--only-if-quality'
+            - '4'
+          artifacts:
+            project/fuzzing/private/logs:
+              path: /logs/
+              type: directory
         metadata:
           name: grizzly-reduce-monitor
-          description: Hook for triggering grizzly reduce monitor tasks
+          description: Reset grizzly testcase after failed reduction
           owner: truber@mozilla.com
           source: 'https://github.com/MozillaSecurity/grizzly'
         expires:
@@ -284,19 +292,18 @@ fuzzing:
     - grant:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
-        - queue:create-task:highest:proj-fuzzing/grizzly-reduce-monitor
         - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker
-        - queue:route:notify.email.truber@mozilla.com.on-failed
         - secrets:get:project/fuzzing/credstash-aws-auth
-        - secrets:get:project/fuzzing/fuzzmanagerconf
         - secrets:get:project/fuzzing/grizzly-reduce-tool-list
       to:
         - hook-id:project-fuzzing/grizzly-reduce-monitor
     - grant:
+        - queue:create-task:highest:proj-fuzzing/grizzly-reduce-monitor
         - queue:route:notify.email.truber@mozilla.com.on-failed
         - secrets:get:project/fuzzing/fuzzmanagerconf
       to:
         - hook-id:project-fuzzing/grizzly-reduce-reset-error
+        - hook-id:project-fuzzing/grizzly-reduce-monitor
     - grant:
         - docker-worker:capability:privileged
         - queue:route:index.project.fuzzing.orion.*
