@@ -206,6 +206,40 @@ fuzzing:
         - notify.email.jkratzer@mozilla.com.on-failed
       schedule:
         - "0 */8 * * *"
+    coverage-revision:
+      description: Hook for pinning m-c revision for periodic fuzzing coverage tasks
+      owner: fuzzing@mozilla.com
+      emailOnError: true
+      task:
+        provisionerId: proj-fuzzing
+        schedulerId: fuzzing
+        workerType: ci
+        payload:
+          image:
+            type: indexed-image
+            namespace: project.fuzzing.orion.coverage-revision.master
+            path: public/coverage-revision.tar
+          maxRunTime: 600
+          artifacts:
+            public/coverage-revision.txt:
+              path: /coverage-revision.txt
+              type: file
+        metadata:
+          name: coverage-revision
+          description: Hook for pinning m-c revision for periodic fuzzing coverage tasks
+          owner: fuzzing@mozilla.com
+          source: 'https://github.com/MozillaSecurity'
+        expires:
+          $fromNow: 4 weeks
+        deadline:
+          $fromNow: 3 hours
+        scopes:
+          - queue:route:notify.email.fuzzing@mozilla.com.on-failed
+          - queue:scheduler-id:fuzzing
+      routes:
+        - index.project.fuzzing.coverage-revision.latest
+      schedule:
+        - "0 0 * * 1"
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
@@ -296,3 +330,9 @@ fuzzing:
         - generic-worker:allow-rdp:proj-fuzzing/*
       to:
         - project-admin:fuzzing
+    - grant:
+        - queue:create-task:highest:proj-fuzzing/ci
+        - queue:route:notify.email.fuzzing@mozilla.com.on-failed
+        - queue:route:index.project.fuzzing.coverage-revision.*
+      to:
+        - hook-id:project-fuzzing/coverage-revision
