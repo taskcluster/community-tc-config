@@ -26,6 +26,9 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
     ci-windows:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
@@ -95,6 +98,7 @@ fuzzing:
       emailOnError: true
       task:
         provisionerId: proj-fuzzing
+        schedulerId: fuzzing
         workerType: grizzly-reduce-monitor
         payload:
           image:
@@ -106,6 +110,10 @@ fuzzing:
           maxRunTime: 3600
           command:
             - '/usr/bin/grizzly-reduce-tc-monitor'
+          artifacts:
+            project/fuzzing/private/logs:
+              path: /logs/
+              type: directory
         metadata:
           name: grizzly-reduce-monitor
           description: Hook for triggering grizzly reduce monitor tasks
@@ -124,6 +132,8 @@ fuzzing:
           - secrets:get:project/fuzzing/credstash-aws-auth
           - secrets:get:project/fuzzing/fuzzmanagerconf
           - secrets:get:project/fuzzing/grizzly-reduce-tool-list
+      schedule:
+        - 0 */2 * * *
       routes:
         - notify.email.truber@mozilla.com.on-failed
     grizzly-reduce-reset-error:
@@ -135,6 +145,7 @@ fuzzing:
           routingKeyPattern: primary.#.#.#.#.#.grizzly-reduce-worker.fuzzing.#
       task:
         provisionerId: proj-fuzzing
+        schedulerId: fuzzing
         workerType: grizzly-reduce-monitor
         payload:
           image:
@@ -176,7 +187,7 @@ fuzzing:
           image: 'mozillasecurity/bugmon:latest'
           features:
             taskclusterProxy: true
-          maxRunTime: 3600
+          maxRunTime: 10800
           env:
             BUG_ACTION: monitor
           artifacts:
@@ -215,6 +226,11 @@ fuzzing:
         - secrets:get:project/fuzzing/pypi-*
         - secrets:get:project/fuzzing/ci-*
       to:
+        - repo:github.com/MozillaSecurity/*
+    - grant:
+        - queue:scheduler-id:fuzzing
+      to:
+        - hook-id:project-fuzzing/*
         - repo:github.com/MozillaSecurity/*
     - grant:
         - docker-worker:capability:privileged
@@ -268,9 +284,9 @@ fuzzing:
     - grant:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
+        - queue:create-task:highest:proj-fuzzing/grizzly-reduce-monitor
         - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker
         - queue:route:notify.email.truber@mozilla.com.on-failed
-        - queue:scheduler-id:fuzzing
         - secrets:get:project/fuzzing/credstash-aws-auth
         - secrets:get:project/fuzzing/fuzzmanagerconf
         - secrets:get:project/fuzzing/grizzly-reduce-tool-list
@@ -278,13 +294,13 @@ fuzzing:
         - hook-id:project-fuzzing/grizzly-reduce-monitor
     - grant:
         - queue:route:notify.email.truber@mozilla.com.on-failed
-        - queue:scheduler-id:fuzzing
         - secrets:get:project/fuzzing/fuzzmanagerconf
       to:
         - hook-id:project-fuzzing/grizzly-reduce-reset-error
     - grant:
         - docker-worker:capability:privileged
         - queue:route:index.project.fuzzing.orion.*
+        - secrets:get:project/fuzzing/docker-hub
       to:
         - repo:github.com/MozillaSecurity/orion:*
     - grant:
