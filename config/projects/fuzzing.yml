@@ -132,10 +132,10 @@ fuzzing:
           - secrets:get:project/fuzzing/credstash-aws-auth
           - secrets:get:project/fuzzing/fuzzmanagerconf
           - secrets:get:project/fuzzing/grizzly-reduce-tool-list
+        routes:
+          - notify.email.truber@mozilla.com.on-failed
       schedule:
         - "0 */2 * * *"
-      routes:
-        - notify.email.truber@mozilla.com.on-failed
     grizzly-reduce-reset-error:
       description: Hook for resetting Grizzly reduce tasks on error
       owner: truber@mozilla.com
@@ -182,8 +182,8 @@ fuzzing:
           - queue:route:notify.email.truber@mozilla.com.on-failed
           - queue:scheduler-id:fuzzing
           - secrets:get:project/fuzzing/fuzzmanagerconf
-      routes:
-        - notify.email.truber@mozilla.com.on-failed
+        routes:
+          - notify.email.truber@mozilla.com.on-failed
     bugmon:
       description: Hook for triggering bugmon monitor tasks
       owner: jkratzer@mozilla.com
@@ -221,8 +221,8 @@ fuzzing:
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
           - queue:scheduler-id:-
           - secrets:get:project/fuzzing/bz-api-key
-      routes:
-        - notify.email.jkratzer@mozilla.com.on-failed
+        routes:
+          - notify.email.jkratzer@mozilla.com.on-failed
       schedule:
         - "0 */8 * * *"
     coverage-revision:
@@ -253,10 +253,12 @@ fuzzing:
         deadline:
           $fromNow: 3 hours
         scopes:
+          - queue:route:index.project.fuzzing.coverage-revision.latest
           - queue:route:notify.email.fuzzing@mozilla.com.on-failed
           - queue:scheduler-id:fuzzing
-      routes:
-        - index.project.fuzzing.coverage-revision.latest
+        routes:
+          - index.project.fuzzing.coverage-revision.latest
+          - notify.email.fuzzing@mozilla.com.on-failed
       schedule:
         - "0 0 * * 1"
   grants:
