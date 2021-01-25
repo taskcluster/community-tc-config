@@ -231,6 +231,7 @@
     - queue:list-workers:*
     - queue:pending-count:*
     - queue:status:*
+    - queue:create-task:project:none
     - secrets:list-secrets
     - worker-manager:get-worker-pool:*
     - worker-manager:get-worker:*
