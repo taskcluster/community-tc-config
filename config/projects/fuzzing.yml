@@ -64,7 +64,10 @@ fuzzing:
         provisionerId: proj-fuzzing
         workerType: ci
         payload:
-          image: 'mozillasecurity/domino-web-tests:latest'
+          image:
+            type: indexed-image
+            path: public/domino-web-tests.tar.zst
+            namespace: project.fuzzing.orion.domino-web-tests.master
           features:
             taskclusterProxy: true
           maxRunTime: 3600
@@ -103,8 +106,8 @@ fuzzing:
         payload:
           image:
             type: indexed-image
-            path: public/grizzly-reduce-tc-monitor.tar
-            namespace: project.fuzzing.reduce-monitor.main
+            path: public/grizzly-reduce-monitor.tar.zst
+            namespace: project.fuzzing.orion.grizzly-reduce-monitor.master
           features:
             taskclusterProxy: true
           maxRunTime: 3600
@@ -152,8 +155,8 @@ fuzzing:
         payload:
           image:
             type: indexed-image
-            path: public/grizzly-reduce-tc-monitor.tar
-            namespace: project.fuzzing.reduce-monitor.main
+            path: public/grizzly-reduce-monitor.tar.zst
+            namespace: project.fuzzing.orion.grizzly-reduce-monitor.master
           features:
             taskclusterProxy: true
           maxRunTime: 600
@@ -192,7 +195,10 @@ fuzzing:
         provisionerId: proj-fuzzing
         workerType: bugmon-monitor
         payload:
-          image: 'mozillasecurity/bugmon:latest'
+          image:
+            type: indexed-image
+            path: public/bugmon.tar.zst
+            namespace: project.fuzzing.orion.bugmon.master
           features:
             taskclusterProxy: true
           maxRunTime: 10800
@@ -237,7 +243,7 @@ fuzzing:
           image:
             type: indexed-image
             namespace: project.fuzzing.orion.coverage-revision.master
-            path: public/coverage-revision.tar
+            path: public/coverage-revision.tar.zst
           maxRunTime: 600
           artifacts:
             public/coverage-revision.txt:
