@@ -218,20 +218,20 @@
     - index:list-tasks:*
     - purge-cache:all-purge-requests
     - purge-cache:purge-requests:*
+    - queue:create-task:project:none
     - queue:get-artifact:public/*
     - queue:get-provisioner:*
     - queue:get-task:*
-    - queue:get-worker-type:*
     - queue:get-worker:*
+    - queue:get-worker-type:*
     - queue:list-artifacts:*
     - queue:list-dependent-tasks:*
     - queue:list-provisioners
     - queue:list-task-group:*
-    - queue:list-worker-types:*
     - queue:list-workers:*
+    - queue:list-worker-types:*
     - queue:pending-count:*
     - queue:status:*
-    - queue:create-task:project:none
     - secrets:list-secrets
     - worker-manager:get-worker-pool:*
     - worker-manager:get-worker:*
