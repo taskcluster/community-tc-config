@@ -186,7 +186,7 @@ relman:
     # stab-crashes
     - grant:
         - queue:route:notify.email.*
-        - secrets:get:project/stab-crashes/production
+        - secrets:get:project-relman/stab-crashes/production
       to: hook-id:project-relman/stab-crashes*
 
     - grant:
