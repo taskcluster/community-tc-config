@@ -65,6 +65,8 @@ relman:
     rust-code-analysis/deploy: true
     rust-parsepatch/deploy: true
     pyo3-parsepatch/deploy: true
+    stab-crashes/deploy: true
+    stab-crashes/production: true
     grcov/deploy: true
   grants:
     - grant:
@@ -179,6 +181,18 @@ relman:
     # pyo3-parsepatch
     - grant: secrets:get:project/relman/pyo3-parsepatch/deploy
       to: repo:github.com/mozilla/pyo3-parsepatch:tag:*
+
+    # stab-crashes
+    - grant:
+        - queue:route:notify.email.*
+        - secrets:get:project/stab-crashes/production
+      to: hook-id:project-relman/stab-crashes*
+
+    - grant:
+        - secrets:get:project/relman/stab-crashes/deploy
+        - assume:hook-id:project-relman/stab-crashes
+        - hooks:modify-hook:project-relman/stab-crashes
+      to: repo:github.com/mozilla/stab-crashes:tag:*
 
     # grcov
     - grant: secrets:get:project/relman/grcov/deploy
