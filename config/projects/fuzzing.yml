@@ -267,6 +267,50 @@ fuzzing:
           - notify.email.fuzzing@mozilla.com.on-failed
       schedule:
         - "0 0 * * 1"
+    gr-css:
+      description: Hook for updating gr.css grammar
+      owner: jkratzer@mozilla.com
+      emailOnError: true
+      task:
+        provisionerId: proj-fuzzing
+        workerType: ci
+        payload:
+          image:
+            type: indexed-image
+            path: public/gr-css-reports.tar.zst
+            namespace: project.fuzzing.orion.gr-css-reports.master
+          features:
+            taskclusterProxy: true
+          maxRunTime: 10800
+          artifacts:
+            project/fuzzing/gr-css:
+              path: /live.log
+              type: file
+        metadata:
+          name: gr-css
+          description: Hook for updating gr.css grammar
+          owner: jkratzer@mozilla.com
+          source: 'https://github.com/MozillaSecurity/gr.css.reports'
+        expires:
+          $fromNow: 1 months
+        deadline:
+          $fromNow: 6 hours
+        scopes:
+          - docker-worker:capability:device:hostSharedMemory
+          - docker-worker:capability:device:loopbackAudio
+          - docker-worker:capability:privileged
+          - queue:get-artifact:project/fuzzing/gr-css/*
+          - queue:route:notify.email.jkratzer@mozilla.com.on-failed
+          - queue:scheduler-id:-
+          - secrets:get:project/fuzzing/deploy-gr-css
+          - secrets:get:project/fuzzing/deploy-gr-css-generator
+          - secrets:get:project/fuzzing/deploy-gr-css-reports
+          - secrets:get:project/fuzzing/deploy-octo-private
+          - secrets:get:project/fuzzing/git-token-gr-css
+        routes:
+          - notify.email.jkratzer@mozilla.com.on-failed
+      schedule:
+        - "0 10 * * *"
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
@@ -367,3 +411,18 @@ fuzzing:
         - queue:route:index.project.fuzzing.coverage-revision.*
       to:
         - hook-id:project-fuzzing/coverage-revision
+    - grant:
+        - docker-worker:capability:device:hostSharedMemory
+        - docker-worker:capability:device:loopbackAudio
+        - docker-worker:capability:privileged
+        - queue:create-task:highest:proj-fuzzing/ci
+        - queue:get-artifact:project/fuzzing/gr-css/*
+        - queue:route:notify.email.jkratzer@mozilla.com.on-failed
+        - queue:scheduler-id:-
+        - secrets:get:project/fuzzing/deploy-gr-css
+        - secrets:get:project/fuzzing/deploy-gr-css-generator
+        - secrets:get:project/fuzzing/deploy-gr-css-reports
+        - secrets:get:project/fuzzing/deploy-octo-private
+        - secrets:get:project/fuzzing/git-token-gr-css
+      to:
+        - hook-id:project-fuzzing/gr-css
