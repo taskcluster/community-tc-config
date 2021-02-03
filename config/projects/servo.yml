@@ -25,6 +25,8 @@ servo:
   grants:
     - grant:
         - generic-worker:allow-rdp:proj-servo/*
+        - generic-worker:os-group:proj-servo/*
+        - generic-worker:run-as-administrator:proj-servo/*
         # notification
         - queue:route:notify.irc-channel.#servo.*
         - queue:route:notify.matrix-room.#servo:mozilla.org.*
