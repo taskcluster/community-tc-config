@@ -132,7 +132,6 @@ fuzzing:
           - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker
           - queue:route:notify.email.truber@mozilla.com.on-failed
           - queue:scheduler-id:fuzzing
-          - secrets:get:project/fuzzing/credstash-aws-auth
           - secrets:get:project/fuzzing/deploy-bearspray
           - secrets:get:project/fuzzing/deploy-grizzly-private
           - secrets:get:project/fuzzing/fuzzmanagerconf
@@ -382,7 +381,6 @@ fuzzing:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
         - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker
-        - secrets:get:project/fuzzing/credstash-aws-auth
         - secrets:get:project/fuzzing/deploy-bearspray
         - secrets:get:project/fuzzing/deploy-grizzly-private
         - secrets:get:project/fuzzing/google-logging-creds
