@@ -10,5 +10,5 @@ mwz:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 1
+      maxCapacity: 10
       machineType: "zones/{zone}/machineTypes/n1-standard-1"
