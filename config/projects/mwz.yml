@@ -3,6 +3,8 @@ mwz:
   adminRoles:
     - login-identity:github/28673|djmitche
     - login-identity:github/11596690|MasterWayZ
+  externallyManaged:
+    - "Secret=project/mwz/.*"
   workerPools:
     testing:
       owner: nobody@mozilla.com
