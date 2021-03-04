@@ -154,6 +154,7 @@ taskcluster:
 
     - grant:
         - secrets:get:project/taskcluster/testing/codecov
+        - secrets:get:project/taskcluster/testing/client-libraries
         - secrets:get:project/taskcluster/testing/taskcluster-*
         - docker-worker:cache:taskcluster-*
       to: repo:github.com/taskcluster/taskcluster:*
@@ -337,6 +338,12 @@ taskcluster:
     generic-worker/travis-ci:
       scopes:
         - assume:project:taskcluster:generic-worker-tester
+    # This client is used to test the client libraries in Taskcluster CI
+    # Its access token is in `community-tc-secret-values.yml`.
+    testing/client-libraries:
+      scopes:
+        - "object:upload:taskcluster:taskcluster/test/client-rs/*"
+        - "object:download:taskcluster/test/client-rs/*"
 
   secrets:
     # codecov API token
@@ -352,9 +359,11 @@ taskcluster:
     testing/taskcluster-auth: true
       # auth's secrets contain a GCP credential which has too many parts
       # to try to encode in secret values
+
     testing/taskcluster-notify:
       AWS_ACCESS_KEY_ID: $taskcluster-notify-aws-access-key-id
       AWS_SECRET_ACCESS_KEY: $taskcluster-notify-aws-secret-access-key
+
     testing/taskcluster-queue:
       AWS_ACCESS_KEY_ID: $taskcluster-queue-aws-access-key-id
       AWS_SECRET_ACCESS_KEY: $taskcluster-queue-aws-secret-access-key
@@ -374,6 +383,11 @@ taskcluster:
       GOOGLE_ACCESS_KEY_ID: $taskcluster-object-google-access-key-id
       GOOGLE_SECRET_ACCESS_KEY: $taskcluster-object-google-secret-access-key
       GOOGLE_TEST_BUCKET: $taskcluster-object-google-test-bucket
+
+    testing/client-libraries:
+      TASKCLUSTER_CLIENT_ID: project/taskcluster/testing/client-libraries
+      TASKCLUSTER_ACCESS_TOKEN: $taskcluster-testing-client-libraries-access-token
+
     # key for deploying json-e docs; this corresponds to a "deploy key" on the
     # taskcluster/json-e github repo.
     json-e-deploy: true
