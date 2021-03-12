@@ -342,8 +342,8 @@ taskcluster:
     # Its access token is in `community-tc-secret-values.yml`.
     testing/client-libraries:
       scopes:
-        - "object:upload:taskcluster:taskcluster/test/client-rs/*"
-        - "object:download:taskcluster/test/client-rs/*"
+        - "object:upload:taskcluster:taskcluster/test/*"
+        - "object:download:taskcluster/test/*"
 
   secrets:
     # codecov API token
