@@ -308,7 +308,8 @@ fuzzing:
           - secrets:get:project/fuzzing/deploy-gr-css-generator
           - secrets:get:project/fuzzing/deploy-gr-css-reports
           - secrets:get:project/fuzzing/deploy-octo-private
-          - secrets:get:project/fuzzing/git-token-gr-css
+          - secrets:get:project/fuzzing/deploy-npm
+          - secrets:get:project/fuzzing/ci-git-token
         routes:
           - notify.email.jkratzer@mozilla.com.on-failed
       schedule:
@@ -423,10 +424,11 @@ fuzzing:
         - queue:get-artifact:project/fuzzing/gr-css/*
         - queue:route:notify.email.jkratzer@mozilla.com.on-failed
         - queue:scheduler-id:-
+        - secrets:get:project/fuzzing/ci-git-token
         - secrets:get:project/fuzzing/deploy-gr-css
         - secrets:get:project/fuzzing/deploy-gr-css-generator
         - secrets:get:project/fuzzing/deploy-gr-css-reports
         - secrets:get:project/fuzzing/deploy-octo-private
-        - secrets:get:project/fuzzing/git-token-gr-css
+        - secrets:get:project/fuzzing/deploy-npm
       to:
         - hook-id:project-fuzzing/gr-css
