@@ -163,11 +163,6 @@
     # glandium, for git-cinnabar
     - login-identity:github/1038527|glandium
 
-    # deepspeech
-    - github-team:mozilla/research-machine-learning
-    - login-identity:github/1645737|lissyx
-    - login-identity:github/477142|reuben
-
     # for firefoxreality
     - github-team:MozillaReality/fxr-eng-tc
 
