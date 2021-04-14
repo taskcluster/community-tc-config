@@ -43,7 +43,7 @@ relman:
     win2012r2:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: deepspeech-win2012r2
+      imageset: relman-win2012r2
       cloud: aws
       securityGroup: rdp
       minCapacity: 0
