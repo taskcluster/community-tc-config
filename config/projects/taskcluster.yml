@@ -153,7 +153,6 @@ taskcluster:
       to: repo:github.com/mozilla/hawk:*
 
     - grant:
-        - secrets:get:project/taskcluster/testing/codecov
         - secrets:get:project/taskcluster/testing/client-libraries
         - secrets:get:project/taskcluster/testing/taskcluster-*
         - docker-worker:cache:taskcluster-*
@@ -346,8 +345,6 @@ taskcluster:
         - "object:download:taskcluster/test/*"
 
   secrets:
-    # codecov API token
-    testing/codecov: true
     # client_id/access_token for project/taskcluster/testing/docker-worker/ci-creds
     testing/docker-worker/ci-creds: true
     # client_id/access_token for generic-worker integration tests
