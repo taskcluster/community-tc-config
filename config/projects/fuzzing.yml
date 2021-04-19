@@ -25,7 +25,7 @@ fuzzing:
       imageset: docker-worker
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 20
       workerConfig:
         dockerConfig:
           allowPrivileged: true
@@ -408,6 +408,7 @@ fuzzing:
         - repo:github.com/MozillaSecurity/grizzly-reduce-tc:*
     - grant:
         - generic-worker:allow-rdp:proj-fuzzing/*
+        - queue:cancel-task:fuzzing/*
       to:
         - project-admin:fuzzing
     - grant:
