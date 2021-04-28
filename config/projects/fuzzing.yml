@@ -233,6 +233,42 @@ fuzzing:
           - notify.email.jkratzer@mozilla.com.on-failed
       schedule:
         - "0 */8 * * *"
+    js-tests-distiller:
+      description: Hook for distilling JS tests for fuzzing
+      owner: fuzzing@mozilla.com
+      emailOnError: true
+      task:
+        provisionerId: proj-fuzzing
+        schedulerId: fuzzing
+        workerType: ci
+        payload:
+          image:
+            type: indexed-image
+            namespace: project.fuzzing.orion.js-tests-distiller.master
+            path: public/js-tests-distiller.tar.zst
+          maxRunTime: 10800
+          artifacts:
+            public/tests.zip:
+              path: /home/ubuntu/output/jstests-distilled.zip
+              type: file
+        metadata:
+          name: js-tests-distiller
+          description: Hook for distilling JS tests for fuzzing
+          owner: fuzzing@mozilla.com
+          source: 'https://github.com/MozillaSecurity'
+        expires:
+          $fromNow: 4 weeks
+        deadline:
+          $fromNow: 12 hours
+        scopes:
+          - queue:route:index.project.fuzzing.js-tests-distiller.latest
+          - queue:route:notify.email.fuzzing@mozilla.com.on-failed
+          - queue:scheduler-id:fuzzing
+        routes:
+          - index.project.fuzzing.js-tests-distiller.latest
+          - notify.email.fuzzing@mozilla.com.on-failed
+      schedule:
+        - "0 0 * * *"
     coverage-revision:
       description: Hook for pinning m-c revision for periodic fuzzing coverage tasks
       owner: fuzzing@mozilla.com
@@ -411,6 +447,12 @@ fuzzing:
         - queue:cancel-task:fuzzing/*
       to:
         - project-admin:fuzzing
+    - grant:
+        - queue:create-task:highest:proj-fuzzing/ci
+        - queue:route:notify.email.fuzzing@mozilla.com.on-failed
+        - queue:route:index.project.fuzzing.js-tests-distiller.*
+      to:
+        - hook-id:project-fuzzing/js-tests-distiller
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
         - queue:route:notify.email.fuzzing@mozilla.com.on-failed
