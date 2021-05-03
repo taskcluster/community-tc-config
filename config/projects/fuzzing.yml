@@ -251,6 +251,9 @@ fuzzing:
             public/tests.zip:
               path: /home/ubuntu/output/jstests-distilled.zip
               type: file
+            public/tests-legacy.zip:
+              path: /home/ubuntu/output/jstests-legacy.zip
+              type: file
         metadata:
           name: js-tests-distiller
           description: Hook for distilling JS tests for fuzzing
