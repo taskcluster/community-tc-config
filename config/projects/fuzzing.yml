@@ -242,6 +242,8 @@ fuzzing:
         schedulerId: fuzzing
         workerType: ci
         payload:
+          features:
+            taskclusterProxy: true
           image:
             type: indexed-image
             namespace: project.fuzzing.orion.js-tests-distiller.master
@@ -264,6 +266,7 @@ fuzzing:
           - queue:route:index.project.fuzzing.js-tests-distiller.latest
           - queue:route:notify.email.fuzzing@mozilla.com.on-failed
           - queue:scheduler-id:fuzzing
+          - secrets:get:project/fuzzing/deploy-langfuzz
         routes:
           - index.project.fuzzing.js-tests-distiller.latest
           - notify.email.fuzzing@mozilla.com.on-failed
@@ -451,6 +454,7 @@ fuzzing:
         - queue:create-task:highest:proj-fuzzing/ci
         - queue:route:notify.email.fuzzing@mozilla.com.on-failed
         - queue:route:index.project.fuzzing.js-tests-distiller.*
+        - secrets:get:project/fuzzing/deploy-langfuzz
       to:
         - hook-id:project-fuzzing/js-tests-distiller
     - grant:
