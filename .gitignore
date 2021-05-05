@@ -106,3 +106,4 @@ venv.bak/
 # Added by imageset.sh
 *.id_rsa
 *.secrets
+pip-wheel-metadata/
