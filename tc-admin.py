@@ -11,4 +11,5 @@ from generate import update_resources
 
 appconfig = AppConfig()
 
+appconfig.root_url = "https://community-tc.services.mozilla.com"
 appconfig.generators.register(update_resources)
