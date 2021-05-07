@@ -441,6 +441,14 @@ fuzzing:
       to:
         - repo:github.com/MozillaSecurity/orion:*
     - grant:
+        - docker-worker:capability:privileged
+      to:
+        - repo:github.com/MozillaSecurity/FuzzManager:*
+    - grant:
+        - secrets:get:project/fuzzing/docker-hub
+      to:
+        - repo:github.com/MozillaSecurity/FuzzManager:branch:master
+    - grant:
         - generic-worker:allow-rdp:proj-fuzzing/*
         - queue:cancel-task:fuzzing/*
       to:
