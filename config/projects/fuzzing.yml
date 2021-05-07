@@ -398,6 +398,8 @@ fuzzing:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
         - docker-worker:capability:privileged
+        - generic-worker:os-group:proj-fuzzing/*/Administrators
+        - generic-worker:run-as-administrator:proj-fuzzing/*
         - hooks:modify-hook:project-fuzzing/*
         - hooks:trigger-hook:project-fuzzing/*
         - queue:create-task:highest:proj-fuzzing/*
