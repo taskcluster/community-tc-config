@@ -32,7 +32,7 @@ fuzzing:
     ci-windows:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
-      imageset: generic-worker-win2012r2
+      imageset: generic-worker-win2016
       cloud: aws
       minCapacity: 0
       maxCapacity: 10
