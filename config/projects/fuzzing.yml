@@ -372,11 +372,6 @@ fuzzing:
         - hook-id:project-fuzzing/*
         - repo:github.com/MozillaSecurity/*
     - grant:
-        - docker-worker:capability:privileged
-        - queue:route:index.project.fuzzing.config.*
-      to:
-        - repo:github.com/MozillaSecurity/fuzzing-tc:*
-    - grant:
         - secrets:get:project/fuzzing/decision
       to:
         - repo:github.com/MozillaSecurity/fuzzing-tc-config:*
@@ -445,11 +440,6 @@ fuzzing:
         - secrets:get:project/fuzzing/docker-hub
       to:
         - repo:github.com/MozillaSecurity/orion:*
-    - grant:
-        - docker-worker:capability:privileged
-        - queue:route:index.project.fuzzing.reduce-monitor.*
-      to:
-        - repo:github.com/MozillaSecurity/grizzly-reduce-tc:*
     - grant:
         - generic-worker:allow-rdp:proj-fuzzing/*
         - queue:cancel-task:fuzzing/*
