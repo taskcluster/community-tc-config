@@ -1,5 +1,7 @@
 FROM ubuntu:20.04
 
+COPY signin-aws /usr/bin/signin-aws
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y && \
@@ -17,5 +19,4 @@ RUN apt-get update -y && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
     apt-get update -y && \
     apt-get install -y google-cloud-sdk && \
-    curl https://gist.githubusercontent.com/djmitche/80353576a0f389bf130bcb439f63d070/raw/75d161a3a1cac41247f0f2f19846b6f39b7a314a/signin-aws -o /usr/bin/signin-aws && \
     chmod a+x /usr/bin/signin-aws
