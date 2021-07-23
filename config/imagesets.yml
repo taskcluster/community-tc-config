@@ -80,9 +80,9 @@ generic-worker-win2012r2-staging:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0fd523d8ec2760438
-      us-west-1: ami-0f8c5f3dfe823981b
-      us-west-2: ami-009a9df1928a7c91c
+      us-east-1: ami-082c2d64e8209bb0f
+      us-west-1: ami-055c72aff254354fa
+      us-west-2: ami-0820db6bf4ff3c943
   workerConfig:
     genericWorker:
       config:
@@ -93,7 +93,7 @@ generic-worker-win2012r2-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/d783d4128337c16f25a7be4eb6536f5a64d4d669/imagesets/generic-worker-win2012r2-staging/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/590a9c7d29a185a706ed478845f06d7e95f77400/imagesets/generic-worker-win2012r2-staging/bootstrap.ps1
 generic-worker-ubuntu-18-04:
   workerImplementation: generic-worker
   aws:
