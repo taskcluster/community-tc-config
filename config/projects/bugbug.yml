@@ -113,6 +113,7 @@ bugbug:
         - queue:route:project.bugbug.*
         - secrets:get:project/bugbug/production
         - auth:aws-s3:read-write:communitytc-bugbug/*
+        - notify:email:*
       to: hook-id:project-bugbug/bugbug*
     - grant:
         - assume:hook-id:project-bugbug/bugbug-*
