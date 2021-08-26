@@ -286,6 +286,13 @@ taskcluster:
         - repo:github.com/taskcluster/taskcluster:*
         - repo:github.com/taskcluster/staging-releases:*
 
+    - grant:
+        - queue:create-task:medium:proj-taskcluster/*
+        - queue:route:index.project.taskcluster.*
+        - queue:scheduler-id:-
+      to:
+        - hook-id:project-taskcluster/*
+
   clients:
     smoketests:
       scopes:
