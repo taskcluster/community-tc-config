@@ -400,12 +400,10 @@ taskcluster:
       GH_TOKEN: $taskcluster-staging-release-gh-token
 
   hooks:
-    poucave-issue-851-test:
+    telescope-periodic-v01:
       description: >
-        Create a task that Poucave can check for completion. See [Poucave issue
-        851](https://github.com/mozilla-services/poucave/issues/851). Resources
-        stored in [gist
-        24475309d](https://gist.github.com/jwhitlock/24475309dab548f15cba248dcb98ddef).
+        Periodically run a simple task, monitored by
+        [Telescope](https://github.com/mozilla-services/poucave).
       name: Periodic task for Telescope monitoring
       owner: jwhitlock@mozilla.com
       emailOnError: false
@@ -413,7 +411,7 @@ taskcluster:
       task:
         taskQueueId: proj-taskcluster/gw-ci-ubuntu-18-04
         routes:
-          - index.project.taskcluster.telescope.poucave-issue-851-test.07
+          - index.project.taskcluster.telescope.periodic.v01
         created:
           $fromNow: 0 seconds
         expires:
@@ -425,48 +423,35 @@ taskcluster:
             - - /bin/bash
               - '-c'
               - >-
-                which python3 && python -V && which curl && curl --version && which
-                docker && docker --version
+                which python3 && python -V &&
+                which curl && curl --version &&
+                which docker && docker --version
             - - /bin/bash
               - '-c'
               - mkdir -p workspace/results
-            - - /usr/bin/curl
-              - '--silent'
-              - '-o'
-              - task1.py
-              - >-
-                https://gist.githubusercontent.com/jwhitlock/24475309dab548f15cba248dcb98ddef/raw/ac0f0d4466560cf1a1ba05c16285f86520f5ecb0/task1.py
-            - - /usr/bin/python3
-              - task1.py
-              - '--output'
-              - workspace/results/status.json
             - - /bin/bash
               - '-c'
               - >-
-                echo {\"msg\": \"Hello, world!\", \"status\": \"OK\"} >
-                workspace/results/status2.json
+                echo {\"version\": 1.0, \"status\": \"OK\"} >
+                workspace/results/status.json
           artifacts:
             - name: public/results
               path: workspace/results
               type: directory
           maxRunTime: 60
         metadata:
-          name: poucave-issue-851-test-07
+          name: telescope-periodic-v01
           owner: jwhitlock@mozilla.com
           source: https://gist.github.com/jwhitlock/24475309dab548f15cba248dcb98ddef
           description: >
-            Create a task that Poucave can check for completion. See [Poucave issue
-            851](https://github.com/mozilla-services/poucave/issues/851). Resources
-            stored in [gist
-            24475309d](https://gist.github.com/jwhitlock/24475309dab548f15cba248dcb98ddef).
+            A simple task, run every 15 minutes, monitored by
+            [Telescope](https://github.com/mozilla-services/poucave).
         extra:
           index:
             data:
               description: >
-                Create a task that Poucave can check for completion. See [Poucave issue
-                851](https://github.com/mozilla-services/poucave/issues/851). Resources
-                stored in [gist
-                24475309d](https://gist.github.com/jwhitlock/24475309dab548f15cba248dcb98ddef).
+                A simple task, run every 15 minutes, monitored by
+                [Telescope](https://github.com/mozilla-services/poucave).
             expires:
               $fromNow: 1 day
       triggerSchema:
