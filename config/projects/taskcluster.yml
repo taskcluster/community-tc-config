@@ -287,11 +287,11 @@ taskcluster:
         - repo:github.com/taskcluster/staging-releases:*
 
     - grant:
-        - queue:create-task:medium:proj-taskcluster/*
-        - queue:route:index.project.taskcluster.*
+        - queue:create-task:medium:proj-taskcluster/gw-ci-*
+        - queue:route:index.project.taskcluster.telescope.periodic.v01
         - queue:scheduler-id:-
       to:
-        - hook-id:project-taskcluster/*
+        - hook-id:project-taskcluster/telescope-periodic-v01
 
   clients:
     smoketests:
