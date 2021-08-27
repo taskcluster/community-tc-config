@@ -424,27 +424,18 @@ taskcluster:
         expires:
           $fromNow: 1 day
         deadline:
-          $fromNow: 10 minutes
+          $fromNow: 30 minutes
         payload:
           command:
             - - /bin/bash
-              - '-c'
-              - >-
-                which python3 && python -V &&
-                which curl && curl --version &&
-                which docker && docker --version
-            - - /bin/bash
-              - '-c'
-              - mkdir -p workspace/results
-            - - /bin/bash
-              - '-c'
-              - >-
-                echo {\"version\": 1.0, \"status\": \"OK\"} >
-                workspace/results/status.json
+              - -vxec
+              - |
+                mkdir -p workspace/results
+                echo '{"version": 1.0, "status": "OK"}' > workspace/results/status.json
           artifacts:
-            - name: public/results
-              path: workspace/results
-              type: directory
+            - name: public/results/status.json
+              path: workspace/results/status.json
+              type: file
           maxRunTime: 60
         metadata:
           name: telescope-periodic-v01
@@ -452,14 +443,6 @@ taskcluster:
           description: >
             A simple task, run every 15 minutes, monitored by
             [Telescope](https://github.com/mozilla-services/poucave).
-        extra:
-          index:
-            data:
-              description: >
-                A simple task, run every 15 minutes, monitored by
-                [Telescope](https://github.com/mozilla-services/poucave).
-            expires:
-              $fromNow: 1 day
       triggerSchema:
         type: object
         properties: {}
