@@ -286,6 +286,13 @@ taskcluster:
         - repo:github.com/taskcluster/taskcluster:*
         - repo:github.com/taskcluster/staging-releases:*
 
+    - grant:
+        - queue:create-task:medium:proj-taskcluster/gw-ci-*
+        - queue:route:index.project.taskcluster.telescope.periodic.v01
+        - queue:scheduler-id:-
+      to:
+        - hook-id:project-taskcluster/telescope-periodic-v01
+
   clients:
     smoketests:
       scopes:
@@ -398,3 +405,45 @@ taskcluster:
       CRATESIO_TOKEN: $taskcluster-release-cratesio-token
     staging-release:
       GH_TOKEN: $taskcluster-staging-release-gh-token
+
+  hooks:
+    telescope-periodic-v01:
+      description: >
+        Periodically run a simple task, monitored by
+        [Telescope](https://github.com/mozilla-services/poucave).
+      name: Periodic task for Telescope monitoring
+      owner: jwhitlock@mozilla.com
+      emailOnError: false
+      schedule: ['*/15 * * * *']
+      task:
+        taskQueueId: proj-taskcluster/gw-ci-ubuntu-18-04
+        routes:
+          - index.project.taskcluster.telescope.periodic.v01
+        created:
+          $fromNow: 0 seconds
+        expires:
+          $fromNow: 1 day
+        deadline:
+          $fromNow: 30 minutes
+        payload:
+          command:
+            - - /bin/bash
+              - -vxec
+              - |
+                mkdir -p workspace/results
+                echo '{"version": 1.0, "status": "OK"}' > workspace/results/status.json
+          artifacts:
+            - name: public/results/status.json
+              path: workspace/results/status.json
+              type: file
+          maxRunTime: 60
+        metadata:
+          name: telescope-periodic-v01
+          owner: jwhitlock@mozilla.com
+          description: >
+            A simple task, run every 15 minutes, monitored by
+            [Telescope](https://github.com/mozilla-services/poucave).
+      triggerSchema:
+        type: object
+        properties: {}
+        additionalProperties: false
