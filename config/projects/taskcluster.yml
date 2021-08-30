@@ -410,7 +410,7 @@ taskcluster:
     telescope-periodic-v01:
       description: >
         Periodically run a simple task, monitored by
-        [Telescope](https://github.com/mozilla-services/poucave).
+        [Telescope](https://telescope-demo.api.data.allizom.org).
       name: Periodic task for Telescope monitoring
       owner: jwhitlock@mozilla.com
       emailOnError: false
@@ -440,9 +440,11 @@ taskcluster:
         metadata:
           name: telescope-periodic-v01
           owner: jwhitlock@mozilla.com
+          source: >-
+            https://github.com/mozilla/community-tc-config/blob/main/config/projects/taskcluster.yml
           description: >
             A simple task, run every 15 minutes, monitored by
-            [Telescope](https://github.com/mozilla-services/poucave).
+            [Telescope](https://telescope-demo.api.data.allizom.org).
       triggerSchema:
         type: object
         properties: {}
