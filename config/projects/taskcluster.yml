@@ -440,6 +440,8 @@ taskcluster:
         metadata:
           name: telescope-periodic-v01
           owner: jwhitlock@mozilla.com
+          source: >-
+            https://github.com/mozilla/community-tc-config/blob/main/config/projects/taskcluster.yml
           description: >
             A simple task, run every 15 minutes, monitored by
             [Telescope](https://github.com/mozilla-services/poucave).
