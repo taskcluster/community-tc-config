@@ -32,7 +32,7 @@ This will show you the current difference between what's defined in your local r
 Most of the time, there should be no difference.
 
 Then, change the configuration in this repository, using the comments in the relevant files as a guide.
-After making a change the the configuration, you can examine the results by running `tc-admin diff` again.
+After making a change to the configuration, you can examine the results by running `tc-admin diff` again.
 If you are adding or removing a number of resources, you can use `--ids-only` to show only the names of the added or removed resources.
 See `tc-admin --help` for more useful command-line tricks.
 
@@ -55,7 +55,7 @@ See the comments in `projects.yml` for details.
 
 ### Externally Managed Projects and Resources
 
-This respository manages all resources in the deployment *except* those associated with "externally managed" projects.
+This repository manages all resources in the deployment *except* those associated with "externally managed" projects.
 Projects that manage their own resources, either by hand or via their own automation, should have the `externallyManaged` attribute set in `config/projects.yml`, otherwise the next run of `tc-admin apply` will delete the project's resources!
 Note that externally managed projects can still define other resources in their `projects.yml` stanza.
 Such resources will be created and managed by this repository, but if they are removed from `projects.yml`, this repository cannot delete them.
