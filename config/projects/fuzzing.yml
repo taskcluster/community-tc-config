@@ -232,7 +232,52 @@ fuzzing:
         routes:
           - notify.email.jkratzer@mozilla.com.on-failed
       schedule:
-        - "0 */8 * * *"
+        - "0 */8 * * 1-5"
+    bugmon-confirm:
+      description: Hook for triggering bugmon forced confirmation tasks
+      owner: jkratzer@mozilla.com
+      emailOnError: true
+      task:
+        provisionerId: proj-fuzzing
+        workerType: bugmon-monitor
+        payload:
+          image:
+            type: indexed-image
+            path: public/bugmon.tar.zst
+            namespace: project.fuzzing.orion.bugmon.master
+          features:
+            taskclusterProxy: true
+          maxRunTime: 10800
+          env:
+            BUG_ACTION: monitor
+            FORCE_CONFIRM: true
+          artifacts:
+            project/fuzzing/bugmon:
+              path: /bugmon-artifacts
+              type: directory
+        metadata:
+          name: bugmon-confirm
+          description: Hook for triggering bugmon forced confirmation tasks
+          owner: jkratzer@mozilla.com
+          source: 'https://github.com/MozillaSecurity/bugmon'
+        expires:
+          $fromNow: 3 months
+        deadline:
+          $fromNow: 6 hours
+        scopes:
+          - docker-worker:capability:device:hostSharedMemory
+          - docker-worker:capability:device:loopbackAudio
+          - docker-worker:capability:privileged
+          - queue:create-task:highest:proj-fuzzing/bugmon-monitor
+          - queue:create-task:highest:proj-fuzzing/bugmon-processor
+          - queue:get-artifact:project/fuzzing/bugmon/*
+          - queue:route:notify.email.jkratzer@mozilla.com.on-failed
+          - queue:scheduler-id:-
+          - secrets:get:project/fuzzing/bz-api-key
+        routes:
+          - notify.email.jkratzer@mozilla.com.on-failed
+      schedule:
+        - "0 8 * * 6"
     js-tests-distiller:
       description: Hook for distilling JS tests for fuzzing
       owner: fuzzing@mozilla.com
@@ -417,6 +462,7 @@ fuzzing:
         - secrets:get:project/fuzzing/bz-api-key
       to:
         - hook-id:project-fuzzing/bugmon
+        - hook-id:project-fuzzing/bugmon-confirm
     - grant:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
