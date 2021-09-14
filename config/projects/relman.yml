@@ -63,6 +63,7 @@ relman:
     microannotate/deploy: true
     taskboot/deploy: true
     libmozevent/deploy: true
+    libmozdata/deploy: true
     rust-code-analysis/deploy: true
     rust-parsepatch/deploy: true
     pyo3-parsepatch/deploy: true
@@ -168,6 +169,11 @@ relman:
     - grant: secrets:get:project/relman/libmozevent/deploy
       to:
         - repo:github.com/mozilla/libmozevent:tag:*
+
+    # libmozdata
+    - grant: secrets:get:project/relman/libmozdata/deploy
+      to:
+        - repo:github.com/mozilla/libmozdata:tag:*
 
     # rust-code-analysis
     - grant: docker-worker:cache:rust-code-analysis-*
