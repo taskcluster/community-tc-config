@@ -36,6 +36,21 @@ After making a change to the configuration, you can examine the results by runni
 If you are adding or removing a number of resources, you can use `--ids-only` to show only the names of the added or removed resources.
 See `tc-admin --help` for more useful command-line tricks.
 
+## Applying changes (community-tc administrators only)
+
+When the `main` branch is updated, typically a community-tc administrator will apply the changes.
+
+Note to community-tc administrators: you may need to use the `root` client to run `tc-admin apply <options>...` successfully, i.e.
+
+```
+export TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com
+export TASKCLUSTER_CLIENT_ID=static/taskcluster/root
+export TASKCLUSTER_ACCESS_TOKEN=<root access token>
+unset TASKCLUSTER_CERTIFICATE
+```
+
+where the value for `<root access token>` can be shown by running the command `pass show community-tc/root`.
+
 ## Conventions
 
 This deployment follows the convention of [project namespaces](https://docs.taskcluster.net/docs/manual/using/namespaces#projects).
