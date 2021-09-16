@@ -1,6 +1,6 @@
 bugbug:
   adminRoles:
-    - github-team:mozilla/sallt
+    - github-team:mozilla/compiler-and-development-tools
     - github-team:mozilla/cia
   externallyManaged: true # bugbug deploys some hooks into this space
   repos:

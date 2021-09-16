@@ -1,6 +1,6 @@
 relman:
   adminRoles:
-    - github-team:mozilla/sallt
+    - github-team:mozilla/compiler-and-development-tools
   externallyManaged: true # some hooks are deployed into this space
   repos:
     - github.com/mozilla/microannotate:*
