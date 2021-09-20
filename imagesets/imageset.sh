@@ -383,7 +383,7 @@ function google_update {
         sleep 15
     done
 
-    echo "${GCP_PROJECT}/global/images/${UNIQUE_NAME}" > gcp.secrets
+    echo "projects/${GCP_PROJECT}/global/images/${UNIQUE_NAME}" > gcp.secrets
 
     google_delete_found
 }
