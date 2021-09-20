@@ -11,6 +11,7 @@ docker run \
     -ti \
     -v "$(pwd)/..:/community-tc-config" \
     -v ~/.aws:/root/.aws \
+    -v ~/.config:/root/.config \
     -v ~/.gitconfig:/root/.gitconfig \
     -v ~/.gnupg:/root/.gnupg \
     -v ~/.ssh:/root/.ssh \

@@ -90,7 +90,7 @@ function deploy {
             echo us-central1-a 118 | xargs -P1 -n2 "${0}" process-region "${CLOUD}_${ACTION}"
             log "Updating config/imagesets.yml..."
             IMAGE_NAME="$(cat "${IMAGE_SET}/gcp.secrets")"
-            yq w -i ../config/imagesets.yml "${IMAGE_SET}.gcp" "${IMAGE_NAME}"
+            yq w -i ../config/imagesets.yml "${IMAGE_SET}.gcp.image" "${IMAGE_NAME}"
             ;;
     esac
 
@@ -383,7 +383,7 @@ function google_update {
         sleep 15
     done
 
-    echo "${GCP_PROJECT}/global/images/${UNIQUE_NAME}" > gcp.secrets
+    echo "projects/${GCP_PROJECT}/global/images/${UNIQUE_NAME}" > gcp.secrets
 
     google_delete_found
 }
