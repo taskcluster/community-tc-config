@@ -5,8 +5,18 @@
 The AWS/GCP image set building machinery requires the following configuration
 to be present:
 
-1) You will need an AWS access key configured under `~/.aws` on your host, and
-   2FA should be enabled on your AWS account.
+1) Depending on which cloud you will be deploying to:
+
+     * AWS only:
+
+       You will need an AWS access key configured under `~/.aws` on your host,
+       and 2FA should be enabled on your AWS account.
+
+     * GCP only:
+
+       You will need gcloud installed on your host, and you will need to logon on
+       your host (`gcloud auth logon <user>@mozilla.com`) in order that
+       `~/.config/gcloud` folder holds your logon information.
 
 2) You will need a valid git configuration under `~/.gitconfig` on your host with
    a valid user/email, for committing changes to community-tc-config repo and the
@@ -104,7 +114,7 @@ All of the following tools must be available in the `PATH`:
   * `tr`
   * `which`
   * `xargs`
-  * `yq`
+  * `yq` **version 3** (version 4 not supported)
 
 ## Post image set building steps
 
