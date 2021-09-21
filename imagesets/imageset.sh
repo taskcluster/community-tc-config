@@ -62,7 +62,7 @@ function deploy {
     git -C "${PASSWORD_STORE_DIR}" config commit.gpgsign false
 
     case "${CLOUD}" in
-        aws) 
+        aws)
             if [ -z "${AWS_ACCESS_KEY_ID}" ] || [ -z "${AWS_SECRET_ACCESS_KEY}" ] || [ -z "${AWS_SESSION_TOKEN}" ]; then
               log "Need AWS credentials..."
               eval $(signin-aws)
@@ -104,7 +104,16 @@ function deploy {
 
     git reset
     git add ../config/imagesets.yml
-    git commit --no-gpg-sign -m "Built new machine images for imageset ${IMAGE_SET}"
+
+    case "${CLOUD}" in
+        aws)
+            git commit --no-gpg-sign -m "Built new AWS AMIs for imageset ${IMAGE_SET}"
+            ;;
+        google)
+            git commit --no-gpg-sign -m "Built new google machine image for imageset ${IMAGE_SET}"
+            ;;
+    esac
+
     log 'Deployment of image sets successful!'
     log 'Be sure to push changes to community-tc-config repo'
 }
@@ -324,7 +333,7 @@ function google_delete_found {
 
 function google_update {
 
-    # NOTE: to grant permission for community-tc worker manager to use images in your GCP project, run: 
+    # NOTE: to grant permission for community-tc worker manager to use images in your GCP project, run:
     # gcloud projects add-iam-policy-binding "${GCP_PROJECT}" --member serviceAccount:taskcluster-worker-manager@taskcluster-temp-workers.iam.gserviceaccount.com --role roles/compute.imageUser
 
     # Prefer no shh keys, see: https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys
