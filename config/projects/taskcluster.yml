@@ -30,7 +30,7 @@ taskcluster:
 
     gcp-test:
       owner: taskcluster-notifications+workers@mozilla.com
-      description: not actively used, but useful for testing docker-worker on AWS
+      description: not actively used, but useful for testing docker-worker on GCP
       emailOnError: false
       imageset: docker-worker
       cloud: gcp

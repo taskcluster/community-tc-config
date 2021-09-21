@@ -332,7 +332,7 @@ def aws(
       regions: regions to deploy to (required)
       instanceTypes: dict of instance types to provision, values are
                      capacityPerInstance (required)
-      securityGroup: name of the security group to appply (default no-inbound)
+      securityGroup: name of the security group to apply (default no-inbound)
       minCapacity: minimum capacity to run at any time (default 0)
       maxCapacity: maximum capacity to run at any time (required)
     """
