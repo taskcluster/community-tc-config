@@ -24,6 +24,7 @@ taskcluster:
       description: not actively used, but useful for testing docker-worker on AWS
       emailOnError: false
       imageset: docker-worker
+      securityGroup: docker-worker
       cloud: aws
       minCapacity: 0
       maxCapacity: 1
