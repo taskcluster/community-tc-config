@@ -54,9 +54,9 @@ docker-worker:
   aws:
     # built with the `docker_worker_community_aws` builder in monopacker
     amis:
-      us-east-1: ami-096419ca63348982c
-      us-west-1: ami-0683c6f788dce1e15
-      us-west-2: ami-09c39643fc855a113
+      us-east-1: ami-09933aeacc9b3c2ba
+      us-west-1: ami-036c57fcae9304ec3
+      us-west-2: ami-090b3bb7401689d98
 generic-worker-win2012r2:
   workerImplementation: generic-worker
   aws:

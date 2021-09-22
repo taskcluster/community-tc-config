@@ -24,13 +24,14 @@ taskcluster:
       description: not actively used, but useful for testing docker-worker on AWS
       emailOnError: false
       imageset: docker-worker
+      securityGroup: docker-worker
       cloud: aws
       minCapacity: 0
       maxCapacity: 1
 
     gcp-test:
       owner: taskcluster-notifications+workers@mozilla.com
-      description: not actively used, but useful for testing docker-worker on AWS
+      description: not actively used, but useful for testing docker-worker on GCP
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
