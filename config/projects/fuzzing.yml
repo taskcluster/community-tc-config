@@ -401,6 +401,46 @@ fuzzing:
           - notify.email.jkratzer@mozilla.com.on-failed
       schedule:
         - "0 10 * * *"
+    gr-idl-update:
+      description: Hook for updating gr.idl grammar
+      owner: jkratzer@mozilla.com
+      emailOnError: true
+      task:
+        routes:
+          - notify.email.jkratzer@mozilla.com.on-failed
+        scopes:
+          - docker-worker:capability:privileged
+          - queue:get-artifact:project/fuzzing/gr-idl-update/*
+          - queue:route:notify.email.jkratzer@mozilla.com.on-failed
+          - queue:scheduler-id:-
+          - secrets:get:project/fuzzing/ci-git-token
+          - secrets:get:project/fuzzing/deploy-gridl
+          - secrets:get:project/fuzzing/deploy-npm
+        expires:
+          $fromNow: 1 months
+        payload:
+          image:
+            path: public/gr-idl-update.tar.zst
+            type: indexed-image
+            namespace: project.fuzzing.orion.gr-idl-update.master
+          features:
+            taskclusterProxy: true
+          artifacts:
+            project/fuzzing/gr-idl-update:
+              path: /live.log
+              type: file
+          maxRunTime: 10800
+        deadline:
+          $fromNow: 6 hours
+        metadata:
+          name: gr-idl-update
+          owner: jkratzer@mozilla.com
+          source: https://github.com/MozillaSecurity/gridl
+          description: Hook for updating gr.idl grammar
+        workerType: ci
+        provisionerId: proj-fuzzing
+      schedule:
+        - "0 8 * * 1"
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
@@ -528,3 +568,14 @@ fuzzing:
         - secrets:get:project/fuzzing/deploy-npm
       to:
         - hook-id:project-fuzzing/gr-css
+    - grant:
+        - docker-worker:capability:privileged
+        - queue:create-task:highest:proj-fuzzing/ci
+        - queue:get-artifact:project/fuzzing/gr-idl-update/*
+        - queue:route:notify.email.jkratzer@mozilla.com.on-failed
+        - queue:scheduler-id:-
+        - secrets:get:project/fuzzing/ci-git-token
+        - secrets:get:project/fuzzing/deploy-gridl
+        - secrets:get:project/fuzzing/deploy-npm
+      to:
+        - hook-id:project-fuzzing/gr-idl-update
