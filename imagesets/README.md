@@ -15,7 +15,7 @@ to be present:
      * GCP only:
 
        You will need gcloud installed on your host, and you will need to logon on
-       your host (`gcloud auth logon <user>@mozilla.com`) in order that
+       your host (`gcloud auth login <user>@mozilla.com`) in order that
        `~/.config/gcloud` folder holds your logon information.
 
 2) You will need a valid git configuration under `~/.gitconfig` on your host with
