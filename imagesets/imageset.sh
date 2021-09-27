@@ -336,7 +336,7 @@ function google_update {
     # NOTE: to grant permission for community-tc worker manager to use images in your GCP project, run:
     # gcloud projects add-iam-policy-binding "${GCP_PROJECT}" --member serviceAccount:taskcluster-worker-manager@taskcluster-temp-workers.iam.gserviceaccount.com --role roles/compute.imageUser
 
-    # Prefer no shh keys, see: https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys
+    # Prefer no ssh keys, see: https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys
 
     google_find_old_objects
 
