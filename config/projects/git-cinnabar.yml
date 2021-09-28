@@ -10,10 +10,14 @@ git-cinnabar:
       imageset: docker-worker
       cloud: gcp
       maxCapacity: 5
+      machineType: "zones/{zone}/machineTypes/n2-standard-4"
     win2012r2:
       imageset: generic-worker-win2012r2
       cloud: aws
       maxCapacity: 2
+      instanceTypes:
+        c5.2xlarge: 1
+        m5.2xlarge: 1
   clients:
     worker-osx-10-10:
       scopes:
