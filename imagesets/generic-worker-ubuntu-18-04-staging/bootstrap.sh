@@ -111,4 +111,4 @@ end_time="$(date '+%s')"
 echo "UserData execution took: $(($end_time-$start_time)) seconds"
 
 # shutdown so that instance can be snapshotted
-shutdown now
+shutdown -h now
