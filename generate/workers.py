@@ -234,7 +234,7 @@ def gcp(
     image_set=None,
     minCapacity=0,
     maxCapacity=None,
-    machineType="zones/{zone}/machineTypes/n1-standard-4",
+    machineType="zones/{zone}/machineTypes/n2-standard-4",
     diskSizeGb=50,
     **cfg,
 ):
@@ -245,7 +245,7 @@ def gcp(
       minCapacity: minimum capacity to run at any time (default 0)
       maxCapacity: maximum capacity to run at any time (required)
       machineType: fully qualified gcp machine type name (default
-                   `zones/{zone}/machineTypes/n1-standard-4`)
+                   `zones/{zone}/machineTypes/n2-standard-4`)
       diskSizeGb: boot disk size, in GB (defaults to 50)
     """
 
@@ -319,7 +319,7 @@ def aws(
     *,
     image_set=None,
     regions=None,
-    instanceTypes={"m3.2xlarge": 1},
+    instanceTypes={"m4.2xlarge": 1},
     securityGroup="no-inbound",
     minCapacity=0,
     maxCapacity=None,
