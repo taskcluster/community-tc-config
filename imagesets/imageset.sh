@@ -317,7 +317,7 @@ function google_delete_found {
     # terminate old instances
     if [ -n "${OLD_INSTANCES}" ]; then
         log "Now terminating instances" ${OLD_INSTANCES}...
-        gcloud compute instances delete ${OLD_INSTANCES} --zone="${REGION}" --delete-disks=all
+        gcloud compute instances delete ${OLD_INSTANCES} --zone="${REGION}" --delete-disks=all --project="${GCP_PROJECT}"
     else
         log "No previous instances to terminate."
     fi
@@ -325,7 +325,7 @@ function google_delete_found {
     # delete old images
     if [ -n "${OLD_IMAGES}" ]; then
         log "Deleting the old image(s) ("${OLD_IMAGES}")..."
-        gcloud compute images delete ${OLD_IMAGES}
+        gcloud compute images delete ${OLD_IMAGES} --project="${GCP_PROJECT}"
     else
         log "No old snapshot to delete."
     fi
@@ -364,7 +364,7 @@ function google_update {
     log ''
 
     if [ "${PLATFORM}" == "windows" ]; then
-        until gcloud compute reset-windows-password "${UNIQUE_NAME}" --zone "${REGION}"; do
+        until gcloud compute reset-windows-password "${UNIQUE_NAME}" --zone="${REGION}" --project="${GCP_PROJECT}"; do
             sleep 15
         done
     fi
@@ -380,7 +380,7 @@ function google_update {
 
     log "Now creating an image from the terminated instance..."
     # gcloud compute disks snapshot "${UNIQUE_NAME}" --project="${GCP_PROJECT}" --description="my description" --labels="key1=value1" --snapshot-names="${UNIQUE_NAME}" --zone="${REGION}" --storage-location=us
-    gcloud compute images create "${UNIQUE_NAME}" --source-disk="${UNIQUE_NAME}" --source-disk-zone="${REGION}" --labels="image-set=${IMAGE_SET}"
+    gcloud compute images create "${UNIQUE_NAME}" --source-disk="${UNIQUE_NAME}" --source-disk-zone="${REGION}" --source-disk-project="${GCP_PROJECT}" --labels="image-set=${IMAGE_SET}" --project="${GCP_PROJECT}"
 
     log ''
     log "The image is being created here:"
