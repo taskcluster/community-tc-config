@@ -6,6 +6,7 @@
 
 from tcadmin.resources import WorkerPool, Secret, Role
 
+from functools import lru_cache
 import copy, hashlib, json, os, asyncio
 import yaml
 
@@ -314,6 +315,28 @@ def gcp(
     return wp
 
 
+@lru_cache(maxsize=100)
+def aws_instance_types_in_availability_zone(az):
+    """
+    Return the set of instance types (such as "m5.large") in an AWS
+    availability zone.
+
+      az: The availability zone, such as "us-east-1a"
+
+    The instances are read from JSONs file in config/ec2-instance-type-offerings,
+    and cached in memory.
+    See /misc/update-instance-types.sh for how these are generated and updated.
+    """
+    my_path = os.path.realpath(__file__)
+    my_dir = os.path.dirname(my_path)
+    proj_path = os.path.dirname(my_dir)
+    offerings_path = os.path.join(proj_path, "config", "ec2-instance-type-offerings")
+    offerings_file = os.path.join(offerings_path, f"{az}.json")
+    with open(offerings_file, "r") as the_file:
+        data = json.load(the_file)
+    return set(data)
+
+
 @cloud
 def aws(
     *,
@@ -364,10 +387,7 @@ def aws(
             for instanceType, capacityPerInstance in instanceTypes.items():
                 # Filter out availability zones where the required instance type
                 # is not available.
-                if (
-                    instanceType == "m3.2xlarge"
-                    and az in ["us-east-1a", "us-east-1f", "us-west-2d"]
-                ) or (instanceType == "g3s.xlarge" and az.startswith("us-west-1")):
+                if instanceType not in aws_instance_types_in_availability_zone(az):
                     continue
                 launchConfig = {
                     "capacityPerInstance": capacityPerInstance,
@@ -382,6 +402,10 @@ def aws(
                     },
                 }
                 launchConfigs.append(launchConfig)
+    assert launchConfigs, (
+        f"The regions {regions} do not support instance types"
+        f" {list(instanceTypes.keys())}"
+    )
 
     wp = DynamicWorkerPoolSettings(AWS_PROVIDER)
     wp.config = {
