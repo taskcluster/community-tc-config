@@ -6,6 +6,8 @@
 
 from tcadmin.resources import WorkerPool, Secret, Role
 
+from collections import defaultdict
+from functools import lru_cache
 import copy, hashlib, json, os, asyncio
 import yaml
 
@@ -228,6 +230,35 @@ def static(**cfg):
     return StaticWorkerPoolSettings("static")
 
 
+def config_path():
+    """Return the path to the configuration directory"""
+    my_path = os.path.realpath(__file__)
+    my_dir = os.path.dirname(my_path)
+    proj_path = os.path.dirname(my_dir)
+    config_path = os.path.join(proj_path, "config")
+    return config_path
+
+
+@lru_cache(maxsize=2)
+def gcp_machine_types_by_zone():
+    """
+    Return the set of machine types (such as "n1-standard-2") in a GCP Zone.
+
+      zone: The GCP zone, such as "us-central1-a"
+
+    The instances are read from config/gce-machine-type-offerings.json and
+    cached in memory.
+    See /misc/update-gce-machine-types.sh for how this file is generated and updated.
+    """
+    offerings_file = os.path.join(config_path(), "gce-machine-type-offerings.json")
+    with open(offerings_file, "r") as the_file:
+        data = json.load(the_file)
+    machine_types_by_zone = defaultdict(set)
+    for pair in data:
+        machine_types_by_zone[pair["zone"]].add(pair["name"])
+    return machine_types_by_zone
+
+
 @cloud
 def gcp(
     *,
@@ -266,16 +297,14 @@ def gcp(
         for zone in zones["zones"]
     ]
 
-    # some machine types aren't available in some zones..
+    # some machine types aren't available in some zones.
     # https://cloud.google.com/compute/docs/regions-zones#available
     def machine_in_zone(machineType, zone):
-        if machineType.startswith("zones/{zone}/machineTypes/n2-"):
-            if zone.startswith("us-east1"):
-                return zone[-1] in "cd"
-            if zone.startswith("us-east4"):
-                return True
-            return False
-        return True
+        s1, s2, s3, mtype = machineType.split("/")
+        assert s1 == "zones"
+        assert s2 == "{zone}"
+        assert s3 == "machineTypes"
+        return mtype in gcp_machine_types_by_zone()[zone]
 
     assert maxCapacity, "must give a maxCapacity"
     wp = DynamicWorkerPoolSettings(GOOGLE_PROVIDER)
@@ -307,11 +336,32 @@ def gcp(
         ],
     }
 
-    assert (
-        len(wp.config["launchConfigs"]) != 0
-    ), "No configured GCP zones support that machine type"
+    assert len(wp.config["launchConfigs"]) != 0, (
+        f"No configured GCP zones ({', '.join(zone for zone, r in GOOGLE_ZONES_REGIONS)})"
+        f" support machine type {machineType.split('/')[-1]}"
+    )
 
     return wp
+
+
+@lru_cache(maxsize=100)
+def aws_instance_types_in_availability_zone(az):
+    """
+    Return the set of instance types (such as "m5.large") in an AWS
+    availability zone.
+
+      az: The availability zone, such as "us-east-1a"
+
+    The instances are read from JSONs file in config/ec2-instance-type-offerings,
+    and cached in memory.
+    See /misc/update-instance-types.sh for how these are generated and updated.
+    """
+    offerings_file = os.path.join(
+        config_path(), "ec2-instance-type-offerings", f"{az}.json"
+    )
+    with open(offerings_file, "r") as the_file:
+        data = json.load(the_file)
+    return set(data)
 
 
 @cloud
@@ -364,10 +414,7 @@ def aws(
             for instanceType, capacityPerInstance in instanceTypes.items():
                 # Filter out availability zones where the required instance type
                 # is not available.
-                if (
-                    instanceType == "m3.2xlarge"
-                    and az in ["us-east-1a", "us-east-1f", "us-west-2d"]
-                ) or (instanceType == "g3s.xlarge" and az.startswith("us-west-1")):
+                if instanceType not in aws_instance_types_in_availability_zone(az):
                     continue
                 launchConfig = {
                     "capacityPerInstance": capacityPerInstance,
@@ -382,6 +429,10 @@ def aws(
                     },
                 }
                 launchConfigs.append(launchConfig)
+    assert launchConfigs, (
+        f"The regions {regions} do not support instance types"
+        f" {list(instanceTypes.keys())}"
+    )
 
     wp = DynamicWorkerPoolSettings(AWS_PROVIDER)
     wp.config = {
