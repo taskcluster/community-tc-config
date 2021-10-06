@@ -64,7 +64,10 @@ to be present:
 
      * GCP only:
 
-       First run `export GCP_PROJECT=<your google cloud project of choice to deploy image into>` (typically `community-tc-workers`)
+       First run `export GCP_PROJECT=<your google cloud project of choice to deploy image into>`
+       (typically `taskcluster-imaging`). Worker Manager spawns instances in project
+       `community-tc-workers` but typically the machine images are stored in project
+       `taskcluster-imaging`.
 
 Once all of the above prerequisite steps have been made, you are in a position
 to be able to build image sets.
