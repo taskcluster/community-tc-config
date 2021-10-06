@@ -12,4 +12,4 @@ mwz:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
-      machineType: "zones/{zone}/machineTypes/n1-standard-1"
+      machineType: "zones/{zone}/machineTypes/n2-standard-2"

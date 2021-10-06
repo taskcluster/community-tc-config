@@ -9,7 +9,7 @@ servo:
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
-      machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
+      machineType: "zones/{zone}/machineTypes/n2-highcpu-16"
       diskSizeGb: 100
       minCapacity: 0
       maxCapacity: 40
@@ -18,7 +18,7 @@ servo:
       emailOnError: false
       imageset: docker-worker
       cloud: gcp
-      machineType: "zones/{zone}/machineTypes/n1-highcpu-16"
+      machineType: "zones/{zone}/machineTypes/n2-highcpu-16"
       diskSizeGb: 100
       minCapacity: 0
       maxCapacity: 10
