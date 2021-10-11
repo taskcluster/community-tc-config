@@ -2,10 +2,10 @@
 set -e
 
 function log {
-    if [ -n "${REGION}" ]; then
-        echo -e "\x1B[38;5;${COLOUR}m$(basename "${0}"): $(date): ${CLOUD}: ${IMAGE_SET}: ${REGION}: ${@}\x1B[0m"
+    if [ -n "${BACKGROUND_COLOUR}" ] && [ -n "${FOREGROUND_COLOUR}" ] && [ -n "${CLOUD}" ] && [ -n "${IMAGE_SET}" ] && [ -n "${REGION}" ]; then
+        echo -e "\x1B[48;5;${BACKGROUND_COLOUR}m\x1B[38;5;${FOREGROUND_COLOUR}m$(basename "${0}"): $(date): ${CLOUD}: ${IMAGE_SET}: ${REGION}: ${@}\x1B[0m"
     else
-        echo -e "\x1B[38;5;188m$(basename "${0}"): $(date): ${@}\x1B[0m"
+        echo -e "\x1B[48;5;123m\x1B[38;5;0m$(basename "${0}"): $(date): ${@}\x1B[0m"
     fi
 }
 
@@ -67,7 +67,7 @@ function deploy {
               log "Need AWS credentials..."
               eval $(signin-aws)
             fi
-            echo us-west-1 118 us-west-2 199 us-east-1 100 | xargs -P3 -n2 "${0}" process-region "${CLOUD}_${ACTION}"
+            echo us-west-1 118 246 us-west-2 199 220 us-east-1 4 200 | xargs -P3 -n3 "${0}" process-region "${CLOUD}_${ACTION}"
             log "Fetching secrets..."
             pass git pull
             for REGION in us-west-1 us-west-2 us-east-1; do
@@ -87,7 +87,7 @@ function deploy {
                 log "Environment variable GCP_PROJECT must be exported before calling this script" >&2
                 exit 67
             fi
-            echo us-central1-a 118 | xargs -P1 -n2 "${0}" process-region "${CLOUD}_${ACTION}"
+            echo us-central1-a 21 230 | xargs -P1 -n3 "${0}" process-region "${CLOUD}_${ACTION}"
             log "Updating config/imagesets.yml..."
             IMAGE_NAME="$(cat "${IMAGE_SET}/gcp.secrets")"
             yq w -i ../config/imagesets.yml "${IMAGE_SET}.gcp.image" "${IMAGE_NAME}"
@@ -410,7 +410,8 @@ if [ "${1}" == "process-region" ]; then
       exit 68
     fi
     REGION="${3}"
-    COLOUR="${4}"
+    FOREGROUND_COLOUR="${4}"
+    BACKGROUND_COLOUR="${5}"
     "${2}"
     exit 0
 fi
