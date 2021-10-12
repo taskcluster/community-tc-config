@@ -369,7 +369,10 @@ def aws(
     *,
     image_set=None,
     regions=None,
-    instanceTypes={"m5.2xlarge": 1},
+    instanceTypes={
+        "m4.2xlarge": 1,
+        "m5.2xlarge": 1,
+    },
     securityGroup="no-inbound",
     minCapacity=0,
     maxCapacity=None,
