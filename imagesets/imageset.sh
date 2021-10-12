@@ -78,10 +78,10 @@ function deploy {
               log "Need AWS credentials..."
               eval $(signin-aws)
             fi
-            echo us-west-1 118 246 us-west-2 199 220 us-east-1 4 200 | xargs -P3 -n3 "${0}" process-region "${CLOUD}_${ACTION}"
+            echo us-west-1 118 246 us-west-2 199 220 us-east-1 4 200 us-east-2 33 210 | xargs -P4 -n3 "${0}" process-region "${CLOUD}_${ACTION}"
             log "Fetching secrets..."
             pass git pull
-            for REGION in us-west-1 us-west-2 us-east-1; do
+            for REGION in us-west-1 us-west-2 us-east-1 us-east-2; do
               # some regions may not have secrets if they do not support the required instance type
               if [ -f "${IMAGE_SET}/aws.${REGION}.secrets" ]; then
                 IMAGE_ID="$(cat "${IMAGE_SET}/aws.${REGION}.secrets" | sed -n 's/^AMI: *//p')"
