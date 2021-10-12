@@ -78,7 +78,7 @@ function deploy {
               log "Need AWS credentials..."
               eval $(signin-aws)
             fi
-            echo us-west-1 118 246 us-west-2 199 220 us-east-1 4 200 us-east-2 33 210 | xargs -P4 -n3 "${0}" process-region "${CLOUD}_${ACTION}"
+            echo us-west-1 118 246 us-west-2 199 220 us-east-1 4 200 us-east-2 33 210 | xargs -P4 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
             log "Fetching secrets..."
             pass git pull
             for REGION in us-west-1 us-west-2 us-east-1 us-east-2; do
@@ -98,7 +98,7 @@ function deploy {
                 log "Environment variable GCP_PROJECT must be exported before calling this script" >&2
                 exit 67
             fi
-            echo us-central1-a 21 230 | xargs -P1 -n3 "${0}" process-region "${CLOUD}_${ACTION}"
+            echo us-central1-a 21 230 | xargs -P1 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
             log "Updating config/imagesets.yml..."
             IMAGE_NAME="$(cat "${IMAGE_SET}/gcp.secrets")"
             yq w -i ../config/imagesets.yml "${IMAGE_SET}.gcp.image" "${IMAGE_NAME}"
