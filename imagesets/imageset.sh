@@ -26,6 +26,17 @@ function deploy {
         fi
     done
 
+    if ! yq --version 2>&1 | grep -q 'version 3\.'; then
+        log "${0} requires yq version 3 in your PATH, but you have:" >&2
+        log "    $(which yq)" >&2
+        log "    $(yq --version 2>&1)" >&2
+        log "See https://mikefarah.gitbook.io/yq/upgrading-from-v3 about backward incompatibility of version 4 and higher."
+        log "Note, an alternative solution is to upgrade this script to use v4 syntax and rebuild/publish docker container etc."
+        exit 69
+    else
+        log "  \xE2\x9C\x94 yq is version 3"
+    fi
+
     log "Checking inputs..."
 
     if [ "${#}" -ne 3 ]; then

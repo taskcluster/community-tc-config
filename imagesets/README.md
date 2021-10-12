@@ -117,7 +117,7 @@ All of the following tools must be available in the `PATH`:
   * `tr`
   * `which`
   * `xargs`
-  * `yq` **version 3** (version 4 not supported)
+  * `yq` **version 3** (version 4 is [backwardly incompatible](https://mikefarah.gitbook.io/yq/upgrading-from-v3))
 
 ## Post image set building steps
 
