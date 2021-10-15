@@ -63,7 +63,7 @@ function deploy {
     export IMAGE_SET_COMMIT_SHA="$(git rev-parse HEAD)"
 
     # UUID is 20 random chars of [a-z0-9]
-    UUID="$(LC_CTYPE=C </dev/urandom tr -dc "a-z0-9" | head -c 20)"
+    export UUID="$(LC_CTYPE=C </dev/urandom tr -dc "a-z0-9" | head -c 20)"
     export UNIQUE_NAME="${IMAGE_SET}-${UUID}"
 
     export TEMP_DIR="$(mktemp -d -t password-store.XXXXXXXXXX)"
