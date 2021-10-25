@@ -51,6 +51,70 @@ fuzzing:
       minCapacity: 0
       maxCapacity: 20
   hooks:
+    fuzzing-tc-config-community-update:
+      description: Run Fuzzing pool rebuild when Community-TC config changes
+      owner: truber@mozilla.com
+      emailOnError: true
+      bindings:
+        - exchange: exchange/taskcluster-github/v1/push
+          routingKeyPattern: primary.mozilla.community-tc-config
+      task:
+        provisionerId: proj-fuzzing
+        workerType: ci
+        payload:
+          features:
+            # Needed for access to secret
+            taskclusterProxy: true
+          maxRunTime: 3600
+          image:
+            type: indexed-image
+            path: public/fuzzing-decision.tar.zst
+            namespace: project.fuzzing.orion.fuzzing-decision.master
+          command:
+            - /bin/sh
+            - -l
+            - -e
+            - -x
+            - -c
+            - >-
+              tc-admin apply --grep Role;
+              tc-admin apply --grep WorkerPool;
+              tc-admin apply;
+          env:
+            TASKCLUSTER_SECRET: project/fuzzing/decision
+            FUZZING_GIT_REPOSITORY: git@github.com:MozillaSecurity/fuzzing-tc-config.git
+            FUZZING_GIT_REVISION: refs/heads/master
+        scopes:
+          - assume:hook-id:project-fuzzing/*
+          - auth:create-role:hook-id:project-fuzzing/*
+          - auth:delete-role:hook-id:project-fuzzing/*
+          - auth:update-role:hook-id:project-fuzzing/*
+          - docker-worker:capability:device:hostSharedMemory
+          - docker-worker:capability:device:loopbackAudio
+          - docker-worker:capability:privileged
+          - generic-worker:os-group:proj-fuzzing/*
+          - generic-worker:run-as-administrator:proj-fuzzing/*
+          - hooks:modify-hook:project-fuzzing/*
+          - hooks:trigger-hook:project-fuzzing/*
+          - queue:cancel-task:-/*
+          - queue:create-task:highest:proj-fuzzing/*
+          - secrets:get:project/fuzzing/*
+          - worker-manager:manage-worker-pool:proj-fuzzing/*
+          - worker-manager:provider:community-tc-workers-*
+        metadata:
+          name: Fuzzing Taskcluster apply changes
+          description: Apply potential modifications on the taskcluster instance
+          owner: truber@mozilla.com
+          source: https://github.com/MozillaSecurity/fuzzing-tc-config
+        deadline:
+          $fromNow: 2 hours
+      triggerSchema:
+        type: object
+        properties:
+          branch:
+            type: string
+            default: main
+        additionalProperties: true
     domino-web-tests:
       description: Domino Web Tests trigger
       owner: jkratzer@mozilla.com
@@ -490,6 +554,7 @@ fuzzing:
         - worker-manager:provider:community-tc-workers-*
       to:
         - repo:github.com/MozillaSecurity/fuzzing-tc-config:branch:master
+        - hook-id:project-fuzzing/fuzzing-tc-config-community-update
     - grant:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
