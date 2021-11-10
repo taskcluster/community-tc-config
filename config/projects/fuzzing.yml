@@ -536,7 +536,8 @@ fuzzing:
         - hook-id:project-fuzzing/domino-web-tests
     # fuzzing-tc-config code on master can run tc-admin apply to manage worker pools
     - grant:
-        - assume:hook-id:project-fuzzing/*
+        - assume:hook-id:project-fuzzing/linux-pool*
+        - assume:hook-id:project-fuzzing/windows-pool*
         - auth:create-role:hook-id:project-fuzzing/*
         - auth:update-role:hook-id:project-fuzzing/*
         - auth:delete-role:hook-id:project-fuzzing/*
