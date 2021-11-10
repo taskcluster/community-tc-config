@@ -204,3 +204,9 @@ relman:
     # grcov
     - grant: secrets:get:project/relman/grcov/deploy
       to: repo:github.com/mozilla/grcov:tag:*
+
+    # mozci
+    - grant:
+        - queue:route:index.project.mozci.docker-pr.*
+        - queue:route:index.project.mozci.docker.*
+      to: repo:github.com/mozilla/mozci:*
