@@ -85,7 +85,8 @@ fuzzing:
             FUZZING_GIT_REPOSITORY: git@github.com:MozillaSecurity/fuzzing-tc-config.git
             FUZZING_GIT_REVISION: refs/heads/master
         scopes:
-          - assume:hook-id:project-fuzzing/*
+          - assume:hook-id:project-fuzzing/linux-pool*
+          - assume:hook-id:project-fuzzing/windows-pool*
           - auth:create-role:hook-id:project-fuzzing/*
           - auth:delete-role:hook-id:project-fuzzing/*
           - auth:update-role:hook-id:project-fuzzing/*
