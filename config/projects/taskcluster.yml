@@ -3,6 +3,7 @@ taskcluster:
     - github-team:taskcluster/core
   repos:
     - github.com/taskcluster/*
+    - github.com/json-e/json-e:*
     - github.com/mozilla/community-tc-config:*
     - github.com/mozilla/hawk:*
   externallyManaged:
@@ -186,7 +187,7 @@ taskcluster:
         - secrets:get:project/taskcluster/json-e-deploy
         # ..and notify on failure
         - queue:route:notify.email.taskcluster-notifications@mozilla.com.*
-      to: repo:github.com/taskcluster/json-e:branch:main
+      to: repo:github.com/json-e/json-e:branch:main
 
     - grant:
         - assume:project:taskcluster:worker-test-scopes
@@ -409,7 +410,7 @@ taskcluster:
       TASKCLUSTER_ACCESS_TOKEN: $taskcluster-testing-client-libraries-access-token
 
     # key for deploying json-e docs; this corresponds to a "deploy key" on the
-    # taskcluster/json-e github repo.
+    # json-e/json-e github repo.
     json-e-deploy: true
     release:
       DOCKER_USERNAME: $taskcluster-release-docker-hub-username
