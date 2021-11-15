@@ -183,6 +183,10 @@ taskcluster:
         - repo:github.com/taskcluster/taskcluster:tag:v*
 
     - grant:
+        - queue:create-task:highest:proj-taskcluster/ci
+      to: repo:github.com/json-e/json-e:*
+
+    - grant:
         # pushes to json-e main can read secrets for deploying the site
         - secrets:get:project/taskcluster/json-e-deploy
         # ..and notify on failure
