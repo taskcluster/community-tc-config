@@ -55,7 +55,7 @@ mozci:
         - queue:create-task:project:none
 
         # Children tasks are indexed
-        - queue:route:index.project.mozci.classification.*
+        - queue:route:index.project.mozci.*
 
       to: hook-id:project-mozci/decision-task-testing
 
