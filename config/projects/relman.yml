@@ -19,7 +19,6 @@ relman:
     - github.com/mozilla/stab-crashes:*
     - github.com/mozilla/grcov:*
     - github.com/mozilla/adr:*
-    - github.com/mozilla/mozci:*
   clients:
     bugbug/code-review-production:
       scopes:
@@ -97,7 +96,6 @@ relman:
         - repo:github.com/mozilla/stab-crashes:*
         - repo:github.com/mozilla/grcov:*
         - repo:github.com/mozilla/adr:*
-        - repo:github.com/mozilla/mozci:*
 
     # all hooks
     - grant:
@@ -204,9 +202,3 @@ relman:
     # grcov
     - grant: secrets:get:project/relman/grcov/deploy
       to: repo:github.com/mozilla/grcov:tag:*
-
-    # mozci
-    - grant:
-        - queue:route:index.project.mozci.docker-pr.*
-        - queue:route:index.project.mozci.docker.*
-      to: repo:github.com/mozilla/mozci:*
