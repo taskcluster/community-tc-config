@@ -57,6 +57,9 @@ mozci:
         # Children tasks are indexed
         - queue:route:index.project.mozci.*
 
+        # Children tasks need to share a common cache
+        - docker-worker:cache:mozci-classifications-testing
+
       to: hook-id:project-mozci/decision-task-testing
 
   hooks:
