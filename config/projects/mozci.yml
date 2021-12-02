@@ -30,6 +30,8 @@ mozci:
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-4"
+  secrets:
+    mozci/testing: true
   grants:
     # all repos
     - grant:
@@ -57,6 +59,11 @@ mozci:
         # Children tasks are indexed
         - queue:route:index.project.mozci.*
 
+        # Children tasks need to share a common cache
+        - docker-worker:cache:mozci-classifications-testing
+
+        # Children tasks read their configuration from taskcluster
+        - secrets:get:project/mozci/testing
       to: hook-id:project-mozci/decision-task-testing
 
   hooks:
