@@ -84,6 +84,7 @@ mozci:
             taskclusterProxy: true
           command:
             - decision
+            - autoland
           maxRunTime: 1800
         scopes:
           - assume:hook-id:project-mozci/decision-task-testing
