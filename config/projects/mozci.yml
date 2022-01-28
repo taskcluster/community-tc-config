@@ -66,6 +66,14 @@ mozci:
         - secrets:get:project/mozci/testing
       to: hook-id:project-mozci/decision-task-testing
 
+    - grant:
+        # Monitoring tasks read their configuration from taskcluster
+        - secrets:get:project/mozci/testing
+
+        # The monitoring tasks needs to send emails to admins
+        - notify:email:*
+      to: hook-id:project-mozci/monitoring-testing
+
   hooks:
     decision-task-testing:
       description: Run mozci classification tasks for new pushes
@@ -91,5 +99,35 @@ mozci:
         metadata:
           name: mozci decision task - testing
           description: mozci decision task
+          owner: mcastelluccio@mozilla.com
+          source: https://github.com/mozilla/mozci
+
+    monitoring-testing:
+      description: Run mozci monitoring for the last day's tasks
+      owner: mcastelluccio@mozilla.com
+      emailOnError: true
+      schedule: ['0 7 * * *'] # every day at 7am
+      task:
+        provisionerId: proj-mozci
+        workerType: compute-smaller
+        payload:
+          image:
+            type: indexed-image
+            path: public/mozci.tar.zst
+            namespace: project.mozci.docker.branch.master
+          features:
+            taskclusterProxy: true
+          env:
+            TASKCLUSTER_SECRET: project/mozci/testing
+          command:
+            - classify-eval
+            - "--from=1 day"
+            - --send-email
+          maxRunTime: 1800
+        scopes:
+          - assume:hook-id:project-mozci/monitoring-testing
+        metadata:
+          name: mozci monitoring - testing
+          description: mozci monitoring
           owner: mcastelluccio@mozilla.com
           source: https://github.com/mozilla/mozci
