@@ -511,6 +511,7 @@ fuzzing:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
         - queue:create-task:highest:proj-fuzzing/ci-*
+        - queue:route:checks
         - secrets:get:project/fuzzing/deploy-*
         - secrets:get:project/fuzzing/codecov-*
         - secrets:get:project/fuzzing/pypi-*
