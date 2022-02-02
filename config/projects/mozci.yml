@@ -120,8 +120,9 @@ mozci:
           env:
             TASKCLUSTER_SECRET: project/mozci/testing
           command:
+            - push
             - classify-eval
-            - "--from=1 day"
+            - "--from=1 days ago"
             - --send-email
           maxRunTime: 1800
         scopes:
