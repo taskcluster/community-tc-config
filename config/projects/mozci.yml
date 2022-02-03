@@ -122,7 +122,7 @@ mozci:
           command:
             - push
             - classify-eval
-            - "--from=1 days ago"
+            - "--from-date=1 days ago"
             - --send-email
           maxRunTime: 1800
         scopes:
