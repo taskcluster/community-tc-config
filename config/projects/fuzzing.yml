@@ -50,6 +50,13 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
+    grizzly-reduce-worker-windows:
+      owner: truber@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2016
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 10
   hooks:
     fuzzing-tc-config-community-update:
       description: Run Fuzzing pool rebuild when Community-TC config changes
@@ -195,7 +202,9 @@ fuzzing:
         scopes:
           - docker-worker:capability:device:hostSharedMemory
           - docker-worker:capability:device:loopbackAudio
-          - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker
+          - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows
+          - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows
+          - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker*
           - queue:route:notify.email.truber@mozilla.com.on-failed
           - queue:scheduler-id:fuzzing
           - secrets:get:project/fuzzing/deploy-bearspray
@@ -212,6 +221,10 @@ fuzzing:
       owner: truber@mozilla.com
       emailOnError: true
       bindings:
+        - exchange: exchange/taskcluster-queue/v1/task-exception
+          routingKeyPattern: primary.#.grizzly-reduce-worker-windows.fuzzing.#
+        - exchange: exchange/taskcluster-queue/v1/task-failed
+          routingKeyPattern: primary.#.grizzly-reduce-worker-windows.fuzzing.#
         - exchange: exchange/taskcluster-queue/v1/task-exception
           routingKeyPattern: primary.#.grizzly-reduce-worker.fuzzing.#
         - exchange: exchange/taskcluster-queue/v1/task-failed
@@ -511,6 +524,7 @@ fuzzing:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
         - queue:create-task:highest:proj-fuzzing/ci-*
+        - queue:route:checks
         - secrets:get:project/fuzzing/deploy-*
         - secrets:get:project/fuzzing/codecov-*
         - secrets:get:project/fuzzing/pypi-*
@@ -575,7 +589,9 @@ fuzzing:
     - grant:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
-        - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker
+        - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows
+        - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows
+        - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker*
         - secrets:get:project/fuzzing/deploy-bearspray
         - secrets:get:project/fuzzing/deploy-grizzly-private
         - secrets:get:project/fuzzing/google-logging-creds
