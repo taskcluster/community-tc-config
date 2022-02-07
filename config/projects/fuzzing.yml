@@ -202,6 +202,8 @@ fuzzing:
         scopes:
           - docker-worker:capability:device:hostSharedMemory
           - docker-worker:capability:device:loopbackAudio
+          - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows
+          - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows
           - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker*
           - queue:route:notify.email.truber@mozilla.com.on-failed
           - queue:scheduler-id:fuzzing
@@ -587,6 +589,8 @@ fuzzing:
     - grant:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
+        - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows
+        - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows
         - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker*
         - secrets:get:project/fuzzing/deploy-bearspray
         - secrets:get:project/fuzzing/deploy-grizzly-private
