@@ -64,6 +64,13 @@ mozci:
 
         # Children tasks read their configuration from taskcluster
         - secrets:get:project/mozci/testing
+
+        # Children tasks are able to send emails
+        - notify:email:*
+
+        # Children tasks are able to send notifications
+        # to code sherriffs through Matrix
+        - notify:matrix-room:!sheriff-notifications:mozilla.org
       to: hook-id:project-mozci/decision-task-testing
 
     - grant:
