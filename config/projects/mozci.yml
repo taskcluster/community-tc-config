@@ -107,7 +107,7 @@ mozci:
       description: Run mozci classification tasks for new pushes
       owner: mcastelluccio@mozilla.com
       emailOnError: true
-      schedule: ['*/15 * * * *'] # every 15 minutes
+      schedule: ['0 */6 * * *'] # once every 6 hours
       task:
         provisionerId: proj-mozci
         workerType: compute-smaller
