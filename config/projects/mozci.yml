@@ -32,6 +32,7 @@ mozci:
       machineType: "zones/{zone}/machineTypes/n2-standard-4"
   secrets:
     testing: true
+    production: true
   grants:
     # all repos
     - grant:
@@ -59,19 +60,31 @@ mozci:
         # Children tasks are indexed
         - queue:route:index.project.mozci.*
 
-        # Children tasks need to share a common cache
-        - docker-worker:cache:mozci-classifications-testing
-
-        # Children tasks read their configuration from taskcluster
-        - secrets:get:project/mozci/testing
-
         # Children tasks are able to send emails
         - notify:email:*
 
         # Children tasks are able to send notifications
         # to code sherriffs through Matrix
         - notify:matrix-room:!sheriff-notifications:mozilla.org
+      to:
+        - hook-id:project-mozci/decision-task-testing
+        - hook-id:project-mozci/decision-task-production
+
+    - grant:
+        # Children tasks need to share a common cache
+        - docker-worker:cache:mozci-classifications-testing
+
+        # Children tasks read their configuration from taskcluster
+        - secrets:get:project/mozci/testing
       to: hook-id:project-mozci/decision-task-testing
+
+    - grant:
+        # Children tasks need to share a common cache
+        - docker-worker:cache:mozci-classifications-production
+
+        # Children tasks read their configuration from taskcluster
+        - secrets:get:project/mozci/production
+      to: hook-id:project-mozci/decision-task-production
 
     - grant:
         # Monitoring tasks read their configuration from taskcluster
@@ -81,12 +94,20 @@ mozci:
         - notify:email:*
       to: hook-id:project-mozci/monitoring-testing
 
+    - grant:
+        # Monitoring tasks read their configuration from taskcluster
+        - secrets:get:project/mozci/production
+
+        # The monitoring tasks needs to send emails to admins
+        - notify:email:*
+      to: hook-id:project-mozci/monitoring-production
+
   hooks:
     decision-task-testing:
       description: Run mozci classification tasks for new pushes
       owner: mcastelluccio@mozilla.com
       emailOnError: true
-      schedule: ['*/15 * * * *'] # every 15 minutes
+      schedule: ['0 */6 * * *'] # once every 6 hours
       task:
         provisionerId: proj-mozci
         workerType: compute-smaller
@@ -136,6 +157,64 @@ mozci:
           - assume:hook-id:project-mozci/monitoring-testing
         metadata:
           name: mozci monitoring - testing
+          description: mozci monitoring
+          owner: mcastelluccio@mozilla.com
+          source: https://github.com/mozilla/mozci
+
+    decision-task-production:
+      description: Run mozci classification tasks for new pushes
+      owner: mcastelluccio@mozilla.com
+      emailOnError: true
+      schedule: ['*/15 * * * *'] # every 15 minutes
+      task:
+        provisionerId: proj-mozci
+        workerType: compute-smaller
+        payload:
+          image:
+            type: indexed-image
+            path: public/mozci.tar.zst
+            namespace: project.mozci.docker.branch.production
+          features:
+            taskclusterProxy: true
+          command:
+            - decision
+            - autoland
+          maxRunTime: 1800
+        scopes:
+          - assume:hook-id:project-mozci/decision-task-production
+        metadata:
+          name: mozci decision task - production
+          description: mozci decision task
+          owner: mcastelluccio@mozilla.com
+          source: https://github.com/mozilla/mozci
+
+    monitoring-production:
+      description: Run mozci monitoring for the last day's tasks
+      owner: mcastelluccio@mozilla.com
+      emailOnError: true
+      schedule: ['0 7 * * *'] # every day at 7am
+      task:
+        provisionerId: proj-mozci
+        workerType: compute-smaller
+        payload:
+          image:
+            type: indexed-image
+            path: public/mozci.tar.zst
+            namespace: project.mozci.docker.branch.production
+          features:
+            taskclusterProxy: true
+          env:
+            TASKCLUSTER_SECRET: project/mozci/production
+          command:
+            - push
+            - classify-eval
+            - "--from-date=1 days ago"
+            - --send-email
+          maxRunTime: 1800
+        scopes:
+          - assume:hook-id:project-mozci/monitoring-production
+        metadata:
+          name: mozci monitoring - production
           description: mozci monitoring
           owner: mcastelluccio@mozilla.com
           source: https://github.com/mozilla/mozci
