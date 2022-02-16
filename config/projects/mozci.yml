@@ -121,6 +121,7 @@ mozci:
           command:
             - decision
             - autoland
+            - --environment=testing
           maxRunTime: 1800
         scopes:
           - assume:hook-id:project-mozci/decision-task-testing
@@ -152,6 +153,7 @@ mozci:
             - classify-eval
             - "--from-date=1 days ago"
             - --send-email
+            - --environment=testing
           maxRunTime: 1800
         scopes:
           - assume:hook-id:project-mozci/monitoring-testing
@@ -179,6 +181,7 @@ mozci:
           command:
             - decision
             - autoland
+            - --environment=production
           maxRunTime: 1800
         scopes:
           - assume:hook-id:project-mozci/decision-task-production
@@ -210,6 +213,7 @@ mozci:
             - classify-eval
             - "--from-date=1 days ago"
             - --send-email
+            - --environment=production
           maxRunTime: 1800
         scopes:
           - assume:hook-id:project-mozci/monitoring-production
