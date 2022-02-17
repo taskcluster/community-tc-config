@@ -299,6 +299,12 @@ taskcluster:
       to:
         - hook-id:project-taskcluster/telescope-periodic-v01
 
+    - grant:
+        - queue:create-task:medium:proj-taskcluster/gw-ci-ubuntu-18-04
+      to:
+        - repo:github.com/taskcluster/docker-exec-websocket-server:*
+        - repo:github.com/taskcluster/docker-exec-websocket-client:*
+
   clients:
     smoketests:
       scopes:
