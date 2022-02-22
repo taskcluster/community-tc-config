@@ -64,8 +64,9 @@ mozci:
         - notify:email:*
 
         # Children tasks are able to send notifications
-        # to code sherriffs through Matrix
-        - notify:matrix-room:!sheriff-notifications:mozilla.org
+        # to code sheriffs through Matrix
+        - notify:matrix-room:#sheriff-notifications:mozilla.org
+        - notify:matrix-room:!vNAdpBnFtfGfispLtR:mozilla.org
       to:
         - hook-id:project-mozci/decision-task-testing
         - hook-id:project-mozci/decision-task-production
@@ -153,6 +154,8 @@ mozci:
             - classify-eval
             - "--from-date=1 days ago"
             - --send-email
+            - --recalculate
+            - --detailed-classifications
             - --environment=testing
           maxRunTime: 1800
         scopes:
@@ -213,6 +216,8 @@ mozci:
             - classify-eval
             - "--from-date=1 days ago"
             - --send-email
+            - --recalculate
+            - --detailed-classifications
             - --environment=production
           maxRunTime: 1800
         scopes:
