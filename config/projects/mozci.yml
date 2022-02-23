@@ -64,8 +64,7 @@ mozci:
         - notify:email:*
 
         # Children tasks are able to send notifications
-        # to code sheriffs through Matrix
-        - notify:matrix-room:#sheriff-notifications:mozilla.org
+        # to #sheriff-notifications room on Matrix
         - notify:matrix-room:!vNAdpBnFtfGfispLtR:mozilla.org
       to:
         - hook-id:project-mozci/decision-task-testing
