@@ -129,6 +129,8 @@ taskcluster:
       emailOnError: true
       imageset: generic-worker
       cloud: static
+      minCapacity: 0
+      maxCapacity: 10
       lifecycle:
         reregistrationTimeout: 2592000 # 30 days
 
