@@ -60,6 +60,10 @@ mozci:
         # Children tasks are indexed
         - queue:route:index.project.mozci.*
 
+        # When a child task (prod or testing) is failing on TC,
+        # an email should be sent to the analysis team
+        - queue:route:notify.email.release-mgmt-analysis@mozilla.com.on-failed
+
         # Children tasks are able to send emails
         - notify:email:*
 
