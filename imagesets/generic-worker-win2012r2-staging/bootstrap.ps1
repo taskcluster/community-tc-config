@@ -1,4 +1,4 @@
-$TASKCLUSTER_VERSION = "32.0.0"
+$TASKCLUSTER_VERSION = "44.8.4"
 
 # use TLS 1.2 (see bug 1443595)
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -171,7 +171,7 @@ New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound
 
 # install go (not required, but useful)
 md "C:\gopath"
-Expand-ZIPFile -File "C:\go1.11.5.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.11.5.windows-amd64.zip"
+Expand-ZIPFile -File "C:\go1.17.8.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.17.8.windows-amd64.zip"
 
 # install git
 $client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.16.2.windows.1/Git-2.16.2-64-bit.exe", "C:\Git-2.16.2-64-bit.exe")
