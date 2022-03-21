@@ -46,7 +46,7 @@ systemctl status docker | grep "Started Docker Application Container Engine"
 usermod -aG docker ubuntu
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
-retry curl -L 'https://dl.google.com/go/go1.17.7.linux-amd64.tar.gz' > go.tar.gz
+retry curl -L 'https://dl.google.com/go/go1.17.8.linux-amd64.tar.gz' > go.tar.gz
 tar xvfz go.tar.gz -C /usr/local
 export HOME=/root
 export GOPATH=~/go
