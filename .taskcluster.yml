@@ -8,17 +8,17 @@ tasks:
     repo:
       $if: 'tasks_for == "github-push"'
       then:
-        git_url: ${event.repository.url}
+        clone_url: ${event.repository.url}
         url: ${event.repository.url}
         ref: ${event.after}
       else:
         $if: 'tasks_for == "github-pull-request"'
         then:
-          git_url: ${event.pull_request.head.repo.git_url}
+          clone_url: ${event.pull_request.head.repo.clone_url}
           url: ${event.pull_request.head.repo.url}
           ref: ${event.pull_request.head.sha}
         else:
-          git_url: ${event.repository.url}
+          clone_url: ${event.repository.url}
           url: ${event.repository.url}
           ref: ${event.release.tag_name}
   in:
@@ -31,7 +31,7 @@ tasks:
             - '--login'
             - '-c'
             - >-
-              git clone ${repo.git_url} repo &&
+              git clone ${repo.clone_url} repo &&
               cd repo &&
               git config advice.detachedHead false &&
               git checkout ${repo.ref} &&
@@ -45,7 +45,7 @@ tasks:
             - '--login'
             - '-c'
             - >-
-              git clone ${repo.git_url} repo &&
+              git clone ${repo.clone_url} repo &&
               cd repo &&
               git config advice.detachedHead false &&
               git checkout ${repo.ref} &&
@@ -58,7 +58,7 @@ tasks:
             - '--login'
             - '-c'
             - >-
-              git clone ${repo.git_url} repo &&
+              git clone ${repo.clone_url} repo &&
               cd repo &&
               git config advice.detachedHead false &&
               git checkout ${repo.ref} &&
