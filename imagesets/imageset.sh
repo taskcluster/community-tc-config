@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-set -e
+
+set -eu
+set -o pipefail
 
 function log {
-    if [ -n "${BACKGROUND_COLOUR}" ] && [ -n "${FOREGROUND_COLOUR}" ] && [ -n "${CLOUD}" ] && [ -n "${IMAGE_SET}" ] && [ -n "${REGION}" ]; then
+    if [ -n "${BACKGROUND_COLOUR-}" ] && [ -n "${FOREGROUND_COLOUR-}" ] && [ -n "${CLOUD-}" ] && [ -n "${IMAGE_SET-}" ] && [ -n "${REGION-}" ]; then
         echo -e "\x1B[48;5;${BACKGROUND_COLOUR}m\x1B[38;5;${FOREGROUND_COLOUR}m$(basename "${0}"): $(date): ${CLOUD}: ${IMAGE_SET}: ${REGION}: ${@}\x1B[0m"
     else
         echo -e "\x1B[48;5;123m\x1B[38;5;0m$(basename "${0}"): $(date): ${@}\x1B[0m"
@@ -16,7 +18,7 @@ function deploy {
     # Presumably bash and env must already be in the PATH to reach this point,
     # but let's keep them in the dependency list in case this list is
     # copy/pasted to any docs, etc. Having them here doesn't do any harm.
-    for command in aws basename bash cat chmod cut date dirname env find gcloud git grep head mktemp pass rm sed signin-aws sleep sort tail touch tr which xargs yq; do
+    for command in aws base64 basename bash cat chmod cut date dirname env find gcloud git head mktemp pass rm sed sleep sort tail touch which xargs yq; do
         if ! which "${command}" >/dev/null; then
             log "  \xE2\x9D\x8C ${command}"
             log "${0} requires ${command} to be installed and available in your PATH - please fix and rerun" >&2
@@ -26,7 +28,7 @@ function deploy {
         fi
     done
 
-    if ! yq --version 2>&1 | grep -q 'version 3\.'; then
+    if [ -z "$(yq --version 2>&1 | sed -n 's/version 3\./x/p')" ]; then
         log "${0} requires yq version 3 in your PATH, but you have:" >&2
         log "    $(which yq)" >&2
         log "    $(yq --version 2>&1)" >&2
@@ -62,8 +64,8 @@ function deploy {
 
     export IMAGE_SET_COMMIT_SHA="$(git rev-parse HEAD)"
 
-    # UUID is 20 random chars of [a-z0-9]
-    export UUID="$(LC_CTYPE=C </dev/urandom tr -dc "a-z0-9" | head -c 20)"
+    # generate 20 char random identifier from chars [a-z0-9]
+    export UUID="$(cat /dev/urandom | head -c 256 | base64 | sed 's/[^a-z0-9]//g' | head -c 20)"
     export UNIQUE_NAME="${IMAGE_SET}-${UUID}"
 
     export TEMP_DIR="$(mktemp -d -t password-store.XXXXXXXXXX)"
@@ -74,9 +76,9 @@ function deploy {
 
     case "${CLOUD}" in
         aws)
-            if [ -z "${AWS_ACCESS_KEY_ID}" ] || [ -z "${AWS_SECRET_ACCESS_KEY}" ] || [ -z "${AWS_SESSION_TOKEN}" ]; then
+            if [ -z "${AWS_ACCESS_KEY_ID-}" ] || [ -z "${AWS_SECRET_ACCESS_KEY-}" ] || [ -z "${AWS_SESSION_TOKEN-}" ]; then
               log "Need AWS credentials..."
-              eval $(signin-aws)
+			  eval $(./signin-aws.sh)
             fi
             echo us-west-1 118 246 us-west-2 199 220 us-east-1 4 200 us-east-2 33 210 | xargs -P4 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
             log "Fetching secrets..."
@@ -288,7 +290,7 @@ function aws_update {
     {
         echo "Instance:    ${INSTANCE_ID}"
         echo "Public IP:   ${PUBLIC_IP}"
-        if [ -n "${PASSWORD}" ]; then
+        if [ -n "${PASSWORD-}" ]; then
             echo "Username:    Administrator"
             echo "Password:    ${PASSWORD}"
         fi
@@ -412,7 +414,7 @@ function google_update {
 
 ################## Entry point ##################
 
-if [ "${1}" == "process-region" ]; then
+if [ "${1-}" == "process-region" ]; then
     # Step into directory containing image set definition.
     cd "$(dirname "${0}")/${IMAGE_SET}"
     if [ -n "$(git status --porcelain . ../config/imagesets.yml)" ]; then
