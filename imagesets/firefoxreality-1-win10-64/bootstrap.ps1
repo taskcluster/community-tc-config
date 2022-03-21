@@ -1,4 +1,4 @@
-$TASKCLUSTER_VERSION = "32.0.0"
+$TASKCLUSTER_VERSION = "44.8.4"
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Get-ChildItem Env: | Out-File "C:\install_env.txt"
