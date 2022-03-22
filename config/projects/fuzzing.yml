@@ -222,6 +222,10 @@ fuzzing:
       emailOnError: true
       bindings:
         - exchange: exchange/taskcluster-queue/v1/task-exception
+          routingKeyPattern: primary.#.grizzly-reduce-worker-macos.fuzzing.#
+        - exchange: exchange/taskcluster-queue/v1/task-failed
+          routingKeyPattern: primary.#.grizzly-reduce-worker-macos.fuzzing.#
+        - exchange: exchange/taskcluster-queue/v1/task-exception
           routingKeyPattern: primary.#.grizzly-reduce-worker-windows.fuzzing.#
         - exchange: exchange/taskcluster-queue/v1/task-failed
           routingKeyPattern: primary.#.grizzly-reduce-worker-windows.fuzzing.#
@@ -245,8 +249,7 @@ fuzzing:
             - '/usr/bin/grizzly-reduce-tc-update'
             - '--crash-from-reduce-task'
             - '${payload.status.taskId}'
-            - '--quality'
-            - '5'
+            - '--auto'
             - '--only-if-quality'
             - '4'
           artifacts:
