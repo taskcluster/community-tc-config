@@ -1,4 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -eu
+set -o pipefail
+export SHELLOPTS
 
 # This script expects AWS credentials:
 #   SIGNIN_AWS_ACCESS_KEY_ID
@@ -10,9 +14,9 @@
 # Put these environment variables into your .bashrc.local (or .bashrc, if you
 # don't sync dot-files). In your .bashrc you'll also want:
 #   signin-aws() {
-#       eval `~/bin/signin-aws "${@}"`
+#       eval `signin-aws.sh "${@}"`
 #   }
-# Then put this script in your PATH as 'signin-aws', and you should be able to
+# Then put this script in your PATH as 'signin-aws.sh', and you should be able to
 # sign-in by typing 'signin-aws' in your shell.
 #
 # Note: if using a yubikey nano, you'll probably want touch-required on your
@@ -28,39 +32,39 @@ DURATION="21600"  # 6 hours
 
 # Attempt to get token from yubikey
 TOKEN=''
-if [[ ! -z "$SIGNIN_AWS_YUBIKEY_OATH_NAME" ]]; then
+if [ -n "${SIGNIN_AWS_YUBIKEY_OATH_NAME-}" ]; then
   killall -q scdaemon
-  TOKEN=`yubioath-cli show "$SIGNIN_AWS_YUBIKEY_OATH_NAME" | rev | cut -b -6 | rev`
+  TOKEN="$(yubioath-cli show "${SIGNIN_AWS_YUBIKEY_OATH_NAME}" | rev | cut -b -6 | rev)"
   if [ ! $? -eq 0 ]; then
     TOKEN=''
   fi
 fi
 
 # Ask user for token
-if [[ -z "$TOKEN" ]]; then
+if [ -z "${TOKEN}" ]; then
   (>&2 echo -n "Enter token: ")
   read TOKEN  
 fi
 
 # Re-export AWS credentials for use in this script, if set
-if [ -n "$SIGNIN_AWS_ACCESS_KEY_ID" ]; then
-    export AWS_ACCESS_KEY_ID="$SIGNIN_AWS_ACCESS_KEY_ID"
-    export AWS_SECRET_ACCESS_KEY="$SIGNIN_AWS_SECRET_ACCESS_KEY"
+if [ -n "${SIGNIN_AWS_ACCESS_KEY_ID-}" ]; then
+  export AWS_ACCESS_KEY_ID="${SIGNIN_AWS_ACCESS_KEY_ID}"
+  export AWS_SECRET_ACCESS_KEY="${SIGNIN_AWS_SECRET_ACCESS_KEY}"
 fi
 
 (>&2 echo "Fetching temporary credentials")
-SERIAL_NUMBER=`aws "${@}" iam list-mfa-devices  | jq -r .MFADevices[0].SerialNumber`
-if [ -z "$SERIAL_NUMBER" ]; then
+SERIAL_NUMBER="$(aws "${@}" iam list-mfa-devices  | jq -r .MFADevices[0].SerialNumber)"
+if [ -z "${SERIAL_NUMBER}" ]; then
   echo "Could not list MFA devices"
-  return 1
+  exit 64
 fi
-STS_CREDENTIALS=`aws "${@}" sts get-session-token --serial-number "$SERIAL_NUMBER" --token-code "$TOKEN" --duration-seconds $DURATION`
-if [ -z "$STS_CREDENTIALS" ]; then
+STS_CREDENTIALS="$(aws "${@}" sts get-session-token --serial-number "${SERIAL_NUMBER}" --token-code "${TOKEN}" --duration-seconds "${DURATION}")"
+if [ -z "${STS_CREDENTIALS}" ]; then
   echo "Could not get session token"
-  return 1
+  exit 65
 fi
 
 # Print result as importable for eval
-echo "export AWS_ACCESS_KEY_ID='`echo $STS_CREDENTIALS | jq -r .Credentials.AccessKeyId`'"
-echo "export AWS_SECRET_ACCESS_KEY='`echo $STS_CREDENTIALS | jq -r .Credentials.SecretAccessKey`'"
-echo "export AWS_SESSION_TOKEN='`echo $STS_CREDENTIALS | jq -r .Credentials.SessionToken`'"
+echo "export AWS_ACCESS_KEY_ID='$(echo ${STS_CREDENTIALS} | jq -r .Credentials.AccessKeyId)'"
+echo "export AWS_SECRET_ACCESS_KEY='$(echo ${STS_CREDENTIALS} | jq -r .Credentials.SecretAccessKey)'"
+echo "export AWS_SESSION_TOKEN='$(echo ${STS_CREDENTIALS} | jq -r .Credentials.SessionToken)'"
