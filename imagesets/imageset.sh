@@ -22,7 +22,7 @@ function deploy {
     if ! which "${command}" > /dev/null; then
       log "  \xE2\x9D\x8C ${command}"
       log "${0} requires ${command} to be installed and available in your PATH - please fix and rerun" >&2
-      exit 65
+      exit 64
     else
       log "  \xE2\x9C\x94 ${command}"
     fi
@@ -34,7 +34,7 @@ function deploy {
     log "    $(yq --version 2>&1)" >&2
     log "See https://mikefarah.gitbook.io/yq/upgrading-from-v3 about backward incompatibility of version 4 and higher."
     log "Note, an alternative solution is to upgrade this script to use v4 syntax and rebuild/publish docker container etc."
-    exit 69
+    exit 65
   else
     log "  \xE2\x9C\x94 yq is version 3"
   fi
@@ -43,22 +43,49 @@ function deploy {
 
   if [ "${#}" -ne 3 ]; then
     log "Please specify a cloud (aws/google), action (delete|update), and image set (e.g. generic-worker-win2012r2) e.g. ${0} aws update generic-worker-win2012r2" >&2
-    exit 64
+    exit 66
   fi
 
   export CLOUD="${1}"
   if [ "${CLOUD}" != "aws" ] && [ "${CLOUD}" != "google" ]; then
     log "Provider must be 'aws' or 'google' but '${CLOUD}' was specified" >&2
-    exit 65
+    exit 67
   fi
 
   ACTION="${2}"
   if [ "${ACTION}" != "update" ] && [ "${ACTION}" != "delete" ]; then
     log "Action must be 'delete' or 'update' but '${ACTION}' was specified" >&2
-    exit 66
+    exit 68
   fi
 
   export IMAGE_SET="${3}"
+
+  OFFICIAL_GIT_REPO='git@github.com:mozilla/community-tc-config'
+
+  # Local changes should be dealt with before continuing. git stash can help
+  # here! Untracked files shouldn't get pushed, so let's make sure we have none.
+  modified="$(git status --porcelain)"
+  if [ -n "${modified}" ]; then
+    log ""
+    log "There are changes in the local tree. This probably means" >&2
+    log "you'll do something unintentional. For safety's sake, please" >&2
+    log 'revert or stash them!' >&2
+    git status
+    exit 69
+  fi
+
+  # Check that the current HEAD is also the tip of the official repo main
+  # branch. If the commits match, it does not matter what the local branch
+  # name is, or even if we have a detached head.
+  remoteMasterSha="$(git ls-remote "${OFFICIAL_GIT_REPO}" main | cut -f1)"
+  localSha="$(git rev-parse HEAD)"
+  if [ "${remoteMasterSha}" != "${localSha}" ]; then
+    log ""
+    log "Locally, you are on commit ${localSha}." >&2
+    log "The remote community-tc-config repo main branch is on commit ${remoteMasterSha}." >&2
+    log "Make sure to git push/pull so that they both point to the same commit." >&2
+    exit 70
+  fi
 
   log 'Starting!'
 
@@ -98,7 +125,7 @@ function deploy {
     google)
       if [ "${GCP_PROJECT}" == "" ]; then
         log "Environment variable GCP_PROJECT must be exported before calling this script" >&2
-        exit 67
+        exit 71
       fi
       echo us-central1-a 21 230 | xargs -P1 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
       log "Updating config/imagesets.yml..."
@@ -115,7 +142,6 @@ function deploy {
     yq w -i ../config/imagesets.yml "${IMAGE_SET}.workerConfig.genericWorker.config.workerTypeMetadata.machine-setup.script" "https://github.com/mozilla/community-tc-config/blob/${IMAGE_SET_COMMIT_SHA}/imagesets/${BOOTSTRAP_SCRIPT}"
   fi
 
-  git reset
   git add ../config/imagesets.yml
 
   case "${CLOUD}" in
@@ -127,8 +153,11 @@ function deploy {
       ;;
   esac
 
+  git -c pull.rebase=true pull "${OFFICIAL_GIT_REPO}" main
+  git push "${OFFICIAL_GIT_REPO}" "+HEAD:refs/heads/main"
   log 'Deployment of image sets successful!'
-  log 'Be sure to push changes to community-tc-config repo'
+  log ''
+  log 'Be sure to run tc-admin in the community-tc-config repo to apply changes to the community cluster!'
 }
 
 ################## AWS ##################
@@ -414,11 +443,6 @@ function google_update {
 if [ "${1-}" == "process-region" ]; then
   # Step into directory containing image set definition.
   cd "$(dirname "${0}")/${IMAGE_SET}"
-  if [ -n "$(git status --porcelain . ../config/imagesets.yml)" ]; then
-    log "The following local changes need to be committed/stashed/discarded before running this script:" >&2
-    git status . ../../config/imagesets.yml 2>&1 | sed 's/^/    /' >&2
-    exit 68
-  fi
   REGION="${3}"
   FOREGROUND_COLOUR="${4}"
   BACKGROUND_COLOUR="${5}"
