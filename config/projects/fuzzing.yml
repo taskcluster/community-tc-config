@@ -285,7 +285,7 @@ fuzzing:
             namespace: project.fuzzing.orion.bugmon.master
           features:
             taskclusterProxy: true
-          maxRunTime: 10800
+          maxRunTime: 14400
           env:
             BUG_ACTION: monitor
           artifacts:
