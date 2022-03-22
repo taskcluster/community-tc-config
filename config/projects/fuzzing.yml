@@ -202,7 +202,7 @@ fuzzing:
         scopes:
           - docker-worker:capability:device:hostSharedMemory
           - docker-worker:capability:device:loopbackAudio
-          - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows
+          - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows/Administrators
           - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows
           - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker*
           - queue:route:notify.email.truber@mozilla.com.on-failed
@@ -221,6 +221,10 @@ fuzzing:
       owner: truber@mozilla.com
       emailOnError: true
       bindings:
+        - exchange: exchange/taskcluster-queue/v1/task-exception
+          routingKeyPattern: primary.#.grizzly-reduce-worker-macos.fuzzing.#
+        - exchange: exchange/taskcluster-queue/v1/task-failed
+          routingKeyPattern: primary.#.grizzly-reduce-worker-macos.fuzzing.#
         - exchange: exchange/taskcluster-queue/v1/task-exception
           routingKeyPattern: primary.#.grizzly-reduce-worker-windows.fuzzing.#
         - exchange: exchange/taskcluster-queue/v1/task-failed
@@ -245,8 +249,7 @@ fuzzing:
             - '/usr/bin/grizzly-reduce-tc-update'
             - '--crash-from-reduce-task'
             - '${payload.status.taskId}'
-            - '--quality'
-            - '5'
+            - '--auto'
             - '--only-if-quality'
             - '4'
           artifacts:
@@ -282,7 +285,7 @@ fuzzing:
             namespace: project.fuzzing.orion.bugmon.master
           features:
             taskclusterProxy: true
-          maxRunTime: 10800
+          maxRunTime: 14400
           env:
             BUG_ACTION: monitor
           artifacts:
@@ -589,7 +592,7 @@ fuzzing:
     - grant:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
-        - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows
+        - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows/Administrators
         - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows
         - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker*
         - secrets:get:project/fuzzing/deploy-bearspray
