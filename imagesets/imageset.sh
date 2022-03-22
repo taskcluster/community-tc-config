@@ -242,7 +242,7 @@ function aws_update {
   PUBLIC_IP="$(aws --region "${REGION}" ec2 describe-instances --instance-id "${INSTANCE_ID}" --query 'Reservations[*].Instances[*].NetworkInterfaces[*].Association.PublicIp' --output text)"
 
   if [ "${IMAGE_OS}" == "windows" ]; then
-    until [ -n "${PASSWORD}" ]; do
+    until [ -n "${PASSWORD-}" ]; do
       log "    Waiting for Windows Password from ${INSTANCE_ID} (IP ${PUBLIC_IP})..."
       sleep 10
       PASSWORD="$(aws --region "${REGION}" ec2 get-password-data --instance-id "${INSTANCE_ID}" --priv-launch-key ${CLOUD}.${REGION}.id_rsa --output text --query PasswordData 2> /dev/null || true)"
