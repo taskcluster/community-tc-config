@@ -78,7 +78,7 @@ function deploy {
         aws)
             if [ -z "${AWS_ACCESS_KEY_ID-}" ] || [ -z "${AWS_SECRET_ACCESS_KEY-}" ] || [ -z "${AWS_SESSION_TOKEN-}" ]; then
               log "Need AWS credentials..."
-			  eval $(./signin-aws.sh)
+              eval "$(./signin-aws.sh)"
             fi
             echo us-west-1 118 246 us-west-2 199 220 us-east-1 4 200 us-east-2 33 210 | xargs -P4 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
             log "Fetching secrets..."
