@@ -123,7 +123,7 @@ function deploy {
       pass git push
       ;;
     google)
-      if [ "${GCP_PROJECT}" == "" ]; then
+      if [ -z "${GCP_PROJECT-}" ]; then
         log "Environment variable GCP_PROJECT must be exported before calling this script" >&2
         exit 71
       fi
