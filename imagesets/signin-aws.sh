@@ -53,18 +53,15 @@ if [ -n "${SIGNIN_AWS_ACCESS_KEY_ID-}" ]; then
 fi
 
 (echo >&2 "Fetching temporary credentials")
-SERIAL_NUMBER="$(aws "${@}" iam list-mfa-devices | jq -r .MFADevices[0].SerialNumber)"
+SERIAL_NUMBER="$(aws "${@}" iam list-mfa-devices --query 'MFADevices[0].SerialNumber' --output text)"
 if [ -z "${SERIAL_NUMBER}" ]; then
   echo "Could not list MFA devices"
   exit 64
 fi
-STS_CREDENTIALS="$(aws "${@}" sts get-session-token --serial-number "${SERIAL_NUMBER}" --token-code "${TOKEN}" --duration-seconds "${DURATION}")"
-if [ -z "${STS_CREDENTIALS}" ]; then
-  echo "Could not get session token"
-  exit 65
-fi
 
-# Print result as importable for eval
-echo "export AWS_ACCESS_KEY_ID='$(echo ${STS_CREDENTIALS} | jq -r .Credentials.AccessKeyId)'"
-echo "export AWS_SECRET_ACCESS_KEY='$(echo ${STS_CREDENTIALS} | jq -r .Credentials.SecretAccessKey)'"
-echo "export AWS_SESSION_TOKEN='$(echo ${STS_CREDENTIALS} | jq -r .Credentials.SessionToken)'"
+aws "${@}" sts get-session-token --serial-number  "${SERIAL_NUMBER}" --token-code "${TOKEN}" --duration-seconds "${DURATION}" --query 'Credentials.{A:AccessKeyId,B:SecretAccessKey,C:SessionToken}' --output text | while read AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN; do
+  # Print result as importable for eval
+  echo "export AWS_ACCESS_KEY_ID='${AWS_ACCESS_KEY_ID}'"
+  echo "export AWS_SECRET_ACCESS_KEY='${AWS_SECRET_ACCESS_KEY}'"
+  echo "export AWS_SESSION_TOKEN='${AWS_SESSION_TOKEN}'"
+done
