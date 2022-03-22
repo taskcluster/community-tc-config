@@ -4,9 +4,9 @@ set -exv
 exec &> /var/log/bootstrap.log
 
 for CERT_FILE in /etc/star_taskcluster-worker_net.crt /etc/taskcluster/secrets/worker_livelog_tls_cert; do
-if [ -f "${CERT_FILE}" ]; then
+  if [ -f "${CERT_FILE}" ]; then
 
-echo '-----BEGIN CERTIFICATE-----
+    echo '-----BEGIN CERTIFICATE-----
 MIIG5zCCBc+gAwIBAgIQBkzfM0ohTg96VlvOrr6AAzANBgkqhkiG9w0BAQsFADBP
 MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMSkwJwYDVQQDEyBE
 aWdpQ2VydCBUTFMgUlNBIFNIQTI1NiAyMDIwIENBMTAeFw0yMTA2MTEwMDAwMDBa
@@ -73,7 +73,7 @@ c+LJMto4JQtV05od8GiG7S5BNO98pVAdvzr508EIDObtHopYJeS4d60tbvVS3bR0
 j6tJLp07kzQoH3jOlOrHvdPJbRzeXDLz
 -----END CERTIFICATE-----' | sudo tee "${CERT_FILE}"
 
-fi
+  fi
 done
 
 sudo shutdown -h now

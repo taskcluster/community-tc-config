@@ -67,7 +67,7 @@ mkdir -p /var/local/generic-worker
 echo 127.0.1.1 taskcluster >> /etc/hosts
 
 # configure generic-worker to run on boot
-cat > /lib/systemd/system/worker.service <<EOF
+cat > /lib/systemd/system/worker.service << EOF
 [Unit]
 Description=Start TC worker
 
@@ -84,7 +84,7 @@ User=root
 RequiredBy=graphical.target
 EOF
 
-cat > /etc/start-worker.yml <<EOF
+cat > /etc/start-worker.yml << EOF
 provider:
     providerType: %MY_CLOUD%
 worker:
@@ -108,7 +108,7 @@ system_info:
 EOF
 
 end_time="$(date '+%s')"
-echo "UserData execution took: $(($end_time-$start_time)) seconds"
+echo "UserData execution took: $(($end_time - $start_time)) seconds"
 
 # shutdown so that instance can be snapshotted
 shutdown -h now

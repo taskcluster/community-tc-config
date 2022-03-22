@@ -20,7 +20,7 @@ export SHELLOPTS
 # sign-in by typing 'signin-aws' in your shell.
 #
 # Note: if using a yubikey nano, you'll probably want touch-required on your
-#       TOTP generator. That should also work with this script. 
+#       TOTP generator. That should also work with this script.
 
 # reset any existing credentials
 unset AWS_SESSION_TOKEN
@@ -28,7 +28,7 @@ unset AWS_SECRET_ACCESS_KEY
 unset AWS_ACCESS_KEY_ID
 
 # Expiration time of login session (in seconds)
-DURATION="21600"  # 6 hours
+DURATION="21600" # 6 hours
 
 # Attempt to get token from yubikey
 TOKEN=''
@@ -42,8 +42,8 @@ fi
 
 # Ask user for token
 if [ -z "${TOKEN}" ]; then
-  (>&2 echo -n "Enter token: ")
-  read TOKEN  
+  (echo >&2 -n "Enter token: ")
+  read TOKEN
 fi
 
 # Re-export AWS credentials for use in this script, if set
@@ -52,8 +52,8 @@ if [ -n "${SIGNIN_AWS_ACCESS_KEY_ID-}" ]; then
   export AWS_SECRET_ACCESS_KEY="${SIGNIN_AWS_SECRET_ACCESS_KEY}"
 fi
 
-(>&2 echo "Fetching temporary credentials")
-SERIAL_NUMBER="$(aws "${@}" iam list-mfa-devices  | jq -r .MFADevices[0].SerialNumber)"
+(echo >&2 "Fetching temporary credentials")
+SERIAL_NUMBER="$(aws "${@}" iam list-mfa-devices | jq -r .MFADevices[0].SerialNumber)"
 if [ -z "${SERIAL_NUMBER}" ]; then
   echo "Could not list MFA devices"
   exit 64
