@@ -5,9 +5,9 @@ set -o pipefail
 
 function log {
   if [ -n "${BACKGROUND_COLOUR-}" ] && [ -n "${FOREGROUND_COLOUR-}" ] && [ -n "${CLOUD-}" ] && [ -n "${IMAGE_SET-}" ] && [ -n "${REGION-}" ]; then
-    echo -e "\x1B[48;5;${BACKGROUND_COLOUR}m\x1B[38;5;${FOREGROUND_COLOUR}m$(basename "${0}"): $(date): ${CLOUD}: ${IMAGE_SET}: ${REGION}: ${@}\x1B[0m"
+    echo -e "\x1B[48;5;${BACKGROUND_COLOUR}m\x1B[38;5;${FOREGROUND_COLOUR}m$(basename "${0}"): $(date): ${CLOUD}: ${IMAGE_SET}: ${REGION}: ${@}\x1B[K\x1B[0m"
   else
-    echo -e "\x1B[48;5;123m\x1B[38;5;0m$(basename "${0}"): $(date): ${@}\x1B[0m"
+    echo -e "\x1B[48;5;123m\x1B[38;5;0m$(basename "${0}"): $(date): ${@}\x1B[K\x1B[0m"
   fi
 }
 
@@ -32,8 +32,8 @@ function deploy {
     log "${0} requires yq version 3 in your PATH, but you have:" >&2
     log "    $(which yq)" >&2
     log "    $(yq --version 2>&1)" >&2
-    log "See https://mikefarah.gitbook.io/yq/upgrading-from-v3 about backward incompatibility of version 4 and higher."
-    log "Note, an alternative solution is to upgrade this script to use v4 syntax and rebuild/publish docker container etc."
+    log "See https://mikefarah.gitbook.io/yq/upgrading-from-v3 about backward incompatibility of version 4 and higher." >&2
+    log "Note, an alternative solution is to upgrade this script to use v4 syntax and rebuild/publish docker container etc." >&2
     exit 65
   else
     log "  \xE2\x9C\x94 yq is version 3"
@@ -87,7 +87,15 @@ function deploy {
     exit 70
   fi
 
-  log 'Starting!'
+  if [ "${CLOUD}" == "google" ] && [ -z "${GCP_PROJECT-}" ]; then
+    log "Environment variable GCP_PROJECT must be exported before calling this script" >&2
+    exit 71
+  fi
+
+  if ! [ -d "${IMAGE_SET}" ]; then
+    log "Directory $(pwd)/${IMAGE_SET} not found - please specify a valid directory for image set" >&2
+    exit 72
+  fi
 
   export IMAGE_SET_COMMIT_SHA="$(git rev-parse HEAD)"
 
@@ -100,6 +108,21 @@ function deploy {
   git clone ssh://gitolite3@git-internal.mozilla.org/taskcluster/secrets.git "${PASSWORD_STORE_DIR}"
   git -C "${PASSWORD_STORE_DIR}" config pass.signcommits false
   git -C "${PASSWORD_STORE_DIR}" config commit.gpgsign false
+
+  head_sha_password_store="$(pass git rev-parse HEAD)"
+  echo test | pass insert -m -f "test"
+  if [ "$(pass test)" != "test" ]; then
+    log "Problem writing to password store" >&2
+    exit 73
+  fi
+  # Note, we could have used `HEAD~1` rather than the explicit commit id here,
+  # however if the `pass insert` command above didn't result in a git commit
+  # (e.g. because test.gpg is in a gitignore list of the user or repo) then we
+  # would end up removing the wrong commit. Using the explicit commit id here
+  # protects against those type of edge cases.
+  pass git reset --hard "${head_sha_password_store}" >/dev/null 2>&1
+
+  log 'Starting!'
 
   case "${CLOUD}" in
     aws)
@@ -123,10 +146,6 @@ function deploy {
       pass git push
       ;;
     google)
-      if [ -z "${GCP_PROJECT-}" ]; then
-        log "Environment variable GCP_PROJECT must be exported before calling this script" >&2
-        exit 71
-      fi
       echo us-central1-a 21 230 | xargs -P1 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
       log "Updating config/imagesets.yml..."
       IMAGE_NAME="$(cat "${IMAGE_SET}/gcp.secrets")"
