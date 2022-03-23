@@ -116,7 +116,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-win2012r2-staging
-      cloud: aws
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 10
       workerConfig:
