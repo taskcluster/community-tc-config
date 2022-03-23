@@ -440,7 +440,7 @@ function google_update {
 
   log "Now creating an image from the terminated instance..."
   # gcloud compute disks snapshot "${UNIQUE_NAME}" --project="${GCP_PROJECT}" --description="my description" --labels="key1=value1" --snapshot-names="${UNIQUE_NAME}" --zone="${REGION}" --storage-location=us
-  gcloud compute images create "${UNIQUE_NAME}" --source-disk="${UNIQUE_NAME}" --source-disk-zone="${REGION}" --source-disk-project="${GCP_PROJECT}" --labels="image-set=${IMAGE_SET}" --project="${GCP_PROJECT}"
+  gcloud compute images create "${UNIQUE_NAME}" --source-disk="${UNIQUE_NAME}" --source-disk-zone="${REGION}" --labels="image-set=${IMAGE_SET}" --project="${GCP_PROJECT}"
 
   log ''
   log "The image is being created here:"
