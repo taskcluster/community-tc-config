@@ -174,10 +174,10 @@ generic-worker-win2016:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-050830c0b6ca86039
-      us-west-1: ami-02762343c39a96d85
-      us-west-2: ami-044b10fec4e19f72e
-      us-east-2: ami-040d4c20f0af2d307
+      us-east-1: ami-02bcfc9a24751f1bb
+      us-west-1: ami-00f8f353a4a4055d4
+      us-west-2: ami-0e019740238f6f1fd
+      us-east-2: ami-03fd7c33256729351
   workerConfig:
     genericWorker:
       config:
@@ -188,4 +188,4 @@ generic-worker-win2016:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/612de3380b97f81baa670efdf18b25ed16b5bbde/imagesets/generic-worker-win2016/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/5611dfd9817937dc741df5df2a231257f7fd5ad9/imagesets/generic-worker-win2016/bootstrap.ps1
