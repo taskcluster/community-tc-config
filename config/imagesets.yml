@@ -94,7 +94,9 @@ generic-worker-win2012r2-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/7912ef2b182c29eac6cd18f7a42b7ddb37e7a3e0/imagesets/generic-worker-win2012r2-staging/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/04ba2fa7761efa3734d00d5920f9618e6e9eba41/imagesets/generic-worker-win2012r2-staging/bootstrap.ps1
+  gcp:
+    image: projects/taskcluster-imaging/global/images/generic-worker-win2012r2-staging-dw3iysfa3k0h0cyd0wil
 generic-worker-ubuntu-18-04:
   workerImplementation: generic-worker
   aws:
