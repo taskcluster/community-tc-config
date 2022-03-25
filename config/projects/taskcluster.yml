@@ -143,6 +143,12 @@ taskcluster:
       securityGroup: rdp
       minCapacity: 0
       maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            # While iterating on the image building process for this worker
+            # pool, useful for workers not to die immediately...
+            idleTimeoutSecs: 3600
 
   grants:
     - grant:
