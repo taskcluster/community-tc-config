@@ -192,3 +192,23 @@ generic-worker-win2016:
           machine-setup:
             maintainer: pmoore@mozilla.com
             script: https://github.com/mozilla/community-tc-config/blob/5611dfd9817937dc741df5df2a231257f7fd5ad9/imagesets/generic-worker-win2016/bootstrap.ps1
+generic-worker-win2022:
+  workerImplementation: generic-worker
+  aws:
+    amis:
+      us-west-1: ami-034242a73a19c0fef
+      us-west-2: ami-0addef070b3c9783d
+      us-east-1: ami-0490cab064969cc87
+      us-east-2: ami-0d6af3eba47f16cbb
+  gcp:
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
+        shutdownMachineOnIdle: true
+        idleTimeoutSecs: 15
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: pmoore@mozilla.com
+            script: https://github.com/mozilla/community-tc-config/blob/13ee3450a8c3721f5c740aff46bbb5751079f842/imagesets/generic-worker-win2022/bootstrap.ps1

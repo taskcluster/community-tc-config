@@ -59,6 +59,7 @@ taskcluster:
       emailOnError: true
       imageset: generic-worker-win2012r2
       cloud: aws
+      securityGroup: rdp
       minCapacity: 0
       maxCapacity: 10
 
@@ -105,6 +106,7 @@ taskcluster:
       emailOnError: true
       imageset: generic-worker-win2012r2
       cloud: aws
+      securityGroup: rdp
       minCapacity: 0
       maxCapacity: 10
       workerConfig:
@@ -117,6 +119,7 @@ taskcluster:
       emailOnError: true
       imageset: generic-worker-win2012r2-staging
       cloud: gcp
+      securityGroup: rdp
       minCapacity: 0
       maxCapacity: 10
       workerConfig:
@@ -131,6 +134,21 @@ taskcluster:
       cloud: static
       lifecycle:
         reregistrationTimeout: 2592000 # 30 days
+
+    gw-windows-2022:
+      owner: pmoore@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2022
+      cloud: aws
+      securityGroup: rdp
+      minCapacity: 0
+      maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            # While iterating on the image building process for this worker
+            # pool, useful for workers not to die immediately...
+            idleTimeoutSecs: 3600
 
   grants:
     - grant:
