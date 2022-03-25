@@ -59,6 +59,7 @@ taskcluster:
       emailOnError: true
       imageset: generic-worker-win2012r2
       cloud: aws
+      securityGroup: rdp
       minCapacity: 0
       maxCapacity: 10
 
@@ -105,6 +106,7 @@ taskcluster:
       emailOnError: true
       imageset: generic-worker-win2012r2
       cloud: aws
+      securityGroup: rdp
       minCapacity: 0
       maxCapacity: 10
       workerConfig:
@@ -117,6 +119,7 @@ taskcluster:
       emailOnError: true
       imageset: generic-worker-win2012r2-staging
       cloud: gcp
+      securityGroup: rdp
       minCapacity: 0
       maxCapacity: 10
       workerConfig:
@@ -137,6 +140,7 @@ taskcluster:
       emailOnError: true
       imageset: generic-worker-win2022
       cloud: aws
+      securityGroup: rdp
       minCapacity: 0
       maxCapacity: 10
 
