@@ -132,6 +132,14 @@ taskcluster:
       lifecycle:
         reregistrationTimeout: 2592000 # 30 days
 
+    gw-windows-2022:
+      owner: pmoore@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2022
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 10
+
   grants:
     - grant:
         - notify:manage-denylist
