@@ -120,7 +120,7 @@ function deploy {
   # (e.g. because test.gpg is in a gitignore list of the user or repo) then we
   # would end up removing the wrong commit. Using the explicit commit id here
   # protects against those type of edge cases.
-  pass git reset --hard "${head_sha_password_store}" >/dev/null 2>&1
+  pass git reset --hard "${head_sha_password_store}" > /dev/null 2>&1
 
   log 'Starting!'
 

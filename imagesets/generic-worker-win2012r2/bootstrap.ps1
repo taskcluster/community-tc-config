@@ -59,7 +59,7 @@ Start-Process C:\generic-worker\install.bat -Wait -NoNewWindow
 md C:\worker-runner
 $client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v${TASKCLUSTER_VERSION}/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
 
-# install tc-worker-runner
+# install worker-runner
 Set-Content -Path c:\worker-runner\install.bat @"
 set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% install worker-runner c:\worker-runner\start-worker.exe
@@ -187,4 +187,17 @@ Expand-ZIPFile -File "C:\ProcessExplorer.zip" -Destination "C:\ProcessExplorer" 
 md "C:\ProcessMonitor"
 Expand-ZIPFile -File "C:\ProcessMonitor.zip" -Destination "C:\ProcessMonitor" -Url "https://download.sysinternals.com/files/ProcessMonitor.zip"
 
+# See https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch.html#ec2launch-inittasks
+# schedule one time run of EC2Launch service on first boot of instances to ensure network routes are correctly configured
+C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
+# make sure admin password isn't changed, since we've already captured the current random password
+$launchConfig = Get-Content 'C:\ProgramData\Amazon\EC2-Windows\Launch\Config\LaunchConfig.json' -raw | ConvertFrom-Json
+$launchConfig.adminPasswordType = "DoNothing"
+$launchConfig | ConvertTo-Json -depth 32 | Set-Content 'C:\ProgramData\Amazon\EC2-Windows\Launch\Config\LaunchConfig.json'
+
+# now shutdown, in preparation for creating an image
+# Stop-Computer isn't working, also not when specifying -AsJob, so reverting to using `shutdown` command instead
+#   * https://www.reddit.com/r/PowerShell/comments/65250s/windows_10_creators_update_stopcomputer_not/dgfofug/?st=j1o3oa29&sh=e0c29c6d
+#   * https://support.microsoft.com/en-in/help/4014551/description-of-the-security-and-quality-rollup-for-the-net-framework-4
+#   * https://support.microsoft.com/en-us/help/4020459
 shutdown -s
