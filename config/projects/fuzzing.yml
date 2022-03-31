@@ -50,6 +50,16 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
+    grizzly-reduce-worker-android:
+      owner: truber@mozilla.com
+      emailOnError: true
+      imageset: docker-worker
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 10
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
     grizzly-reduce-worker-windows:
       owner: truber@mozilla.com
       emailOnError: true
@@ -221,6 +231,10 @@ fuzzing:
       owner: truber@mozilla.com
       emailOnError: true
       bindings:
+        - exchange: exchange/taskcluster-queue/v1/task-exception
+          routingKeyPattern: primary.#.grizzly-reduce-worker-android.fuzzing.#
+        - exchange: exchange/taskcluster-queue/v1/task-failed
+          routingKeyPattern: primary.#.grizzly-reduce-worker-android.fuzzing.#
         - exchange: exchange/taskcluster-queue/v1/task-exception
           routingKeyPattern: primary.#.grizzly-reduce-worker-macos.fuzzing.#
         - exchange: exchange/taskcluster-queue/v1/task-failed
