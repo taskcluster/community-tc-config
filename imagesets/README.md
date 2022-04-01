@@ -147,14 +147,19 @@ complete:
    pip3 install -e .
    which tc-admin
    pass git pull
-   TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com tc-admin diff || true
+   TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com
+   TASKCLUSTER_CLIENT_ID=static/taskcluster/root
+   TASKCLUSTER_ACCESS_TOKEN="$(pass show community-tc/root)"
+   unset TASKCLUSTER_CERTIFICATE
+   tc-admin diff || true
+   tc-admin diff --ids-only || true
    echo
    echo 'Applying in 60 seconds (Ctrl-C to abort)....'
    echo
    sleep 60
    echo 'Applying!'
    echo
-   TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com tc-admin apply
+   tc-admin apply
    cd ../..
    rm -rf tc-admin
    ```
