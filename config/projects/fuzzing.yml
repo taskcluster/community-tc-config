@@ -212,6 +212,7 @@ fuzzing:
         scopes:
           - docker-worker:capability:device:hostSharedMemory
           - docker-worker:capability:device:loopbackAudio
+          - docker-worker:capability:privileged
           - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows/Administrators
           - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows
           - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker*
@@ -606,6 +607,7 @@ fuzzing:
     - grant:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
+        - docker-worker:capability:privileged
         - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows/Administrators
         - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows
         - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker*
