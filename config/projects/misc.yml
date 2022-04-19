@@ -28,7 +28,6 @@ misc:
       description: Taskcluster hook to run fx release metrics
       owner: jcristau@mozilla.com
       emailOnError: true
-      schedule: ['0 0 8 * * *']
       task:
         provisionerId: proj-misc
         workerType: ci
