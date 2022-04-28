@@ -560,6 +560,10 @@ fuzzing:
             namespace: project.fuzzing.orion.prefmonitor.master
           features:
             taskclusterProxy: true
+          artifacts:
+            project/fuzzing/prefmonitor:
+              path: /live.log
+              type: file
           maxRunTime: 10800
         deadline:
           $fromNow: 6 hours
