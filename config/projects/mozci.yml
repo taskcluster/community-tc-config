@@ -294,7 +294,7 @@ mozci:
           image:
             type: indexed-image
             path: public/mozci.tar.zst
-            namespace: project.mozci.docker.branch.master
+            namespace: project.mozci.docker.branch.production
           features:
             taskclusterProxy: true
           env:
