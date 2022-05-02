@@ -210,7 +210,8 @@ mozci:
           command:
             - push
             - check-backfills
-            - "--nb-pushes=20"
+            - --nb-pushes=20
+            - --environment=testing
           maxRunTime: 1800
         scopes:
           - assume:hook-id:project-mozci/monitoring-testing
@@ -302,6 +303,7 @@ mozci:
           command:
             - push
             - check-backfills
+            - --environment=production
           maxRunTime: 1800
         scopes:
           - assume:hook-id:project-mozci/monitoring-production
