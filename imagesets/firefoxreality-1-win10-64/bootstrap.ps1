@@ -1,4 +1,4 @@
-$TASKCLUSTER_VERSION = "44.8.4"
+$TASKCLUSTER_VERSION = "44.13.4"
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Get-ChildItem Env: | Out-File "C:\install_env.txt"
@@ -103,7 +103,7 @@ Start-Process "msiexec" -ArgumentList "/i C:\BinScopeSetup.msi /quiet" -Wait -No
 New-NetFirewallRule -DisplayName "Allow livelog PUT requests" -Direction Inbound -LocalPort 60022 -Protocol TCP -Action Allow
 New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound -LocalPort 60023 -Protocol TCP -Action Allow
 md "C:\gopath"
-Expand-ZIPFile -File "C:\go1.17.8.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.17.8.windows-amd64.zip"
+Expand-ZIPFile -File "C:\go1.18.1.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.18.1.windows-amd64.zip"
 $client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.16.2.windows.1/Git-2.16.2-64-bit.exe", "C:\Git-2.16.2-64-bit.exe")
 Start-Process "C:\Git-2.16.2-64-bit.exe" -ArgumentList "/VERYSILENT /LOG=C:\git_install.log /NORESTART /SUPPRESSMSGBOXES" -Wait -NoNewWindow
 $client.DownloadFile("http://aka.ms/downloadazcopy", "C:\AZCopy.msi")
