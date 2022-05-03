@@ -106,6 +106,27 @@ mozci:
         - notify:email:*
       to: hook-id:project-mozci/monitoring-production
 
+    - grant:
+        # Backfill tasks are self-indexed
+        - queue:route:index.project.mozci.*
+
+        # Backfill tasks are able to send notifications
+        # to #sheriff-notifications room on Matrix
+        - notify:matrix-room:!vNAdpBnFtfGfispLtR:mozilla.org
+      to:
+        - hook-id:project-mozci/check-backfills-testing
+        - hook-id:project-mozci/check-backfills-production
+
+    - grant:
+        # Backfill tasks read their configuration from taskcluster
+        - secrets:get:project/mozci/testing
+      to: hook-id:project-mozci/check-backfills-testing
+
+    - grant:
+        # Backfill tasks read their configuration from taskcluster
+        - secrets:get:project/mozci/production
+      to: hook-id:project-mozci/check-backfills-production
+
   hooks:
     decision-task-testing:
       description: Run mozci classification tasks for new pushes
@@ -169,6 +190,37 @@ mozci:
           owner: mcastelluccio@mozilla.com
           source: https://github.com/mozilla/mozci
 
+    check-backfills-testing:
+      description: Check backfill completion every few minutes
+      owner: mcastelluccio@mozilla.com
+      emailOnError: true
+      schedule: ['*/5 * * * *'] # every 5 minutes
+      task:
+        provisionerId: proj-mozci
+        workerType: compute-smaller
+        payload:
+          image:
+            type: indexed-image
+            path: public/mozci.tar.zst
+            namespace: project.mozci.docker.branch.master
+          features:
+            taskclusterProxy: true
+          env:
+            TASKCLUSTER_SECRET: project/mozci/testing
+          command:
+            - push
+            - check-backfills
+            - --nb-pushes=20
+            - --environment=testing
+          maxRunTime: 1800
+        scopes:
+          - assume:hook-id:project-mozci/monitoring-testing
+        metadata:
+          name: mozci check-backfills - testing
+          description: Check backfill completion every few minutes
+          owner: mcastelluccio@mozilla.com
+          source: https://github.com/mozilla/mozci
+
     decision-task-production:
       description: Run mozci classification tasks for new pushes
       owner: mcastelluccio@mozilla.com
@@ -228,5 +280,35 @@ mozci:
         metadata:
           name: mozci monitoring - production
           description: mozci monitoring
+          owner: mcastelluccio@mozilla.com
+          source: https://github.com/mozilla/mozci
+
+    check-backfills-production:
+      description: Check backfill completion every few minutes
+      owner: mcastelluccio@mozilla.com
+      emailOnError: true
+      schedule: ['*/5 * * * *'] # every 5 minutes
+      task:
+        provisionerId: proj-mozci
+        workerType: compute-smaller
+        payload:
+          image:
+            type: indexed-image
+            path: public/mozci.tar.zst
+            namespace: project.mozci.docker.branch.production
+          features:
+            taskclusterProxy: true
+          env:
+            TASKCLUSTER_SECRET: project/mozci/production
+          command:
+            - push
+            - check-backfills
+            - --environment=production
+          maxRunTime: 1800
+        scopes:
+          - assume:hook-id:project-mozci/monitoring-production
+        metadata:
+          name: mozci check-backfills - production
+          description: Check backfill completion every few minutes
           owner: mcastelluccio@mozilla.com
           source: https://github.com/mozilla/mozci
