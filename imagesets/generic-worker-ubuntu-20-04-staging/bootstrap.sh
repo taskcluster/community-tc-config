@@ -4,7 +4,7 @@ set -exv
 exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
-TASKCLUSTER_REF='v44.8.4'
+TASKCLUSTER_REF='v44.13.4'
 ######################################
 
 function retry {
@@ -45,7 +45,7 @@ retry apt-get install -y docker-ce docker-ce-cli containerd.io
 retry docker run hello-world
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
-retry curl -L 'https://dl.google.com/go/go1.17.8.linux-amd64.tar.gz' > go.tar.gz
+retry curl -L 'https://dl.google.com/go/go1.18.1.linux-amd64.tar.gz' > go.tar.gz
 tar xvfz go.tar.gz -C /usr/local
 export HOME=/root
 export GOPATH=~/go
