@@ -51,12 +51,10 @@ to be present:
 
          The image set building process requires that you are authenticated against
          AWS. If the env vars `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`,
-         `AWS_SESSION_TOKEN` are not set, the
-         [`signin-aws`](docker/signin-aws)
+         `AWS_SESSION_TOKEN` are not set, the [`signin-aws.sh`](signin-aws.sh)
          script will be automatically run. However, the yubikey interface isn't
          supported when running under docker, so if you use a yubikey, it is recommended
-         to download this script on your host and run `eval $(signin-aws)` before
-         calling the `imageset-under-docker.sh` script.
+         to run `eval $(signin-aws.sh)` before calling the `imageset-under-docker.sh` script.
 
        * Other MFA Device:
  
@@ -109,7 +107,6 @@ All of the following tools must be available in the `PATH`:
   * `pass`
   * `rm`
   * `sed`
-  * [`signin-aws`](docker/signin-aws)
   * `sleep`
   * `sort`
   * `tail`
