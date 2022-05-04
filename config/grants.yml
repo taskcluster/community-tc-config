@@ -168,7 +168,6 @@
 
     # for a few project admins
     - project-admin:fuzzing
-    - project-admin:servo
     - project-admin:wpt
 
     # for relman
@@ -184,8 +183,7 @@
     - queue:route:checks
     - queue:route:statuses
   to:
-    # Repositories that whish to use this work-around
-    - repo:github.com/servo/servo:*
+    # Repositories that wish to use this workaround
     - repo:github.com/web-platform-tests/wpt:*
 
 # Allow the taskcluster team to handle the denylist
