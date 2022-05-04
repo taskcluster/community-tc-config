@@ -139,7 +139,7 @@ taskcluster:
       owner: pmoore@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-20-04-staging
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 10
 
