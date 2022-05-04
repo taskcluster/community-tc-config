@@ -120,10 +120,10 @@ generic-worker-ubuntu-18-04-podman:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0f7922d839c6778ce
-      us-west-1: ami-0d15d84d0d3c0c05e
-      us-west-2: ami-0224758e5b048b961
-      us-east-2: ami-0a0d2a9f8d222630d
+      us-east-1: ami-0c10203348cc8a550
+      us-west-1: ami-07a31f1d4e7e5cc2e
+      us-west-2: ami-0ccc417829348f52f
+      us-east-2: ami-04e5b93319cb19a05
   workerConfig:
     genericWorker:
       config:
@@ -134,7 +134,7 @@ generic-worker-ubuntu-18-04-podman:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/5611dfd9817937dc741df5df2a231257f7fd5ad9/imagesets/generic-worker-ubuntu-18-04-podman/bootstrap.sh
+            script: https://github.com/mozilla/community-tc-config/blob/6141dcaa89185c9ef5a78147e706c3cabf638f86/imagesets/generic-worker-ubuntu-18-04-podman/bootstrap.sh
 generic-worker-ubuntu-18-04-staging:
   workerImplementation: generic-worker
   aws:
