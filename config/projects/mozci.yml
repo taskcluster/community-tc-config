@@ -208,13 +208,12 @@ mozci:
           env:
             TASKCLUSTER_SECRET: project/mozci/testing
           command:
-            - push
             - check-backfills
             - --nb-pushes=20
             - --environment=testing
           maxRunTime: 1800
         scopes:
-          - assume:hook-id:project-mozci/monitoring-testing
+          - assume:hook-id:project-mozci/check-backfills-testing
         metadata:
           name: mozci check-backfills - testing
           description: Check backfill completion every few minutes
@@ -301,12 +300,11 @@ mozci:
           env:
             TASKCLUSTER_SECRET: project/mozci/production
           command:
-            - push
             - check-backfills
             - --environment=production
           maxRunTime: 1800
         scopes:
-          - assume:hook-id:project-mozci/monitoring-production
+          - assume:hook-id:project-mozci/check-backfills-production
         metadata:
           name: mozci check-backfills - production
           description: Check backfill completion every few minutes
