@@ -139,10 +139,10 @@ generic-worker-ubuntu-18-04-staging:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0676d665caff00630
-      us-west-1: ami-0ca7d5b2ec1c971ea
-      us-west-2: ami-089a3e8c95386bb90
-      us-east-2: ami-01bf7c2a1d7894fc7
+      us-east-1: ami-0f975d5f8f3bd848c
+      us-west-1: ami-01d6de5e6296eaa5d
+      us-west-2: ami-0b3af8465ac0dd4d0
+      us-east-2: ami-0f67bfd8ca1673022
   workerConfig:
     genericWorker:
       config:
@@ -153,7 +153,7 @@ generic-worker-ubuntu-18-04-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/221899853f2c4e09c97b92e1e2e53e889a668bd2/imagesets/generic-worker-ubuntu-18-04-staging/bootstrap.sh
+            script: https://github.com/mozilla/community-tc-config/blob/6141dcaa89185c9ef5a78147e706c3cabf638f86/imagesets/generic-worker-ubuntu-18-04-staging/bootstrap.sh
 relman-win2012r2:
   workerImplementation: generic-worker
   aws:
