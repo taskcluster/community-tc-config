@@ -209,7 +209,7 @@ mozci:
             TASKCLUSTER_SECRET: project/mozci/testing
           command:
             - check-backfills
-            - --nb-pushes=20
+            - --nb-pushes=10
             - --environment=testing
           maxRunTime: 1800
         scopes:
@@ -301,6 +301,7 @@ mozci:
             TASKCLUSTER_SECRET: project/mozci/production
           command:
             - check-backfills
+            - --nb-pushes=40
             - --environment=production
           maxRunTime: 1800
         scopes:
