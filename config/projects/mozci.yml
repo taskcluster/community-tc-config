@@ -107,9 +107,6 @@ mozci:
       to: hook-id:project-mozci/monitoring-production
 
     - grant:
-        # Backfill tasks are self-indexed
-        - queue:route:index.project.mozci.*
-
         # Backfill tasks are able to send notifications
         # to #sheriff-notifications room on Matrix
         - notify:matrix-room:!vNAdpBnFtfGfispLtR:mozilla.org
@@ -118,11 +115,17 @@ mozci:
         - hook-id:project-mozci/check-backfills-production
 
     - grant:
+        # Backfill tasks are indexing themselves
+        - index:insert-task:project.mozci.check-backfill.testing.*
+
         # Backfill tasks read their configuration from taskcluster
         - secrets:get:project/mozci/testing
       to: hook-id:project-mozci/check-backfills-testing
 
     - grant:
+        # Backfill tasks are indexing themselves
+        - index:insert-task:project.mozci.check-backfill.production.*
+
         # Backfill tasks read their configuration from taskcluster
         - secrets:get:project/mozci/production
       to: hook-id:project-mozci/check-backfills-production
@@ -214,6 +217,7 @@ mozci:
           maxRunTime: 1800
         scopes:
           - assume:hook-id:project-mozci/check-backfills-testing
+          - index:insert-task:project.mozci.check-backfill.testing.*
         metadata:
           name: mozci check-backfills - testing
           description: Check backfill completion every few minutes
@@ -306,6 +310,7 @@ mozci:
           maxRunTime: 1800
         scopes:
           - assume:hook-id:project-mozci/check-backfills-production
+          - index:insert-task:project.mozci.check-backfill.production.*
         metadata:
           name: mozci check-backfills - production
           description: Check backfill completion every few minutes
