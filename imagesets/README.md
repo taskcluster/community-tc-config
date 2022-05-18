@@ -125,41 +125,8 @@ complete:
    updating image references in `/config/imagesets.yml`. Make sure to push this
    commit upstream (i.e. to `git@github.com:mozilla/community-tc-config.git`).
 
-2) Apply the config changes by running `tc-admin`. Note, here is a script that
-   does this, if you have not already set something up:
-
-
-   ```bash
-   #!/bin/bash -e
-   rm -rf tc-admin
-   mkdir tc-admin
-   pip3 install --upgrade pip
-   cd tc-admin
-   python3 -m venv tc-admin-venv
-   source tc-admin-venv/bin/activate
-   pip3 install pytest
-   pip3 install --upgrade pip
-   git clone https://github.com/mozilla/community-tc-config
-   cd community-tc-config
-   pip3 install -e .
-   which tc-admin
-   pass git pull
-   TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com
-   TASKCLUSTER_CLIENT_ID=static/taskcluster/root
-   TASKCLUSTER_ACCESS_TOKEN="$(pass show community-tc/root)"
-   unset TASKCLUSTER_CERTIFICATE
-   tc-admin diff || true
-   tc-admin diff --ids-only || true
-   echo
-   echo 'Applying in 60 seconds (Ctrl-C to abort)....'
-   echo
-   sleep 60
-   echo 'Applying!'
-   echo
-   tc-admin apply
-   cd ../..
-   rm -rf tc-admin
-   ```
+2) Apply the config changes by running `run-tc-admin.sh` in the root folder of
+   this repository.
 
 3) Don't forget to test your image set changes! Try rerunning some tasks that
    previously ran successfully.

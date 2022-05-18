@@ -20,33 +20,34 @@ function tc_admin {
   pip3 install -e .
   which tc-admin
   git clone ssh://gitolite3@git-internal.mozilla.org/taskcluster/secrets.git "${PASSWORD_STORE_DIR}"
-  TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com
-  TASKCLUSTER_CLIENT_ID=static/taskcluster/root
-  TASKCLUSTER_ACCESS_TOKEN="$(pass show community-tc/root | head -n 1)"
+  export TASKCLUSTER_ROOT_URL='https://community-tc.services.mozilla.com'
+  export TASKCLUSTER_CLIENT_ID='static/taskcluster/root'
+  export TASKCLUSTER_ACCESS_TOKEN="$(pass show community-tc/root | head -n 1)"
   unset TASKCLUSTER_CERTIFICATE
   tc-admin diff || true
   tc-admin diff --ids-only || true
   echo
-  echo 'Applying in 60 seconds (Ctrl-C to abort)....'
-  echo
   done=false
-  while ! ${done}; do
+  while true; do
     read -p "Apply changes (yes/no)? " choice
-    case "$choice" in
+    case "${choice}" in
       yes)
         echo
         echo 'Applying!'
         echo
         tc-admin apply
-        done=true;;
+        break
+        ;;
       no)
-        echo "Ok ok 🐥"
-        done=true;;
+        echo "Ok, ok, 🐥."
+        break
+        ;;
       *)
-        echo "Invalid response: '${choice}'. Please answer 'yes' or 'no'.";;
+        echo "Invalid response: '${choice}'. Please answer 'yes' or 'no'."
+        ;;
     esac
   done
-  cd /
+  cd
   rm -rf "${TEMP_DIR}"
 }
 
