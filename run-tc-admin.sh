@@ -4,17 +4,23 @@ set -eu
 set -o pipefail
 
 function tc_admin {
+
+
+  ################################################
+  # this is temporarily in here while i work out what is needed, then it will be moved into docker image itself...
   apt update
   apt install -y python3-pip python3.8-venv
   pip install --upgrade pip
+  python3 -m venv tc-admin-venv
+  pip3 install pytest
+  pip3 install --upgrade pip
+  ################################################
 
+
+  source tc-admin-venv/bin/activate
   export TEMP_DIR="$(mktemp -d -t password-store.XXXXXXXXXX)"
   export PASSWORD_STORE_DIR="${TEMP_DIR}/.password-store"
   cd "${TEMP_DIR}"
-  python3 -m venv tc-admin-venv
-  source tc-admin-venv/bin/activate
-  pip3 install pytest
-  pip3 install --upgrade pip
   git clone https://github.com/mozilla/community-tc-config
   cd community-tc-config
   pip3 install -e .
