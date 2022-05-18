@@ -136,15 +136,15 @@ taskcluster:
         reregistrationTimeout: 2592000 # 30 days
 
     gw-ubuntu-20-04-staging:
-      owner: pmoore@mozilla.com
+      owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-20-04-staging
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 10
 
     gw-windows-2022:
-      owner: pmoore@mozilla.com
+      owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-win2022
       cloud: aws
