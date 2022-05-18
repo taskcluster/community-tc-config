@@ -59,7 +59,7 @@ if [ "${1-}" == "native" ]; then
   tc_admin
 else
   TAG="$(cat docker/TAG)"
-  echo docker run \
+  docker run \
     --rm \
     -ti \
     -v "$(pwd):/community-tc-config" \
