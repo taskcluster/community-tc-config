@@ -307,6 +307,9 @@ fuzzing:
             project/fuzzing/bugmon:
               path: /bugmon-artifacts
               type: directory
+            project/fuzzing/grizzly:
+              path: /tmp/grizzly
+              type: directory
         metadata:
           name: bugmon
           description: Hook for triggering bugmon monitor tasks
@@ -351,6 +354,9 @@ fuzzing:
           artifacts:
             project/fuzzing/bugmon:
               path: /bugmon-artifacts
+              type: directory
+            project/fuzzing/grizzly:
+              path: /tmp/grizzly
               type: directory
         metadata:
           name: bugmon-confirm
