@@ -503,7 +503,7 @@ fuzzing:
         routes:
           - notify.email.jkratzer@mozilla.com.on-failed
       schedule:
-        - "0 10 * * *"
+        - "0 8 * * 6"
     gr-idl-update:
       description: Hook for updating gr.idl grammar
       owner: jkratzer@mozilla.com
