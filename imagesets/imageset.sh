@@ -274,8 +274,13 @@ function aws_update {
     fi
   done
 
+  # Create a new role with access granted by the aws_access_policy.
+  if [ -f "aws_instance_profile" ]; then
+    PROFILE="Name=$(cat aws_instance_profile)"
+  fi
+
   # Create new base AMI, and apply user-data filter output, to get instance ID.
-  if ! INSTANCE_ID="$(aws --region "${REGION}" ec2 run-instances --image-id "${AMI}" --key-name "${IMAGE_SET}_${REGION}" --security-groups "rdp-only" "ssh-only" --user-data "$(cat "${TEMP_SETUP_SCRIPT}")" --instance-type $(cat aws_base_instance_type) --block-device-mappings DeviceName=/dev/sda1,Ebs='{VolumeSize=75,DeleteOnTermination=true,VolumeType=gp2}' --instance-initiated-shutdown-behavior stop --client-token "${UNIQUE_NAME}" --query 'Instances[*].InstanceId' --output text 2>&1)"; then
+  if ! INSTANCE_ID="$(aws --region "${REGION}" ec2 run-instances --image-id "${AMI}" --key-name "${IMAGE_SET}_${REGION}" --security-groups "rdp-only" "ssh-only" --user-data "$(cat "${TEMP_SETUP_SCRIPT}")" --instance-type $(cat aws_base_instance_type) --block-device-mappings DeviceName=/dev/sda1,Ebs='{VolumeSize=75,DeleteOnTermination=true,VolumeType=gp2}' --instance-initiated-shutdown-behavior stop --client-token "${UNIQUE_NAME}" --query 'Instances[*].InstanceId' --output text ${PROFILE:+--iam-instance-profile $PROFILE} 2>&1)"; then
     log "Cannot deploy in ${REGION} since instance type $(cat aws_base_instance_type) is not supported; skipping."
     return 0
   fi
