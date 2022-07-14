@@ -14,7 +14,11 @@ if [ $# -lt 5 ]; then
   exit 1
 fi
 
-aws iam create-role --role-name "${3}" --assume-role-policy-document "file://${1}"
+echo "Creating role ${3} using trust policy located at ${1}."
+aws iam create-role --role-name "${3}" --assume-role-policy-document "file://${1}" 2> /dev/null
+echo "Applying access policy located at ${2} to role ${3}."
 aws iam put-role-policy --role-name "${3}" --policy-name "${4}" --policy-document "file://${2}"
-aws iam create-instance-profile --instance-profile-name "${5}"
+echo "Creating instance profile using name ${5}."
+aws iam create-instance-profile --instance-profile-name "${5}" 2> /dev/null
+echo "Adding role ${3} to instance profile ${5}."
 aws iam add-role-to-instance-profile --instance-profile-name "${5}" --role-name "${3}"
