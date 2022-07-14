@@ -275,13 +275,8 @@ function aws_update {
   done
 
   # Create a new role with access granted by the aws_access_policy.
-  if [ -f "aws_trust_policy.json" ] && [ -f "aws_access_policy.json" ]; then
-    aws iam create-role --role-name "Role-$IMAGE_SET" --assume-role-policy-document file://aws_trust_policy.json
-    aws iam put-role-policy --role-name "Role-$IMAGE_SET" --policy-name "Policy-$IMAGE_SET" --policy-document file://aws_access_policy.json
-    aws iam create-instance-profile --instance-profile-name "Profile-$IMAGE_SET"
-    aws iam add-role-to-instance-profile --instance-profile-name "Profile-$IMAGE_SET" --role-name "Role-$IMAGE_SET"
-    PROFILE="Name=Profile-$IMAGE_SET"
-    sleep 10
+  if [ -f "aws_instance_profile" ]; then
+    PROFILE="Name=$(cat aws_instance_profile)"
   fi
 
   # Create new base AMI, and apply user-data filter output, to get instance ID.
