@@ -582,6 +582,43 @@ fuzzing:
         provisionerId: proj-fuzzing
       schedule:
         - "0 8 * * 1"
+    covdiff:
+      description: Hook for downloading, merging, and submitting Mozilla CI coverage reports
+      owner: jkratzer@mozilla.com
+      emailOnError: true
+      task:
+        routes:
+          - notify.email.jkratzer@mozilla.com.on-failed
+        scopes:
+          - docker-worker:capability:privileged
+          - queue:get-artifact:project/fuzzing/covdiff/*
+          - queue:route:notify.email.jkratzer@mozilla.com.on-failed
+          - queue:scheduler-id:-
+          - secrets:get:project/fuzzing/fuzzmanagerconf
+        expires:
+          $fromNow: 1 months
+        payload:
+          image:
+            path: public/covdiff.tar.zst
+            type: indexed-image
+            namespace: project.fuzzing.orion.covdiff.master
+          features:
+            taskclusterProxy: true
+          artifacts:
+            project/fuzzing/covdiff:
+              path: /live.log
+              type: file
+          maxRunTime: 10800
+        deadline:
+          $fromNow: 6 hours
+        metadata:
+          name: covdiff
+          owner: jkratzer@mozilla.com
+          source: https://github.com/MozillaSecurity/covdiff
+        workerType: ci
+        provisionerId: proj-fuzzing
+      schedule:
+        - "0 8 * * 1"
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
@@ -736,3 +773,12 @@ fuzzing:
         - secrets:get:project/fuzzing/prefmonitor-ci-token
       to:
         - hook-id:project-fuzzing/prefmonitor
+    - grant:
+        - docker-worker:capability:privileged
+        - queue:create-task:highest:proj-fuzzing/ci
+        - queue:get-artifact:project/fuzzing/covdiff/*
+        - queue:route:notify.email.jkratzer@mozilla.com.on-failed
+        - queue:scheduler-id:-
+        - secrets:get:project/fuzzing/fuzzmanagerconf
+      to:
+        - hook-id:project-fuzzing/covdiff
