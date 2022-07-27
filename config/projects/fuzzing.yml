@@ -595,6 +595,7 @@ fuzzing:
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
           - queue:scheduler-id:-
           - secrets:get:project/fuzzing/fuzzmanagerconf
+          - secrets:get:project/fuzzing/moz-ci-coverage-key
         expires:
           $fromNow: 1 months
         payload:
@@ -781,5 +782,6 @@ fuzzing:
         - queue:route:notify.email.jkratzer@mozilla.com.on-failed
         - queue:scheduler-id:-
         - secrets:get:project/fuzzing/fuzzmanagerconf
+        - secrets:get:project/fuzzing/moz-ci-coverage-key
       to:
         - hook-id:project-fuzzing/covdiff
