@@ -620,7 +620,7 @@ fuzzing:
         workerType: ci
         provisionerId: proj-fuzzing
       schedule:
-        - "0 8 * * 1"
+        - "0 10 * * 1"
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
