@@ -243,6 +243,7 @@ taskcluster:
         - queue:create-artifact:*
         - queue:create-task:lowest:null-provisioner/*
         - queue:create-task:lowest:proj-taskcluster/ci
+        - queue:rerun-task:taskcluster-level-1/*
         - queue:get-artifact:private/docker-worker-tests/*
         - queue:resolve-task
         - queue:route:statuses
