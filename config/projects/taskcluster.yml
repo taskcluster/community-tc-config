@@ -320,13 +320,6 @@ taskcluster:
         - repo:github.com/taskcluster/staging-releases:*
 
     - grant:
-        - queue:create-task:medium:proj-taskcluster/gw-ci-*
-        - queue:route:index.project.taskcluster.telescope.periodic.v01
-        - queue:scheduler-id:-
-      to:
-        - hook-id:project-taskcluster/telescope-periodic-v01
-
-    - grant:
         - queue:create-task:medium:proj-taskcluster/gw-ci-ubuntu-18-04
       to:
         - repo:github.com/taskcluster/docker-exec-websocket-server:*
@@ -389,22 +382,6 @@ taskcluster:
       scopes:
         - "object:upload:taskcluster:taskcluster/test/*"
         - "object:download:taskcluster/test/*"
-    # A client for the Telescope-Demo site
-    # Access token is stored in GCP Secret Manager
-    # GCP project is mozilla-api-stage
-    telescope-demo-client:
-      description: >
-        This is a temporary client created by SysEng for the Telescope-demo environment
-
-      scopes:
-        - assume:hook-id:project-taskcluster/*
-        - hooks:modify-hook:project-taskcluster/*
-        - index:insert-task:project.taskcluster.*
-        - queue:create-task:highest:proj-taskcluster/*
-        - queue:route:index.project.taskcluster.*
-        - queue:scheduler-id:-
-        - secrets:get:project/taskcluster/*
-        - secrets:set:project/taskcluster/*
   secrets:
     # client_id/access_token for project/taskcluster/testing/docker-worker/ci-creds
     testing/docker-worker/ci-creds: true
@@ -460,46 +437,4 @@ taskcluster:
     staging-release:
       GH_TOKEN: $taskcluster-staging-release-gh-token
 
-  hooks:
-    telescope-periodic-v01:
-      description: >
-        Periodically run a simple task, monitored by
-        [Telescope](https://telescope-demo.api.data.allizom.org).
-      name: Periodic task for Telescope monitoring
-      owner: jwhitlock@mozilla.com
-      emailOnError: false
-      schedule: ['*/15 * * * *']
-      task:
-        taskQueueId: proj-taskcluster/gw-ci-ubuntu-18-04
-        routes:
-          - index.project.taskcluster.telescope.periodic.v01
-        created:
-          $fromNow: 0 seconds
-        expires:
-          $fromNow: 1 day
-        deadline:
-          $fromNow: 30 minutes
-        payload:
-          command:
-            - - /bin/bash
-              - -vxec
-              - |
-                mkdir -p workspace/results
-                echo '{"version": 1.0, "status": "OK"}' > workspace/results/status.json
-          artifacts:
-            - name: public/results/status.json
-              path: workspace/results/status.json
-              type: file
-          maxRunTime: 60
-        metadata:
-          name: telescope-periodic-v01
-          owner: jwhitlock@mozilla.com
-          source: >-
-            https://github.com/mozilla/community-tc-config/blob/main/config/projects/taskcluster.yml
-          description: >
-            A simple task, run every 15 minutes, monitored by
-            [Telescope](https://telescope-demo.api.data.allizom.org).
-      triggerSchema:
-        type: object
-        properties: {}
-        additionalProperties: false
+  hooks: []
