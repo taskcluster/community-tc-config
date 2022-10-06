@@ -4,7 +4,7 @@ set -exv
 exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
-TASKCLUSTER_VERSION='v44.13.4'
+TASKCLUSTER_VERSION='v44.21.0'
 ######################################
 
 function retry {
@@ -33,7 +33,8 @@ start_time="$(date '+%s')"
 
 retry apt update
 DEBIAN_FRONTEND=noninteractive apt upgrade -yq
-retry apt install -y apt-transport-https ca-certificates curl software-properties-common gzip python3-venv python-virtualenv
+# build-essential is needed for running `go test -race` with the -vet=off flag as of go1.19
+retry apt install -y apt-transport-https ca-certificates curl software-properties-common gzip python3-venv python-virtualenv build-essential
 
 # install docker
 retry curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
