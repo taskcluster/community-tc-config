@@ -81,10 +81,10 @@ generic-worker-win2012r2-staging:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-06ccdcdf8022331d4
-      us-east-2: ami-0ba0809605c6bde1b
-      us-west-1: ami-0624d847469b029e4
-      us-west-2: ami-099551827eeb3211d
+      us-east-1: ami-01a043947fff1ba30
+      us-east-2: ami-0881b64079821bf38
+      us-west-1: ami-0a584dbd07adebae3
+      us-west-2: ami-00ef635cda834ad6f
   workerConfig:
     genericWorker:
       config:
@@ -95,7 +95,7 @@ generic-worker-win2012r2-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/599d9181baed326fb78a3d070288a55e69103fa2/imagesets/generic-worker-win2012r2-staging/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/ac57dee9a0f6c5d20499df8f1ecbe29eda684ca7/imagesets/generic-worker-win2012r2-staging/bootstrap.ps1
   gcp:
     image: projects/taskcluster-imaging/global/images/generic-worker-win2012r2-staging-nx3g6xeg3iab95mb75sj
 generic-worker-ubuntu-18-04:
