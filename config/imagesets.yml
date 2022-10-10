@@ -102,10 +102,10 @@ generic-worker-ubuntu-18-04:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-07136ec8407540db9
-      us-west-1: ami-02cb7dc7d4a8f61e0
-      us-west-2: ami-0a7a9abe52b450a85
-      us-east-2: ami-052ff24c63094cc61
+      us-east-1: ami-04c680bf36e8a4283
+      us-west-1: ami-08ba8312aa59cd7e4
+      us-west-2: ami-0e1c81a83b28cf630
+      us-east-2: ami-05d4f928c78c65e44
   workerConfig:
     genericWorker:
       config:
@@ -116,7 +116,7 @@ generic-worker-ubuntu-18-04:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/6141dcaa89185c9ef5a78147e706c3cabf638f86/imagesets/generic-worker-ubuntu-18-04/bootstrap.sh
+            script: https://github.com/mozilla/community-tc-config/blob/bb0833bdce85dface0e0d6398a7d586fda9c9d8d/imagesets/generic-worker-ubuntu-18-04/bootstrap.sh
 generic-worker-ubuntu-18-04-staging:
   workerImplementation: generic-worker
   aws:
