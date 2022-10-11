@@ -95,9 +95,9 @@ generic-worker-win2012r2-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/ac57dee9a0f6c5d20499df8f1ecbe29eda684ca7/imagesets/generic-worker-win2012r2-staging/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/be7fa3c6f9f3d0e8302c26f82e8c8ea0a37f54c2/imagesets/generic-worker-win2012r2-staging/bootstrap.ps1
   gcp:
-    image: projects/taskcluster-imaging/global/images/generic-worker-win2012r2-staging-nx3g6xeg3iab95mb75sj
+    image: projects/taskcluster-imaging/global/images/generic-worker-win2012r2-staging-mus0j5yseyvgcdoqd8yw
 generic-worker-ubuntu-18-04:
   workerImplementation: generic-worker
   aws:
