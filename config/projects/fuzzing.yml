@@ -19,6 +19,19 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+    bugmon-pernosco:
+      owner: jkratzer@mozilla.com
+      emailOnError: false
+      imageset: docker-worker
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 10
+      instanceTypes:
+        m5d.metal: 1
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
+          allowDisableSeccomp: true
     ci:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
@@ -322,6 +335,7 @@ fuzzing:
         scopes:
           - docker-worker:capability:device:hostSharedMemory
           - docker-worker:capability:device:loopbackAudio
+          - docker-worker:capability:disableSeccomp
           - docker-worker:capability:privileged
           - queue:create-task:highest:proj-fuzzing/bugmon-monitor
           - queue:create-task:highest:proj-fuzzing/bugmon-processor
@@ -370,6 +384,7 @@ fuzzing:
         scopes:
           - docker-worker:capability:device:hostSharedMemory
           - docker-worker:capability:device:loopbackAudio
+          - docker-worker:capability:disableSeccomp
           - docker-worker:capability:privileged
           - queue:create-task:highest:proj-fuzzing/bugmon-monitor
           - queue:create-task:highest:proj-fuzzing/bugmon-processor
