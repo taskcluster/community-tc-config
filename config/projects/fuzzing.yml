@@ -12,6 +12,9 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
     bugmon-processor:
       owner: jkratzer@mozilla.com
       emailOnError: false
@@ -19,6 +22,9 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
     bugmon-pernosco:
       owner: jkratzer@mozilla.com
       emailOnError: false
