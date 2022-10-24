@@ -82,10 +82,12 @@ fuzzing:
     grizzly-reduce-worker-windows:
       owner: truber@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win2016
+      imageset: generic-worker-win2016-amd
       cloud: aws
       minCapacity: 0
       maxCapacity: 10
+      instanceTypes:
+        g4ad.2xlarge: 1
   hooks:
     fuzzing-tc-config-community-update:
       description: Run Fuzzing pool rebuild when Community-TC config changes
