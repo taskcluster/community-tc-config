@@ -702,6 +702,7 @@ fuzzing:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
         - docker-worker:capability:privileged
+        - docker-worker:capability:disableSeccomp
         - queue:create-task:highest:proj-fuzzing/bugmon-monitor
         - queue:create-task:highest:proj-fuzzing/bugmon-processor
         - queue:get-artifact:project/fuzzing/bugmon/*
