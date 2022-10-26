@@ -29,6 +29,7 @@ fuzzing:
       owner: jkratzer@mozilla.com
       emailOnError: false
       imageset: docker-worker
+      securityGroup: docker-worker
       cloud: aws
       minCapacity: 0
       maxCapacity: 10
