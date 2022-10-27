@@ -352,6 +352,9 @@ fuzzing:
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
           - queue:scheduler-id:-
           - secrets:get:project/fuzzing/bz-api-key
+          - secrets:get:project/fuzzing/pernosco-user
+          - secrets:get:project/fuzzing/pernosco-group
+          - secrets:get:project/fuzzing/pernosco-secret
         routes:
           - notify.email.jkratzer@mozilla.com.on-failed
       schedule:
@@ -401,6 +404,9 @@ fuzzing:
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
           - queue:scheduler-id:-
           - secrets:get:project/fuzzing/bz-api-key
+          - secrets:get:project/fuzzing/pernosco-user
+          - secrets:get:project/fuzzing/pernosco-group
+          - secrets:get:project/fuzzing/pernosco-secret
         routes:
           - notify.email.jkratzer@mozilla.com.on-failed
       schedule:
@@ -708,6 +714,9 @@ fuzzing:
         - queue:route:notify.email.jkratzer@mozilla.com.on-failed
         - queue:scheduler-id:-
         - secrets:get:project/fuzzing/bz-api-key
+        - secrets:get:project/fuzzing/pernosco-user
+        - secrets:get:project/fuzzing/pernosco-group
+        - secrets:get:project/fuzzing/pernosco-secret
       to:
         - hook-id:project-fuzzing/bugmon
         - hook-id:project-fuzzing/bugmon-confirm
