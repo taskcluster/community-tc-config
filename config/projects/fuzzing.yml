@@ -19,8 +19,7 @@ fuzzing:
       owner: jkratzer@mozilla.com
       emailOnError: false
       imageset: docker-worker
-      securityGroup: docker-worker
-      cloud: aws
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 10
       workerConfig:
@@ -31,8 +30,7 @@ fuzzing:
       owner: jkratzer@mozilla.com
       emailOnError: false
       imageset: docker-worker
-      securityGroup: docker-worker
-      cloud: aws
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 10
       instanceTypes:
