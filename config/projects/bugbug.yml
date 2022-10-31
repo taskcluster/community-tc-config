@@ -8,7 +8,7 @@ bugbug:
     ci:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-2021
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50
@@ -18,7 +18,7 @@ bugbug:
     batch:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-2021
       cloud: gcp
       minCapacity: 0
       maxCapacity: 25
@@ -26,7 +26,7 @@ bugbug:
     compute-smaller:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-2021
       cloud: gcp
       minCapacity: 0
       maxCapacity: 25
@@ -34,7 +34,7 @@ bugbug:
     compute-small:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-2021
       cloud: gcp
       minCapacity: 0
       maxCapacity: 25
@@ -42,7 +42,7 @@ bugbug:
     compute-large:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-2021
       cloud: gcp
       minCapacity: 0
       maxCapacity: 25
@@ -55,7 +55,7 @@ bugbug:
     compute-super-large:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-2021
       cloud: gcp
       minCapacity: 0
       maxCapacity: 25
