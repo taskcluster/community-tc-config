@@ -3,7 +3,7 @@ wpt:
     - github-team:web-platform-tests/admins
   workerPools:
     ci:
-      imageset: docker-worker
+      imageset: docker-worker-2021
       cloud: gcp
       minCapacity: 0
       maxCapacity: 80

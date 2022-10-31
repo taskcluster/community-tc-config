@@ -8,7 +8,7 @@ fuzzing:
     bugmon-monitor:
       owner: jkratzer@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-2022
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5
@@ -18,7 +18,7 @@ fuzzing:
     bugmon-processor:
       owner: jkratzer@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-2022
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
@@ -29,7 +29,7 @@ fuzzing:
     bugmon-pernosco:
       owner: jkratzer@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-2022
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
@@ -42,7 +42,7 @@ fuzzing:
     ci:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-2021
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
@@ -59,21 +59,21 @@ fuzzing:
     grizzly-reduce-monitor:
       owner: truber@mozilla.com
       emailOnError: true
-      imageset: docker-worker
+      imageset: docker-worker-2021
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5
     grizzly-reduce-worker:
       owner: truber@mozilla.com
       emailOnError: true
-      imageset: docker-worker
+      imageset: docker-worker-2021
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
     grizzly-reduce-worker-android:
       owner: truber@mozilla.com
       emailOnError: true
-      imageset: docker-worker
+      imageset: docker-worker-2021
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10

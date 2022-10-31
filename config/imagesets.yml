@@ -47,7 +47,11 @@
 generic-worker:
   workerImplementation: generic-worker
   # (this is intended for use with static workers)
-docker-worker:
+docker-worker-2021:
+  workerImplementation: docker-worker
+  gcp:
+    image: projects/taskcluster-imaging/global/images/docker-worker-5nrfllxteqxz1yrln5kx
+docker-worker-2022:
   workerImplementation: docker-worker
   gcp:
     image: projects/taskcluster-imaging/global/images/docker-community-gcp-googlecompute-2022-10-27t13-20-03z

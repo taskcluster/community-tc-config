@@ -8,7 +8,7 @@ mwz:
     testing:
       owner: nobody@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-2021
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
