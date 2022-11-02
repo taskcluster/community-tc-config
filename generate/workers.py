@@ -495,18 +495,6 @@ def generic_worker(wp, **cfg):
 @worker_implementation
 def docker_worker(wp, **cfg):
 
-    # Our aws images for docker-worker currently don't support
-    # any of these devices
-    # These devices are enabled by default in docker-worker currently
-    device_management = None
-    if cfg["cloud"] == "aws":
-        device_management = {
-            "deviceManagement": {
-                "loopbackVideo": {"enabled": False},
-                "loopbackAudio": {"enabled": False},
-            },
-        }
-
     if wp.supports_worker_config():
         wp.merge_worker_config(
             WorkerPoolSettings.EXISTING_CONFIG,
@@ -516,7 +504,6 @@ def docker_worker(wp, **cfg):
                     "afterIdleSeconds": 15,
                 },
             },
-            device_management,
         )
 
     wp.secret_tpl = {
