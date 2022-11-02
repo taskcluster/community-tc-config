@@ -19,13 +19,14 @@ fuzzing:
       owner: jkratzer@mozilla.com
       emailOnError: false
       imageset: docker-worker-2022
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 10
       workerConfig:
         dockerConfig:
           allowPrivileged: true
           allowDisableSeccomp: true
+      securityGroup: docker-worker
     bugmon-pernosco:
       owner: jkratzer@mozilla.com
       emailOnError: false
