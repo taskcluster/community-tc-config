@@ -654,6 +654,42 @@ fuzzing:
         provisionerId: proj-fuzzing
       schedule:
         - "0 10 * * 1"
+    orion-cron:
+      description: Periodically check if any Orion services need to be rebuilt
+      owner: truber@mozilla.com
+      emailOnError: true
+      task:
+        created: {$fromNow: ''}
+        deadline: {$fromNow: '1 hour'}
+        provisionerId: proj-fuzzing
+        workerType: ci
+        payload:
+          features:
+            taskclusterProxy: true
+          maxRunTime: 3600
+          image: mozillasecurity/orion-decision:latest
+          env:
+            DOCKER_HUB_SECRET: project/fuzzing/docker-hub
+            CLONE_REPO: https://github.com/MozillaSecurity/orion
+            TASKCLUSTER_NOW: ${now}
+          command:
+            - cron-decision
+            - -v
+        scopes:
+          - docker-worker:capability:privileged
+          - index:insert-task:project.fuzzing.orion.*
+          - queue:create-task:highest:proj-fuzzing/ci
+          - queue:create-task:highest:proj-fuzzing/ci-*
+          - queue:route:index.project.fuzzing.orion.*
+          - queue:scheduler-id:taskcluster-github
+          - secrets:get:project/fuzzing/docker-hub
+        metadata:
+          name: Orion decision task
+          description: Schedule Orion build tasks
+          owner: truber@mozilla.com
+          source: https://github.com/MozillaSecurity/orion
+      schedule:
+        - "0 0 * * 0"
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
@@ -747,9 +783,11 @@ fuzzing:
         - hook-id:project-fuzzing/grizzly-reduce-monitor
     - grant:
         - docker-worker:capability:privileged
+        - index:insert-task:project.fuzzing.orion.*
         - queue:route:index.project.fuzzing.orion.*
         - secrets:get:project/fuzzing/docker-hub
       to:
+        - hook-id:project-fuzzing/orion-cron
         - repo:github.com/MozillaSecurity/orion:*
     - grant:
         - docker-worker:capability:privileged
