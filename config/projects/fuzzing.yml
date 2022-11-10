@@ -661,6 +661,7 @@ fuzzing:
       task:
         created: {$fromNow: ''}
         deadline: {$fromNow: '1 hour'}
+        schedulerId: fuzzing
         provisionerId: proj-fuzzing
         workerType: ci
         payload:
@@ -671,7 +672,8 @@ fuzzing:
           env:
             DOCKER_HUB_SECRET: project/fuzzing/docker-hub
             CLONE_REPO: https://github.com/MozillaSecurity/orion
-            TASKCLUSTER_NOW: ${now}
+            TASKCLUSTER_NOW:
+              $fromNow: 0 seconds
           command:
             - cron-decision
             - -v
@@ -701,6 +703,12 @@ fuzzing:
         - secrets:get:project/fuzzing/ci-*
       to:
         - repo:github.com/MozillaSecurity/*
+    - grant:
+        - queue:create-task:highest:proj-fuzzing/ci
+        - queue:create-task:highest:proj-fuzzing/ci-*
+        - queue:scheduler-id:taskcluster-github
+      to:
+        - hook-id:project-fuzzing/orion-cron
     - grant:
         - queue:scheduler-id:fuzzing
       to:
