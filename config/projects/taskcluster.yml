@@ -336,6 +336,10 @@ taskcluster:
         # manage the static worker pool proj-taskcluster/dustin-testing-5777
         - worker-manager:manage-worker-pool:proj-taskcluster/dustin-testing-5777
         - worker-manager:provider:static
+        # manage static workers in that pool
+        - worker-manager:create-worker:proj-taskcluster/dustin-testing-5777/*
+        - worker-manager:update-worker:proj-taskcluster/dustin-testing-5777/*
+        - worker-manager:remove-worker:proj-taskcluster/dustin-testing-5777/*
       to:
         - login-identity:github/28673|djmitche
 
