@@ -327,22 +327,6 @@ taskcluster:
         - repo:github.com/taskcluster/docker-exec-websocket-server:*
         - repo:github.com/taskcluster/docker-exec-websocket-client:*
 
-    # temporary scopes to allow dustin to test #5777
-    - grant:
-        # create tasks for proj-taskcluster/dustin-testing-5777 with projectId dustin-testing-5777
-        - queue:create-task:project:dustin-testing-5777
-        - queue:create-task:highest:proj-taskcluster/dustin-testing-5777
-        - queue:scheduler-id:dustin-testing-5777
-        # manage the static worker pool proj-taskcluster/dustin-testing-5777
-        - worker-manager:manage-worker-pool:proj-taskcluster/dustin-testing-5777
-        - worker-manager:provider:static
-        # manage static workers in that pool
-        - worker-manager:create-worker:proj-taskcluster/dustin-testing-5777/*
-        - worker-manager:update-worker:proj-taskcluster/dustin-testing-5777/*
-        - worker-manager:remove-worker:proj-taskcluster/dustin-testing-5777/*
-      to:
-        - login-identity:github/28673|djmitche
-
   clients:
     smoketests:
       scopes:
