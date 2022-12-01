@@ -34,7 +34,8 @@ start_time="$(date '+%s')"
 retry apt-get update
 DEBIAN_FRONTEND=noninteractive retry apt-get upgrade -yq
 retry apt-get -y remove docker docker.io containerd runc
-retry apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common git tar python3-venv
+# build-essential is needed for running `go test -race` with the -vet=off flag as of go1.19
+retry apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common git tar python3-venv build-essential
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
 retry curl -L 'https://dl.google.com/go/go1.19.3.linux-amd64.tar.gz' > go.tar.gz
