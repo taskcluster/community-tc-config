@@ -37,7 +37,7 @@ retry apt-get -y remove docker docker.io containerd runc
 retry apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common git tar python3-venv
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
-retry curl -L 'https://dl.google.com/go/go1.19.2.linux-amd64.tar.gz' > go.tar.gz
+retry curl -L 'https://dl.google.com/go/go1.19.3.linux-amd64.tar.gz' > go.tar.gz
 tar xvfz go.tar.gz -C /usr/local
 export HOME=/root
 export GOPATH=~/go
@@ -91,7 +91,7 @@ retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
 
 (
   echo '[registries.search]'
-  echo 'registries=["registry.access.redhat.com", "registry.fedoraproject.org", "docker.io"]'
+  echo 'registries=["docker.io"]'
 ) >> /etc/containers/registries.conf
 
 # See
