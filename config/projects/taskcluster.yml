@@ -113,6 +113,18 @@ taskcluster:
           config:
             runTasksAsCurrentUser: true
 
+    gw-ci-ubuntu-22-04-staging:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-22-04-staging
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
     gw-ci-windows2012r2-amd64:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
