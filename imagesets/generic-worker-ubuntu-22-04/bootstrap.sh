@@ -87,7 +87,12 @@ EOF
 
 systemctl enable worker
 
-retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop
+retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
+
+(
+  echo '[registries.search]'
+  echo 'registries=["registry.access.redhat.com", "registry.fedoraproject.org", "docker.io"]'
+) >> /etc/containers/registries.conf
 
 # See
 #   * https://console.aws.amazon.com/support/cases#/6410417131/en
