@@ -67,7 +67,7 @@ taskcluster:
     # their config so that they can run generic-worker
     # as root user in tests. this should not be used
     # by any other tasks!
-    gw-ci-macos:
+    gw-ci-macos-10-14:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker
@@ -77,7 +77,7 @@ taskcluster:
       # note: workerConfig not specified here as configuration
       # is stored directly on manually provisioned worker
 
-    gw-ci-ubuntu:
+    gw-ci-ubuntu-22-04:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-22-04
@@ -89,7 +89,7 @@ taskcluster:
           config:
             runTasksAsCurrentUser: true
 
-    gw-ci-windows:
+    gw-ci-windows-2022:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-win2022
@@ -297,7 +297,7 @@ taskcluster:
         - repo:github.com/taskcluster/staging-releases:*
 
     - grant:
-        - queue:create-task:medium:proj-taskcluster/gw-ci-ubuntu-18-04
+        - queue:create-task:medium:proj-taskcluster/gw-ci-ubuntu-22-04
       to:
         - repo:github.com/taskcluster/docker-exec-websocket-server:*
         - repo:github.com/taskcluster/docker-exec-websocket-client:*
@@ -309,28 +309,10 @@ taskcluster:
     docker-worker/ci:
       scopes:
         - assume:project:taskcluster:docker-worker-tester
-    # Client for workerpool proj-taskcluster/gw-ci-macos.
+    # Client for workerpool proj-taskcluster/gw-ci-macos-10-14.
     generic-worker/ci-macos:
       scopes:
-        - assume:worker-pool:proj-taskcluster/gw-ci-macos
-        - assume:worker-id:proj-taskcluster/*
-    # Client for workerpool proj-taskcluster/gw-ci-raspbian-stretch
-    generic-worker/ci-raspbian-stretch:
-      scopes:
-        - assume:worker-pool:proj-taskcluster/gw-ci-raspbian-stretch
-        - assume:worker-id:proj-taskcluster/*
-    # Client for proj-taskcluster/gw-ci-windows10-amd64. This client is
-    # currently used by a single manually configured worker, running in Azure.
-    # When we have an azure provider, we can terminate this worker, delete this
-    # client, and use worker manager provisioned instances instead.
-    generic-worker/ci-windows10-amd64:
-      scopes:
-        - assume:worker-pool:proj-taskcluster/gw-ci-windows10-amd64
-        - assume:worker-id:proj-taskcluster/*
-    # Client for workerpool proj-taskcluster/gw-ci-windows10-arm
-    generic-worker/ci-windows10-arm:
-      scopes:
-        - assume:worker-pool:proj-taskcluster/gw-ci-windows10-arm
+        - assume:worker-pool:proj-taskcluster/gw-ci-macos-10-14
         - assume:worker-id:proj-taskcluster/*
     # A client whose clientId and accessToken are stored in taskcluster secret
     # `project/taskcluster/testing/generic-worker/ci-creds` and used by
@@ -338,14 +320,6 @@ taskcluster:
     # that are then claimed and processed by the generic-worker build under
     # test.
     generic-worker/taskcluster-ci:
-      scopes:
-        - assume:project:taskcluster:generic-worker-tester
-    # A client whose accessToken is securely stored in travis-ci.org
-    # taskcluster/generic-worker project as encrypted environment variable
-    # TASKCLUSTER_ACCESS_TOKEN, and used by commands in generic-worker's
-    # .travis.yml to create production tasks that are then claimed and
-    # processed by the generic-worker build under test in travis-ci.org.
-    generic-worker/travis-ci:
       scopes:
         - assume:project:taskcluster:generic-worker-tester
     # This client is used to test the client libraries in Taskcluster CI
