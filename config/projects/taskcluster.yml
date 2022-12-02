@@ -39,6 +39,15 @@ taskcluster:
       minCapacity: 0
       maxCapacity: 1
 
+    release:
+      owner: taskcluster-notifications+workers@mozilla.com
+      description: "Trusted worker to build Taskcluster releases (only!)"
+      emailOnError: true
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 1
+
     dw-ci:
       # docker-worker's CI requires the 'privileged' scope, so run
       # it on another worker.  Such workers are "untrusted" as this
@@ -52,105 +61,12 @@ taskcluster:
       workerConfig:
         dockerConfig:
           allowPrivileged: true
-          allowDisableSeccomp: true
-
-    windows2012r2-amd64-ci:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-win2012r2
-      cloud: aws
-      securityGroup: rdp
-      minCapacity: 0
-      maxCapacity: 10
-
-    release:
-      owner: taskcluster-notifications+workers@mozilla.com
-      description: "Trusted worker to build Taskcluster releases (only!)"
-      emailOnError: true
-      imageset: generic-worker-ubuntu-22-04
-      cloud: aws
-      minCapacity: 0
-      maxCapacity: 1
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
 
     # gw-ci-* worker pools are for generic-worker CI
-    gw-ci-ubuntu-18-04:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-ubuntu-22-04
-      cloud: aws
-      minCapacity: 0
-      maxCapacity: 10
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
-
-    gw-ci-ubuntu-18-04-staging:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-ubuntu-22-04-staging
-      cloud: aws
-      minCapacity: 0
-      maxCapacity: 10
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
-
-    gw-ci-ubuntu-22-04:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-ubuntu-22-04
-      cloud: aws
-      minCapacity: 0
-      maxCapacity: 10
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
-
-    gw-ci-ubuntu-22-04-staging:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-ubuntu-22-04-staging
-      cloud: aws
-      minCapacity: 0
-      maxCapacity: 10
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
-
-    gw-ci-windows2012r2-amd64:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-win2012r2
-      cloud: aws
-      securityGroup: rdp
-      minCapacity: 0
-      maxCapacity: 10
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
-
-    gw-ci-windows2012r2-amd64-staging:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-win2012r2-staging
-      cloud: gcp
-      securityGroup: rdp
-      minCapacity: 0
-      maxCapacity: 10
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
-
+    # they all have `runTasksAsCurrentUser: true` in
+    # their config so that they can run generic-worker
+    # as root user in tests. this should not be used
+    # by any other tasks!
     gw-ci-macos:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
@@ -158,16 +74,22 @@ taskcluster:
       cloud: static
       lifecycle:
         reregistrationTimeout: 2592000 # 30 days
+      # note: workerConfig not specified here as configuration
+      # is stored directly on manually provisioned worker
 
-    gw-ubuntu-20-04-staging:
+    gw-ci-ubuntu:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-22-04-staging
+      imageset: generic-worker-ubuntu-22-04
       cloud: aws
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 20
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
 
-    gw-windows-2022:
+    gw-ci-windows:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-win2022
@@ -178,9 +100,38 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            runTasksAsCurrentUser: true
+
+    gw-ubuntu-22-04:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 10
+
+    gw-ubuntu-22-04-staging:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-22-04-staging
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 1
+      workerConfig:
+        genericWorker:
+          config:
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
             idleTimeoutSecs: 3600
+
+    gw-windows-2022:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2022
+      cloud: aws
+      securityGroup: rdp
+      minCapacity: 0
+      maxCapacity: 10
 
   grants:
     - grant:
@@ -362,11 +313,6 @@ taskcluster:
     generic-worker/ci-macos:
       scopes:
         - assume:worker-pool:proj-taskcluster/gw-ci-macos
-        - assume:worker-id:proj-taskcluster/*
-    # Client for workerpool proj-taskcluster/gw-ci-macos-staging.
-    generic-worker/ci-macos-staging:
-      scopes:
-        - assume:worker-pool:proj-taskcluster/gw-ci-macos-staging
         - assume:worker-id:proj-taskcluster/*
     # Client for workerpool proj-taskcluster/gw-ci-raspbian-stretch
     generic-worker/ci-raspbian-stretch:

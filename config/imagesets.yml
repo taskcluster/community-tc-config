@@ -62,46 +62,6 @@ docker-worker-2022:
       us-east-2: ami-030afcd77623b0567
       us-west-1: ami-099344ae0ceec3c10
       us-west-2: ami-06e3a10f0b4f62382
-generic-worker-win2012r2:
-  workerImplementation: generic-worker
-  aws:
-    amis:
-      us-east-1: ami-07d683fa39bbeda64
-      us-west-1: ami-0bb00e94d8edaaa46
-      us-west-2: ami-0134f14c5d00e0512
-      us-east-2: ami-0b4ff1dc19cc7d266
-  workerConfig:
-    genericWorker:
-      config:
-        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        shutdownMachineOnIdle: true
-        idleTimeoutSecs: 15
-        shutdownMachineOnInternalError: true
-        workerTypeMetadata:
-          machine-setup:
-            maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/18f1db7d8bab25f5110cf348ea82cefa6ad4cac5/imagesets/generic-worker-win2012r2/bootstrap.ps1
-generic-worker-win2012r2-staging:
-  workerImplementation: generic-worker
-  aws:
-    amis:
-      us-east-1: ami-01a043947fff1ba30
-      us-east-2: ami-0881b64079821bf38
-      us-west-1: ami-0a584dbd07adebae3
-      us-west-2: ami-00ef635cda834ad6f
-  workerConfig:
-    genericWorker:
-      config:
-        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        shutdownMachineOnIdle: true
-        idleTimeoutSecs: 15
-        shutdownMachineOnInternalError: true
-        workerTypeMetadata:
-          machine-setup:
-            maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/be7fa3c6f9f3d0e8302c26f82e8c8ea0a37f54c2/imagesets/generic-worker-win2012r2-staging/bootstrap.ps1
-  gcp:
-    image: projects/taskcluster-imaging/global/images/generic-worker-win2012r2-staging-mus0j5yseyvgcdoqd8yw
 relman-win2012r2:
   workerImplementation: generic-worker
   aws:
@@ -121,25 +81,6 @@ relman-win2012r2:
           machine-setup:
             maintainer: mcastelluccio@mozilla.com
             script: https://github.com/mozilla/community-tc-config/blob/18f1db7d8bab25f5110cf348ea82cefa6ad4cac5/imagesets/relman-win2012r2/bootstrap.ps1
-generic-worker-win2016:
-  workerImplementation: generic-worker
-  aws:
-    amis:
-      us-east-1: ami-0013a6f54841d0b20
-      us-west-1: ami-0bb7bd2c95efd377a
-      us-west-2: ami-0f58b2394da254988
-      us-east-2: ami-093fb6260f9b65d29
-  workerConfig:
-    genericWorker:
-      config:
-        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        shutdownMachineOnIdle: true
-        idleTimeoutSecs: 15
-        shutdownMachineOnInternalError: true
-        workerTypeMetadata:
-          machine-setup:
-            maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/18f1db7d8bab25f5110cf348ea82cefa6ad4cac5/imagesets/generic-worker-win2016/bootstrap.ps1
 generic-worker-ubuntu-22-04:
   workerImplementation: generic-worker
   workerConfig:
@@ -195,21 +136,3 @@ generic-worker-win2022:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
             script: https://github.com/mozilla/community-tc-config/blob/18f1db7d8bab25f5110cf348ea82cefa6ad4cac5/imagesets/generic-worker-win2022/bootstrap.ps1
-generic-worker-win2016-amd:
-  workerImplementation: generic-worker
-  aws:
-    amis:
-      us-west-2: ami-066d37e7817c77ce4
-      us-east-1: ami-00f011e619ad67213
-      us-east-2: ami-0ff4619b4f38042e1
-  workerConfig:
-    genericWorker:
-      config:
-        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        shutdownMachineOnIdle: true
-        idleTimeoutSecs: 15
-        shutdownMachineOnInternalError: true
-        workerTypeMetadata:
-          machine-setup:
-            maintainer: jkratzer@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/18f1db7d8bab25f5110cf348ea82cefa6ad4cac5/imagesets/generic-worker-win2016-amd/bootstrap.ps1
