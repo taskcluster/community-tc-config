@@ -15,7 +15,7 @@ taskcluster:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
-      imageset: docker-worker-2022
+      imageset: docker-worker
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
@@ -24,7 +24,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       description: not actively used, but useful for testing docker-worker on AWS
       emailOnError: false
-      imageset: docker-worker-2022
+      imageset: docker-worker
       securityGroup: docker-worker
       cloud: aws
       minCapacity: 0
@@ -34,7 +34,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       description: not actively used, but useful for testing docker-worker on GCP
       emailOnError: false
-      imageset: docker-worker-2022
+      imageset: docker-worker
       cloud: gcp
       minCapacity: 0
       maxCapacity: 1
@@ -54,7 +54,7 @@ taskcluster:
       # might allow one task to interfere with another.
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
-      imageset: docker-worker-2022
+      imageset: docker-worker
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10

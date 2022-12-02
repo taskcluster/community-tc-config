@@ -19,7 +19,7 @@ firefoxreality:
     ci-linux:
       owner: nobody@mozilla.com
       emailOnError: false
-      imageset: docker-worker-2021
+      imageset: docker-worker
       cloud: gcp
       minCapacity: 0
       maxCapacity: 6
