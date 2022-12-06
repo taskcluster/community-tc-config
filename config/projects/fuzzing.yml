@@ -15,6 +15,7 @@ fuzzing:
       workerConfig:
         dockerConfig:
           allowPrivileged: true
+          allowDisableSeccomp: true
     bugmon-processor:
       owner: jkratzer@mozilla.com
       emailOnError: false
