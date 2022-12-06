@@ -158,6 +158,19 @@ taskcluster:
             # pool, useful for workers not to die immediately...
             idleTimeoutSecs: 3600
 
+    gw-ci-windows-2022:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2022
+      cloud: aws
+      securityGroup: rdp
+      minCapacity: 0
+      maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
   grants:
     - grant:
         - notify:manage-denylist
