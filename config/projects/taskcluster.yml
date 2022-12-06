@@ -52,7 +52,6 @@ taskcluster:
       workerConfig:
         dockerConfig:
           allowPrivileged: true
-          allowDisableSeccomp: true
 
     windows2012r2-amd64-ci:
       owner: taskcluster-notifications+workers@mozilla.com

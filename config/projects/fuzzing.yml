@@ -25,7 +25,6 @@ fuzzing:
       workerConfig:
         dockerConfig:
           allowPrivileged: true
-          allowDisableSeccomp: true
     bugmon-pernosco:
       owner: jkratzer@mozilla.com
       emailOnError: false
@@ -38,7 +37,6 @@ fuzzing:
       workerConfig:
         dockerConfig:
           allowPrivileged: true
-          allowDisableSeccomp: true
       securityGroup: docker-worker
     ci:
       owner: fuzzing+taskcluster@mozilla.com
