@@ -47,11 +47,6 @@ bugbug:
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-8"
-      workerConfig:
-        genericWorker:
-          config:
-            # Tasks using this worker pool are triggered rarely.
-            idleTimeoutSecs: 15
     compute-super-large:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
@@ -60,11 +55,6 @@ bugbug:
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-16"
-      workerConfig:
-        genericWorker:
-          config:
-            # Tasks using this worker pool are triggered rarely.
-            idleTimeoutSecs: 15
   secrets:
     bugbug/deploy: true
     bugbug/integration: true
