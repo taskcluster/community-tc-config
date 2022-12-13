@@ -129,6 +129,8 @@ generic-worker-win2022:
     genericWorker:
       config:
         ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
+        livelogExecutable: C:\generic-worker\livelog.exe
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
         shutdownMachineOnIdle: true
         idleTimeoutSecs: 15
         shutdownMachineOnInternalError: true
