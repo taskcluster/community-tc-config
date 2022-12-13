@@ -4,7 +4,7 @@ set -exv
 exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
-TASKCLUSTER_REF='v44.21.0'
+TASKCLUSTER_REF='v45.0.1'
 ######################################
 
 function retry {
@@ -34,18 +34,11 @@ start_time="$(date '+%s')"
 retry apt-get update
 DEBIAN_FRONTEND=noninteractive retry apt-get upgrade -yq
 retry apt-get -y remove docker docker.io containerd runc
-retry apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common git tar python3-venv
-
-# install docker
-retry curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
-retry apt-get update
-retry apt-get install -y docker-ce docker-ce-cli containerd.io
-retry docker run hello-world
+# build-essential is needed for running `go test -race` with the -vet=off flag as of go1.19
+retry apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common git tar python3-venv build-essential
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
-retry curl -L 'https://dl.google.com/go/go1.19.2.linux-amd64.tar.gz' > go.tar.gz
+retry curl -L 'https://dl.google.com/go/go1.19.3.linux-amd64.tar.gz' > go.tar.gz
 tar xvfz go.tar.gz -C /usr/local
 export HOME=/root
 export GOPATH=~/go
@@ -95,7 +88,13 @@ EOF
 
 systemctl enable worker
 
-retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop
+retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
+
+# set podman registries conf
+(
+  echo '[registries.search]'
+  echo 'registries=["docker.io"]'
+) >> /etc/containers/registries.conf
 
 # See
 #   * https://console.aws.amazon.com/support/cases#/6410417131/en

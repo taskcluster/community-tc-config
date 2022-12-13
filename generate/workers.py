@@ -456,6 +456,7 @@ def generic_worker(wp, **cfg):
                     "config": {
                         "wstAudience": "communitytc",
                         "wstServerURL": "https://community-websocktunnel.services.mozilla.com",
+                        "idleTimeoutSecs": 600,
                     },
                 },
             },

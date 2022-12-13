@@ -42,7 +42,7 @@ function deploy {
   log "Checking inputs..."
 
   if [ "${#}" -ne 3 ]; then
-    log "Please specify a cloud (aws/google), action (delete|update), and image set (e.g. generic-worker-win2012r2) e.g. ${0} aws update generic-worker-win2012r2" >&2
+    log "Please specify a cloud (aws/google), action (delete|update), and image set (e.g. generic-worker-win2022) e.g. ${0} aws update generic-worker-win2022" >&2
     exit 66
   fi
 

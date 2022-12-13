@@ -7,14 +7,14 @@ bergamot:
     ci-linux:
       owner: nobody@mozilla.org
       emailOnError: false
-      imageset: docker-worker-2021
+      imageset: docker-worker
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
     ci-windows:
       owner: nobody@mozilla.org
       emailOnError: false
-      imageset: generic-worker-win2012r2
+      imageset: generic-worker-win2022
       cloud: aws
       minCapacity: 0
       maxCapacity: 10

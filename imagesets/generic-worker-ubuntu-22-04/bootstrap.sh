@@ -4,7 +4,7 @@ set -exv
 exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
-TASKCLUSTER_VERSION='v44.21.0'
+TASKCLUSTER_VERSION='v45.0.1'
 ######################################
 
 function retry {
@@ -31,20 +31,11 @@ function retry {
 
 start_time="$(date '+%s')"
 
-retry apt update
-DEBIAN_FRONTEND=noninteractive apt upgrade -yq
+retry apt-get update
+DEBIAN_FRONTEND=noninteractive retry apt-get upgrade -yq
+retry apt-get -y remove docker docker.io containerd runc
 # build-essential is needed for running `go test -race` with the -vet=off flag as of go1.19
-retry apt install -y apt-transport-https ca-certificates curl software-properties-common gzip python3-venv python-virtualenv build-essential
-
-# install docker
-retry curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
-retry apt update
-apt-cache policy docker-ce | grep -qF download.docker.com
-retry apt install -y docker-ce
-sleep 5
-systemctl status docker | grep "Started Docker Application Container Engine"
-usermod -aG docker ubuntu
+retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common gzip python3-venv build-essential
 
 cd /usr/local/bin
 retry curl -L "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/generic-worker-multiuser-linux-amd64" > generic-worker
@@ -91,7 +82,13 @@ EOF
 
 systemctl enable worker
 
-retry apt install -y ubuntu-desktop ubuntu-gnome-desktop
+retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
+
+# set podman registries conf
+(
+  echo '[registries.search]'
+  echo 'registries=["docker.io"]'
+) >> /etc/containers/registries.conf
 
 # See
 #   * https://console.aws.amazon.com/support/cases#/6410417131/en

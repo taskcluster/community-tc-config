@@ -7,12 +7,12 @@ git-cinnabar:
     codecov: true
   workerPools:
     ci:
-      imageset: docker-worker-2021
+      imageset: docker-worker
       cloud: gcp
       maxCapacity: 5
       machineType: "zones/{zone}/machineTypes/n2-standard-4"
     win2012r2:
-      imageset: generic-worker-win2012r2
+      imageset: generic-worker-win2022
       cloud: aws
       maxCapacity: 2
       instanceTypes:

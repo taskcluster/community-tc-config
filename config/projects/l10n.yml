@@ -6,7 +6,7 @@ l10n:
     - github.com/mozilla-l10n/*
   workerPools:
     ci:
-      imageset: docker-worker-2021
+      imageset: docker-worker
       cloud: gcp
       maxCapacity: 5
   grants:
