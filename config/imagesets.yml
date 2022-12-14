@@ -50,14 +50,14 @@ generic-worker:
 docker-worker:
   workerImplementation: docker-worker
   gcp:
-    image: projects/taskcluster-imaging/global/images/docker-community-gcp-googlecompute-2022-12-02t19-06-04z
+    image: projects/taskcluster-imaging/global/images/docker-community-gcp-googlecompute-2022-12-14t16-52-34z
   aws:
     # originally built with the `docker_community_aws` builder in monopacker
     amis:
-      us-east-1: ami-01102b0bbdea1ae89
-      us-east-2: ami-0f58e4472ea65e221
-      us-west-1: ami-0ba86d5b2f93aa309
-      us-west-2: ami-0dd6d77eeb0f39eb7
+      us-east-1: ami-03f1c0a7102c03856
+      us-east-2: ami-0a172d261610275a8
+      us-west-1: ami-079635988fff55b09
+      us-west-2: ami-08c278b93b0349b65
 relman-win2012r2:
   workerImplementation: generic-worker
   aws:
