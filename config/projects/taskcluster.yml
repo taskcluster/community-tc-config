@@ -303,7 +303,7 @@ taskcluster:
         - repo:github.com/taskcluster/docker-exec-websocket-client:*
 
   clients:
-    smoketests:
+    smoketest:
       scopes:
         - assume:project:taskcluster:smoketests
     docker-worker/ci:
