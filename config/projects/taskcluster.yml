@@ -47,6 +47,10 @@ taskcluster:
       cloud: aws
       minCapacity: 0
       maxCapacity: 1
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
 
     dw-ci:
       # docker-worker's CI requires the 'privileged' scope, so run
