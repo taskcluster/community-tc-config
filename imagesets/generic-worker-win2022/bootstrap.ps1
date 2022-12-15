@@ -187,6 +187,25 @@ Expand-ZIPFile -File "C:\ProcessExplorer.zip" -Destination "C:\ProcessExplorer" 
 md "C:\ProcessMonitor"
 Expand-ZIPFile -File "C:\ProcessMonitor.zip" -Destination "C:\ProcessMonitor" -Url "https://download.sysinternals.com/files/ProcessMonitor.zip"
 
+# install AMD drivers
+$Bucket = "ec2-amd-windows-drivers"
+$KeyPrefix = "latest"
+$LocalPath = "C:\AMD"
+md $LocalPath
+$Objects = Get-S3Object -BucketName $Bucket -KeyPrefix $KeyPrefix -Region us-east-1
+foreach ($Object in $Objects) {
+    $LocalFileName = $Object.Key
+    if ($LocalFileName -ne '' -and $Object.Size -ne 0) {
+        $LocalFilePath = Join-Path $LocalPath $LocalFileName
+        Copy-S3Object -BucketName $Bucket -Key $Object.Key -LocalFile $LocalFilePath -Region us-east-1
+    }
+}
+Expand-Archive $LocalFilePath -DestinationPath $LocalPath -Verbose
+$Driverdir = Get-ChildItem $LocalPath -Directory -Filter "*Retail_End_User*" | %{$_.FullName}
+pnputil /add-driver "$Driverdir\Packages\Drivers\Display\WT6A_INF/*.inf" /install
+# show the folder size
+Get-ChildItem $LocalPath -recurse | Measure-Object -property length -sum
+
 # See https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch.html#ec2launch-inittasks
 # schedule one time run of EC2Launch service on first boot of instances to ensure network routes are correctly configured
 if ("%MY_CLOUD%" -eq "aws") {
