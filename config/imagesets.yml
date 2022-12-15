@@ -138,3 +138,21 @@ generic-worker-win2022:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
             script: https://github.com/mozilla/community-tc-config/blob/0b3b28b17551965ecb46fe25db4501b5679a91d8/imagesets/generic-worker-win2022/bootstrap.ps1
+generic-worker-win2016-amd:
+  workerImplementation: generic-worker
+  aws:
+    amis:
+      us-west-2: ami-066d37e7817c77ce4
+      us-east-1: ami-00f011e619ad67213
+      us-east-2: ami-0ff4619b4f38042e1
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
+        shutdownMachineOnIdle: true
+        idleTimeoutSecs: 15
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: jkratzer@mozilla.com
+            script: https://github.com/mozilla/community-tc-config/blob/18f1db7d8bab25f5110cf348ea82cefa6ad4cac5/imagesets/generic-worker-win2016-amd/bootstrap.ps1
