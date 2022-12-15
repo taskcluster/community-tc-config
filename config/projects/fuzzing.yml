@@ -85,7 +85,7 @@ fuzzing:
     grizzly-reduce-worker-windows:
       owner: truber@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win2022
+      imageset: generic-worker-win2016-amd
       cloud: aws
       minCapacity: 0
       maxCapacity: 10
