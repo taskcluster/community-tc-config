@@ -8,7 +8,7 @@ fuzzing:
     bugmon-monitor:
       owner: jkratzer@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-legacy
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5
@@ -19,7 +19,7 @@ fuzzing:
     bugmon-processor:
       owner: jkratzer@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-legacy
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
@@ -30,7 +30,7 @@ fuzzing:
     bugmon-pernosco:
       owner: jkratzer@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-legacy
       cloud: aws
       minCapacity: 0
       maxCapacity: 10
