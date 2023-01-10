@@ -53,6 +53,7 @@ firefoxreality:
         - secrets:get:project/firefoxreality/fr/release-signing-token
       to:
         - repo:github.com/MozillaReality/FirefoxReality:release
+        - repo:github.com/MozillaReality/FirefoxReality:release:*
     - grant:
         - queue:route:index.project.firefoxreality.*
       to:

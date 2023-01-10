@@ -47,5 +47,6 @@ git-cinnabar:
         - queue:route:index.project.git-cinnabar.*
       to:
         - repo:github.com/glandium/git-cinnabar:release
+        - repo:github.com/glandium/git-cinnabar:release:*
         - repo:github.com/glandium/git-cinnabar:branch:*
         - repo:github.com/glandium/git-cinnabar:tag:*
