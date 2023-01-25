@@ -25,7 +25,8 @@ taskcluster:
       description: not actively used, but useful for testing docker-worker on AWS
       emailOnError: false
       imageset: docker-worker
-      securityGroup: docker-worker
+      securityGroups:
+        - docker-worker
       cloud: aws
       minCapacity: 0
       maxCapacity: 1
@@ -98,7 +99,8 @@ taskcluster:
       emailOnError: true
       imageset: generic-worker-win2022
       cloud: aws
-      securityGroup: rdp
+      securityGroups:
+        - rdp
       minCapacity: 0
       maxCapacity: 10
       workerConfig:
@@ -133,7 +135,8 @@ taskcluster:
       emailOnError: true
       imageset: generic-worker-win2022
       cloud: aws
-      securityGroup: rdp
+      securityGroups:
+        - rdp
       minCapacity: 0
       maxCapacity: 10
 

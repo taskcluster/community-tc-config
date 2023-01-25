@@ -40,7 +40,8 @@ fuzzing:
         dockerConfig:
           allowPrivileged: true
           allowDisableSeccomp: true
-      securityGroup: docker-worker
+      securityGroups:
+        - docker-worker
     ci:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
