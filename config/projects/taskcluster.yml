@@ -101,6 +101,7 @@ taskcluster:
       cloud: aws
       securityGroups:
         - rdp
+        - ssh
       minCapacity: 0
       maxCapacity: 10
       workerConfig:
@@ -137,6 +138,7 @@ taskcluster:
       cloud: aws
       securityGroups:
         - rdp
+        - ssh
       minCapacity: 0
       maxCapacity: 10
 
