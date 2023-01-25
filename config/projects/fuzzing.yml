@@ -578,44 +578,6 @@ fuzzing:
         provisionerId: proj-fuzzing
       schedule:
         - "0 8 * * 1"
-    prefmonitor:
-      description: Hook for monitoring prefpicker dependencies
-      owner: jkratzer@mozilla.com
-      emailOnError: true
-      task:
-        routes:
-          - notify.email.jkratzer@mozilla.com.on-failed
-        scopes:
-          - docker-worker:capability:privileged
-          - queue:get-artifact:project/fuzzing/prefmonitor/*
-          - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-          - queue:scheduler-id:-
-          - secrets:get:project/fuzzing/prefmonitor-ci-token
-        expires:
-          $fromNow: 1 months
-        payload:
-          image:
-            path: public/prefmonitor.tar.zst
-            type: indexed-image
-            namespace: project.fuzzing.orion.prefmonitor.master
-          features:
-            taskclusterProxy: true
-          artifacts:
-            project/fuzzing/prefmonitor:
-              path: /live.log
-              type: file
-          maxRunTime: 10800
-        deadline:
-          $fromNow: 6 hours
-        metadata:
-          name: prefmonitor
-          owner: jkratzer@mozilla.com
-          source: https://github.com/MozillaSecurity/prefpicker-monitor
-          description: Hook for monitoring prefpicker dependencies
-        workerType: ci
-        provisionerId: proj-fuzzing
-      schedule:
-        - "0 8 * * 1"
     covdiff:
       description: Hook for downloading, merging, and submitting Mozilla CI coverage reports
       owner: jkratzer@mozilla.com
@@ -851,15 +813,6 @@ fuzzing:
         - secrets:get:project/fuzzing/deploy-npm
       to:
         - hook-id:project-fuzzing/gr-idl-update
-    - grant:
-        - docker-worker:capability:privileged
-        - queue:create-task:highest:proj-fuzzing/ci
-        - queue:get-artifact:project/fuzzing/prefmonitor/*
-        - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-        - queue:scheduler-id:-
-        - secrets:get:project/fuzzing/prefmonitor-ci-token
-      to:
-        - hook-id:project-fuzzing/prefmonitor
     - grant:
         - docker-worker:capability:privileged
         - queue:create-task:highest:proj-fuzzing/ci
