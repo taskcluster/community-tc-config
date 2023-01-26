@@ -44,7 +44,8 @@ relman:
       emailOnError: false
       imageset: relman-win2012r2
       cloud: aws
-      securityGroup: rdp
+      securityGroups:
+        - rdp
       minCapacity: 0
       maxCapacity: 10
   secrets:

@@ -167,7 +167,7 @@ $env:LOGONSERVER = "\\" + $env:COMPUTERNAME
 Start-Process "C:\cygwin\bin\bash.exe" -ArgumentList "--login -c `"ssh-host-config -y -c 'ntsec mintty' -u 'cygwinsshd' -w 'qwe123QWE!@#'`"" -Wait -NoNewWindow -PassThru
 
 # start sshd
-Start-Process "net" -ArgumentList "start sshd" -Wait -NoNewWindow -PassThru
+Start-Process "net" -ArgumentList "start cygsshd" -Wait -NoNewWindow -PassThru
 
 # download bash setup script
 $client.DownloadFile("https://raw.githubusercontent.com/petemoore/myscrapbook/master/setup.sh", "C:\cygwin\home\Administrator\setup.sh")
