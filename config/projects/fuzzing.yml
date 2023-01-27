@@ -380,7 +380,7 @@ fuzzing:
           maxRunTime: 10800
           env:
             BUG_ACTION: monitor
-            FORCE_CONFIRM: true
+            FORCE_CONFIRM: "true"
           artifacts:
             project/fuzzing/bugmon:
               path: /bugmon-artifacts
