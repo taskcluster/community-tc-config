@@ -74,10 +74,10 @@ relman-win2012r2:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-02232f2d413960ac8
-      us-west-1: ami-0250a41d54c92ef34
-      us-west-2: ami-0ad42b9ed6e00ed79
-      us-east-2: ami-03390fb2d21cafffb
+      us-east-1: ami-043f20b9d24912704
+      us-west-1: ami-025c77d7158d86739
+      us-west-2: ami-0c5fc166a6180a86a
+      us-east-2: ami-049d92d455adda565
   workerConfig:
     genericWorker:
       config:
@@ -88,7 +88,7 @@ relman-win2012r2:
         workerTypeMetadata:
           machine-setup:
             maintainer: mcastelluccio@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/18f1db7d8bab25f5110cf348ea82cefa6ad4cac5/imagesets/relman-win2012r2/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/eb8ea65f619e0808342acf94742f81dab3750fe1/imagesets/relman-win2012r2/bootstrap.ps1
 generic-worker-ubuntu-22-04:
   workerImplementation: generic-worker
   workerConfig:
