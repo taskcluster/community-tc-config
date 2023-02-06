@@ -105,7 +105,17 @@ function deploy {
 
   export TEMP_DIR="$(mktemp -d -t password-store.XXXXXXXXXX)"
   export PASSWORD_STORE_DIR="${TEMP_DIR}/.password-store"
-  git clone ssh://gitolite3@git-internal.mozilla.org/taskcluster/secrets.git "${PASSWORD_STORE_DIR}"
+  # Register your ssh public key with https://source.cloud.google.com/user/ssh_keys?register=true
+  #
+  # Add the following to your ~/.ssh/config:
+  #
+  # Host source.developers.google.com
+  #  User <user>@mozilla.com
+  #  UpdateHostKeys yes
+  #  IdentityFile <path to your private key>
+  #  Port 2022
+  #
+  git clone ssh://source.developers.google.com/p/taskcluster-passwords/r/secrets "${PASSWORD_STORE_DIR}"
   git -C "${PASSWORD_STORE_DIR}" config pass.signcommits false
   git -C "${PASSWORD_STORE_DIR}" config commit.gpgsign false
 
