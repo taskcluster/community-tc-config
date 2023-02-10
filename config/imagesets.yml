@@ -50,100 +50,34 @@ generic-worker:
 docker-worker:
   workerImplementation: docker-worker
   gcp:
-    image: projects/taskcluster-imaging/global/images/docker-worker-5nrfllxteqxz1yrln5kx
+    image: projects/taskcluster-imaging/global/images/docker-community-gcp-googlecompute-2022-12-14t16-52-34z
   aws:
-    # originally built with the `docker_worker_community_aws` builder in monopacker
+    # originally built with the `docker_community_aws` builder in monopacker
     amis:
-      us-east-1: ami-0bd18568d25fa4852
-      us-west-1: ami-0128d94ca859fcd2b
-      us-west-2: ami-0123f65a860be84bb
-      us-east-2: ami-07b28b1eb79e1dd6f
-generic-worker-win2012r2:
-  workerImplementation: generic-worker
-  aws:
-    amis:
-      us-east-1: ami-00ff6399b9bbb217f
-      us-west-1: ami-0a8fe9b46627594c6
-      us-west-2: ami-0bc3827dc51b67d41
-      us-east-2: ami-0afbf6fb4159ecf48
-  workerConfig:
-    genericWorker:
-      config:
-        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        shutdownMachineOnIdle: true
-        idleTimeoutSecs: 15
-        shutdownMachineOnInternalError: true
-        workerTypeMetadata:
-          machine-setup:
-            maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/6141dcaa89185c9ef5a78147e706c3cabf638f86/imagesets/generic-worker-win2012r2/bootstrap.ps1
-generic-worker-win2012r2-staging:
-  workerImplementation: generic-worker
-  aws:
-    amis:
-      us-east-1: ami-06ccdcdf8022331d4
-      us-east-2: ami-0ba0809605c6bde1b
-      us-west-1: ami-0624d847469b029e4
-      us-west-2: ami-099551827eeb3211d
-  workerConfig:
-    genericWorker:
-      config:
-        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        shutdownMachineOnIdle: true
-        idleTimeoutSecs: 15
-        shutdownMachineOnInternalError: true
-        workerTypeMetadata:
-          machine-setup:
-            maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/599d9181baed326fb78a3d070288a55e69103fa2/imagesets/generic-worker-win2012r2-staging/bootstrap.ps1
+      us-east-1: ami-03f1c0a7102c03856
+      us-east-2: ami-0a172d261610275a8
+      us-west-1: ami-079635988fff55b09
+      us-west-2: ami-08c278b93b0349b65
+# v44.23.4 docker worker which includes the disableSeccomp feature
+docker-worker-legacy:
+  workerImplementation: docker-worker
   gcp:
-    image: projects/taskcluster-imaging/global/images/generic-worker-win2012r2-staging-nx3g6xeg3iab95mb75sj
-generic-worker-ubuntu-18-04:
-  workerImplementation: generic-worker
+    image: projects/taskcluster-imaging/global/images/docker-community-gcp-googlecompute-2022-12-19t19-01-04z
   aws:
+    # originally built with the `docker_community_aws` builder in monopacker
     amis:
-      us-east-1: ami-07136ec8407540db9
-      us-west-1: ami-02cb7dc7d4a8f61e0
-      us-west-2: ami-0a7a9abe52b450a85
-      us-east-2: ami-052ff24c63094cc61
-  workerConfig:
-    genericWorker:
-      config:
-        ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
-        shutdownMachineOnIdle: true
-        idleTimeoutSecs: 15
-        shutdownMachineOnInternalError: true
-        workerTypeMetadata:
-          machine-setup:
-            maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/6141dcaa89185c9ef5a78147e706c3cabf638f86/imagesets/generic-worker-ubuntu-18-04/bootstrap.sh
-generic-worker-ubuntu-18-04-staging:
-  workerImplementation: generic-worker
-  aws:
-    amis:
-      us-east-1: ami-0f975d5f8f3bd848c
-      us-west-1: ami-01d6de5e6296eaa5d
-      us-west-2: ami-0b3af8465ac0dd4d0
-      us-east-2: ami-0f67bfd8ca1673022
-  workerConfig:
-    genericWorker:
-      config:
-        ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
-        shutdownMachineOnIdle: true
-        idleTimeoutSecs: 15
-        shutdownMachineOnInternalError: true
-        workerTypeMetadata:
-          machine-setup:
-            maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/6141dcaa89185c9ef5a78147e706c3cabf638f86/imagesets/generic-worker-ubuntu-18-04-staging/bootstrap.sh
+      us-east-1: ami-0ec6d5fc54628fa9b
+      us-east-2: ami-071b3ff08f2d9c1dd
+      us-west-1: ami-03f677a21b2fadb15
+      us-west-2: ami-0de87470eb34a8e36
 relman-win2012r2:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-0d835bc0f2d58c432
-      us-west-1: ami-0c4c370afeb409a20
-      us-west-2: ami-0cd6aa8e516c67ec9
-      us-east-2: ami-0b292b91ab5b5f2eb
+      us-east-1: ami-043f20b9d24912704
+      us-west-1: ami-025c77d7158d86739
+      us-west-2: ami-0c5fc166a6180a86a
+      us-east-2: ami-049d92d455adda565
   workerConfig:
     genericWorker:
       config:
@@ -154,30 +88,9 @@ relman-win2012r2:
         workerTypeMetadata:
           machine-setup:
             maintainer: mcastelluccio@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/6141dcaa89185c9ef5a78147e706c3cabf638f86/imagesets/relman-win2012r2/bootstrap.ps1
-generic-worker-win2016:
+            script: https://github.com/mozilla/community-tc-config/blob/eb8ea65f619e0808342acf94742f81dab3750fe1/imagesets/relman-win2012r2/bootstrap.ps1
+generic-worker-ubuntu-22-04:
   workerImplementation: generic-worker
-  aws:
-    amis:
-      us-east-1: ami-0aac8125d1c0c8b67
-      us-west-1: ami-0a4ad1e015799dd17
-      us-west-2: ami-01f9b70cbfa383c57
-      us-east-2: ami-0db37aad2e293244d
-  workerConfig:
-    genericWorker:
-      config:
-        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        shutdownMachineOnIdle: true
-        idleTimeoutSecs: 15
-        shutdownMachineOnInternalError: true
-        workerTypeMetadata:
-          machine-setup:
-            maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/6141dcaa89185c9ef5a78147e706c3cabf638f86/imagesets/generic-worker-win2016/bootstrap.ps1
-generic-worker-ubuntu-20-04-staging:
-  workerImplementation: generic-worker
-  gcp:
-    image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-20-04-staging-qcptgq686i8olmysjhvx
   workerConfig:
     genericWorker:
       config:
@@ -187,21 +100,63 @@ generic-worker-ubuntu-20-04-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/599d9181baed326fb78a3d070288a55e69103fa2/imagesets/generic-worker-ubuntu-20-04-staging/bootstrap.sh
+            script: https://github.com/mozilla/community-tc-config/blob/2d9afaf0b49e86b670f40213c9e018337d74d973/imagesets/generic-worker-ubuntu-22-04/bootstrap.sh
   aws:
     amis:
-      us-west-1: ami-010652b8f52e91bf7
-      us-west-2: ami-043c49baf77212ad6
-      us-east-1: ami-0ade22902a8d8f242
-      us-east-2: ami-032b5bfb5811893cc
+      us-west-1: ami-0c8666cbf42631740
+      us-west-2: ami-0216f9a4fc8fcb88c
+      us-east-1: ami-0f45a57827d8396f7
+      us-east-2: ami-0f50a55a02ca3cfed
+  gcp:
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-22-04-0tjqrcuyegnoqshxd40o
+generic-worker-ubuntu-22-04-staging:
+  workerImplementation: generic-worker
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        shutdownMachineOnIdle: true
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: taskcluster-notifications+workers@mozilla.com
+            script: https://github.com/mozilla/community-tc-config/blob/9136aae0842d05be746543dd8e0e546845ccc120/imagesets/generic-worker-ubuntu-22-04-staging/bootstrap.sh
+  aws:
+    amis:
+      us-west-1: ami-0b018857d4751b20b
+      us-west-2: ami-0e922d8335651b75d
+      us-east-1: ami-08a16b7c0b03ef992
+      us-east-2: ami-0f36116d9abe19723
+  gcp:
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-22-04-staging-e4k6zz5w813o26vibjyx
 generic-worker-win2022:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-west-1: ami-08d7566866a6f6b92
-      us-west-2: ami-04979e6be3c3dc7b5
-      us-east-1: ami-02e5df2c6cc595f33
-      us-east-2: ami-011d7ffb17c0848e6
+      us-west-1: ami-093f9234ced8d9f56
+      us-west-2: ami-0c9440d23d2a5da8f
+      us-east-1: ami-0dadf2e1a45bb588a
+      us-east-2: ami-06be0c62f4cea4ea7
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
+        livelogExecutable: C:\generic-worker\livelog.exe
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
+        shutdownMachineOnIdle: true
+        idleTimeoutSecs: 15
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: taskcluster-notifications+workers@mozilla.com
+            script: https://github.com/mozilla/community-tc-config/blob/11cba7d3ba5b84fd8c054c3c67dde948a33165bd/imagesets/generic-worker-win2022/bootstrap.ps1
+generic-worker-win2016-amd:
+  workerImplementation: generic-worker
+  aws:
+    amis:
+      us-west-2: ami-066d37e7817c77ce4
+      us-east-1: ami-00f011e619ad67213
+      us-east-2: ami-0ff4619b4f38042e1
   workerConfig:
     genericWorker:
       config:
@@ -211,5 +166,5 @@ generic-worker-win2022:
         shutdownMachineOnInternalError: true
         workerTypeMetadata:
           machine-setup:
-            maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/6141dcaa89185c9ef5a78147e706c3cabf638f86/imagesets/generic-worker-win2022/bootstrap.ps1
+            maintainer: jkratzer@mozilla.com
+            script: https://github.com/mozilla/community-tc-config/blob/18f1db7d8bab25f5110cf348ea82cefa6ad4cac5/imagesets/generic-worker-win2016-amd/bootstrap.ps1

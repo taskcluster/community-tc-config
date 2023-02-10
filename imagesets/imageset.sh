@@ -42,7 +42,7 @@ function deploy {
   log "Checking inputs..."
 
   if [ "${#}" -ne 3 ]; then
-    log "Please specify a cloud (aws/google), action (delete|update), and image set (e.g. generic-worker-win2012r2) e.g. ${0} aws update generic-worker-win2012r2" >&2
+    log "Please specify a cloud (aws/google), action (delete|update), and image set (e.g. generic-worker-win2022) e.g. ${0} aws update generic-worker-win2022" >&2
     exit 66
   fi
 
@@ -105,7 +105,17 @@ function deploy {
 
   export TEMP_DIR="$(mktemp -d -t password-store.XXXXXXXXXX)"
   export PASSWORD_STORE_DIR="${TEMP_DIR}/.password-store"
-  git clone ssh://gitolite3@git-internal.mozilla.org/taskcluster/secrets.git "${PASSWORD_STORE_DIR}"
+  # Register your ssh public key with https://source.cloud.google.com/user/ssh_keys?register=true
+  #
+  # Add the following to your ~/.ssh/config:
+  #
+  # Host source.developers.google.com
+  #  User <user>@mozilla.com
+  #  UpdateHostKeys yes
+  #  IdentityFile <path to your private key>
+  #  Port 2022
+  #
+  git clone ssh://source.developers.google.com/p/taskcluster-passwords/r/secrets "${PASSWORD_STORE_DIR}"
   git -C "${PASSWORD_STORE_DIR}" config pass.signcommits false
   git -C "${PASSWORD_STORE_DIR}" config commit.gpgsign false
 
@@ -275,8 +285,13 @@ function aws_update {
     fi
   done
 
+  # Create a new role with access granted by the aws_access_policy.
+  if [ -f "aws_instance_profile" ]; then
+    PROFILE="Name=$(cat aws_instance_profile)"
+  fi
+
   # Create new base AMI, and apply user-data filter output, to get instance ID.
-  if ! INSTANCE_ID="$(aws --region "${REGION}" ec2 run-instances --image-id "${AMI}" --key-name "${IMAGE_SET}_${REGION}" --security-groups "rdp-only" "ssh-only" --user-data "$(cat "${TEMP_SETUP_SCRIPT}")" --instance-type $(cat aws_base_instance_type) --block-device-mappings DeviceName=/dev/sda1,Ebs='{VolumeSize=75,DeleteOnTermination=true,VolumeType=gp2}' --instance-initiated-shutdown-behavior stop --client-token "${UNIQUE_NAME}" --query 'Instances[*].InstanceId' --output text 2>&1)"; then
+  if ! INSTANCE_ID="$(aws --region "${REGION}" ec2 run-instances --image-id "${AMI}" --key-name "${IMAGE_SET}_${REGION}" --security-groups "rdp-only" "ssh-only" --user-data "$(cat "${TEMP_SETUP_SCRIPT}")" --instance-type $(cat aws_base_instance_type) --block-device-mappings DeviceName=/dev/sda1,Ebs='{VolumeSize=75,DeleteOnTermination=true,VolumeType=gp2}' --instance-initiated-shutdown-behavior stop --client-token "${UNIQUE_NAME}" --query 'Instances[*].InstanceId' --output text ${PROFILE:+--iam-instance-profile $PROFILE} 2>&1)"; then
     log "Cannot deploy in ${REGION} since instance type $(cat aws_base_instance_type) is not supported; skipping."
     return 0
   fi

@@ -9,8 +9,8 @@ setup(
     url="https://github.com/mozilla/community-tc-config",
     packages=find_packages("."),
     install_requires=[
-        "tc-admin~=3.0.1",
-        "json-e~=3.0.0",
+        "tc-admin>=3.3.1",
+        "json-e>=4.5.0",
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest-mock", "pytest-asyncio"],

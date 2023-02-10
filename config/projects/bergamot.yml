@@ -14,7 +14,7 @@ bergamot:
     ci-windows:
       owner: nobody@mozilla.org
       emailOnError: false
-      imageset: generic-worker-win2012r2
+      imageset: generic-worker-win2022
       cloud: aws
       minCapacity: 0
       maxCapacity: 10

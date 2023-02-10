@@ -8,17 +8,40 @@ fuzzing:
     bugmon-monitor:
       owner: jkratzer@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-legacy
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
+          allowDisableSeccomp: true
     bugmon-processor:
       owner: jkratzer@mozilla.com
       emailOnError: false
-      imageset: docker-worker
+      imageset: docker-worker-legacy
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
+          allowDisableSeccomp: true
+    bugmon-pernosco:
+      owner: jkratzer@mozilla.com
+      emailOnError: false
+      imageset: docker-worker-legacy
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 10
+      instanceTypes:
+        m5d.metal: 1
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
+          allowDisableSeccomp: true
+      securityGroups:
+        - docker-worker
     ci:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
@@ -32,7 +55,7 @@ fuzzing:
     ci-windows:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
-      imageset: generic-worker-win2016
+      imageset: generic-worker-win2022
       cloud: aws
       minCapacity: 0
       maxCapacity: 10
@@ -63,10 +86,12 @@ fuzzing:
     grizzly-reduce-worker-windows:
       owner: truber@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win2016
+      imageset: generic-worker-win2016-amd
       cloud: aws
       minCapacity: 0
       maxCapacity: 10
+      instanceTypes:
+        g4ad.2xlarge: 1
   hooks:
     fuzzing-tc-config-community-update:
       description: Run Fuzzing pool rebuild when Community-TC config changes
@@ -307,6 +332,9 @@ fuzzing:
             project/fuzzing/bugmon:
               path: /bugmon-artifacts
               type: directory
+            project/fuzzing/grizzly:
+              path: /tmp/grizzly
+              type: directory
         metadata:
           name: bugmon
           description: Hook for triggering bugmon monitor tasks
@@ -319,13 +347,18 @@ fuzzing:
         scopes:
           - docker-worker:capability:device:hostSharedMemory
           - docker-worker:capability:device:loopbackAudio
+          - docker-worker:capability:disableSeccomp
           - docker-worker:capability:privileged
           - queue:create-task:highest:proj-fuzzing/bugmon-monitor
           - queue:create-task:highest:proj-fuzzing/bugmon-processor
+          - queue:create-task:highest:proj-fuzzing/bugmon-pernosco
           - queue:get-artifact:project/fuzzing/bugmon/*
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
           - queue:scheduler-id:-
           - secrets:get:project/fuzzing/bz-api-key
+          - secrets:get:project/fuzzing/pernosco-user
+          - secrets:get:project/fuzzing/pernosco-group
+          - secrets:get:project/fuzzing/pernosco-secret
         routes:
           - notify.email.jkratzer@mozilla.com.on-failed
       schedule:
@@ -347,10 +380,13 @@ fuzzing:
           maxRunTime: 10800
           env:
             BUG_ACTION: monitor
-            FORCE_CONFIRM: true
+            FORCE_CONFIRM: "true"
           artifacts:
             project/fuzzing/bugmon:
               path: /bugmon-artifacts
+              type: directory
+            project/fuzzing/grizzly:
+              path: /tmp/grizzly
               type: directory
         metadata:
           name: bugmon-confirm
@@ -364,13 +400,18 @@ fuzzing:
         scopes:
           - docker-worker:capability:device:hostSharedMemory
           - docker-worker:capability:device:loopbackAudio
+          - docker-worker:capability:disableSeccomp
           - docker-worker:capability:privileged
           - queue:create-task:highest:proj-fuzzing/bugmon-monitor
           - queue:create-task:highest:proj-fuzzing/bugmon-processor
+          - queue:create-task:highest:proj-fuzzing/bugmon-pernosco
           - queue:get-artifact:project/fuzzing/bugmon/*
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
           - queue:scheduler-id:-
           - secrets:get:project/fuzzing/bz-api-key
+          - secrets:get:project/fuzzing/pernosco-user
+          - secrets:get:project/fuzzing/pernosco-group
+          - secrets:get:project/fuzzing/pernosco-secret
         routes:
           - notify.email.jkratzer@mozilla.com.on-failed
       schedule:
@@ -497,7 +538,7 @@ fuzzing:
         routes:
           - notify.email.jkratzer@mozilla.com.on-failed
       schedule:
-        - "0 10 * * *"
+        - "0 8 * * 6"
     gr-idl-update:
       description: Hook for updating gr.idl grammar
       owner: jkratzer@mozilla.com
@@ -538,8 +579,8 @@ fuzzing:
         provisionerId: proj-fuzzing
       schedule:
         - "0 8 * * 1"
-    prefmonitor:
-      description: Hook for monitoring prefpicker dependencies
+    covdiff:
+      description: Hook for downloading, merging, and submitting Mozilla CI coverage reports
       owner: jkratzer@mozilla.com
       emailOnError: true
       task:
@@ -547,35 +588,74 @@ fuzzing:
           - notify.email.jkratzer@mozilla.com.on-failed
         scopes:
           - docker-worker:capability:privileged
-          - queue:get-artifact:project/fuzzing/prefmonitor/*
+          - queue:get-artifact:project/fuzzing/covdiff/*
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
           - queue:scheduler-id:-
-          - secrets:get:project/fuzzing/prefmonitor-ci-token
+          - secrets:get:project/fuzzing/fuzzmanagerconf
+          - secrets:get:project/fuzzing/moz-ci-coverage-key
         expires:
           $fromNow: 1 months
         payload:
           image:
-            path: public/prefmonitor.tar.zst
+            path: public/covdiff.tar.zst
             type: indexed-image
-            namespace: project.fuzzing.orion.prefmonitor.master
+            namespace: project.fuzzing.orion.covdiff.master
           features:
             taskclusterProxy: true
           artifacts:
-            project/fuzzing/prefmonitor:
+            project/fuzzing/covdiff:
               path: /live.log
               type: file
           maxRunTime: 10800
         deadline:
           $fromNow: 6 hours
         metadata:
-          name: prefmonitor
+          name: covdiff
           owner: jkratzer@mozilla.com
-          source: https://github.com/MozillaSecurity/prefpicker-monitor
-          description: Hook for monitoring prefpicker dependencies
+          source: https://github.com/MozillaSecurity/covdiff
+          description: Hook for downloading, merging, and submitting Mozilla CI coverage reports
         workerType: ci
         provisionerId: proj-fuzzing
       schedule:
-        - "0 8 * * 1"
+        - "0 10 * * 1"
+    orion-cron:
+      description: Periodically check if any Orion services need to be rebuilt
+      owner: truber@mozilla.com
+      emailOnError: true
+      task:
+        created: {$fromNow: ''}
+        deadline: {$fromNow: '1 hour'}
+        schedulerId: fuzzing
+        provisionerId: proj-fuzzing
+        workerType: ci
+        payload:
+          features:
+            taskclusterProxy: true
+          maxRunTime: 3600
+          image: mozillasecurity/orion-decision:latest
+          env:
+            DOCKER_HUB_SECRET: project/fuzzing/docker-hub
+            CLONE_REPO: https://github.com/MozillaSecurity/orion
+            TASKCLUSTER_NOW:
+              $fromNow: 0 seconds
+          command:
+            - cron-decision
+            - -v
+        scopes:
+          - docker-worker:capability:privileged
+          - index:insert-task:project.fuzzing.orion.*
+          - queue:create-task:highest:proj-fuzzing/ci
+          - queue:create-task:highest:proj-fuzzing/ci-*
+          - queue:route:index.project.fuzzing.orion.*
+          - queue:scheduler-id:taskcluster-github
+          - secrets:get:project/fuzzing/docker-hub
+        metadata:
+          name: Orion decision task
+          description: Schedule Orion build tasks
+          owner: truber@mozilla.com
+          source: https://github.com/MozillaSecurity/orion
+      schedule:
+        - "0 0 * * 0"
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
@@ -587,6 +667,12 @@ fuzzing:
         - secrets:get:project/fuzzing/ci-*
       to:
         - repo:github.com/MozillaSecurity/*
+    - grant:
+        - queue:create-task:highest:proj-fuzzing/ci
+        - queue:create-task:highest:proj-fuzzing/ci-*
+        - queue:scheduler-id:taskcluster-github
+      to:
+        - hook-id:project-fuzzing/orion-cron
     - grant:
         - queue:scheduler-id:fuzzing
       to:
@@ -633,12 +719,17 @@ fuzzing:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
         - docker-worker:capability:privileged
+        - docker-worker:capability:disableSeccomp
         - queue:create-task:highest:proj-fuzzing/bugmon-monitor
         - queue:create-task:highest:proj-fuzzing/bugmon-processor
+        - queue:create-task:highest:proj-fuzzing/bugmon-pernosco
         - queue:get-artifact:project/fuzzing/bugmon/*
         - queue:route:notify.email.jkratzer@mozilla.com.on-failed
         - queue:scheduler-id:-
         - secrets:get:project/fuzzing/bz-api-key
+        - secrets:get:project/fuzzing/pernosco-user
+        - secrets:get:project/fuzzing/pernosco-group
+        - secrets:get:project/fuzzing/pernosco-secret
       to:
         - hook-id:project-fuzzing/bugmon
         - hook-id:project-fuzzing/bugmon-confirm
@@ -664,9 +755,11 @@ fuzzing:
         - hook-id:project-fuzzing/grizzly-reduce-monitor
     - grant:
         - docker-worker:capability:privileged
+        - index:insert-task:project.fuzzing.orion.*
         - queue:route:index.project.fuzzing.orion.*
         - secrets:get:project/fuzzing/docker-hub
       to:
+        - hook-id:project-fuzzing/orion-cron
         - repo:github.com/MozillaSecurity/orion:*
     - grant:
         - docker-worker:capability:privileged
@@ -724,9 +817,10 @@ fuzzing:
     - grant:
         - docker-worker:capability:privileged
         - queue:create-task:highest:proj-fuzzing/ci
-        - queue:get-artifact:project/fuzzing/prefmonitor/*
+        - queue:get-artifact:project/fuzzing/covdiff/*
         - queue:route:notify.email.jkratzer@mozilla.com.on-failed
         - queue:scheduler-id:-
-        - secrets:get:project/fuzzing/prefmonitor-ci-token
+        - secrets:get:project/fuzzing/fuzzmanagerconf
+        - secrets:get:project/fuzzing/moz-ci-coverage-key
       to:
-        - hook-id:project-fuzzing/prefmonitor
+        - hook-id:project-fuzzing/covdiff

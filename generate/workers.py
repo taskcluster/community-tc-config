@@ -373,7 +373,7 @@ def aws(
         "m4.2xlarge": 1,
         "m5.2xlarge": 1,
     },
-    securityGroup="no-inbound",
+    securityGroups=["no-inbound"],
     minCapacity=0,
     maxCapacity=None,
     **cfg,
@@ -385,7 +385,7 @@ def aws(
       regions: regions to deploy to (required)
       instanceTypes: dict of instance types to provision, values are
                      capacityPerInstance (required)
-      securityGroup: name of the security group to apply (default no-inbound)
+      securityGroups: list of the security groups to apply (default ["no-inbound"])
       minCapacity: minimum capacity to run at any time (default 0)
       maxCapacity: maximum capacity to run at any time (required)
     """
@@ -412,7 +412,9 @@ def aws(
 
     launchConfigs = []
     for region in regions:
-        groupId = aws_config["security_groups"][region][securityGroup]
+        groupIds = [
+            aws_config["security_groups"][region][group] for group in securityGroups
+        ]
         for az, subnetId in aws_config["subnets"][region].items():
             for instanceType, capacityPerInstance in instanceTypes.items():
                 # Filter out availability zones where the required instance type
@@ -426,7 +428,7 @@ def aws(
                         "ImageId": imageIds[region],
                         "Placement": {"AvailabilityZone": az},
                         "SubnetId": subnetId,
-                        "SecurityGroupIds": [groupId],
+                        "SecurityGroupIds": groupIds,
                         "InstanceType": instanceType,
                         "InstanceMarketOptions": {"MarketType": "spot"},
                     },
@@ -456,6 +458,7 @@ def generic_worker(wp, **cfg):
                     "config": {
                         "wstAudience": "communitytc",
                         "wstServerURL": "https://community-websocktunnel.services.mozilla.com",
+                        "idleTimeoutSecs": 600,
                     },
                 },
             },
@@ -495,18 +498,6 @@ def generic_worker(wp, **cfg):
 @worker_implementation
 def docker_worker(wp, **cfg):
 
-    # Our aws images for docker-worker currently don't support
-    # any of these devices
-    # These devices are enabled by default in docker-worker currently
-    device_management = None
-    if cfg["cloud"] == "aws":
-        device_management = {
-            "deviceManagement": {
-                "loopbackVideo": {"enabled": False},
-                "loopbackAudio": {"enabled": False},
-            },
-        }
-
     if wp.supports_worker_config():
         wp.merge_worker_config(
             WorkerPoolSettings.EXISTING_CONFIG,
@@ -516,7 +507,6 @@ def docker_worker(wp, **cfg):
                     "afterIdleSeconds": 15,
                 },
             },
-            device_management,
         )
 
     wp.secret_tpl = {

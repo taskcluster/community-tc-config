@@ -25,7 +25,8 @@ taskcluster:
       description: not actively used, but useful for testing docker-worker on AWS
       emailOnError: false
       imageset: docker-worker
-      securityGroup: docker-worker
+      securityGroups:
+        - docker-worker
       cloud: aws
       minCapacity: 0
       maxCapacity: 1
@@ -38,6 +39,19 @@ taskcluster:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 1
+
+    release:
+      owner: taskcluster-notifications+workers@mozilla.com
+      description: "Trusted worker to build Taskcluster releases (only!)"
+      emailOnError: true
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 1
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
 
     dw-ci:
       # docker-worker's CI requires the 'privileged' scope, so run
@@ -52,111 +66,81 @@ taskcluster:
       workerConfig:
         dockerConfig:
           allowPrivileged: true
-          disableSeccomp: true
-
-    windows2012r2-amd64-ci:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-win2012r2
-      cloud: aws
-      securityGroup: rdp
-      minCapacity: 0
-      maxCapacity: 10
-
-    release:
-      owner: taskcluster-notifications+workers@mozilla.com
-      description: "Trusted worker to build Taskcluster releases (only!)"
-      emailOnError: true
-      imageset: generic-worker-ubuntu-18-04
-      cloud: aws
-      minCapacity: 0
-      maxCapacity: 1
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
 
     # gw-ci-* worker pools are for generic-worker CI
-    gw-ci-ubuntu-18-04:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-ubuntu-18-04
-      cloud: aws
-      minCapacity: 0
-      maxCapacity: 10
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
-
-    gw-ci-ubuntu-18-04-staging:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-ubuntu-18-04-staging
-      cloud: aws
-      minCapacity: 0
-      maxCapacity: 10
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
-
-    gw-ci-windows2012r2-amd64:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-win2012r2
-      cloud: aws
-      securityGroup: rdp
-      minCapacity: 0
-      maxCapacity: 10
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
-
-    gw-ci-windows2012r2-amd64-staging:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-win2012r2-staging
-      cloud: gcp
-      securityGroup: rdp
-      minCapacity: 0
-      maxCapacity: 10
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
-
-    gw-ci-macos:
+    # they all have `runTasksAsCurrentUser: true` in
+    # their config so that they can run generic-worker
+    # as root user in tests. this should not be used
+    # by any other tasks!
+    gw-ci-macos-10-14:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker
       cloud: static
       lifecycle:
         reregistrationTimeout: 2592000 # 30 days
+      # note: workerConfig not specified here as configuration
+      # is stored directly on manually provisioned worker
 
-    gw-ubuntu-20-04-staging:
+    gw-ci-ubuntu-22-04:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-20-04-staging
+      imageset: generic-worker-ubuntu-22-04
       cloud: aws
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 20
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
 
-    gw-windows-2022:
+    gw-ci-windows-2022:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-win2022
       cloud: aws
-      securityGroup: rdp
+      securityGroups:
+        - rdp
+        - ssh
       minCapacity: 0
       maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
+    gw-ubuntu-22-04:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 10
+
+    gw-ubuntu-22-04-staging:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-22-04-staging
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 1
       workerConfig:
         genericWorker:
           config:
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
             idleTimeoutSecs: 3600
+
+    gw-windows-2022:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2022
+      cloud: aws
+      securityGroups:
+        - rdp
+        - ssh
+      minCapacity: 0
+      maxCapacity: 10
 
   grants:
     - grant:
@@ -228,10 +212,12 @@ taskcluster:
         - docker-worker:capability:device:loopbackAudio
         - docker-worker:capability:device:loopbackVideo
         - docker-worker:capability:device:hostSharedMemory
+        - docker-worker:capability:disableSeccomp
         - docker-worker:capability:privileged
         - docker-worker:capability:device:loopbackAudio:null-provisioner/*
         - docker-worker:capability:device:loopbackVideo:null-provisioner/*
         - docker-worker:capability:device:hostSharedMemory:null-provisioner/*
+        - docker-worker:capability:disableSeccomp:null-provisioner/*
         - docker-worker:capability:privileged:null-provisioner/*
         - docker-worker:image:localhost:*
         - purge-cache:null-provisioner/*
@@ -243,6 +229,7 @@ taskcluster:
         - queue:create-artifact:*
         - queue:create-task:lowest:null-provisioner/*
         - queue:create-task:lowest:proj-taskcluster/ci
+        - queue:rerun-task:taskcluster-level-1/*
         - queue:get-artifact:private/docker-worker-tests/*
         - queue:resolve-task
         - queue:route:statuses
@@ -319,52 +306,22 @@ taskcluster:
         - repo:github.com/taskcluster/staging-releases:*
 
     - grant:
-        - queue:create-task:medium:proj-taskcluster/gw-ci-*
-        - queue:route:index.project.taskcluster.telescope.periodic.v01
-        - queue:scheduler-id:-
-      to:
-        - hook-id:project-taskcluster/telescope-periodic-v01
-
-    - grant:
-        - queue:create-task:medium:proj-taskcluster/gw-ci-ubuntu-18-04
+        - queue:create-task:medium:proj-taskcluster/gw-ci-ubuntu-22-04
       to:
         - repo:github.com/taskcluster/docker-exec-websocket-server:*
         - repo:github.com/taskcluster/docker-exec-websocket-client:*
 
   clients:
-    smoketests:
+    smoketest:
       scopes:
         - assume:project:taskcluster:smoketests
     docker-worker/ci:
       scopes:
         - assume:project:taskcluster:docker-worker-tester
-    # Client for workerpool proj-taskcluster/gw-ci-macos.
+    # Client for workerpool proj-taskcluster/gw-ci-macos-10-14.
     generic-worker/ci-macos:
       scopes:
-        - assume:worker-pool:proj-taskcluster/gw-ci-macos
-        - assume:worker-id:proj-taskcluster/*
-    # Client for workerpool proj-taskcluster/gw-ci-macos-staging.
-    generic-worker/ci-macos-staging:
-      scopes:
-        - assume:worker-pool:proj-taskcluster/gw-ci-macos-staging
-        - assume:worker-id:proj-taskcluster/*
-    # Client for workerpool proj-taskcluster/gw-ci-raspbian-stretch
-    generic-worker/ci-raspbian-stretch:
-      scopes:
-        - assume:worker-pool:proj-taskcluster/gw-ci-raspbian-stretch
-        - assume:worker-id:proj-taskcluster/*
-    # Client for proj-taskcluster/gw-ci-windows10-amd64. This client is
-    # currently used by a single manually configured worker, running in Azure.
-    # When we have an azure provider, we can terminate this worker, delete this
-    # client, and use worker manager provisioned instances instead.
-    generic-worker/ci-windows10-amd64:
-      scopes:
-        - assume:worker-pool:proj-taskcluster/gw-ci-windows10-amd64
-        - assume:worker-id:proj-taskcluster/*
-    # Client for workerpool proj-taskcluster/gw-ci-windows10-arm
-    generic-worker/ci-windows10-arm:
-      scopes:
-        - assume:worker-pool:proj-taskcluster/gw-ci-windows10-arm
+        - assume:worker-pool:proj-taskcluster/gw-ci-macos-10-14
         - assume:worker-id:proj-taskcluster/*
     # A client whose clientId and accessToken are stored in taskcluster secret
     # `project/taskcluster/testing/generic-worker/ci-creds` and used by
@@ -374,36 +331,12 @@ taskcluster:
     generic-worker/taskcluster-ci:
       scopes:
         - assume:project:taskcluster:generic-worker-tester
-    # A client whose accessToken is securely stored in travis-ci.org
-    # taskcluster/generic-worker project as encrypted environment variable
-    # TASKCLUSTER_ACCESS_TOKEN, and used by commands in generic-worker's
-    # .travis.yml to create production tasks that are then claimed and
-    # processed by the generic-worker build under test in travis-ci.org.
-    generic-worker/travis-ci:
-      scopes:
-        - assume:project:taskcluster:generic-worker-tester
     # This client is used to test the client libraries in Taskcluster CI
     # Its access token is in `community-tc-secret-values.yml`.
     testing/client-libraries:
       scopes:
         - "object:upload:taskcluster:taskcluster/test/*"
         - "object:download:taskcluster/test/*"
-    # A client for the Telescope-Demo site
-    # Access token is stored in GCP Secret Manager
-    # GCP project is mozilla-api-stage
-    telescope-demo-client:
-      description: >
-        This is a temporary client created by SysEng for the Telescope-demo environment
-
-      scopes:
-        - assume:hook-id:project-taskcluster/*
-        - hooks:modify-hook:project-taskcluster/*
-        - index:insert-task:project.taskcluster.*
-        - queue:create-task:highest:proj-taskcluster/*
-        - queue:route:index.project.taskcluster.*
-        - queue:scheduler-id:-
-        - secrets:get:project/taskcluster/*
-        - secrets:set:project/taskcluster/*
   secrets:
     # client_id/access_token for project/taskcluster/testing/docker-worker/ci-creds
     testing/docker-worker/ci-creds: true
@@ -459,46 +392,4 @@ taskcluster:
     staging-release:
       GH_TOKEN: $taskcluster-staging-release-gh-token
 
-  hooks:
-    telescope-periodic-v01:
-      description: >
-        Periodically run a simple task, monitored by
-        [Telescope](https://telescope-demo.api.data.allizom.org).
-      name: Periodic task for Telescope monitoring
-      owner: jwhitlock@mozilla.com
-      emailOnError: false
-      schedule: ['*/15 * * * *']
-      task:
-        taskQueueId: proj-taskcluster/gw-ci-ubuntu-18-04
-        routes:
-          - index.project.taskcluster.telescope.periodic.v01
-        created:
-          $fromNow: 0 seconds
-        expires:
-          $fromNow: 1 day
-        deadline:
-          $fromNow: 30 minutes
-        payload:
-          command:
-            - - /bin/bash
-              - -vxec
-              - |
-                mkdir -p workspace/results
-                echo '{"version": 1.0, "status": "OK"}' > workspace/results/status.json
-          artifacts:
-            - name: public/results/status.json
-              path: workspace/results/status.json
-              type: file
-          maxRunTime: 60
-        metadata:
-          name: telescope-periodic-v01
-          owner: jwhitlock@mozilla.com
-          source: >-
-            https://github.com/mozilla/community-tc-config/blob/main/config/projects/taskcluster.yml
-          description: >
-            A simple task, run every 15 minutes, monitored by
-            [Telescope](https://telescope-demo.api.data.allizom.org).
-      triggerSchema:
-        type: object
-        properties: {}
-        additionalProperties: false
+  hooks: []

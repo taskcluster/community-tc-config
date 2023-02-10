@@ -12,7 +12,7 @@ git-cinnabar:
       maxCapacity: 5
       machineType: "zones/{zone}/machineTypes/n2-standard-4"
     win2012r2:
-      imageset: generic-worker-win2012r2
+      imageset: generic-worker-win2022
       cloud: aws
       maxCapacity: 2
       instanceTypes:
@@ -47,5 +47,6 @@ git-cinnabar:
         - queue:route:index.project.git-cinnabar.*
       to:
         - repo:github.com/glandium/git-cinnabar:release
+        - repo:github.com/glandium/git-cinnabar:release:*
         - repo:github.com/glandium/git-cinnabar:branch:*
         - repo:github.com/glandium/git-cinnabar:tag:*
