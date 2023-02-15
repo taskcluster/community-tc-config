@@ -152,6 +152,8 @@ taskcluster:
 
     - grant:
         - queue:create-task:highest:proj-taskcluster/ci
+        # For replacing the docker-worker pool (proj-taskcluster/ci) for d2g work
+        - queue:create-task:highest:proj-taskcluster/gw-ubuntu-22-04
         - queue:create-task:highest:proj-taskcluster/windows2012r2-amd64-ci
         # The account and secret for the Azure testing storage account.
         # This is secret but ok for use by PRs.
