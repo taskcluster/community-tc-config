@@ -100,7 +100,7 @@ generic-worker-ubuntu-22-04:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/da05ba70a7f8bfb9afab53a2ccf2eea3570468ef/imagesets/generic-worker-ubuntu-22-04/bootstrap.sh
+            script: https://github.com/mozilla/community-tc-config/blob/4be4850432a3fecbf9ca0c7c54ddeba34ed99022/imagesets/generic-worker-ubuntu-22-04/bootstrap.sh
   aws:
     amis:
       us-west-1: ami-0fec4eae11c250ace
@@ -108,7 +108,7 @@ generic-worker-ubuntu-22-04:
       us-east-1: ami-0293cdb8ad22d876b
       us-east-2: ami-0cb274505a7e939e6
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-22-04-r05z0zlbdyomc4jg20o9
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-22-04-54w0ikgxljvqq3if0nwd
 generic-worker-ubuntu-22-04-staging:
   workerImplementation: generic-worker
   workerConfig:
