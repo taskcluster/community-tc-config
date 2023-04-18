@@ -737,7 +737,7 @@ fuzzing:
         - secrets:get:project/fuzzing/ansible-vault-key
         - secrets:get:project/fuzzing/ssh-fm-staging-automation-user
       to:
-        - repo:github.com/MozillaSecurity/fuzzmanager-config
+        - repo:github.com/MozillaSecurity/fuzzmanager-config:*
     - grant:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
