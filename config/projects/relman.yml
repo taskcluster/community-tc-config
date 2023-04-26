@@ -14,7 +14,7 @@ relman:
     - github.com/mozilla/rust-parsepatch:*
     - github.com/mozilla/pyo3-parsepatch:*
     - github.com/mozilla/libmozdata:*
-    - github.com/mozilla/relman-auto-nag:*
+    - github.com/mozilla/bugbot:*
     - github.com/mozilla/coverage-crawler:*
     - github.com/mozilla/stab-crashes:*
     - github.com/mozilla/grcov:*
@@ -92,7 +92,7 @@ relman:
         - repo:github.com/mozilla/dump_syms:*
         - repo:github.com/mozilla/libmozevent:*
         - repo:github.com/mozilla/libmozdata:*
-        - repo:github.com/mozilla/relman-auto-nag:*
+        - repo:github.com/mozilla/bugbot:*
         - repo:github.com/mozilla/coverage-crawler:*
         - repo:github.com/mozilla/stab-crashes:*
         - repo:github.com/mozilla/grcov:*
