@@ -1,3 +1,10 @@
+# This script is not maintained!!
+#
+# See https://github.com/mozilla/community-tc-config/pull/549#issuecomment-1353426207
+# This is just a working version used by the fuzzing team, until they are able
+# to migrate to the standard Windows Server image set that we provide.
+#
+# Do not update unless necessary!
 $TASKCLUSTER_VERSION = "44.21.0"
 
 # use TLS 1.2 (see bug 1443595)
