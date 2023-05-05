@@ -116,6 +116,10 @@ taskcluster:
       cloud: aws
       minCapacity: 0
       maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            enableInteractive: true
 
     gw-ubuntu-22-04-staging:
       owner: taskcluster-notifications+workers@mozilla.com
