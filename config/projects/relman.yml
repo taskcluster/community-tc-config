@@ -48,6 +48,18 @@ relman:
         - rdp
       minCapacity: 0
       maxCapacity: 10
+    generic-worker-ubuntu-22-04:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 5
+      workerConfig:
+        genericWorker:
+          config:
+            enableInteractive: true
+
   secrets:
     bugzilla-dashboard-backend/deploy-production: true
     bugzilla-dashboard-backend/deploy-testing: true
