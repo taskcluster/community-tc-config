@@ -52,7 +52,7 @@ relman:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: generic-worker-ubuntu-22-04
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 5
       workerConfig:
