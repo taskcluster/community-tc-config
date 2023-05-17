@@ -4,7 +4,7 @@ set -exv
 exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
-TASKCLUSTER_REF='v50.0.0'
+TASKCLUSTER_REF='10ea2e3b6ad930fb9ae1c692c4ad6e096ed4b2ad'
 ######################################
 
 function retry {
@@ -46,7 +46,7 @@ retry apt-get install -y docker-ce docker-ce-cli containerd.io
 retry docker run hello-world
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
-retry curl -L 'https://dl.google.com/go/go1.19.3.linux-amd64.tar.gz' > go.tar.gz
+retry curl -fsSL 'https://dl.google.com/go/go1.19.9.linux-amd64.tar.gz' > go.tar.gz
 tar xvfz go.tar.gz -C /usr/local
 export HOME=/root
 export GOPATH=~/go
@@ -96,7 +96,22 @@ EOF
 
 systemctl enable worker
 
-retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
+retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop
+
+# Install v4 of podman from kubic rather than regular ubuntu package
+# See:
+#   * https://github.com/mozilla/community-tc-config/pull/580
+#   * https://podman.io/docs/installation#ubuntu
+
+mkdir -p /etc/apt/keyrings
+retry curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/xUbuntu_$(lsb_release -rs)/Release.key \
+  | gpg --dearmor > /etc/apt/keyrings/devel_kubic_libcontainers_unstable.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/devel_kubic_libcontainers_unstable.gpg]\
+    https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/xUbuntu_$(lsb_release -rs)/ /" \
+  > /etc/apt/sources.list.d/devel:kubic:libcontainers:unstable.list
+retry apt-get update -qq
+retry apt-get -qq -y install podman
 
 # set podman registries conf
 (
