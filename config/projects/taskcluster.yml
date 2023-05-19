@@ -215,19 +215,20 @@ taskcluster:
         - assume:worker-id:random-local-worker/docker-worker
         - aws-provisioner:create-secret:*
         - docker-worker:cache:docker-worker-garbage-*
-        - docker-worker:capability:device:loopbackAudio
-        - docker-worker:capability:device:loopbackVideo
         - docker-worker:capability:device:hostSharedMemory
-        - docker-worker:capability:disableSeccomp
-        - docker-worker:capability:privileged
-        - docker-worker:capability:device:loopbackAudio:null-provisioner/*
-        - docker-worker:capability:device:loopbackVideo:null-provisioner/*
         - docker-worker:capability:device:hostSharedMemory:null-provisioner/*
+        - docker-worker:capability:device:loopbackAudio
+        - docker-worker:capability:device:loopbackAudio:null-provisioner/*
+        - docker-worker:capability:device:loopbackVideo
+        - docker-worker:capability:device:loopbackVideo:null-provisioner/*
+        - docker-worker:capability:disableSeccomp
         - docker-worker:capability:disableSeccomp:null-provisioner/*
+        - docker-worker:capability:privileged
         - docker-worker:capability:privileged:null-provisioner/*
         - docker-worker:image:localhost:*
         - purge-cache:null-provisioner/*
         - queue:cancel-task
+        - queue:cancel-task-group:taskcluster-level-1/*
         - queue:cancel-task:docker-worker-tests/*
         - queue:claim-task
         - queue:claim-task:null-provisioner/*
@@ -235,15 +236,16 @@ taskcluster:
         - queue:create-artifact:*
         - queue:create-task:lowest:null-provisioner/*
         - queue:create-task:lowest:proj-taskcluster/ci
-        - queue:rerun-task:taskcluster-level-1/*
         - queue:get-artifact:private/docker-worker-tests/*
+        - queue:rerun-task:taskcluster-level-1/*
         - queue:resolve-task
         - queue:route:statuses
         - queue:scheduler-id:docker-worker-tests
         - queue:scheduler-id:taskcluster-github
+        - queue:seal-task-group:taskcluster-level-1/*
         - queue:worker-id:docker-worker/docker-worker
-        - queue:worker-id:random-local-worker/dummy-worker-*
         - queue:worker-id:random-local-worker/docker-worker
+        - queue:worker-id:random-local-worker/dummy-worker-*
         - secrets:get:project/taskcluster/taskcluster-worker/stateless-dns
         - secrets:get:project/taskcluster/testing/docker-worker/ci-creds
         - secrets:get:project/taskcluster/testing/docker-worker/pulse-creds
