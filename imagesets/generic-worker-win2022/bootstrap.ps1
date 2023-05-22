@@ -24,6 +24,12 @@ function Expand-ZIPFile($file, $destination, $url)
 # allow powershell scripts to run
 Set-ExecutionPolicy Unrestricted -Force -Scope Process
 
+# Disable AV for IO speed
+Set-Service "WinDefend" -StartupType Disabled -Status Stopped
+
+# Disable disk indexing
+Set-Service "WSearch" -StartupType Disabled -Status Stopped
+
 # install chocolatey package manager
 Invoke-Expression ($client.DownloadString('https://chocolatey.org/install.ps1'))
 
