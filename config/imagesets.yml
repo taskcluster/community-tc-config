@@ -133,10 +133,10 @@ generic-worker-win2022:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-west-1: ami-0bf32830371d8ab72
-      us-west-2: ami-0f939215a37d381aa
-      us-east-1: ami-0adddfb672121fcf4
-      us-east-2: ami-0fd17aca9d330448c
+      us-west-1: ami-0060a869b9486e396
+      us-west-2: ami-07481587be8c1c891
+      us-east-1: ami-004372a3644552077
+      us-east-2: ami-0beef3d3b5d60a958
   workerConfig:
     genericWorker:
       config:
@@ -149,7 +149,7 @@ generic-worker-win2022:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/027b40d643b723238f07b6a0e379e328bb9769bd/imagesets/generic-worker-win2022/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/8630f9060c757b55dbce5e050ef2d3b5727cf6be/imagesets/generic-worker-win2022/bootstrap.ps1
 generic-worker-win2016-amd:
   workerImplementation: generic-worker
   aws:
