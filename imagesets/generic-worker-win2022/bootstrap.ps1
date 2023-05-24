@@ -1,4 +1,4 @@
-$TASKCLUSTER_VERSION = "v50.0.0"
+$TASKCLUSTER_VERSION = "v51.0.0"
 
 # use TLS 1.2 (see bug 1443595)
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -23,6 +23,12 @@ function Expand-ZIPFile($file, $destination, $url)
 
 # allow powershell scripts to run
 Set-ExecutionPolicy Unrestricted -Force -Scope Process
+
+# Disable AV for IO speed
+Set-Service "WinDefend" -StartupType Disabled -Status Stopped
+
+# Disable disk indexing
+Set-Service "WSearch" -StartupType Disabled -Status Stopped
 
 # install chocolatey package manager
 Invoke-Expression ($client.DownloadString('https://chocolatey.org/install.ps1'))
