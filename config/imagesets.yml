@@ -70,7 +70,7 @@ docker-worker-legacy:
       us-east-2: ami-071b3ff08f2d9c1dd
       us-west-1: ami-03f677a21b2fadb15
       us-west-2: ami-0de87470eb34a8e36
-relman-win2012r2:
+relman-win2022:
   workerImplementation: generic-worker
   aws:
     amis:
@@ -88,7 +88,7 @@ relman-win2012r2:
         workerTypeMetadata:
           machine-setup:
             maintainer: mcastelluccio@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/2a372b1c36072208c80161385acca21cce5eb6c7/imagesets/relman-win2012r2/bootstrap.ps1
+            script: https://github.com/mozilla/community-tc-config/blob/159b607264ae7c82d2d5da365c5fcd95bbfce337/imagesets/relman-win2022/bootstrap.ps1
 generic-worker-ubuntu-22-04:
   workerImplementation: generic-worker
   workerConfig:

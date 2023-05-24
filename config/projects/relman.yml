@@ -39,10 +39,10 @@ relman:
       workerConfig:
         dockerConfig:
           allowPrivileged: true
-    win2012r2:
+    win2022:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: relman-win2012r2
+      imageset: relman-win2022
       cloud: aws
       securityGroups:
         - rdp
