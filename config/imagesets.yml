@@ -70,7 +70,7 @@ docker-worker-legacy:
       us-east-2: ami-071b3ff08f2d9c1dd
       us-west-1: ami-03f677a21b2fadb15
       us-west-2: ami-0de87470eb34a8e36
-relman-win2012r2:
+relman-win2022:
   workerImplementation: generic-worker
   aws:
     amis:
