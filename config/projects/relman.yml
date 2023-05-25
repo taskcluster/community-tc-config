@@ -42,7 +42,7 @@ relman:
     win2022:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: relman-win2022
+      imageset: generic-worker-win2022
       cloud: aws
       securityGroups:
         - rdp
