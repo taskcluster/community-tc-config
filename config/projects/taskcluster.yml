@@ -280,6 +280,7 @@ taskcluster:
 
     - grant:
         - assume:worker-id:test-worker-group/test-worker-id
+        - assume:worker-pool:test-provisioner/*
         - assume:worker-type:test-provisioner/*
         - auth:create-client:project/taskcluster:generic-worker-tester/TestReclaimCancelledTask
         - auth:create-client:project/taskcluster:generic-worker-tester/TestResolveResolvedTask
@@ -290,15 +291,16 @@ taskcluster:
         - generic-worker:cache:unknown-issuer-app-cache
         - generic-worker:os-group:test-provisioner/*
         - generic-worker:run-as-administrator:test-provisioner/*
+        - index:find-task:garbage.generic-worker-tests.*
+        - index:insert-task:garbage.generic-worker-tests.*
         - queue:cancel-task:test-scheduler/*
-        - assume:worker-pool:test-provisioner/*
         - queue:create-artifact:public/*
         - queue:create-task:highest:test-provisioner/*
-        - queue:scheduler-id:test-scheduler
         - queue:get-artifact:SampleArtifacts/_/X.txt
         - queue:get-artifact:SampleArtifacts/_/non-existent-artifact.txt
         - queue:get-artifact:SampleArtifacts/b/c/d.jpg
         - queue:resolve-task
+        - queue:scheduler-id:test-scheduler
       to: project:taskcluster:generic-worker-tester
 
     - grant:
