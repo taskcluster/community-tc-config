@@ -70,27 +70,6 @@ docker-worker-legacy:
       us-east-2: ami-071b3ff08f2d9c1dd
       us-west-1: ami-03f677a21b2fadb15
       us-west-2: ami-0de87470eb34a8e36
-relman-win2022:
-  workerImplementation: generic-worker
-  aws:
-    amis:
-      us-east-1: ami-0ded75d6b2519794f
-      us-west-1: ami-0123ae4d75fccccfa
-      us-west-2: ami-0fdc5b1a62970eedd
-      us-east-2: ami-042ee89dc2fdddef3
-  workerConfig:
-    genericWorker:
-      config:
-        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        livelogExecutable: C:\generic-worker\livelog.exe
-        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
-        shutdownMachineOnIdle: true
-        idleTimeoutSecs: 15
-        shutdownMachineOnInternalError: true
-        workerTypeMetadata:
-          machine-setup:
-            maintainer: mcastelluccio@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/159b607264ae7c82d2d5da365c5fcd95bbfce337/imagesets/relman-win2022/bootstrap.ps1
 generic-worker-ubuntu-22-04:
   workerImplementation: generic-worker
   workerConfig:
@@ -135,10 +114,10 @@ generic-worker-win2022:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-west-1: ami-06dafd7ff4af49825
-      us-west-2: ami-0060b1a9b4e25a9eb
-      us-east-1: ami-0f57a61bb88caffcb
-      us-east-2: ami-077eb1162daeb4464
+      us-east-1: ami-0ded75d6b2519794f
+      us-west-1: ami-0123ae4d75fccccfa
+      us-west-2: ami-0fdc5b1a62970eedd
+      us-east-2: ami-042ee89dc2fdddef3
   workerConfig:
     genericWorker:
       config:
@@ -150,7 +129,7 @@ generic-worker-win2022:
         shutdownMachineOnInternalError: true
         workerTypeMetadata:
           machine-setup:
-            maintainer: taskcluster-notifications+workers@mozilla.com
+            maintainer: pmoore@mozilla.com
             script: https://github.com/mozilla/community-tc-config/blob/39bd95783c89241a8a15b2f353e8e860db684c0f/imagesets/generic-worker-win2022/bootstrap.ps1
 generic-worker-win2016-amd:
   workerImplementation: generic-worker
