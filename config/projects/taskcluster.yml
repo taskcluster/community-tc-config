@@ -305,8 +305,7 @@ taskcluster:
 
     - grant:
         - assume:project:taskcluster:generic-worker-tester
-        - queue:create-task:highest:proj-taskcluster/gw-ci-*
-        - queue:create-task:highest:proj-taskcluster/dw-ci
+        - queue:create-task:highest:proj-taskcluster/*
         - generic-worker:cache:generic-worker-checkout
         - secrets:get:project/taskcluster/testing/generic-worker/ci-creds
         - queue:scheduler-id:taskcluster-level-1
