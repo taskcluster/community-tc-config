@@ -349,6 +349,10 @@ taskcluster:
       scopes:
         - "object:upload:taskcluster:taskcluster/test/*"
         - "object:download:taskcluster/test/*"
+    # Running periodic audits and worker version reports
+    audit-reports:
+      scopes:
+        - "queue:create-task:lowest:*"
   secrets:
     # client_id/access_token for project/taskcluster/testing/docker-worker/ci-creds
     testing/docker-worker/ci-creds: true
