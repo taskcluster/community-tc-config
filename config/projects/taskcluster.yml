@@ -353,6 +353,7 @@ taskcluster:
     audit-reports:
       scopes:
         - "queue:create-task:lowest:*"
+        - "queue:scheduler-id:audit"
   secrets:
     # client_id/access_token for project/taskcluster/testing/docker-worker/ci-creds
     testing/docker-worker/ci-creds: true
