@@ -50,6 +50,7 @@ if [[ "%MY_CLOUD%" == "google" ]]; then
     # Required only in GCP.
     apt-get install linux-modules-extra-gcp -y
 fi
+echo "v4l2loopback" | tee --append /etc/modules
 modprobe v4l2loopback video_nr=0
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
