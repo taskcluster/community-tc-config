@@ -46,6 +46,10 @@ retry apt-get install -y docker-ce docker-ce-cli containerd.io
 retry docker run hello-world
 
 # set up video device
+if [[ "%MY_CLOUD%" == "google" ]]; then
+    # Required only in GCP.
+    apt-get install linux-modules-extra-gcp -y
+fi
 modprobe v4l2loopback video_nr=0
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
