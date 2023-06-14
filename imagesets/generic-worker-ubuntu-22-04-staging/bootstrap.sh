@@ -45,13 +45,12 @@ retry apt-get update
 retry apt-get install -y docker-ce docker-ce-cli containerd.io
 retry docker run hello-world
 
-# set up video device
 if [[ "%MY_CLOUD%" == "google" ]]; then
-    # Required only in GCP.
-    apt-get install linux-modules-extra-gcp -y
+    # installs the v4l2loopback kernel module
+    # used for the video device
+    # only required on gcp
+    retry apt-get install linux-modules-extra-gcp -y
 fi
-echo "v4l2loopback" | tee --append /etc/modules
-modprobe v4l2loopback video_nr=0
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
 retry curl -fsSL 'https://dl.google.com/go/go1.19.9.linux-amd64.tar.gz' > go.tar.gz

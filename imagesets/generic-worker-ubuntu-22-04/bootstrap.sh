@@ -45,6 +45,13 @@ retry apt-get update
 retry apt-get install -y docker-ce docker-ce-cli containerd.io
 retry docker run hello-world
 
+if [[ "%MY_CLOUD%" == "google" ]]; then
+    # installs the v4l2loopback kernel module
+    # used for the video device
+    # only required on gcp
+    retry apt-get install linux-modules-extra-gcp -y
+fi
+
 cd /usr/local/bin
 retry curl -L "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/generic-worker-multiuser-linux-amd64" > generic-worker
 retry curl -L "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/start-worker-linux-amd64" > start-worker
