@@ -4,7 +4,7 @@ set -exv
 exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
-TASKCLUSTER_REF='10ea2e3b6ad930fb9ae1c692c4ad6e096ed4b2ad'
+TASKCLUSTER_REF='e8e9d279140ff301868e00b23b4d4719680c8645'
 ######################################
 
 function retry {
@@ -44,6 +44,9 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docke
 retry apt-get update
 retry apt-get install -y docker-ce docker-ce-cli containerd.io
 retry docker run hello-world
+
+# set up video device
+modprobe v4l2loopback video_nr=0
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
 retry curl -fsSL 'https://dl.google.com/go/go1.19.9.linux-amd64.tar.gz' > go.tar.gz
