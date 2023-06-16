@@ -343,6 +343,7 @@ taskcluster:
     generic-worker/taskcluster-ci:
       scopes:
         - assume:project:taskcluster:generic-worker-tester
+        - generic-worker:loopback-video
     # This client is used to test the client libraries in Taskcluster CI
     # Its access token is in `community-tc-secret-values.yml`.
     testing/client-libraries:
