@@ -312,25 +312,7 @@ def gcp(
         "maxCapacity": maxCapacity,
         "minCapacity": minCapacity,
         "launchConfigs": [
-            {
-                "capacityPerInstance": 1,
-                "machineType": machineType.format(zone=zone),
-                "region": region,
-                "zone": zone,
-                "scheduling": {"onHostMaintenance": "terminate"},
-                "disks": [
-                    {
-                        "type": "PERSISTENT",
-                        "boot": True,
-                        "autoDelete": True,
-                        "initializeParams": {
-                            "sourceImage": image,
-                            "diskSizeGb": diskSizeGb,
-                        },
-                    },
-                ],
-                "networkInterfaces": [{"accessConfigs": [{"type": "ONE_TO_ONE_NAT"}]}],
-            }
+            gcp_launch_config(zone, region, machineType, image, diskSizeGb, **cfg)
             for zone, region in GOOGLE_ZONES_REGIONS
             if machine_in_zone(machineType, zone)
         ],
@@ -342,6 +324,29 @@ def gcp(
     )
 
     return wp
+
+
+def gcp_launch_config(zone, region, machineType, image, diskSizeGb, **cfg):
+    default_launch_config = {
+        "capacityPerInstance": 1,
+        "machineType": machineType.format(zone=zone),
+        "region": region,
+        "zone": zone,
+        "scheduling": {"onHostMaintenance": "terminate"},
+        "disks": [
+            {
+                "type": "PERSISTENT",
+                "boot": True,
+                "autoDelete": True,
+                "initializeParams": {
+                    "sourceImage": image,
+                    "diskSizeGb": diskSizeGb,
+                },
+            },
+        ],
+        "networkInterfaces": [{"accessConfigs": [{"type": "ONE_TO_ONE_NAT"}]}],
+    }
+    return merge(cfg.get("launchConfig", {}), default_launch_config)
 
 
 @lru_cache(maxsize=100)
