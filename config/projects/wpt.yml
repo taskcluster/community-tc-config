@@ -10,6 +10,9 @@ wpt:
       workerConfig:
         dockerConfig:
           allowPrivileged: true
+      launchConfig:
+        advancedMachineFeatures:
+          enableNestedVirtualization: true
   repos:
     - github.com/web-platform-tests/*
   grants:
