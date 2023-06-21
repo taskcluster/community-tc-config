@@ -53,16 +53,16 @@ if [[ "%MY_CLOUD%" == "google" ]]; then
 fi
 
 cd /usr/local/bin
-retry curl -L "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/generic-worker-multiuser-linux-amd64" > generic-worker
-retry curl -L "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/start-worker-linux-amd64" > start-worker
-retry curl -L "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/livelog-linux-amd64" > livelog
-retry curl -L "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/taskcluster-proxy-linux-amd64" > taskcluster-proxy
+retry curl -fsSL "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/generic-worker-multiuser-linux-amd64" > generic-worker
+retry curl -fsSL "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/start-worker-linux-amd64" > start-worker
+retry curl -fsSL "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/livelog-linux-amd64" > livelog
+retry curl -fsSL "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/taskcluster-proxy-linux-amd64" > taskcluster-proxy
 chmod a+x generic-worker start-worker taskcluster-proxy livelog
 
 mkdir -p /etc/generic-worker
 mkdir -p /var/local/generic-worker
-./generic-worker --version
-./generic-worker new-ed25519-keypair --file /etc/generic-worker/ed25519_key
+/usr/local/bin/generic-worker --version
+/usr/local/bin/generic-worker new-ed25519-keypair --file /etc/generic-worker/ed25519_key
 
 # ensure host 'taskcluster' resolves to localhost
 echo 127.0.1.1 taskcluster >> /etc/hosts
