@@ -625,7 +625,7 @@ fuzzing:
       task:
         created: {$fromNow: ''}
         deadline: {$fromNow: '1 hour'}
-        schedulerId: fuzzing
+        schedulerId: taskcluster-github
         provisionerId: proj-fuzzing
         workerType: ci
         payload:
