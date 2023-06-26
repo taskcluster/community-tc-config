@@ -117,7 +117,7 @@ taskcluster:
       imageset: generic-worker-ubuntu-22-04
       cloud: aws
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 20
       workerConfig:
         genericWorker:
           config:
