@@ -12,34 +12,6 @@ taskcluster:
     - "Client=project/taskcluster/smoketest/.*"
     - "Role=project:taskcluster:smoketest:.*"
   workerPools:
-    ci:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
-      minCapacity: 0
-      maxCapacity: 20
-
-    aws-test:
-      owner: taskcluster-notifications+workers@mozilla.com
-      description: not actively used, but useful for testing docker-worker on AWS
-      emailOnError: false
-      imageset: docker-worker
-      securityGroups:
-        - docker-worker
-      cloud: aws
-      minCapacity: 0
-      maxCapacity: 1
-
-    gcp-test:
-      owner: taskcluster-notifications+workers@mozilla.com
-      description: not actively used, but useful for testing docker-worker on GCP
-      emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
-      minCapacity: 0
-      maxCapacity: 1
-
     release:
       owner: taskcluster-notifications+workers@mozilla.com
       description: "Trusted worker to build Taskcluster releases (only!)"
@@ -52,20 +24,6 @@ taskcluster:
         genericWorker:
           config:
             runTasksAsCurrentUser: true
-
-    dw-ci:
-      # docker-worker's CI requires the 'privileged' scope, so run
-      # it on another worker.  Such workers are "untrusted" as this
-      # might allow one task to interfere with another.
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
-      minCapacity: 0
-      maxCapacity: 10
-      workerConfig:
-        dockerConfig:
-          allowPrivileged: true
 
     # gw-ci-* worker pools are for generic-worker CI
     # they all have `runTasksAsCurrentUser: true` in
