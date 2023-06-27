@@ -62,7 +62,6 @@ class ExternallyManaged:
 
 
 class Projects(YamlDirectory):
-
     directory = "config/projects"
 
     @attr.s
