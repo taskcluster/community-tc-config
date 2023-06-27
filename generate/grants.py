@@ -19,7 +19,6 @@ def make_list(val):
 
 
 class Grants(ConfigList):
-
     filename = "config/grants.yml"
 
     @attr.s

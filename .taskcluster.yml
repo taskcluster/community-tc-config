@@ -24,7 +24,7 @@ tasks:
   in:
     $let:
       tests:
-        - image: 'python:3.6'
+        - image: 'python:3.11'
           name: tc-admin diff
           command:
             - /bin/bash
@@ -38,7 +38,7 @@ tasks:
               pip install --no-use-pep517 -e . &&
               tc-admin generate --without-secrets >/dev/null &&
               { tc-admin diff --without-secrets | cat; true; }
-        - image: 'python:3.6'
+        - image: 'python:3.11'
           name: black
           command:
             - /bin/bash
@@ -50,8 +50,8 @@ tasks:
               git config advice.detachedHead false &&
               git checkout ${repo.ref} &&
               pip install black &&
-              black --check generate
-        - image: 'python:3.6'
+              black --diff generate
+        - image: 'python:3.11'
           name: yamllint
           command:
             - /bin/bash

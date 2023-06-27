@@ -80,7 +80,6 @@ def merge(*dicts):
 
 
 class WorkerPoolSettings:
-
     # sentinel value (see below)
     class EXISTING_CONFIG:
         pass
@@ -135,7 +134,6 @@ class StaticWorkerPoolSettings(WorkerPoolSettings):
 
 
 class DynamicWorkerPoolSettings(WorkerPoolSettings):
-
     supports_worker_config = True
 
     def supports_worker_config(self):
@@ -502,7 +500,6 @@ def generic_worker(wp, **cfg):
 
 @worker_implementation
 def docker_worker(wp, **cfg):
-
     if wp.supports_worker_config():
         wp.merge_worker_config(
             WorkerPoolSettings.EXISTING_CONFIG,

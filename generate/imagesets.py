@@ -11,7 +11,6 @@ from .loader import loader
 
 
 class ImageSets(ConfigDict):
-
     filename = "config/imagesets.yml"
 
     @attr.s
