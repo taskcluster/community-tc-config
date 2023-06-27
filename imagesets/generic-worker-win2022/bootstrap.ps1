@@ -1,4 +1,4 @@
-$TASKCLUSTER_VERSION = "v53.1.0"
+$TASKCLUSTER_VERSION = "v53.2.1"
 
 # use TLS 1.2 (see bug 1443595)
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
