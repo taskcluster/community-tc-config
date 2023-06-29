@@ -121,33 +121,33 @@ New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound
 
 # install go (not required, but useful)
 md "C:\gopath"
-Expand-ZIPFile -File "C:\go1.19.3.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.19.3.windows-amd64.zip"
+Expand-ZIPFile -File "C:\go1.20.5.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.20.5.windows-amd64.zip"
 
 # install git
-$client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.16.2.windows.1/Git-2.16.2-64-bit.exe", "C:\Git-2.16.2-64-bit.exe")
-Start-Process "C:\Git-2.16.2-64-bit.exe" -ArgumentList "/VERYSILENT /LOG=C:\git_install.log /NORESTART /SUPPRESSMSGBOXES" -Wait -NoNewWindow
+$client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.41.0.windows.1/Git-2.41.0-64-bit.exe", "C:\Git-2.41.0-64-bit.exe")
+Start-Process "C:\Git-2.41.0-64-bit.exe" -ArgumentList "/VERYSILENT /LOG=C:\git_install.log /NORESTART /SUPPRESSMSGBOXES" -Wait -NoNewWindow
 
 # install node
-$client.DownloadFile("https://nodejs.org/dist/v16.14.2/node-v16.14.2-x64.msi", "C:\NodeSetup.msi")
+$client.DownloadFile("https://nodejs.org/dist/v18.16.1/node-v18.16.1-x64.msi", "C:\NodeSetup.msi")
 Start-Process "msiexec" -ArgumentList "/i C:\NodeSetup.msi /quiet" -Wait -NoNewWindow -PassThru
 
-# install python 3.10.4
-$client.DownloadFile("https://www.python.org/ftp/python/3.10.4/python-3.10.4-amd64.exe", "C:\python-3.10.4-amd64.exe")
-Start-Process "C:\python-3.10.4-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1" -Wait -NoNewWindow -PassThru
+# install python 3.11.4
+$client.DownloadFile("https://www.python.org/ftp/python/3.11.4/python-3.11.4-amd64.exe", "C:\python-3.11.4-amd64.exe")
+Start-Process "C:\python-3.11.4-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1" -Wait -NoNewWindow -PassThru
 
 # set permanent env vars
 [Environment]::SetEnvironmentVariable("GOROOT", "C:\go", "Machine")
-[Environment]::SetEnvironmentVariable("PATH", $Env:Path + ";C:\Program Files\Vim\vim80;C:\go\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs;C:\Program Files\Python310", "Machine")
+[Environment]::SetEnvironmentVariable("PATH", $Env:Path + ";C:\Program Files\Vim\vim80;C:\go\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs;C:\Program Files\Python311", "Machine")
 [Environment]::SetEnvironmentVariable("PATHEXT", $Env:PathExt + ";.PY", "Machine")
 [Environment]::SetEnvironmentVariable("GOPATH", "C:\gopath", "Machine")
 
 # set env vars for the currently running process
 $env:GOROOT  = "C:\go"
 $env:GOPATH  = "C:\gopath"
-$env:PATH    = $env:PATH + ";C:\go\bin;C:\gopath\bin;C:\Program Files\Git\cmd;C:\Program Files\Python310"
+$env:PATH    = $env:PATH + ";C:\go\bin;C:\gopath\bin;C:\Program Files\Git\cmd;C:\Program Files\Python311"
 $env:PATHEXT = $env:PATHEXT + ";.PY"
 
-# get generic-worker and livelog source code (note required, but useful)
+# get generic-worker and livelog source code (not required, but useful)
 Start-Process "go" -ArgumentList "get -t github.com/taskcluster/generic-worker github.com/taskcluster/livelog" -Wait -NoNewWindow -PassThru
 
 # generate ed25519 key
@@ -209,6 +209,9 @@ choco install -y windows-sdk-10.0
 # install VisualStudio 2019 Community
 choco install -y visualstudio2019community --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.160 --passive --locale en-US"
 choco install -y visualstudio2019buildtools --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Component.NuGet.BuildTools --add Microsoft.VisualStudio.Workload.UniversalBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.NetCoreBuildTools;includeRecommended --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US"
+
+# install gcc for go race detector
+choco install -y mingw --version 11.2.0.07112021
 
 # now shutdown, in preparation for creating an image
 # Stop-Computer isn't working, also not when specifying -AsJob, so reverting to using `shutdown` command instead
