@@ -11,6 +11,12 @@ git-cinnabar:
       cloud: gcp
       maxCapacity: 5
       machineType: "zones/{zone}/machineTypes/n2-standard-4"
+    linux:
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
+      maxCapacity: 5
+      instanceTypes:
+        m5.xlarge: 1
     win2012r2:
       imageset: generic-worker-win2022
       cloud: aws
@@ -19,10 +25,6 @@ git-cinnabar:
         c5.2xlarge: 1
         m5.2xlarge: 1
   clients:
-    worker-osx-10-10:
-      scopes:
-        - assume:worker-pool:proj-git-cinnabar/osx-10-10
-        - assume:worker-id:proj-git-cinnabar/travis-*
     worker-osx:
       scopes:
         - assume:worker-pool:proj-git-cinnabar/osx
@@ -30,9 +32,9 @@ git-cinnabar:
   grants:
     - grant:
         - queue:create-task:highest:proj-git-cinnabar/ci
+        - queue:create-task:highest:proj-git-cinnabar/linux
         - queue:create-task:highest:proj-git-cinnabar/win2012r2
-        # these two workerTypes are implemented in Travis-CI (!)
-        - queue:create-task:highest:proj-git-cinnabar/osx-10-10
+        # this workerType is implemented in Github Actions (!)
         - queue:create-task:highest:proj-git-cinnabar/osx
         - queue:scheduler-id:taskcluster-github
       to:
