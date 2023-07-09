@@ -6,11 +6,6 @@ git-cinnabar:
   secrets:
     codecov: true
   workerPools:
-    ci:
-      imageset: docker-worker
-      cloud: gcp
-      maxCapacity: 5
-      machineType: "zones/{zone}/machineTypes/n2-standard-4"
     linux:
       imageset: generic-worker-ubuntu-22-04
       cloud: aws
@@ -31,7 +26,6 @@ git-cinnabar:
         - assume:worker-id:proj-git-cinnabar/travis-*
   grants:
     - grant:
-        - queue:create-task:highest:proj-git-cinnabar/ci
         - queue:create-task:highest:proj-git-cinnabar/linux
         - queue:create-task:highest:proj-git-cinnabar/win2012r2
         # this workerType is implemented in Github Actions (!)
