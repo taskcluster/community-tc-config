@@ -81,9 +81,13 @@ generic-worker-freebsd:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config
+            script: https://github.com/mozilla/community-tc-config/blob/ce90750aa55ab27f6111040925ebe820ec939ff0/imagesets/generic-worker-freebsd/bootstrap.sh
   aws:
     amis:
+      us-west-1: ami-03ab357e5bc4fde14
+      us-west-2: ami-0aec17d43bf888035
+      us-east-1: ami-05904e574e7a66fa8
+      us-east-2: ami-090ed2386963df7bf
 generic-worker-ubuntu-22-04:
   workerImplementation: generic-worker
   workerConfig:
