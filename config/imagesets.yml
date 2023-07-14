@@ -70,6 +70,20 @@ docker-worker-legacy:
       us-east-2: ami-071b3ff08f2d9c1dd
       us-west-1: ami-03f677a21b2fadb15
       us-west-2: ami-0de87470eb34a8e36
+generic-worker-freebsd:
+  workerImplementation: generic-worker
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        shutdownMachineOnIdle: true
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: taskcluster-notifications+workers@mozilla.com
+            script: https://github.com/mozilla/community-tc-config
+  aws:
+    amis:
 generic-worker-ubuntu-22-04:
   workerImplementation: generic-worker
   workerConfig:
