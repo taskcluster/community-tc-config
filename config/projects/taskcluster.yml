@@ -71,7 +71,7 @@ taskcluster:
     # they all have `runTasksAsCurrentUser: true` in
     # their config so that they can run generic-worker
     # as root user in tests. this should not be used
-    # by any other tasks!
+    # by any other CI tasks!
     gw-ci-macos-13:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
