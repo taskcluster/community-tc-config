@@ -453,6 +453,15 @@ def aws(
 
 @worker_implementation
 def generic_worker(wp, **cfg):
+    # Default value, if config value not known (static worker pools define
+    # config locally). Note, if ever a static worker pool needs to use a
+    # different value than this one, we will need to stop setting this default
+    # here, and require that projects manage their static worker pool roles
+    # directly themselves. For now, setting it here has the advantage that it
+    # is less likely for a project to forget to configure the role itself,
+    # which may otherwise go unnoticed, preventing real production panics from
+    # being reported.
+    sentryProject = "generic-worker"
     if wp.supports_worker_config():
         wp.merge_worker_config(
             WorkerPoolSettings.EXISTING_CONFIG,
@@ -493,7 +502,7 @@ def generic_worker(wp, **cfg):
             "sentryProject", "generic-worker"
         )
 
-        wp.scopes.append("auth:sentry:" + sentryProject)
+    wp.scopes.append("auth:sentry:" + sentryProject)
 
     return wp
 
