@@ -82,6 +82,14 @@ taskcluster:
       # note: workerConfig not specified here as configuration
       # is stored directly on manually provisioned worker
 
+    gw-ci-freebsd:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker
+      cloud: static
+      lifecycle:
+        reregistrationTimeout: 2592000 # 30 days
+
     gw-ci-ubuntu-22-04:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
