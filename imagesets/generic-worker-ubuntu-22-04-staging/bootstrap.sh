@@ -3,9 +3,11 @@
 set -exv
 exec &> /var/log/bootstrap.log
 
-# Version numbers ####################
-TASKCLUSTER_REF='2790ef681cdba77129e2e38a158f10a5196b338c'
-######################################
+##############################################################################
+# TASKCLUSTER_REF can be a git commit SHA, a git branch name, or a git tag name
+# (i.e. for a taskcluster version number, prefix with 'v' to make it a git tag)
+TASKCLUSTER_REF='main'
+##############################################################################
 
 function retry {
   set +e
