@@ -131,11 +131,25 @@ taskcluster:
           config:
             enableInteractive: true
 
-    gw-ubuntu-22-04-staging:
+    gw-ubuntu-staging-aws:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-22-04-staging
       cloud: aws
+      minCapacity: 0
+      maxCapacity: 1
+      workerConfig:
+        genericWorker:
+          config:
+            # While iterating on the image building process for this worker
+            # pool, useful for workers not to die immediately...
+            idleTimeoutSecs: 3600
+
+    gw-ubuntu-staging-google:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-22-04-staging
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 1
       workerConfig:
