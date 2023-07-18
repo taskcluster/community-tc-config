@@ -54,26 +54,6 @@ if [[ "%MY_CLOUD%" == "google" ]]; then
     retry apt-get install linux-modules-extra-gcp -y
 fi
 
-if [[ "%MY_CLOUD%" == "aws" ]]; then
-    # installs the linux-generic kernel
-    # for the snd-aloop kernel module
-    retry apt-get install linux-generic -y
-
-    # selects the linux-generic kernel
-    # as default for boot
-    cat > /etc/default/grub << EOF
-GRUB_DEFAULT="1>4"
-GRUB_TIMEOUT_STYLE=hidden
-GRUB_TIMEOUT=0
-GRUB_DISTRIBUTOR=`lsb_release -i -s 2> /dev/null || echo Debian`
-GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
-GRUB_CMDLINE_LINUX=""
-GRUB_TERMINAL=console
-EOF
-
-    update-grub
-fi
-
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
 retry curl -fsSL 'https://dl.google.com/go/go1.20.5.linux-amd64.tar.gz' > go.tar.gz
 tar xvfz go.tar.gz -C /usr/local
