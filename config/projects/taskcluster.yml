@@ -15,30 +15,10 @@ taskcluster:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
-      minCapacity: 0
-      maxCapacity: 20
-
-    aws-test:
-      owner: taskcluster-notifications+workers@mozilla.com
-      description: not actively used, but useful for testing docker-worker on AWS
-      emailOnError: false
-      imageset: docker-worker
-      securityGroups:
-        - docker-worker
+      imageset: generic-worker-ubuntu-22-04
       cloud: aws
       minCapacity: 0
-      maxCapacity: 1
-
-    gcp-test:
-      owner: taskcluster-notifications+workers@mozilla.com
-      description: not actively used, but useful for testing docker-worker on GCP
-      emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
-      minCapacity: 0
-      maxCapacity: 1
+      maxCapacity: 10
 
     release:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -52,20 +32,6 @@ taskcluster:
         genericWorker:
           config:
             runTasksAsCurrentUser: true
-
-    dw-ci:
-      # docker-worker's CI requires the 'privileged' scope, so run
-      # it on another worker.  Such workers are "untrusted" as this
-      # might allow one task to interfere with another.
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
-      minCapacity: 0
-      maxCapacity: 10
-      workerConfig:
-        dockerConfig:
-          allowPrivileged: true
 
     # gw-ci-* worker pools are for generic-worker CI
     # they all have `runTasksAsCurrentUser: true` in
