@@ -6,7 +6,7 @@ exec &> /var/log/bootstrap.log
 ##############################################################################
 # TASKCLUSTER_REF can be a git commit SHA, a git branch name, or a git tag name
 # (i.e. for a taskcluster version number, prefix with 'v' to make it a git tag)
-TASKCLUSTER_REF='bb38aaf520c9a39463d1846b5b0eda87acf8a29b'
+TASKCLUSTER_REF='main'
 ##############################################################################
 
 function retry {
