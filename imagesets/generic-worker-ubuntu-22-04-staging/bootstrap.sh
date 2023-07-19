@@ -39,13 +39,13 @@ retry apt-get -y remove docker docker.io containerd runc
 # build-essential is needed for running `go test -race` with the -vet=off flag as of go1.19
 retry apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common git tar python3-venv build-essential
 
-# # install docker
-# retry curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-# echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-#   $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
-# retry apt-get update
-# retry apt-get install -y docker-ce docker-ce-cli containerd.io
-# retry docker run hello-world
+# install docker
+retry curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+retry apt-get update
+retry apt-get install -y docker-ce docker-ce-cli containerd.io
+retry docker run hello-world
 
 if [[ "%MY_CLOUD%" == "google" ]]; then
     # installs the v4l2loopback kernel module
