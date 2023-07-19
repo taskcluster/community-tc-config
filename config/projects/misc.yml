@@ -11,16 +11,16 @@ misc:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
       minCapacity: 0
-      maxCapacity: 20
+      maxCapacity: 10
       # basically everyone has access to this worker (see grants below)
     tutorial:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
       minCapacity: 0
       maxCapacity: 2
   hooks:
