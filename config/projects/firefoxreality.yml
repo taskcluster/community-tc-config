@@ -19,8 +19,8 @@ firefoxreality:
     ci-linux:
       owner: nobody@mozilla.com
       emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
       minCapacity: 0
       maxCapacity: 6
   grants:
