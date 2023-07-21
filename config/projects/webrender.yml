@@ -11,8 +11,8 @@ webrender:
     ci-linux:
       owner: kats@mozilla.com
       emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
       minCapacity: 0
       maxCapacity: 2
   clients:
