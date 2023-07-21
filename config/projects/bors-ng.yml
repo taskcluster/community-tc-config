@@ -6,10 +6,10 @@ bors-ng:
     ci:
       owner: michael@notriddle.com
       emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
       minCapacity: 0
-      maxCapacity: 2
+      maxCapacity: 1
   grants:
     - grant: queue:create-task:highest:proj-bors-ng/ci
       to: repo:github.com/bors-ng/bors-ng:*
