@@ -8,53 +8,59 @@ bugbug:
     ci:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
       minCapacity: 0
       maxCapacity: 50
       workerConfig:
-        dockerConfig:
-          allowPrivileged: true
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
     batch:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
       minCapacity: 0
       maxCapacity: 25
-      machineType: "zones/{zone}/machineTypes/n2-standard-2"
+      instanceTypes:
+        m5.large: 1
     compute-smaller:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
       minCapacity: 0
       maxCapacity: 25
-      machineType: "zones/{zone}/machineTypes/n2-standard-2"
+      instanceTypes:
+        m5.large: 1
     compute-small:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
       minCapacity: 0
       maxCapacity: 25
-      machineType: "zones/{zone}/machineTypes/n2-standard-4"
+      instanceTypes:
+        m5.xlarge: 1
     compute-large:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
       minCapacity: 0
       maxCapacity: 25
-      machineType: "zones/{zone}/machineTypes/n2-standard-8"
+      instanceTypes:
+        m5.2xlarge: 1
     compute-super-large:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: docker-worker
-      cloud: gcp
+      imageset: generic-worker-ubuntu-22-04
+      cloud: aws
       minCapacity: 0
       maxCapacity: 25
-      machineType: "zones/{zone}/machineTypes/n2-standard-16"
+      instanceTypes:
+        m5.4xlarge: 1
   secrets:
     bugbug/deploy: true
     bugbug/integration: true
@@ -77,6 +83,7 @@ bugbug:
     # bugbug
     - grant:
         - docker-worker:cache:bugbug-*
+        - generic-worker:cache:bugbug-*
         - docker-worker:capability:privileged
         - secrets:get:project/bugbug/integration
       to: project:bugbug/build
