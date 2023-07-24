@@ -36,6 +36,8 @@ start_time="$(date '+%s')"
 retry apt-get update
 DEBIAN_FRONTEND=noninteractive retry apt-get upgrade -yq
 retry apt-get -y remove docker docker.io containerd runc
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
 # build-essential is needed for running `go test -race` with the -vet=off flag as of go1.19
 retry apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common git tar python3-venv build-essential iptables-persistent
 
