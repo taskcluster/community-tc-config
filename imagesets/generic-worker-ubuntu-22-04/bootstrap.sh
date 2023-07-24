@@ -114,6 +114,9 @@ system_info:
       renderers: [ 'netplan', 'eni', 'sysconfig' ]
 EOF
 
+# Block access to VM metadata endpoint
+iptables -A INPUT -s 169.254.169.254 -j DROP
+
 end_time="$(date '+%s')"
 echo "UserData execution took: $(($end_time - $start_time)) seconds"
 

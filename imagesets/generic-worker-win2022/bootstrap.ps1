@@ -213,6 +213,9 @@ choco install -y visualstudio2019buildtools --version 16.5.4.0 --package-paramet
 # install gcc for go race detector
 choco install -y mingw --version 11.2.0.07112021
 
+# Block access to VM metadata endpoint
+New-NetFirewallRule -DisplayName "Block VM Metadata Endpoint" -Direction Outbound -LocalPort Any -Protocol TCP -Action Block -RemoteAddress 169.254.169.254
+
 # now shutdown, in preparation for creating an image
 # Stop-Computer isn't working, also not when specifying -AsJob, so reverting to using `shutdown` command instead
 #   * https://www.reddit.com/r/PowerShell/comments/65250s/windows_10_creators_update_stopcomputer_not/dgfofug/?st=j1o3oa29&sh=e0c29c6d
