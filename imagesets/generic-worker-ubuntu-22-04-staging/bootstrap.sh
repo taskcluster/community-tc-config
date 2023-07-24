@@ -37,7 +37,7 @@ retry apt-get update
 DEBIAN_FRONTEND=noninteractive retry apt-get upgrade -yq
 retry apt-get -y remove docker docker.io containerd runc
 # build-essential is needed for running `go test -race` with the -vet=off flag as of go1.19
-retry apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common git tar python3-venv build-essential
+retry apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common git tar python3-venv build-essential iptables-persistent
 
 # install docker
 retry curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
@@ -139,7 +139,7 @@ EOF
 
 # Block access to VM metadata endpoint
 iptables -A INPUT -s 169.254.169.254 -j DROP
-retry apt-get install -y iptables-persistent
+iptables-save > /etc/iptables/rules.v4
 
 end_time="$(date '+%s')"
 echo "UserData execution took: $(($end_time - $start_time)) seconds"
