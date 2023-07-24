@@ -34,10 +34,8 @@ start_time="$(date '+%s')"
 retry apt-get update
 DEBIAN_FRONTEND=noninteractive retry apt-get upgrade -yq
 retry apt-get -y remove docker docker.io containerd runc
-echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
-echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
 # build-essential is needed for running `go test -race` with the -vet=off flag as of go1.19
-retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common gzip python3-venv build-essential iptables-persistent
+retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common gzip python3-venv build-essential
 
 # install docker
 retry curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
@@ -115,10 +113,6 @@ system_info:
     network:
       renderers: [ 'netplan', 'eni', 'sysconfig' ]
 EOF
-
-# Block access to VM metadata endpoint
-iptables -A INPUT -s 169.254.169.254 -j DROP
-iptables-save > /etc/iptables/rules.v4
 
 end_time="$(date '+%s')"
 echo "UserData execution took: $(($end_time - $start_time)) seconds"
