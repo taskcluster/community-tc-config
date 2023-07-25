@@ -178,6 +178,6 @@ generic-worker-debian-12-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/903884ca37cedf5d5cfcec87e229e31a3571f601/imagesets/generic-worker-debian-12-staging/bootstrap.sh
+            script: https://github.com/mozilla/community-tc-config/blob/a3fb7cd1dee2c83c006aee9b340a7c43978dba52/imagesets/generic-worker-debian-12-staging/bootstrap.sh
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-debian-12-staging-7p7ln218tv311esohknx
+    image: projects/community-tc-workers/global/images/generic-worker-debian-12-staging-pbt2vd72d3r29qoyo06e
