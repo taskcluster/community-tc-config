@@ -47,7 +47,7 @@ echo \
   "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
   "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list
 retry apt-get update
-retry apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+retry apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 retry docker run hello-world
 
 if [[ "%MY_CLOUD%" == "google" ]]; then
