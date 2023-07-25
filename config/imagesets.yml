@@ -168,5 +168,16 @@ generic-worker-win2016-amd:
             maintainer: jkratzer@mozilla.com
             script: https://github.com/mozilla/community-tc-config/blob/18f1db7d8bab25f5110cf348ea82cefa6ad4cac5/imagesets/generic-worker-win2016-amd/bootstrap.ps1
 generic-worker-debian-12-staging:
+  workerImplementation: generic-worker
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        shutdownMachineOnIdle: true
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: taskcluster-notifications+workers@mozilla.com
+            script: https://github.com/mozilla/community-tc-config/blob/903884ca37cedf5d5cfcec87e229e31a3571f601/imagesets/generic-worker-debian-12-staging/bootstrap.sh
   gcp:
     image: projects/community-tc-workers/global/images/generic-worker-debian-12-staging-7p7ln218tv311esohknx

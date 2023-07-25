@@ -115,7 +115,7 @@ taskcluster:
     gw-ubuntu-staging-google:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-22-04-staging
+      imageset: generic-worker-debian-12-staging
       cloud: gcp
       minCapacity: 0
       maxCapacity: 1
