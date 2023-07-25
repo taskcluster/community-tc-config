@@ -102,6 +102,7 @@ EOF
 systemctl enable worker
 
 DEBIAN_FRONTEND=noninteractive retry apt-get install -y gdm3
+ln -s /etc/gdm3/daemon.conf /etc/gdm3/custom.conf
 
 retry apt-get install -y podman
 
