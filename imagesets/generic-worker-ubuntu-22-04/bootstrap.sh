@@ -102,7 +102,7 @@ if [[ "%MY_CLOUD%" == "google" ]]; then
     # installs the v4l2loopback kernel module
     # used for the video device
     # only required on gcp
-    retry apt-get install -y linux-modules-extra-gcp xserver-xorg-video-dummy
+    retry apt-get install -y linux-modules-extra-$(uname -r) xserver-xorg-video-dummy
 
     # Create config file for a dummy video device driver
     # to make it possible to run generic worker on gcp
