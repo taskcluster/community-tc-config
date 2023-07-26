@@ -100,13 +100,21 @@ systemctl enable worker
 
 retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
 
+# set podman registries conf
+(
+  echo '[registries.search]'
+  echo 'registries=["docker.io"]'
+) >> /etc/containers/registries.conf
+
 if [[ "%MY_CLOUD%" == "google" ]]; then
     # installs the v4l2loopback kernel module
     # used for the video device
     # only required on gcp
     retry apt-get install -y linux-modules-extra-gcp xserver-xorg-video-dummy
 
-    # Create config file for the dummy video device driver
+    # Create config file for a dummy video device driver
+    # to make it possible to run generic worker on gcp
+    # https://github.com/taskcluster/taskcluster/issues/6412
     cat > /etc/X11/xorg.conf.d/99-dummy.conf << EOF
 Section "Device"
     Identifier "dummydevice"
@@ -115,12 +123,6 @@ Section "Device"
 EndSection
 EOF
 fi
-
-# set podman registries conf
-(
-  echo '[registries.search]'
-  echo 'registries=["docker.io"]'
-) >> /etc/containers/registries.conf
 
 # See
 #   * https://console.aws.amazon.com/support/cases#/6410417131/en

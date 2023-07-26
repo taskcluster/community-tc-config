@@ -45,13 +45,6 @@ retry apt-get update
 retry apt-get install -y docker-ce docker-ce-cli containerd.io
 retry docker run hello-world
 
-if [[ "%MY_CLOUD%" == "google" ]]; then
-    # installs the v4l2loopback kernel module
-    # used for the video device
-    # only required on gcp
-    retry apt-get install linux-modules-extra-gcp -y
-fi
-
 cd /usr/local/bin
 retry curl -fsSL "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/generic-worker-multiuser-linux-amd64" > generic-worker
 retry curl -fsSL "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/start-worker-linux-amd64" > start-worker
@@ -104,6 +97,24 @@ retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
   echo '[registries.search]'
   echo 'registries=["docker.io"]'
 ) >> /etc/containers/registries.conf
+
+if [[ "%MY_CLOUD%" == "google" ]]; then
+    # installs the v4l2loopback kernel module
+    # used for the video device
+    # only required on gcp
+    retry apt-get install -y linux-modules-extra-gcp xserver-xorg-video-dummy
+
+    # Create config file for a dummy video device driver
+    # to make it possible to run generic worker on gcp
+    # https://github.com/taskcluster/taskcluster/issues/6412
+    cat > /etc/X11/xorg.conf.d/99-dummy.conf << EOF
+Section "Device"
+    Identifier "dummydevice"
+    Driver "dummy"
+    VideoRam 256000
+EndSection
+EOF
+fi
 
 # See
 #   * https://console.aws.amazon.com/support/cases#/6410417131/en
