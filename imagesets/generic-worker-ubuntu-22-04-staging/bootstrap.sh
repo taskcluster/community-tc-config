@@ -98,7 +98,7 @@ EOF
 
 systemctl enable worker
 
-retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop
+retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
 
 if [[ "%MY_CLOUD%" == "google" ]]; then
     # installs the v4l2loopback kernel module
@@ -115,21 +115,6 @@ Section "Device"
 EndSection
 EOF
 fi
-
-# Install v4 of podman from kubic rather than regular ubuntu package
-# See:
-#   * https://github.com/mozilla/community-tc-config/pull/580
-#   * https://podman.io/docs/installation#ubuntu
-
-mkdir -p /etc/apt/keyrings
-retry curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/xUbuntu_$(lsb_release -rs)/Release.key \
-  | gpg --dearmor > /etc/apt/keyrings/devel_kubic_libcontainers_unstable.gpg
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/devel_kubic_libcontainers_unstable.gpg]\
-    https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/xUbuntu_$(lsb_release -rs)/ /" \
-  > /etc/apt/sources.list.d/devel:kubic:libcontainers:unstable.list
-retry apt-get update -qq
-retry apt-get -qq -y install podman
 
 # set podman registries conf
 (
