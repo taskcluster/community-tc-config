@@ -47,13 +47,6 @@ retry apt-get update
 retry apt-get install -y docker-ce docker-ce-cli containerd.io
 retry docker run hello-world
 
-if [[ "%MY_CLOUD%" == "google" ]]; then
-    # installs the v4l2loopback kernel module
-    # used for the video device
-    # only required on gcp
-    retry apt-get install linux-modules-extra-gcp -y
-fi
-
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
 retry curl -fsSL 'https://dl.google.com/go/go1.20.5.linux-amd64.tar.gz' > go.tar.gz
 tar xvfz go.tar.gz -C /usr/local
@@ -106,6 +99,22 @@ EOF
 systemctl enable worker
 
 retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop
+
+if [[ "%MY_CLOUD%" == "google" ]]; then
+    # installs the v4l2loopback kernel module
+    # used for the video device
+    # only required on gcp
+    retry apt-get install -y linux-modules-extra-gcp xserver-xorg-video-dummy
+
+    # Create config file for the dummy video device driver
+    cat > /etc/X11/xorg.conf.d/99-dummy.conf << EOF
+Section "Device"
+    Identifier "dummydevice"
+    Driver "dummy"
+    VideoRam 256000
+EndSection
+EOF
+fi
 
 # Install v4 of podman from kubic rather than regular ubuntu package
 # See:
