@@ -16,7 +16,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
       imageset: generic-worker-ubuntu-22-04
-      cloud: aws
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 10
 
@@ -25,7 +25,7 @@ taskcluster:
       description: "Trusted worker to build Taskcluster releases (only!)"
       emailOnError: true
       imageset: generic-worker-ubuntu-22-04
-      cloud: aws
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 1
       workerConfig:
@@ -60,7 +60,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-22-04
-      cloud: aws
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 20
       workerConfig:
@@ -89,9 +89,9 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-22-04
-      cloud: aws
+      cloud: gcp
       minCapacity: 0
-      maxCapacity: 20
+      maxCapacity: 50
       workerConfig:
         genericWorker:
           config:
@@ -332,7 +332,7 @@ taskcluster:
     generic-worker/taskcluster-ci:
       scopes:
         - assume:project:taskcluster:generic-worker-tester
-        - generic-worker:loopback-video
+        - generic-worker:loopback-*
     # This client is used to test the client libraries in Taskcluster CI
     # Its access token is in `community-tc-secret-values.yml`.
     testing/client-libraries:
