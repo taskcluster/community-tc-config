@@ -8,10 +8,9 @@ git-cinnabar:
   workerPools:
     linux:
       imageset: generic-worker-ubuntu-22-04
-      cloud: aws
+      cloud: gcp
       maxCapacity: 5
-      instanceTypes:
-        m5.xlarge: 1
+      machineType: "zones/{zone}/machineTypes/n2-standard-4"
     win2012r2:
       imageset: generic-worker-win2022
       cloud: aws
