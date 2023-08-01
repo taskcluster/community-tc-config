@@ -36,10 +36,6 @@ relman:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
     win2022:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
@@ -153,11 +149,13 @@ relman:
     - grant:
         - notify:email:*
         - secrets:get:project/relman/code-review/integration-testing
+        - docker-worker:cache:code-review-integration-testing
         - generic-worker:cache:code-review-integration-testing
       to: hook-id:project-relman/code-review-integration-testing
     - grant:
         - notify:email:*
         - secrets:get:project/relman/code-review/integration-production
+        - docker-worker:cache:code-review-integration-production
         - generic-worker:cache:code-review-integration-production
       to: hook-id:project-relman/code-review-integration-production
 
