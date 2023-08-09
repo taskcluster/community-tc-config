@@ -108,6 +108,18 @@ generic-worker-ubuntu-22-04:
       us-east-2: ami-0c144e40a6cab8c16
   gcp:
     image: projects/community-tc-workers/global/images/generic-worker-ubuntu-22-04-2oas8is3rv1e065poiy7
+generic-worker-ubuntu-22-04-arm64:
+  workerImplementation: generic-worker
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        shutdownMachineOnIdle: true
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: taskcluster-notifications+workers@mozilla.com
+            script: https://github.com/mozilla/community-tc-config/
 generic-worker-ubuntu-22-04-staging:
   workerImplementation: generic-worker
   workerConfig:
