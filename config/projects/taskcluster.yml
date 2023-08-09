@@ -97,6 +97,19 @@ taskcluster:
           config:
             enableInteractive: true
 
+    gw-ubuntu-22-04-arm64:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-22-04-arm64
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 5
+      workerConfig:
+        genericWorker:
+          config:
+            enableInteractive: true
+      machineType: "zones/{zone}/machineTypes/t2a-standard-4"
+
     gw-ubuntu-staging-aws:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true

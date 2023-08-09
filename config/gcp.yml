@@ -19,3 +19,6 @@ regions:
 
   us-east4:
     zones: ["a", "b", "c"]
+
+  us-central1:
+    zones: ["a", "b", "c", "f"]
