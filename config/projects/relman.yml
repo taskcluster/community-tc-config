@@ -32,10 +32,13 @@ relman:
     ci:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: generic-worker-ubuntu-22-04
+      imageset: docker-worker
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
     win2022:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
@@ -114,18 +117,24 @@ relman:
       to: hook-id:project-relman/*
 
     # bugzilla-dashboard-backend
+    - grant: docker-worker:capability:privileged
+      to: repo:github.com/mozilla/bugzilla-dashboard-backend:*
     - grant: secrets:get:project/relman/bugzilla-dashboard-backend/deploy-production
       to: repo:github.com/mozilla/bugzilla-dashboard-backend:branch:production
     - grant: secrets:get:project/relman/bugzilla-dashboard-backend/deploy-testing
       to: repo:github.com/mozilla/bugzilla-dashboard-backend:branch:testing
 
     # task-boot
+    - grant: docker-worker:capability:privileged
+      to: repo:github.com/mozilla/task-boot:*
     - grant: secrets:get:project/relman/taskboot/deploy
       to:
         - repo:github.com/mozilla/task-boot:branch:master
         - repo:github.com/mozilla/task-boot:tag:*
 
     # code-coverage
+    - grant: docker-worker:capability:privileged
+      to: repo:github.com/mozilla/code-coverage:*
     - grant: secrets:get:project/relman/code-coverage/deploy-production
       to: repo:github.com/mozilla/code-coverage:branch:production
     - grant: secrets:get:project/relman/code-coverage/deploy-testing
@@ -134,6 +143,8 @@ relman:
       to: repo:github.com/mozilla/code-coverage:tag:*
 
     # code-review
+    - grant: docker-worker:capability:privileged
+      to: repo:github.com/mozilla/code-review:*
     - grant:
         - secrets:get:project/relman/code-review/deploy-production
         - assume:hook-id:project-relman/code-review-integration-production
@@ -178,7 +189,9 @@ relman:
         - repo:github.com/mozilla/libmozdata:tag:*
 
     # rust-code-analysis
-    - grant: generic-worker:cache:rust-code-analysis-*
+    - grant:
+        - docker-worker:cache:rust-code-analysis-*
+        - generic-worker:cache:rust-code-analysis-*
       to: repo:github.com/mozilla/rust-code-analysis:*
     - grant: secrets:get:project/relman/rust-code-analysis/deploy
       to: repo:github.com/mozilla/rust-code-analysis:tag:*
