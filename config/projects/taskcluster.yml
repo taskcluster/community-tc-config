@@ -150,6 +150,19 @@ taskcluster:
       minCapacity: 0
       maxCapacity: 10
 
+    old-docker-worker:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: docker-worker
+      cloud: gcp
+      securityGroups:
+        - ssh
+      minCapacity: 0
+      maxCapacity: 2
+      workerConfig:
+        dockerConfig:
+          allowPrivileged: true
+
   grants:
     - grant:
         - notify:manage-denylist
