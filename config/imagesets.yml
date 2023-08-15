@@ -102,10 +102,10 @@ generic-worker-ubuntu-22-04:
             script: https://github.com/mozilla/community-tc-config/blob/18cf52b4d8e7c1affabc70f02065d63c8600f998/imagesets/generic-worker-ubuntu-22-04/bootstrap.sh
   aws:
     amis:
-      us-west-1: ami-0077fdb270fee2f5d
-      us-west-2: ami-0e0544696ad66a2b7
-      us-east-1: ami-0e33088bb216a8216
-      us-east-2: ami-0c144e40a6cab8c16
+      us-west-1: ami-09b69ea65dc6232de
+      us-west-2: ami-09e0895ac037d47c9
+      us-east-1: ami-00e9e059b1d9cf411
+      us-east-2: ami-0402d16ed488a0f0c
   gcp:
     image: projects/community-tc-workers/global/images/generic-worker-ubuntu-22-04-10i4rx4umytsao2cuyvr
 generic-worker-ubuntu-22-04-arm64:
