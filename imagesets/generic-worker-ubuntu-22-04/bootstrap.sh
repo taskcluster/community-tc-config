@@ -58,6 +58,12 @@ retry apt-get update
 retry apt-get install -y docker-ce docker-ce-cli containerd.io
 retry docker run hello-world
 
+# configure kvm vmware backdoor
+# this enables a vmware compatible interface for kvm, and is needed for some fuzzing tasks
+cat > /etc/modprobe.d/kvm-backdoor.conf << "EOF"
+options kvm enable_vmware_backdoor=y
+EOF
+
 cd /usr/local/bin
 retry curl -fsSL "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/generic-worker-multiuser-linux-${ARCH}" > generic-worker
 retry curl -fsSL "https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/start-worker-linux-${ARCH}" > start-worker
