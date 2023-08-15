@@ -33,11 +33,24 @@ function retry {
 
 start_time="$(date '+%s')"
 
+case "$(uname -m)" in
+  x86_64)
+    ARCH=amd64
+    ;;
+  aarch64)
+    ARCH=arm64
+    ;;
+  *)
+    echo "Unsupported architecture '$(uname -m)' - currently bootstrap.sh only supports architectures x86_64 and aarch64" >&2
+    exit 64
+    ;;
+esac
+
 retry apt-get update
 DEBIAN_FRONTEND=noninteractive retry apt-get upgrade -yq
 retry apt-get -y remove docker docker.io containerd runc
 # build-essential is needed for running `go test -race` with the -vet=off flag as of go1.19
-retry apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common git tar python3-venv build-essential
+retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common gzip python3-venv build-essential
 
 # install docker
 retry curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
@@ -47,7 +60,14 @@ retry apt-get update
 retry apt-get install -y docker-ce docker-ce-cli containerd.io
 retry docker run hello-world
 
+# configure kvm vmware backdoor
+# this enables a vmware compatible interface for kvm, and is needed for some fuzzing tasks
+cat > /etc/modprobe.d/kvm-backdoor.conf << "EOF"
+options kvm enable_vmware_backdoor=y
+EOF
+
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
+retry apt-get install -y git tar
 retry curl -fsSL 'https://dl.google.com/go/go1.20.5.linux-amd64.tar.gz' > go.tar.gz
 tar xvfz go.tar.gz -C /usr/local
 export HOME=/root

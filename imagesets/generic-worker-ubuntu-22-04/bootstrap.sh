@@ -39,7 +39,7 @@ case "$(uname -m)" in
     ARCH=arm64
     ;;
   *)
-    echo "Unsupported architecture '$(uname -m)' - currently docker/bootstrap.sh only supports architectures x86_64 and aarch64" >&2
+    echo "Unsupported architecture '$(uname -m)' - currently bootstrap.sh only supports architectures x86_64 and aarch64" >&2
     exit 64
     ;;
 esac
