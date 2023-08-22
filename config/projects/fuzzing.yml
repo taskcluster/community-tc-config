@@ -702,6 +702,9 @@ fuzzing:
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:loopbackAudio
         - docker-worker:capability:privileged
+        - generic-worker:capability:device:hostSharedMemory
+        - generic-worker:capability:device:loopbackAudio
+        - generic-worker:capability:privileged
         - generic-worker:os-group:proj-fuzzing/*
         - generic-worker:run-as-administrator:proj-fuzzing/*
         - hooks:modify-hook:project-fuzzing/*
