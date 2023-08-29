@@ -1,0 +1,1 @@
+--image-family=windows-2022 --image-project=windows-cloud --boot-disk-size=50GB --boot-disk-type=pd-standard

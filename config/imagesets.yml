@@ -150,6 +150,8 @@ generic-worker-win2022:
       us-west-1: ami-05b3020199819f2d5
       us-west-2: ami-061c0bff018005402
       us-east-2: ami-047a1727ceb9ac18f
+  gcp:
+    image: todo
   workerConfig:
     genericWorker:
       config:
