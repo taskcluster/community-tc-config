@@ -1,7 +1,7 @@
 #!/bin/csh
 
 # Version numbers ####################
-setenv TASKCLUSTER_VERSION v54.4.2
+setenv TASKCLUSTER_VERSION v54.5.0
 ######################################
 
 pkg update
