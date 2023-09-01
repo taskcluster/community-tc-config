@@ -330,7 +330,11 @@ def gcp_launch_config(zone, region, machineType, image, diskSizeGb, **cfg):
         "machineType": machineType.format(zone=zone),
         "region": region,
         "zone": zone,
-        "scheduling": {"onHostMaintenance": "terminate"},
+        "scheduling": {
+            "onHostMaintenance": "terminate",
+            "provisioningModel": "SPOT",
+            "instanceTerminationAction": "DELETE",
+        },
         "disks": [
             {
                 "type": "PERSISTENT",
