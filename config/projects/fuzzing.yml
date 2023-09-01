@@ -52,6 +52,13 @@ fuzzing:
       workerConfig:
         dockerConfig:
           allowPrivileged: true
+    ci-gw:
+      owner: fuzzing+taskcluster@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-22-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 20
     ci-windows:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
