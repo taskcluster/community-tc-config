@@ -34,9 +34,10 @@ mozci:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: generic-worker-ubuntu-22-04
-      cloud: aws
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 5
+      machineType: "zones/{zone}/machineTypes/c3-standard-8"
       workerConfig:
         genericWorker:
           config:
