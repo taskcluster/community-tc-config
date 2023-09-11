@@ -77,4 +77,10 @@ A7sKPPcw7+uvTPyLNhBzPvOk
   fi
 done
 
+# configure kvm vmware backdoor
+# this enables a vmware compatible interface for kvm, and is needed for some fuzzing tasks
+cat > /etc/modprobe.d/kvm-backdoor.conf << "EOF"
+options kvm enable_vmware_backdoor=y
+EOF
+
 sudo shutdown -h now
