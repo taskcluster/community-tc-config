@@ -124,6 +124,8 @@ mozci:
       to:
         - hook-id:project-mozci/check-backfills-testing
         - hook-id:project-mozci/check-backfills-production
+        - hook-id:project-mozci/monitoring-testing
+        - hook-id:project-mozci/monitoring-production
 
     - grant:
         # Backfill tasks are indexing themselves
