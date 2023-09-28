@@ -141,6 +141,7 @@ fuzzing:
           - auth:delete-role:hook-id:project-fuzzing/*
           - auth:update-role:hook-id:project-fuzzing/*
           - docker-worker:capability:device:hostSharedMemory
+          - docker-worker:capability:device:kvm
           - docker-worker:capability:device:loopbackAudio
           - docker-worker:capability:privileged
           - generic-worker:os-group:proj-fuzzing/*
@@ -707,6 +708,7 @@ fuzzing:
         - auth:update-role:hook-id:project-fuzzing/*
         - auth:delete-role:hook-id:project-fuzzing/*
         - docker-worker:capability:device:hostSharedMemory
+        - docker-worker:capability:device:kvm
         - docker-worker:capability:device:loopbackAudio
         - docker-worker:capability:privileged
         - generic-worker:capability:device:hostSharedMemory
