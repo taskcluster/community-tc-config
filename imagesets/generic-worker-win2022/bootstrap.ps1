@@ -195,16 +195,6 @@ Expand-ZIPFile -File "C:\ProcessExplorer.zip" -Destination "C:\ProcessExplorer" 
 md "C:\ProcessMonitor"
 Expand-ZIPFile -File "C:\ProcessMonitor.zip" -Destination "C:\ProcessMonitor" -Url "https://download.sysinternals.com/files/ProcessMonitor.zip"
 
-# See https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch.html#ec2launch-inittasks
-# schedule one time run of EC2Launch service on first boot of instances to ensure network routes are correctly configured
-if ("%MY_CLOUD%" -eq "aws") {
-  C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
-  # make sure admin password isn't changed, since we've already captured the current random password
-  $launchConfig = Get-Content 'C:\ProgramData\Amazon\EC2-Windows\Launch\Config\LaunchConfig.json' -raw | ConvertFrom-Json
-  $launchConfig.adminPasswordType = "DoNothing"
-  $launchConfig | ConvertTo-Json -depth 32 | Set-Content 'C:\ProgramData\Amazon\EC2-Windows\Launch\Config\LaunchConfig.json'
-}
-
 # install Windows 10 SDK
 choco install -y windows-sdk-10.0
 
