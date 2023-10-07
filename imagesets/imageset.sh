@@ -186,7 +186,8 @@ function deploy {
   git push "${OFFICIAL_GIT_REPO}" "+HEAD:refs/heads/main"
   log 'Deployment of image sets successful!'
   log ''
-  log 'Be sure to run tc-admin in the community-tc-config repo to apply changes to the community cluster!'
+  cd ../..
+  log 'Be sure to run tc-admin to apply changes to the community cluster!'" There is a utility script for doing this: $(pwd)/run-tc-admin.sh"
 }
 
 ################## AWS ##################
