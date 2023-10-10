@@ -123,7 +123,7 @@ complete:
 
 1) A new commit will have been made to your `community-tc-config` repository,
    updating image references in `/config/imagesets.yml`. Make sure to push this
-   commit upstream (i.e. to `git@github.com:mozilla/community-tc-config.git`).
+   commit upstream (i.e. to `git@github.com:taskcluster/community-tc-config.git`).
 
 2) Apply the config changes by running `tc-admin`. Note, here is a script that
    does this, if you have not already set something up:
@@ -139,7 +139,7 @@ complete:
    source tc-admin-venv/bin/activate
    pip3 install pytest
    pip3 install --upgrade pip
-   git clone https://github.com/mozilla/community-tc-config
+   git clone https://github.com/taskcluster/community-tc-config
    cd community-tc-config
    pip3 install -e .
    which tc-admin
