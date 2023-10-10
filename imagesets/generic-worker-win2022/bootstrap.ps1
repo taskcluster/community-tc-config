@@ -29,6 +29,9 @@ Set-ExecutionPolicy Unrestricted -Force -Scope Process
 # TestAbortAfterMaxRunTime from running as intended.
 Uninstall-WindowsFeature -Name Windows-Defender
 
+# Disable SysMain (Superfetch)
+Set-Service "SysMain" -StartupType Disabled -Status Stopped
+
 # Disable disk indexing
 Set-Service "WSearch" -StartupType Disabled -Status Stopped
 
