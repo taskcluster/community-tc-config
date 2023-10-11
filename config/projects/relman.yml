@@ -51,7 +51,7 @@ relman:
       imageset: generic-worker-ubuntu-22-04
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 5
+      maxCapacity: 50
       workerConfig:
         genericWorker:
           config:
