@@ -32,6 +32,7 @@ tasks:
             - '-c'
             - >-
               git clone ${repo.clone_url} repo &&
+              echo "this is test" &&
               cd repo &&
               git config advice.detachedHead false &&
               git checkout ${repo.ref} &&
