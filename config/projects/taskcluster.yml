@@ -4,7 +4,7 @@ taskcluster:
   repos:
     - github.com/taskcluster/*
     - github.com/json-e/json-e:*
-    - github.com/mozilla/community-tc-config:*
+    - github.com/taskcluster/community-tc-config:*
     - github.com/mozilla/hawk:*
   externallyManaged:
     # smoketests create these resources, and also cleans them up, so leave

@@ -60,7 +60,7 @@ function deploy {
 
   export IMAGE_SET="${3}"
 
-  OFFICIAL_GIT_REPO='git@github.com:mozilla/community-tc-config'
+  OFFICIAL_GIT_REPO='git@github.com:taskcluster/community-tc-config'
 
   # Local changes should be dealt with before continuing. git stash can help
   # here! Untracked files shouldn't get pushed, so let's make sure we have none.
@@ -168,7 +168,7 @@ function deploy {
   # Link to bootstrap script in worker type metadata, if generic-worker worker type
   if [ "$(yq r ../config/imagesets.yml "${IMAGE_SET}.workerImplementation")" == "generic-worker" ]; then
     BOOTSTRAP_SCRIPT="$(echo "${IMAGE_SET}"/bootstrap.*)"
-    yq w -i ../config/imagesets.yml "${IMAGE_SET}.workerConfig.genericWorker.config.workerTypeMetadata.machine-setup.script" "https://github.com/mozilla/community-tc-config/blob/${IMAGE_SET_COMMIT_SHA}/imagesets/${BOOTSTRAP_SCRIPT}"
+    yq w -i ../config/imagesets.yml "${IMAGE_SET}.workerConfig.genericWorker.config.workerTypeMetadata.machine-setup.script" "https://github.com/taskcluster/community-tc-config/blob/${IMAGE_SET_COMMIT_SHA}/imagesets/${BOOTSTRAP_SCRIPT}"
   fi
 
   git add ../config/imagesets.yml
