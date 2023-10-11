@@ -32,7 +32,6 @@ tasks:
             - '-c'
             - >-
               git clone ${repo.clone_url} repo &&
-              echo "this is test" &&
               cd repo &&
               git config advice.detachedHead false &&
               git checkout ${repo.ref} &&
@@ -71,7 +70,7 @@ tasks:
           $map: {$eval: tests}
           each(test):
             taskId: {$eval: as_slugid(test.name)}
-            provisionerId: proj-misc
+            provisionerId: proj-taskcluster
             workerType: ci
             created: {$fromNow: ''}
             deadline: {$fromNow: '60 minutes'}
