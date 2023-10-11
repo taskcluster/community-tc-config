@@ -89,6 +89,7 @@ relman:
     - grant:
         - queue:create-task:highest:proj-relman/*
         - queue:route:statuses
+        - queue:route:checks
       to:
         - repo:github.com/mozilla/microannotate:*
         - repo:github.com/mozilla/task-boot:*
