@@ -62,6 +62,7 @@ bugbug:
     - grant:
         - queue:create-task:highest:proj-bugbug/*
         - queue:route:statuses
+        - queue:route:checks
       to:
         - repo:github.com/mozilla/bugbug:*
 
