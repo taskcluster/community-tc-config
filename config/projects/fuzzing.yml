@@ -106,7 +106,7 @@ fuzzing:
       emailOnError: true
       bindings:
         - exchange: exchange/taskcluster-github/v1/push
-          routingKeyPattern: primary.mozilla.community-tc-config
+          routingKeyPattern: primary.taskcluster.community-tc-config
       task:
         provisionerId: proj-fuzzing
         workerType: ci
