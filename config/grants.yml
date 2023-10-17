@@ -153,6 +153,7 @@
 
     # permission to run interactive tsaks
     - queue:get-artifact:private/docker-worker/*
+    - queue:get-artifact:private/generic-worker/*
   to:
     # note, specific users are temporary until mozilla org grants permissions
     # to read teams, https://bugzilla.mozilla.org/show_bug.cgi?id=1593632
@@ -170,8 +171,8 @@
     - project-admin:fuzzing
     - project-admin:wpt
 
-    # for relman
-    - project-admin:relman
+    # for bugbug, mozci, relman
+    - github-team:mozilla/ci-and-quality-tools
 
 # One of these routes is added to each task created in reaction to a GitHub event.
 # If such a task in turn creates other tasks, it can add the same route in order to work around
