@@ -81,7 +81,7 @@ generic-worker-freebsd:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/ce90750aa55ab27f6111040925ebe820ec939ff0/imagesets/generic-worker-freebsd/bootstrap.sh
+            script: https://github.com/taskcluster/community-tc-config/blob/ce90750aa55ab27f6111040925ebe820ec939ff0/imagesets/generic-worker-freebsd/bootstrap.sh
   aws:
     amis:
       us-west-1: ami-03ab357e5bc4fde14
@@ -99,7 +99,7 @@ generic-worker-ubuntu-22-04:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/f0ab965035f8ad3fd31b6e85b623b5ac9bcea45c/imagesets/generic-worker-ubuntu-22-04/bootstrap.sh
+            script: https://github.com/taskcluster/community-tc-config/blob/f0ab965035f8ad3fd31b6e85b623b5ac9bcea45c/imagesets/generic-worker-ubuntu-22-04/bootstrap.sh
   gcp:
     image: projects/community-tc-workers/global/images/generic-worker-ubuntu-22-04-xlo5bk5oajd9kif0snk3
   aws:
@@ -119,7 +119,7 @@ generic-worker-ubuntu-22-04-arm64:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/6052d21e19b4b9683686f38b3b1b4293757dbe1c/imagesets/generic-worker-ubuntu-22-04-arm64/bootstrap.sh
+            script: https://github.com/taskcluster/community-tc-config/blob/6052d21e19b4b9683686f38b3b1b4293757dbe1c/imagesets/generic-worker-ubuntu-22-04-arm64/bootstrap.sh
   gcp:
     image: projects/community-tc-workers/global/images/generic-worker-ubuntu-22-04-arm64-lu0dhbo881nsfytjt4yo
 generic-worker-ubuntu-22-04-staging:
@@ -133,7 +133,7 @@ generic-worker-ubuntu-22-04-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/5a7ebdcf319fb6ac8d85932ddfe40ca0ad27eac7/imagesets/generic-worker-ubuntu-22-04-staging/bootstrap.sh
+            script: https://github.com/taskcluster/community-tc-config/blob/680f4d14f54cd492aaf5f220b8fc78eaf7e83fc1/imagesets/generic-worker-ubuntu-22-04-staging/bootstrap.sh
   aws:
     amis:
       us-west-1: ami-051f27d0951aca7ed
@@ -141,7 +141,7 @@ generic-worker-ubuntu-22-04-staging:
       us-east-1: ami-02c47493c48fb632c
       us-east-2: ami-03e69eae0cd8448d6
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-22-04-staging-l0fp24ym0g032swzvdyq
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-22-04-staging-opzes95b4s6hd3ajvyfv
 generic-worker-win2022:
   workerImplementation: generic-worker
   aws:
@@ -162,7 +162,7 @@ generic-worker-win2022:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/c44c13ea153b878b2e2bddef07e9c9109cdc168d/imagesets/generic-worker-win2022/bootstrap.ps1
+            script: https://github.com/taskcluster/community-tc-config/blob/c44c13ea153b878b2e2bddef07e9c9109cdc168d/imagesets/generic-worker-win2022/bootstrap.ps1
 generic-worker-win2016-amd:
   workerImplementation: generic-worker
   aws:
@@ -180,4 +180,4 @@ generic-worker-win2016-amd:
         workerTypeMetadata:
           machine-setup:
             maintainer: jkratzer@mozilla.com
-            script: https://github.com/mozilla/community-tc-config/blob/18f1db7d8bab25f5110cf348ea82cefa6ad4cac5/imagesets/generic-worker-win2016-amd/bootstrap.ps1
+            script: https://github.com/taskcluster/community-tc-config/blob/18f1db7d8bab25f5110cf348ea82cefa6ad4cac5/imagesets/generic-worker-win2016-amd/bootstrap.ps1

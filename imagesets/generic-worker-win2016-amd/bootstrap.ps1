@@ -1,6 +1,6 @@
 # This script is not maintained!!
 #
-# See https://github.com/mozilla/community-tc-config/pull/549#issuecomment-1353426207
+# See https://github.com/taskcluster/community-tc-config/pull/549#issuecomment-1353426207
 # This is just a working version used by the fuzzing team, until they are able
 # to migrate to the standard Windows Server image set that we provide.
 #

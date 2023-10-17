@@ -146,7 +146,7 @@ fi
 
 # install necessary packages for KVM
 # https://help.ubuntu.com/community/KVM/Installation
-retry apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
+retry apt-get install -y qemu-kvm bridge-utils
 
 # See
 #   * https://console.aws.amazon.com/support/cases#/6410417131/en
