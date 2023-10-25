@@ -1,11 +1,12 @@
-# This script is not maintained!!
+# We still support Windows Server 2016 since the Fuzzing team depend on AMD drivers
+# which are not (yet) compatible with Windows Server 2022.
 #
-# See https://github.com/taskcluster/community-tc-config/pull/549#issuecomment-1353426207
-# This is just a working version used by the fuzzing team, until they are able
-# to migrate to the standard Windows Server image set that we provide.
-#
-# Do not update unless necessary!
-$TASKCLUSTER_VERSION = "44.21.0"
+# This image should only be used for this purpose - all other Windows workloads
+# should be run under Windows Server 2022, in order that we can easily standardise
+# on Windows Server 2022 in the future, dropping support for Windows Server 2016,
+# once the remaining AMD driver issue has been resolved.
+
+$TASKCLUSTER_VERSION = "v56.0.3"
 
 # use TLS 1.2 (see bug 1443595)
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -31,6 +32,17 @@ function Expand-ZIPFile($file, $destination, $url)
 # allow powershell scripts to run
 Set-ExecutionPolicy Unrestricted -Force -Scope Process
 
+# Issue 681: Uninstall Windows Defender as it can interfere with tasks,
+# degrade their performance, and e.g. prevents Generic Worker unit test
+# TestAbortAfterMaxRunTime from running as intended.
+Uninstall-WindowsFeature -Name Windows-Defender
+
+# Disable SysMain (Superfetch)
+Set-Service "SysMain" -StartupType Disabled -Status Stopped
+
+# Disable disk indexing
+Set-Service "WSearch" -StartupType Disabled -Status Stopped
+
 # install chocolatey package manager
 Invoke-Expression ($client.DownloadString('https://chocolatey.org/install.ps1'))
 
@@ -39,7 +51,7 @@ Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "http://www.nssm
 
 # download generic-worker
 md C:\generic-worker
-$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v${TASKCLUSTER_VERSION}/generic-worker-multiuser-windows-amd64", "C:\generic-worker\generic-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/generic-worker-multiuser-windows-amd64", "C:\generic-worker\generic-worker.exe")
 
 # install generic-worker, using the steps suggested in https://docs.taskcluster.net/docs/reference/workers/worker-runner/deployment#recommended-setup
 Set-Content -Path c:\generic-worker\install.bat @"
@@ -64,7 +76,7 @@ Start-Process C:\generic-worker\install.bat -Wait -NoNewWindow
 
 # download worker-runner
 md C:\worker-runner
-$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v${TASKCLUSTER_VERSION}/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
 
 # install worker-runner
 Set-Content -Path c:\worker-runner\install.bat @"
@@ -103,10 +115,10 @@ cacheOverRestarts: c:\generic-worker\start-worker-cache.json
 "@
 
 # download livelog
-$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v${TASKCLUSTER_VERSION}/livelog-windows-amd64", "C:\generic-worker\livelog.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/livelog-windows-amd64", "C:\generic-worker\livelog.exe")
 
 # download taskcluster-proxy
-$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/v${TASKCLUSTER_VERSION}/taskcluster-proxy-windows-amd64", "C:\generic-worker\taskcluster-proxy.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/taskcluster-proxy-windows-amd64", "C:\generic-worker\taskcluster-proxy.exe")
 
 # configure hosts file for taskcluster-proxy access via http://taskcluster
 $HostsFile_Base64 = "IyBDb3B5cmlnaHQgKGMpIDE5OTMtMjAwOSBNaWNyb3NvZnQgQ29ycC4NCiMNCiMgVGhpcyBpcyBhIHNhbXBsZSBIT1NUUyBmaWxlIHVzZWQgYnkgTWljcm9zb2Z0IFRDUC9JUCBmb3IgV2luZG93cy4NCiMNCiMgVGhpcyBmaWxlIGNvbnRhaW5zIHRoZSBtYXBwaW5ncyBvZiBJUCBhZGRyZXNzZXMgdG8gaG9zdCBuYW1lcy4gRWFjaA0KIyBlbnRyeSBzaG91bGQgYmUga2VwdCBvbiBhbiBpbmRpdmlkdWFsIGxpbmUuIFRoZSBJUCBhZGRyZXNzIHNob3VsZA0KIyBiZSBwbGFjZWQgaW4gdGhlIGZpcnN0IGNvbHVtbiBmb2xsb3dlZCBieSB0aGUgY29ycmVzcG9uZGluZyBob3N0IG5hbWUuDQojIFRoZSBJUCBhZGRyZXNzIGFuZCB0aGUgaG9zdCBuYW1lIHNob3VsZCBiZSBzZXBhcmF0ZWQgYnkgYXQgbGVhc3Qgb25lDQojIHNwYWNlLg0KIw0KIyBBZGRpdGlvbmFsbHksIGNvbW1lbnRzIChzdWNoIGFzIHRoZXNlKSBtYXkgYmUgaW5zZXJ0ZWQgb24gaW5kaXZpZHVhbA0KIyBsaW5lcyBvciBmb2xsb3dpbmcgdGhlIG1hY2hpbmUgbmFtZSBkZW5vdGVkIGJ5IGEgJyMnIHN5bWJvbC4NCiMNCiMgRm9yIGV4YW1wbGU6DQojDQojICAgICAgMTAyLjU0Ljk0Ljk3ICAgICByaGluby5hY21lLmNvbSAgICAgICAgICAjIHNvdXJjZSBzZXJ2ZXINCiMgICAgICAgMzguMjUuNjMuMTAgICAgIHguYWNtZS5jb20gICAgICAgICAgICAgICMgeCBjbGllbnQgaG9zdA0KDQojIGxvY2FsaG9zdCBuYW1lIHJlc29sdXRpb24gaXMgaGFuZGxlZCB3aXRoaW4gRE5TIGl0c2VsZi4NCiMJMTI3LjAuMC4xICAgICAgIGxvY2FsaG9zdA0KIwk6OjEgICAgICAgICAgICAgbG9jYWxob3N0DQoNCiMgVXNlZnVsIGZvciBnZW5lcmljLXdvcmtlciB0YXNrY2x1c3Rlci1wcm94eSBpbnRlZ3JhdGlvbg0KIyBTZWUgaHR0cHM6Ly9idWd6aWxsYS5tb3ppbGxhLm9yZy9zaG93X2J1Zy5jZ2k/aWQ9MTQ0OTk4MSNjNg0KMTI3LjAuMC4xICAgICAgICB0YXNrY2x1c3RlciAgICANCg=="
@@ -122,33 +134,33 @@ New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound
 
 # install go (not required, but useful)
 md "C:\gopath"
-Expand-ZIPFile -File "C:\go1.19.2.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.19.2.windows-amd64.zip"
+Expand-ZIPFile -File "C:\go1.20.5.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.20.5.windows-amd64.zip"
 
 # install git
-$client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.16.2.windows.1/Git-2.16.2-64-bit.exe", "C:\Git-2.16.2-64-bit.exe")
-Start-Process "C:\Git-2.16.2-64-bit.exe" -ArgumentList "/VERYSILENT /LOG=C:\git_install.log /NORESTART /SUPPRESSMSGBOXES" -Wait -NoNewWindow
+$client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.41.0.windows.1/Git-2.41.0-64-bit.exe", "C:\Git-2.41.0-64-bit.exe")
+Start-Process "C:\Git-2.41.0-64-bit.exe" -ArgumentList "/VERYSILENT /LOG=C:\git_install.log /NORESTART /SUPPRESSMSGBOXES" -Wait -NoNewWindow
 
 # install node
-$client.DownloadFile("https://nodejs.org/dist/v16.14.2/node-v16.14.2-x64.msi", "C:\NodeSetup.msi")
+$client.DownloadFile("https://nodejs.org/dist/v18.16.1/node-v18.16.1-x64.msi", "C:\NodeSetup.msi")
 Start-Process "msiexec" -ArgumentList "/i C:\NodeSetup.msi /quiet" -Wait -NoNewWindow -PassThru
 
-# install python 3.10.4
-$client.DownloadFile("https://www.python.org/ftp/python/3.10.4/python-3.10.4-amd64.exe", "C:\python-3.10.4-amd64.exe")
-Start-Process "C:\python-3.10.4-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1" -Wait -NoNewWindow -PassThru
+# install python 3.11.4
+$client.DownloadFile("https://www.python.org/ftp/python/3.11.4/python-3.11.4-amd64.exe", "C:\python-3.11.4-amd64.exe")
+Start-Process "C:\python-3.11.4-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1" -Wait -NoNewWindow -PassThru
 
 # set permanent env vars
 [Environment]::SetEnvironmentVariable("GOROOT", "C:\go", "Machine")
-[Environment]::SetEnvironmentVariable("PATH", $Env:Path + ";C:\Program Files\Vim\vim80;C:\go\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs;C:\Program Files\Python310", "Machine")
+[Environment]::SetEnvironmentVariable("PATH", $Env:Path + ";C:\Program Files\Vim\vim80;C:\go\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs;C:\Program Files\Python311", "Machine")
 [Environment]::SetEnvironmentVariable("PATHEXT", $Env:PathExt + ";.PY", "Machine")
 [Environment]::SetEnvironmentVariable("GOPATH", "C:\gopath", "Machine")
 
 # set env vars for the currently running process
 $env:GOROOT  = "C:\go"
 $env:GOPATH  = "C:\gopath"
-$env:PATH    = $env:PATH + ";C:\go\bin;C:\gopath\bin;C:\Program Files\Git\cmd;C:\Program Files\Python310"
+$env:PATH    = $env:PATH + ";C:\go\bin;C:\gopath\bin;C:\Program Files\Git\cmd;C:\Program Files\Python311"
 $env:PATHEXT = $env:PATHEXT + ";.PY"
 
-# get generic-worker and livelog source code (note required, but useful)
+# get generic-worker and livelog source code (not required, but useful)
 Start-Process "go" -ArgumentList "get -t github.com/taskcluster/generic-worker github.com/taskcluster/livelog" -Wait -NoNewWindow -PassThru
 
 # generate ed25519 key
@@ -193,6 +205,16 @@ Expand-ZIPFile -File "C:\ProcessExplorer.zip" -Destination "C:\ProcessExplorer" 
 # install ProcessMonitor (useful utility for troubleshooting, not required)
 md "C:\ProcessMonitor"
 Expand-ZIPFile -File "C:\ProcessMonitor.zip" -Destination "C:\ProcessMonitor" -Url "https://download.sysinternals.com/files/ProcessMonitor.zip"
+
+# install Windows 10 SDK
+choco install -y windows-sdk-10.0
+
+# install VisualStudio 2019 Community
+choco install -y visualstudio2019community --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.160 --passive --locale en-US"
+choco install -y visualstudio2019buildtools --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Component.NuGet.BuildTools --add Microsoft.VisualStudio.Workload.UniversalBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.NetCoreBuildTools;includeRecommended --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US"
+
+# install gcc for go race detector
+choco install -y mingw --version 11.2.0.07112021
 
 # install AMD drivers
 md C:\AMD
