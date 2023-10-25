@@ -31,6 +31,11 @@ function Expand-ZIPFile($file, $destination, $url)
 # allow powershell scripts to run
 Set-ExecutionPolicy Unrestricted -Force -Scope Process
 
+# Issue 681: Uninstall Windows Defender as it can interfere with tasks,
+# degrade their performance, and e.g. prevents Generic Worker unit test
+# TestAbortAfterMaxRunTime from running as intended.
+Uninstall-WindowsFeature -Name Windows-Defender
+
 # install chocolatey package manager
 Invoke-Expression ($client.DownloadString('https://chocolatey.org/install.ps1'))
 
