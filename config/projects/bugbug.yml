@@ -12,6 +12,10 @@ bugbug:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50
+      workerConfig:
+        genericWorker:
+          config:
+            enableInteractive: true
     batch:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
@@ -20,6 +24,10 @@ bugbug:
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-2"
+      workerConfig:
+        genericWorker:
+          config:
+            enableInteractive: true
     compute-smaller:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
@@ -28,6 +36,10 @@ bugbug:
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-2"
+      workerConfig:
+        genericWorker:
+          config:
+            enableInteractive: true
     compute-small:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
@@ -36,6 +48,10 @@ bugbug:
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-4"
+      workerConfig:
+        genericWorker:
+          config:
+            enableInteractive: true
     compute-large:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
@@ -44,6 +60,10 @@ bugbug:
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-8"
+      workerConfig:
+        genericWorker:
+          config:
+            enableInteractive: true
     compute-super-large:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
@@ -52,6 +72,10 @@ bugbug:
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-16"
+      workerConfig:
+        genericWorker:
+          config:
+            enableInteractive: true
   secrets:
     bugbug/deploy: true
     bugbug/integration: true
@@ -62,6 +86,7 @@ bugbug:
     - grant:
         - queue:create-task:highest:proj-bugbug/*
         - queue:route:statuses
+        - queue:route:checks
       to:
         - repo:github.com/mozilla/bugbug:*
 

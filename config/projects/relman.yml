@@ -51,7 +51,7 @@ relman:
       imageset: generic-worker-ubuntu-22-04
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 5
+      maxCapacity: 50
       workerConfig:
         genericWorker:
           config:
@@ -89,6 +89,7 @@ relman:
     - grant:
         - queue:create-task:highest:proj-relman/*
         - queue:route:statuses
+        - queue:route:checks
       to:
         - repo:github.com/mozilla/microannotate:*
         - repo:github.com/mozilla/task-boot:*
