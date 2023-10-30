@@ -167,9 +167,9 @@ generic-worker-win2016-amd:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-west-2: ami-0d2edc54e59d54949
-      us-east-1: ami-05a111b09ee9b679b
-      us-east-2: ami-020e5a379f05a0c7a
+      us-west-2: ami-0c27d8ee6efe18cb0
+      us-east-1: ami-0b59c44f681e79d56
+      us-east-2: ami-07642572809fe2c40
   workerConfig:
     genericWorker:
       config:
@@ -182,4 +182,4 @@ generic-worker-win2016-amd:
         workerTypeMetadata:
           machine-setup:
             maintainer: jkratzer@mozilla.com
-            script: https://github.com/taskcluster/community-tc-config/blob/c9273050d215191da8ce2b86bc5413565822edff/imagesets/generic-worker-win2016-amd/bootstrap.ps1
+            script: https://github.com/taskcluster/community-tc-config/blob/b64dfaecd19b37a1742ced138bd43a0ded16d4b5/imagesets/generic-worker-win2016-amd/bootstrap.ps1
