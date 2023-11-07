@@ -83,7 +83,8 @@ taskcluster:
           config:
             runTasksAsCurrentUser: true
       instanceTypes:
-        c6in.8xlarge: 1
+        c5.4xlarge: 1
+        m5.4xlarge: 1
 
     gw-ubuntu-22-04:
       owner: taskcluster-notifications+workers@mozilla.com
