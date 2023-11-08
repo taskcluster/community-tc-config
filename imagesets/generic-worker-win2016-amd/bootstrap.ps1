@@ -134,7 +134,7 @@ New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound
 
 # install go (not required, but useful)
 md "C:\gopath"
-Expand-ZIPFile -File "C:\go1.20.5.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.20.5.windows-amd64.zip"
+Expand-ZIPFile -File "C:\go1.21.4.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.21.4.windows-amd64.zip"
 
 # install git
 $client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.41.0.windows.1/Git-2.41.0-64-bit.exe", "C:\Git-2.41.0-64-bit.exe")

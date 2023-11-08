@@ -68,7 +68,7 @@ EOF
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
 retry apt-get install -y git tar
-retry curl -fsSL 'https://dl.google.com/go/go1.20.5.linux-amd64.tar.gz' > go.tar.gz
+retry curl -fsSL 'https://dl.google.com/go/go1.21.4.linux-amd64.tar.gz' > go.tar.gz
 tar xvfz go.tar.gz -C /usr/local
 export HOME=/root
 export GOPATH=~/go
