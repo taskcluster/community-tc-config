@@ -27,6 +27,15 @@ fuzzing:
         dockerConfig:
           allowPrivileged: true
           allowDisableSeccomp: true
+    bugmon-processor-windows:
+      owner: jkratzer@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2016-amd
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 10
+      instanceTypes:
+        g4ad.2xlarge: 1
     bugmon-pernosco:
       owner: jkratzer@mozilla.com
       emailOnError: false
@@ -359,6 +368,7 @@ fuzzing:
           - docker-worker:capability:privileged
           - queue:create-task:highest:proj-fuzzing/bugmon-monitor
           - queue:create-task:highest:proj-fuzzing/bugmon-processor
+          - queue:create-task:highest:proj-fuzzing/bugmon-processor-windows
           - queue:create-task:highest:proj-fuzzing/bugmon-pernosco
           - queue:get-artifact:project/fuzzing/bugmon/*
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
@@ -412,6 +422,7 @@ fuzzing:
           - docker-worker:capability:privileged
           - queue:create-task:highest:proj-fuzzing/bugmon-monitor
           - queue:create-task:highest:proj-fuzzing/bugmon-processor
+          - queue:create-task:highest:proj-fuzzing/bugmon-processor-windows
           - queue:create-task:highest:proj-fuzzing/bugmon-pernosco
           - queue:get-artifact:project/fuzzing/bugmon/*
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
@@ -734,6 +745,7 @@ fuzzing:
         - docker-worker:capability:disableSeccomp
         - queue:create-task:highest:proj-fuzzing/bugmon-monitor
         - queue:create-task:highest:proj-fuzzing/bugmon-processor
+        - queue:create-task:highest:proj-fuzzing/bugmon-processor-windows
         - queue:create-task:highest:proj-fuzzing/bugmon-pernosco
         - queue:get-artifact:project/fuzzing/bugmon/*
         - queue:route:notify.email.jkratzer@mozilla.com.on-failed
