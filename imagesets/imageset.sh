@@ -392,7 +392,7 @@ function google_delete_found {
   # terminate old instances
   if [ -n "${OLD_INSTANCES}" ]; then
     log "Now terminating instances" ${OLD_INSTANCES}...
-    gcloud compute instances delete ${OLD_INSTANCES} --zone="${REGION}" --delete-disks=all --project="${GCP_PROJECT}"
+    gcloud compute instances delete ${OLD_INSTANCES} --zone="${REGION}" --delete-disks=all --project="${GCP_PROJECT}" --quiet
   else
     log "No previous instances to terminate."
   fi
@@ -400,7 +400,7 @@ function google_delete_found {
   # delete old images
   if [ -n "${OLD_IMAGES}" ]; then
     log "Deleting the old image(s) ("${OLD_IMAGES}")..."
-    gcloud compute images delete ${OLD_IMAGES} --project="${GCP_PROJECT}"
+    gcloud compute images delete ${OLD_IMAGES} --project="${GCP_PROJECT}" --quiet
   else
     log "No old snapshot to delete."
   fi
@@ -429,7 +429,7 @@ function google_update {
     STARTUP_KEY=startup-script
   fi
 
-  gcloud beta compute --project="${GCP_PROJECT}" instances create "${UNIQUE_NAME}" --description="instance for image set ${IMAGE_SET}" --zone="${REGION}" --machine-type="$(cat gcp_base_instance_type)" --subnet=default --network-tier=PREMIUM --metadata-from-file="${STARTUP_KEY}=${TEMP_SETUP_SCRIPT}" --no-restart-on-failure --maintenance-policy=MIGRATE --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append $(cat gcp_filters) --boot-disk-device-name="${UNIQUE_NAME}" --labels="image-set=${IMAGE_SET}" --reservation-affinity=any --enable-display-device
+  gcloud compute --project="${GCP_PROJECT}" instances create "${UNIQUE_NAME}" --description="instance for image set ${IMAGE_SET}" --zone="${REGION}" --machine-type="$(cat gcp_base_instance_type)" --subnet=default --network-tier=PREMIUM --metadata-from-file="${STARTUP_KEY}=${TEMP_SETUP_SCRIPT}" --no-restart-on-failure --maintenance-policy=MIGRATE --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append $(cat gcp_filters) --boot-disk-device-name="${UNIQUE_NAME}" --labels="image-set=${IMAGE_SET}" --reservation-affinity=any --enable-display-device
 
   log "I've triggered the creation of instance ${UNIQUE_NAME} - it can take a \x1B[4mVery Long Time™\x1B[24m for it to be created and bootstrapped..."
 
