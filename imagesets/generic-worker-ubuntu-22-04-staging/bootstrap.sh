@@ -127,21 +127,25 @@ retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
 ) >> /etc/containers/registries.conf
 
 if [[ "%MY_CLOUD%" == "google" ]]; then
-    # installs the v4l2loopback kernel module
-    # used for the video device
-    # only required on gcp
-    retry apt-get install -y linux-modules-extra-$(uname -r) xserver-xorg-video-dummy
-
-    # Create config file for a dummy video device driver
-    # to make it possible to run generic worker on gcp
-    # https://github.com/taskcluster/taskcluster/issues/6412
-    cat > /etc/X11/xorg.conf.d/99-dummy.conf << EOF
-Section "Device"
-    Identifier "dummydevice"
-    Driver "dummy"
-    VideoRam 256000
-EndSection
-EOF
+    # Installs the v4l2loopback kernel module
+    # used for the video device, and simpledrm
+    # required by Wayland in GCP.
+    retry apt-get install -y linux-modules-extra-$(uname -r)
+    modprobe simpledrm
+    grep -Fx simpledrm /etc/modules || echo simpledrm >> /etc/modules
+    sed -i 's/.*pam_gnome_keyring\.so/# &/' /etc/pam.d/gdm-autologin
+    adduser --disabled-password --gecos "" --debug --home /home/user123 user123
+    echo 'user123:qh$3f#weR22G' | chpasswd
+    sudo -u user123 /bin/bash -c 'mkdir -p ~/.local/share/keyrings && cat > ~/.local/share/keyrings/login.keyring << EOF
+    [keyring]
+    display-name=login
+    ctime=0
+    mtime=0
+    lock-on-idle=false
+    lock-after=false
+    EOF'
+    sed -i 's/#  \(AutomaticLoginEnable = true\)/\1/' /etc/gdm3/custom.conf
+    sed -i 's/#  AutomaticLogin =.*/AutomaticLogin = user123/' /etc/gdm3/custom.conf
 fi
 
 # install necessary packages for KVM
