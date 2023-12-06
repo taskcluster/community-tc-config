@@ -140,9 +140,6 @@ taskcluster:
             # pool, useful for workers not to die immediately...
             idleTimeoutSecs: 3600
             enableInteractive: true
-      launchConfig:
-        displayDevice:
-          enableDisplay: true
 
     gw-windows-2022:
       owner: taskcluster-notifications+workers@mozilla.com

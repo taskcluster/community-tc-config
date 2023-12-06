@@ -347,6 +347,9 @@ def gcp_launch_config(zone, region, machineType, image, diskSizeGb, **cfg):
             },
         ],
         "networkInterfaces": [{"accessConfigs": [{"type": "ONE_TO_ONE_NAT"}]}],
+        "displayDevice": {
+            "enableDisplay": True,
+        },
     }
     return merge(cfg.get("launchConfig", {}), default_launch_config)
 
