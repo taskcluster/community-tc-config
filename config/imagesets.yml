@@ -129,7 +129,7 @@ generic-worker-ubuntu-22-04-staging:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
         shutdownMachineOnIdle: true
-        shutdownMachineOnInternalError: true
+        shutdownMachineOnInternalError: false
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
