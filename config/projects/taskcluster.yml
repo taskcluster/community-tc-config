@@ -154,6 +154,9 @@ taskcluster:
         - ssh
       minCapacity: 0
       maxCapacity: 10
+      instanceTypes:
+        c5.4xlarge: 1
+        m5.4xlarge: 1
 
     old-docker-worker:
       owner: taskcluster-notifications+workers@mozilla.com
