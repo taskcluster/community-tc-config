@@ -118,21 +118,12 @@ retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
 ) >> /etc/containers/registries.conf
 
 if [[ "%MY_CLOUD%" == "google" ]]; then
-    # installs the v4l2loopback kernel module
-    # used for the video device
-    # only required on gcp
-    retry apt-get install -y linux-modules-extra-$(uname -r) xserver-xorg-video-dummy
-
-    # Create config file for a dummy video device driver
-    # to make it possible to run generic worker on gcp
-    # https://github.com/taskcluster/taskcluster/issues/6412
-    cat > /etc/X11/xorg.conf.d/99-dummy.conf << EOF
-Section "Device"
-    Identifier "dummydevice"
-    Driver "dummy"
-    VideoRam 256000
-EndSection
-EOF
+    # Installs the v4l2loopback kernel module
+    # used for the video device, and simpledrm
+    # required by Wayland in GCP.
+    retry apt-get install -y linux-modules-extra-$(uname -r)
+    # needed for mutter to work with DRM rather than falling back to X11
+    grep -Fx simpledrm /etc/modules || echo simpledrm >> /etc/modules
 fi
 
 # See
