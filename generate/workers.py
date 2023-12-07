@@ -436,7 +436,6 @@ def aws(
                     "region": region,
                     "launchConfig": {
                         "ImageId": imageIds[region],
-                        "Placement": {"AvailabilityZone": az},
                         "SubnetId": subnetId,
                         "SecurityGroupIds": groupIds,
                         "InstanceType": instanceType,
