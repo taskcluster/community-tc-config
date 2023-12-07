@@ -6,7 +6,7 @@ exec &> /var/log/bootstrap.log
 ##############################################################################
 # TASKCLUSTER_REF can be a git commit SHA, a git branch name, or a git tag name
 # (i.e. for a taskcluster version number, prefix with 'v' to make it a git tag)
-TASKCLUSTER_REF='6cafbb49e0dd5efb1f1dab6e9fb02f7d4c749926'
+TASKCLUSTER_REF='main'
 ##############################################################################
 
 function retry {
@@ -131,21 +131,8 @@ if [[ "%MY_CLOUD%" == "google" ]]; then
     # used for the video device, and simpledrm
     # required by Wayland in GCP.
     retry apt-get install -y linux-modules-extra-$(uname -r)
-    modprobe simpledrm
+    # needed for mutter to work with DRM rather than falling back to X11
     grep -Fx simpledrm /etc/modules || echo simpledrm >> /etc/modules
-    sed -i 's/.*pam_gnome_keyring\.so/# &/' /etc/pam.d/gdm-autologin
-    adduser --disabled-password --gecos "" --debug --home /home/user123 user123
-    echo 'user123:qh$3f#weR22G' | chpasswd
-    sudo -u user123 /bin/bash -c 'mkdir -p ~/.local/share/keyrings && cat > ~/.local/share/keyrings/login.keyring << EOF
-    [keyring]
-    display-name=login
-    ctime=0
-    mtime=0
-    lock-on-idle=false
-    lock-after=false
-    EOF'
-    sed -i 's/#  \(AutomaticLoginEnable = true\)/\1/' /etc/gdm3/custom.conf
-    sed -i 's/#  AutomaticLogin =.*/AutomaticLogin = user123/' /etc/gdm3/custom.conf
 fi
 
 # install necessary packages for KVM
