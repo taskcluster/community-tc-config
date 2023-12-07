@@ -35,6 +35,7 @@ fuzzing:
       minCapacity: 0
       maxCapacity: 10
       instanceTypes:
+        g4ad.xlarge: 1
         g4ad.2xlarge: 1
     bugmon-pernosco:
       owner: jkratzer@mozilla.com
@@ -112,6 +113,7 @@ fuzzing:
       minCapacity: 0
       maxCapacity: 10
       instanceTypes:
+        g4ad.xlarge: 1
         g4ad.2xlarge: 1
   hooks:
     fuzzing-tc-config-community-update:
