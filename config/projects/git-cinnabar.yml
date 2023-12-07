@@ -16,8 +16,10 @@ git-cinnabar:
       cloud: aws
       maxCapacity: 2
       instanceTypes:
-        c5.2xlarge: 1
-        m5.2xlarge: 1
+        m7i.2xlarge: 1
+        m7i.4xlarge: 1
+        c7i.2xlarge: 1
+        c7i.4xlarge: 1
   clients:
     worker-osx:
       scopes:

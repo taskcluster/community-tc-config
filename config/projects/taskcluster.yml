@@ -83,8 +83,10 @@ taskcluster:
           config:
             runTasksAsCurrentUser: true
       instanceTypes:
-        c5.4xlarge: 1
-        m5.4xlarge: 1
+        m7i.2xlarge: 1
+        m7i.4xlarge: 1
+        c7i.2xlarge: 1
+        c7i.4xlarge: 1
 
     gw-ubuntu-22-04:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -152,8 +154,10 @@ taskcluster:
       minCapacity: 0
       maxCapacity: 10
       instanceTypes:
-        c5.4xlarge: 1
-        m5.4xlarge: 1
+        m7i.2xlarge: 1
+        m7i.4xlarge: 1
+        c7i.2xlarge: 1
+        c7i.4xlarge: 1
 
     old-docker-worker:
       owner: taskcluster-notifications+workers@mozilla.com

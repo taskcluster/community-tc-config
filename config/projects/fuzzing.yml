@@ -75,6 +75,11 @@ fuzzing:
       cloud: aws
       minCapacity: 0
       maxCapacity: 10
+      instanceTypes:
+        m7i.2xlarge: 1
+        m7i.4xlarge: 1
+        c7i.2xlarge: 1
+        c7i.4xlarge: 1
     grizzly-reduce-monitor:
       owner: truber@mozilla.com
       emailOnError: true
