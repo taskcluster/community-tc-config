@@ -117,17 +117,15 @@ retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
   echo 'registries=["docker.io"]'
 ) >> /etc/containers/registries.conf
 
-if [[ "%MY_CLOUD%" == "google" ]]; then
-    # Installs the v4l2loopback kernel module
-    # used for the video device, and vkms
-    # required by Wayland in GCP.
-    retry apt-get install -y linux-modules-extra-$(uname -r)
-    # needed for mutter to work with DRM rather than falling back to X11
-    grep -Fx vkms /etc/modules || echo vkms >> /etc/modules
-    # disable udev rule that tags platform-vkms with "mutter-device-ignore"
-    # ENV{ID_PATH}=="platform-vkms", TAG+="mutter-device-ignore"
-    sed '/platform-vkms/d' /lib/udev/rules.d/61-mutter.rules > /etc/udev/rules.d/61-mutter.rules
-fi
+# Installs the v4l2loopback kernel module
+# used for the video device, and vkms
+# required by Wayland
+retry apt-get install -y linux-modules-extra-$(uname -r)
+# needed for mutter to work with DRM rather than falling back to X11
+grep -Fx vkms /etc/modules || echo vkms >> /etc/modules
+# disable udev rule that tags platform-vkms with "mutter-device-ignore"
+# ENV{ID_PATH}=="platform-vkms", TAG+="mutter-device-ignore"
+sed '/platform-vkms/d' /lib/udev/rules.d/61-mutter.rules > /etc/udev/rules.d/61-mutter.rules
 
 # See
 #   * https://console.aws.amazon.com/support/cases#/6410417131/en
