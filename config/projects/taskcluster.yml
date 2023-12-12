@@ -99,6 +99,7 @@ taskcluster:
         genericWorker:
           config:
             enableInteractive: true
+            shutdownMachineOnInternalError: false
 
     gw-ubuntu-22-04-arm64:
       owner: taskcluster-notifications+workers@mozilla.com
