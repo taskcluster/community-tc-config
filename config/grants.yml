@@ -44,6 +44,8 @@
     - queue:create-task:very-high:proj-<..>/*
     - queue:create-task:highest:proj-<..>/*
     - queue:claim-work:proj-<..>/*
+    - queue:claimed-list:proj-<..>/*
+    - queue:pending-list:proj-<..>/*
 
     # project-specific private artifacts
     - queue:get-artifact:project/<..>/*
