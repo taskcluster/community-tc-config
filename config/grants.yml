@@ -44,8 +44,6 @@
     - queue:create-task:very-high:proj-<..>/*
     - queue:create-task:highest:proj-<..>/*
     - queue:claim-work:proj-<..>/*
-    - queue:claimed-list:proj-<..>/*
-    - queue:pending-list:proj-<..>/*
 
     # project-specific private artifacts
     - queue:get-artifact:project/<..>/*
@@ -214,19 +212,21 @@
     - index:list-tasks:*
     - purge-cache:all-purge-requests
     - purge-cache:purge-requests:*
+    - queue:claimed-list:*
     - queue:create-task:project:none
     - queue:get-artifact:public/*
     - queue:get-provisioner:*
     - queue:get-task:*
-    - queue:get-worker:*
     - queue:get-worker-type:*
+    - queue:get-worker:*
     - queue:list-artifacts:*
     - queue:list-dependent-tasks:*
     - queue:list-provisioners
     - queue:list-task-group:*
-    - queue:list-workers:*
     - queue:list-worker-types:*
+    - queue:list-workers:*
     - queue:pending-count:*
+    - queue:pending-list:*
     - queue:status:*
     - secrets:list-secrets
     - worker-manager:get-worker-pool:*
