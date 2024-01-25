@@ -313,6 +313,7 @@ taskcluster:
         - auth:create-client:project/taskcluster:generic-worker-tester/TestReclaimCancelledTask
         - auth:create-client:project/taskcluster:generic-worker-tester/TestResolveResolvedTask
         - auth:sentry:generic-worker-tests
+        - docker-worker:cache:d2g-test
         - generic-worker:cache:apple-cache
         - generic-worker:cache:banana-cache
         - generic-worker:cache:devtools-app
