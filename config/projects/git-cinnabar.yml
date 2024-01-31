@@ -25,12 +25,17 @@ git-cinnabar:
       scopes:
         - assume:worker-pool:proj-git-cinnabar/osx
         - assume:worker-id:proj-git-cinnabar/travis-*
+    worker-macos:
+      scopes:
+        - assume:worker-pool:proj-git-cinnabar/macos
+        - assume:worker-id:proj-git-cinnabar/gha-*
   grants:
     - grant:
         - queue:create-task:highest:proj-git-cinnabar/linux
         - queue:create-task:highest:proj-git-cinnabar/win2012r2
-        # this workerType is implemented in Github Actions (!)
+        # these two workerTypes are implemented in Github Actions (!)
         - queue:create-task:highest:proj-git-cinnabar/osx
+        - queue:create-task:highest:proj-git-cinnabar/macos
         - queue:scheduler-id:taskcluster-github
       to:
         - repo:github.com/glandium/git-cinnabar:decision-task
