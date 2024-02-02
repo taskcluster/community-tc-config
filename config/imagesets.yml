@@ -146,10 +146,10 @@ generic-worker-win2022:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-00856387ddbf1a631
-      us-west-1: ami-05f3b1109cc5a4c04
-      us-west-2: ami-0329416347df25fbb
-      us-east-2: ami-019ee9b75dd6fb244
+      us-east-1: ami-05da520b30e9aabce
+      us-west-1: ami-024f68204e9d5059c
+      us-west-2: ami-0785060df855d803b
+      us-east-2: ami-000b5f5e2baf87394
   workerConfig:
     genericWorker:
       config:
@@ -162,7 +162,7 @@ generic-worker-win2022:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://github.com/taskcluster/community-tc-config/blob/1ce0aabb11e33e955d1beb8f99dd31c14448f6b2/imagesets/generic-worker-win2022/bootstrap.ps1
+            script: https://github.com/taskcluster/community-tc-config/blob/fcbb71315087198c93d9960868d09190a31e60fa/imagesets/generic-worker-win2022/bootstrap.ps1
 generic-worker-win2016-amd:
   workerImplementation: generic-worker
   aws:
