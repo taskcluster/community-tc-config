@@ -50,7 +50,7 @@ retry apt-get update
 DEBIAN_FRONTEND=noninteractive retry apt-get upgrade -yq
 retry apt-get -y remove docker docker.io containerd runc
 # build-essential is needed for running `go test -race` with the -vet=off flag as of go1.19
-retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common gzip python3-venv build-essential
+retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common gzip python3-venv build-essential snapd
 
 # install docker
 retry curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
@@ -66,9 +66,13 @@ cat > /etc/modprobe.d/kvm-backdoor.conf << "EOF"
 options kvm enable_vmware_backdoor=y
 EOF
 
+# create group for running snap
+groupadd snap_sudo
+echo '%snap_sudo ALL=(ALL:ALL) NOPASSWD: /usr/bin/snap' | EDITOR='tee -a' visudo
+
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
 retry apt-get install -y git tar
-retry curl -fsSL 'https://dl.google.com/go/go1.21.4.linux-amd64.tar.gz' > go.tar.gz
+retry curl -fsSL 'https://dl.google.com/go/go1.22.0.linux-amd64.tar.gz' > go.tar.gz
 tar xvfz go.tar.gz -C /usr/local
 export HOME=/root
 export GOPATH=~/go
