@@ -18,7 +18,7 @@ function deploy {
   # Presumably bash and env must already be in the PATH to reach this point,
   # but let's keep them in the dependency list in case this list is
   # copy/pasted to any docs, etc. Having them here doesn't do any harm.
-  for command in aws base64 basename bash cat chmod cut date dirname env find gcloud git head mktemp pass rm sed sleep sort tail touch which xargs yq; do
+  for command in aws az base64 basename bash cat chmod cut date dirname env find flock gcloud git head mktemp pass rm sed sleep sort tail touch which xargs yq; do
     if ! which "${command}" > /dev/null; then
       log "  \xE2\x9D\x8C ${command}"
       log "${0} requires ${command} to be installed and available in your PATH - please fix and rerun" >&2
@@ -42,13 +42,13 @@ function deploy {
   log "Checking inputs..."
 
   if [ "${#}" -ne 3 ]; then
-    log "Please specify a cloud (aws/google), action (delete|update), and image set (e.g. generic-worker-win2022) e.g. ${0} aws update generic-worker-win2022" >&2
+    log "Please specify a cloud (aws/azure/google), action (delete|update), and image set (e.g. generic-worker-win2022) e.g. ${0} aws update generic-worker-win2022" >&2
     exit 66
   fi
 
   export CLOUD="${1}"
-  if [ "${CLOUD}" != "aws" ] && [ "${CLOUD}" != "google" ]; then
-    log "Provider must be 'aws' or 'google' but '${CLOUD}' was specified" >&2
+  if [ "${CLOUD}" != "aws" ] && [ "${CLOUD}" != "azure" ] && [ "${CLOUD}" != "google" ]; then
+    log "Provider must be 'aws', 'azure', or 'google' but '${CLOUD}' was specified" >&2
     exit 67
   fi
 
@@ -90,6 +90,12 @@ function deploy {
   if [ "${CLOUD}" == "google" ] && [ -z "${GCP_PROJECT-}" ]; then
     log "Environment variable GCP_PROJECT must be exported before calling this script" >&2
     exit 71
+  fi
+
+  if [ "${CLOUD}" == "azure" ] && [ -z "${AZURE_IMAGE_RESOURCE_GROUP-}" ]; then
+    log "Environment variable AZURE_IMAGE_RESOURCE_GROUP must be exported before calling this script" >&2
+    log "This resource group will be used for storing your created image(s)." >&2
+    exit 74
   fi
 
   if ! [ -d "${IMAGE_SET}" ]; then
@@ -155,6 +161,25 @@ function deploy {
       log "Pushing new secrets..."
       pass git push
       ;;
+    azure)
+      if ! az account show > /dev/null 2>&1; then
+        log "Need azure credentials..."
+        az login > /dev/null 2>&1
+      fi
+      echo centralus 26 215 eastus 15 250 eastus2 33 200 northcentralus 100 175 southcentralus 99 150 westus 75 225 westus2 60 160 | xargs -P7 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
+      log "Fetching secrets..."
+      pass git pull
+      for REGION in centralus eastus eastus2 northcentralus southcentralus westus westus2; do
+        # some regions may not have secrets if they do not support the required instance type
+        if [ -f "${IMAGE_SET}/azure.${REGION}.secrets" ]; then
+          IMAGE_ID="$(cat "${IMAGE_SET}/azure.${REGION}.secrets" | sed -n 's/^Image: *//p')"
+          yq w -i ../config/imagesets.yml "${IMAGE_SET}.azure.images.${REGION}" "${IMAGE_ID}"
+          pass insert -m -f "community-tc/imagesets/${IMAGE_SET}/${REGION}" < "${IMAGE_SET}/azure.${REGION}.secrets"
+        fi
+      done
+      log "Pushing new secrets..."
+      pass git push
+      ;;
     google)
       echo us-central1-a 21 230 | xargs -P1 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
       log "Updating config/imagesets.yml..."
@@ -176,6 +201,9 @@ function deploy {
   case "${CLOUD}" in
     aws)
       git commit -m "Built new AWS AMIs for imageset ${IMAGE_SET}"
+      ;;
+    azure)
+      git commit -m "Built new Azure machine image for imageset ${IMAGE_SET}"
       ;;
     google)
       git commit -m "Built new google machine image for imageset ${IMAGE_SET}"
@@ -402,7 +430,7 @@ function google_delete_found {
     log "Deleting the old image(s) ("${OLD_IMAGES}")..."
     gcloud compute images delete ${OLD_IMAGES} --project="${GCP_PROJECT}" --quiet
   else
-    log "No old snapshot to delete."
+    log "No old images to delete."
   fi
 }
 
@@ -470,6 +498,200 @@ function google_update {
   echo "projects/${GCP_PROJECT}/global/images/${UNIQUE_NAME}" > gcp.secrets
 
   google_delete_found
+}
+
+################## AZURE ##################
+
+function azure_delete {
+  azure_find_old_objects
+  azure_delete_found
+}
+
+function azure_find_old_objects {
+  log "Querying old resource groups..."
+  OLD_RESOURCE_GROUPS="$(az group list --query="[?tags.image_set == '${IMAGE_SET}' && location == '${REGION}'].id" --output tsv)"
+  if [ -n "${OLD_RESOURCE_GROUPS}" ]; then
+    log "Found old resource group(s):" $OLD_RESOURCE_GROUPS
+  else
+    log "WARNING: No old resource groups found"
+  fi
+
+  log "Querying previous images..."
+  OLD_IMAGES="$(az image list --query="[?tags.image_set == '${IMAGE_SET}' && location == '${REGION}'].id" --output tsv)"
+  if [ -n "${OLD_IMAGES}" ]; then
+    log "Found old image(s):" $OLD_IMAGES
+  else
+    log "WARNING: No old images found"
+  fi
+}
+
+function azure_delete_found {
+  if [ -n "${OLD_RESOURCE_GROUPS}" ]; then
+    for group in ${OLD_RESOURCE_GROUPS}; do
+      log "Now deleting previous resource group ${group}..."
+      az group delete --name="${group}" --yes --no-wait > /dev/null 2>&1
+    done
+  else
+    log "No previous resource groups to delete."
+  fi
+
+  if [ -n "${OLD_IMAGES}" ]; then
+    log "Deleting the old image(s) ("${OLD_IMAGES}")..."
+    az image delete --ids ${OLD_IMAGES} --no-wait true > /dev/null 2>&1
+  else
+    log "No old images to delete."
+  fi
+}
+
+function azure_update {
+
+  azure_find_old_objects
+
+  NAME_WITH_REGION="${UNIQUE_NAME}-${REGION}"
+  TEMP_SETUP_SCRIPT="$(mktemp -t ${NAME_WITH_REGION}.XXXXXXXXXX)"
+
+  cat bootstrap.ps1 | sed 's/%MY_CLOUD%/azure/g' >> "${TEMP_SETUP_SCRIPT}"
+
+  AZURE_VM_RESOURCE_GROUP="${NAME_WITH_REGION}-rg"
+
+  log "Creating temporary resource group ${AZURE_VM_RESOURCE_GROUP} for image building resources..."
+  az group create \
+    --name="${AZURE_VM_RESOURCE_GROUP}" \
+    --tags "image_set=${IMAGE_SET}" \
+    --location="${REGION}" > /dev/null 2>&1
+
+  ADMIN_PASSWORD="$(head /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9!@#$%^&*' | head -c 20)"
+
+  log "Creating instance ${NAME_WITH_REGION}..."
+  az vm create \
+    --name="${NAME_WITH_REGION}" \
+    --image=MicrosoftWindowsServer:WindowsServer:2022-datacenter-azure-edition:latest \
+    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
+    --computer-name="ImageBuilder" \
+    --os-disk-delete-option=Delete \
+    --data-disk-delete-option=Delete \
+    --nic-delete-option=Delete \
+    --nsg-rule=NONE \
+    --license-type="Windows_Server" \
+    --accept-term \
+    --location="${REGION}" \
+    --security-type="Standard" \
+    --size=$(cat azure_base_instance_type) \
+    --tags "image_set=${IMAGE_SET}" \
+    --admin-username="azureuser" \
+    --admin-password="${ADMIN_PASSWORD}" > /dev/null 2>&1
+
+  PUBLIC_IP="$(az vm show -d --name="${NAME_WITH_REGION}" --resource-group="${AZURE_VM_RESOURCE_GROUP}" --query publicIps --output tsv)"
+
+  log "Created instance ${NAME_WITH_REGION}."
+
+  log "To connect to the template instance (please don't do so until image creation process is completed"'!'"):"
+  log ''
+  log "                         Public IP:   ${PUBLIC_IP}"
+  log "                         Username:    azureuser"
+  log "                         Password:    ${ADMIN_PASSWORD}"
+  log ''
+
+  log "Running bootstrap script - it can take a \x1B[4mVery Long Time™\x1B[24m..."
+  az vm run-command invoke \
+    --command-id="RunPowerShellScript" \
+    --name="${NAME_WITH_REGION}" \
+    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
+    --scripts="@${TEMP_SETUP_SCRIPT}" \
+    --no-wait
+  rm "${TEMP_SETUP_SCRIPT}"
+
+  log "Waiting for instance ${NAME_WITH_REGION} to shut down..."
+  az vm wait \
+    --custom="instanceView.statuses[?code=='PowerState/stopped']" \
+    --name="${NAME_WITH_REGION}" \
+    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
+    --interval=15
+
+  log "Starting instance ${NAME_WITH_REGION} to run sysprep..."
+  az vm start \
+    --name="${NAME_WITH_REGION}" \
+    --resource-group="${AZURE_VM_RESOURCE_GROUP}"
+
+  log "Running Sysprep on instance ${NAME_WITH_REGION}..."
+  az vm run-command invoke \
+    --command-id="RunPowerShellScript" \
+    --name="${NAME_WITH_REGION}" \
+    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
+    --scripts @sysprep.ps1 \
+    --no-wait
+
+  log "Waiting for instance ${NAME_WITH_REGION} to shut down..."
+  az vm wait \
+    --custom="instanceView.statuses[?code=='PowerState/stopped']" \
+    --name="${NAME_WITH_REGION}" \
+    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
+    --interval=15
+
+  log "Generalizing VM to allow it to be imaged..."
+  az vm generalize \
+    --name="${NAME_WITH_REGION}" \
+    --resource-group="${AZURE_VM_RESOURCE_GROUP}"
+
+  log "Deallocating VM..."
+  az vm deallocate \
+    --name="${NAME_WITH_REGION}" \
+    --resource-group="${AZURE_VM_RESOURCE_GROUP}"
+
+  log "Creating an image from the terminated instance..."
+  az image create \
+    --name="${NAME_WITH_REGION}" \
+    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
+    --hyper-v-generation="V2" \
+    --location="${REGION}" \
+    --tags "image_set=${IMAGE_SET}" \
+    --source="${NAME_WITH_REGION}" > /dev/null 2>&1
+
+  IMAGE_ID="$(az image show --name="${NAME_WITH_REGION}" --resource-group="${AZURE_VM_RESOURCE_GROUP}" --query id --output tsv)"
+
+  log ''
+  log "The image is being created here:"
+  log ''
+  log "                         https://portal.azure.com/#@mozilla.com/resource${IMAGE_ID}"
+  log ''
+
+  log "Waiting for image ${NAME_WITH_REGION} to be created..."
+  az image wait \
+    --created \
+    --image-name="${NAME_WITH_REGION}" \
+    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
+    --interval=15
+
+  # Try to acquire an exclusive lock
+  # as only one `az resource move` can
+  # happen at a time
+  exec 200>azure_move_image.lock
+  flock -x 200
+
+  log "Moving image ${NAME_WITH_REGION} to ${AZURE_IMAGE_RESOURCE_GROUP} resource group..."
+  az resource move \
+    --destination-group="${AZURE_IMAGE_RESOURCE_GROUP}" \
+    --ids="${IMAGE_ID}"
+
+  IMAGE_ID="$(az image show --name="${NAME_WITH_REGION}" --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" --query id --output tsv)"
+
+  log "Deleting temporary resource group ${AZURE_VM_RESOURCE_GROUP}..."
+  az group delete \
+    --name="${AZURE_VM_RESOURCE_GROUP}" \
+    --yes
+
+  # Release the lock
+  flock -u 200
+
+  {
+    echo "Instance:  ${NAME_WITH_REGION}"
+    echo "Public IP: ${PUBLIC_IP}"
+    echo "Username:  azureuser"
+    echo "Password:  ${ADMIN_PASSWORD}"
+    echo "Image:     ${IMAGE_ID}"
+  } > "azure.${REGION}.secrets"
+
+  azure_delete_found
 }
 
 ################## Entry point ##################

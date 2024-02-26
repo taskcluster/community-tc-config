@@ -160,6 +160,14 @@ taskcluster:
         c7i.2xlarge: 1
         c7i.4xlarge: 1
 
+    gw-windows-2022-azure:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2022
+      cloud: azure
+      minCapacity: 0
+      maxCapacity: 1
+
     old-docker-worker:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true

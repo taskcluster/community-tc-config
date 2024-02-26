@@ -37,7 +37,7 @@ Each file is defined as follows:
       instanceTypes: a dict, where each key is an instance type, and the
           value is the capacity per instance for that instance type.
       imageset: top level key from imagesets.yml
-      cloud: cloud to deploy in ('aws' or 'gcp')
+      cloud: cloud to deploy in ('aws', 'azure', or 'gcp')
       ..: ..  # arguments to that function
 
   secrets:
