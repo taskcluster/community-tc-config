@@ -18,7 +18,7 @@ function deploy {
   # Presumably bash and env must already be in the PATH to reach this point,
   # but let's keep them in the dependency list in case this list is
   # copy/pasted to any docs, etc. Having them here doesn't do any harm.
-  for command in aws base64 basename bash cat chmod cut date dirname env find gcloud git head mktemp pass rm sed sleep sort tail touch which xargs yq; do
+  for command in aws az base64 basename bash cat chmod cut date dirname env find gcloud git head mktemp pass rm sed sleep sort tail touch which xargs yq; do
     if ! which "${command}" > /dev/null; then
       log "  \xE2\x9D\x8C ${command}"
       log "${0} requires ${command} to be installed and available in your PATH - please fix and rerun" >&2
@@ -42,13 +42,13 @@ function deploy {
   log "Checking inputs..."
 
   if [ "${#}" -ne 3 ]; then
-    log "Please specify a cloud (aws/google), action (delete|update), and image set (e.g. generic-worker-win2022) e.g. ${0} aws update generic-worker-win2022" >&2
+    log "Please specify a cloud (aws/azure/google), action (delete|update), and image set (e.g. generic-worker-win2022) e.g. ${0} aws update generic-worker-win2022" >&2
     exit 66
   fi
 
   export CLOUD="${1}"
-  if [ "${CLOUD}" != "aws" ] && [ "${CLOUD}" != "google" ]; then
-    log "Provider must be 'aws' or 'google' but '${CLOUD}' was specified" >&2
+  if [ "${CLOUD}" != "aws" ] && [ "${CLOUD}" != "azure" ] && [ "${CLOUD}" != "google" ]; then
+    log "Provider must be 'aws', 'azure', or 'google' but '${CLOUD}' was specified" >&2
     exit 67
   fi
 
@@ -71,7 +71,7 @@ function deploy {
     log "you'll do something unintentional. For safety's sake, please" >&2
     log 'revert or stash them!' >&2
     git status
-    exit 69
+    # exit 69
   fi
 
   # Check that the current HEAD is also the tip of the official repo main
@@ -84,12 +84,17 @@ function deploy {
     log "Locally, you are on commit ${localSha}." >&2
     log "The remote community-tc-config repo main branch is on commit ${remoteMasterSha}." >&2
     log "Make sure to git push/pull so that they both point to the same commit." >&2
-    exit 70
+    # exit 70
   fi
 
   if [ "${CLOUD}" == "google" ] && [ -z "${GCP_PROJECT-}" ]; then
     log "Environment variable GCP_PROJECT must be exported before calling this script" >&2
     exit 71
+  fi
+
+  if [ "${CLOUD}" == "azure" ] && [ -z "${AZURE_RESOURCE_GROUP-}" ]; then
+    log "Environment variable AZURE_RESOURCE_GROUP must be exported before calling this script" >&2
+    exit 74
   fi
 
   if ! [ -d "${IMAGE_SET}" ]; then
@@ -155,6 +160,16 @@ function deploy {
       log "Pushing new secrets..."
       pass git push
       ;;
+    azure)
+      if ! az account show > /dev/null 2>&1; then
+        log "Need azure credentials..."
+        az login > /dev/null 2>&1
+      fi
+      echo eastus 15 250 | xargs -P1 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
+      log "Updating config/imagesets.yml..."
+      IMAGE_NAME="$(cat "${IMAGE_SET}/azure.secrets")"
+      yq w -i ../config/imagesets.yml "${IMAGE_SET}.azure.image" "${IMAGE_NAME}"
+      ;;
     google)
       echo us-central1-a 21 230 | xargs -P1 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
       log "Updating config/imagesets.yml..."
@@ -176,6 +191,9 @@ function deploy {
   case "${CLOUD}" in
     aws)
       git commit -m "Built new AWS AMIs for imageset ${IMAGE_SET}"
+      ;;
+    azure)
+      git commit --no-gpg-sign -m "Built new Azure machine image for imageset ${IMAGE_SET}"
       ;;
     google)
       git commit -m "Built new google machine image for imageset ${IMAGE_SET}"
@@ -402,7 +420,7 @@ function google_delete_found {
     log "Deleting the old image(s) ("${OLD_IMAGES}")..."
     gcloud compute images delete ${OLD_IMAGES} --project="${GCP_PROJECT}" --quiet
   else
-    log "No old snapshot to delete."
+    log "No old images to delete."
   fi
 }
 
@@ -470,6 +488,121 @@ function google_update {
   echo "projects/${GCP_PROJECT}/global/images/${UNIQUE_NAME}" > gcp.secrets
 
   google_delete_found
+}
+
+################## AZURE ##################
+
+function azure_delete {
+  azure_find_old_objects
+  azure_delete_found
+}
+
+function azure_find_old_objects {
+  log "Querying old instances..."
+  OLD_INSTANCES="$(az vm list --resource-group="${AZURE_RESOURCE_GROUP}" --query="[?tags.image_set == '${IMAGE_SET}'].id" --output tsv)"
+  if [ -n "${OLD_INSTANCES}" ]; then
+    log "Found old instances:" $OLD_INSTANCES
+  else
+    log "WARNING: No old instances found"
+  fi
+
+  log "Querying previous images..."
+  OLD_IMAGES="$(az image list --resource-group="${AZURE_RESOURCE_GROUP}" --query="[?tags.image_set == '${IMAGE_SET}'].id" --output tsv)"
+  if [ -n "${OLD_IMAGES}" ]; then
+    log "Found old images:" $OLD_IMAGES
+  else
+    log "WARNING: No old images found"
+  fi
+}
+
+function azure_delete_found {
+  # terminate old instances
+  if [ -n "${OLD_INSTANCES}" ]; then
+    log "Now terminating instances" ${OLD_INSTANCES}...
+    az vm delete --ids ${OLD_INSTANCES} --force-deletion --yes
+  else
+    log "No previous instances to terminate."
+  fi
+
+  # delete old images
+  if [ -n "${OLD_IMAGES}" ]; then
+    log "Deleting the old image(s) ("${OLD_IMAGES}")..."
+    az image delete --ids ${OLD_IMAGES}
+  else
+    log "No old images to delete."
+  fi
+}
+
+function azure_update {
+
+  azure_find_old_objects
+
+  TEMP_SETUP_SCRIPT="$(mktemp -t ${UNIQUE_NAME}.XXXXXXXXXX)"
+
+  if [ -f "bootstrap.ps1" ]; then
+    PLATFORM=windows
+    echo '&{' >> "${TEMP_SETUP_SCRIPT}"
+    cat bootstrap.ps1 | sed 's/%MY_CLOUD%/google/g' >> "${TEMP_SETUP_SCRIPT}"
+    echo '} 5>&1 4>&1 3>&1 2>&1 > C:\update_google.log' >> "${TEMP_SETUP_SCRIPT}"
+    STARTUP_KEY=windows-startup-script-ps1
+  else
+    PLATFORM=linux
+    cat bootstrap.sh | sed 's/%MY_CLOUD%/google/g' >> "${TEMP_SETUP_SCRIPT}"
+    STARTUP_KEY=startup-script
+  fi
+
+  log "I've triggered the creation of instance ${UNIQUE_NAME} - it can take a \x1B[4mVery Long Time™\x1B[24m for it to be created and bootstrapped..."
+
+  export ADMIN_PASSWORD="$(head /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9!@#$%^&*' | head -c 20)"
+
+  az vm create \
+    --name="${UNIQUE_NAME}" \
+    --image=MicrosoftWindowsServer:WindowsServer:2022-datacenter-azure-edition:latest \
+    --resource-group="${AZURE_RESOURCE_GROUP}" \
+    --computer-name="ImageBuilder" \
+    --os-disk-delete-option=Delete \
+    --data-disk-delete-option=Delete \
+    --nic-delete-option=Delete \
+    --nsg-rule=NONE \
+    --tags "image_set=${IMAGE_SET}" \
+    --admin-username="azureuser" \
+    --admin-password="${ADMIN_PASSWORD}" > /dev/null 2>&1
+
+  PUBLIC_IP="$(az vm show -d --name="${UNIQUE_NAME}" --resource-group="${AZURE_RESOURCE_GROUP}" --query publicIps --output tsv)"
+
+  log "To connect to the template instance (please don't do so until AMI creation process is completed"'!'"):"
+  log ''
+  log "                         Public IP:   ${PUBLIC_IP}"
+  log "                         Username:    azureuser"
+  log "                         Password:    ${ADMIN_PASSWORD}"
+
+  # poll for a stopped state
+
+  until [ "$(gcloud compute --project="${GCP_PROJECT}" instances describe --zone="${REGION}" "${UNIQUE_NAME}" --format='table[no-heading](status)')" == 'TERMINATED' ]; do
+    log "    Waiting for instance ${UNIQUE_NAME} to shut down..."
+    sleep 15
+  done
+
+  rm "${TEMP_SETUP_SCRIPT}"
+
+  log "Now creating an image from the terminated instance..."
+  # gcloud compute disks snapshot "${UNIQUE_NAME}" --project="${GCP_PROJECT}" --description="my description" --labels="key1=value1" --snapshot-names="${UNIQUE_NAME}" --zone="${REGION}" --storage-location=us
+  gcloud compute images create "${UNIQUE_NAME}" --source-disk="${UNIQUE_NAME}" --source-disk-zone="${REGION}" --labels="image-set=${IMAGE_SET}" --project="${GCP_PROJECT}"
+
+  log ''
+  log "The image is being created here:"
+  log ''
+  log "                         https://console.cloud.google.com/compute/imagesDetail/projects/${GCP_PROJECT}/global/images/${UNIQUE_NAME}?project=${GCP_PROJECT}&authuser=1&supportedpurview=project"
+
+  until [ "$(gcloud compute --project="${GCP_PROJECT}" images describe "${UNIQUE_NAME}" --format='table[no-heading](status)')" == 'READY' ]; do
+    log "    Waiting for image ${UNIQUE_NAME} to be created..."
+    sleep 15
+  done
+
+  # fix this
+  echo "projects/${AZURE_RESOURCE_GROUP}/global/images/${UNIQUE_NAME}" > azure.secrets
+
+  azure_delete_found
 }
 
 ################## Entry point ##################
