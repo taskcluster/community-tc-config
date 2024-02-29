@@ -175,10 +175,10 @@ function deploy {
 
   case "${CLOUD}" in
     aws)
-      git commit --no-gpg-sign -m "Built new AWS AMIs for imageset ${IMAGE_SET}"
+      git commit -m "Built new AWS AMIs for imageset ${IMAGE_SET}"
       ;;
     google)
-      git commit --no-gpg-sign -m "Built new google machine image for imageset ${IMAGE_SET}"
+      git commit -m "Built new google machine image for imageset ${IMAGE_SET}"
       ;;
   esac
 
