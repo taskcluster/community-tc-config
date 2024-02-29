@@ -34668,6 +34668,30 @@
     "zone": "europe-west6-c"
   },
   {
+    "name": "g2-standard-12",
+    "zone": "europe-west6-c"
+  },
+  {
+    "name": "g2-standard-16",
+    "zone": "europe-west6-c"
+  },
+  {
+    "name": "g2-standard-24",
+    "zone": "europe-west6-c"
+  },
+  {
+    "name": "g2-standard-32",
+    "zone": "europe-west6-c"
+  },
+  {
+    "name": "g2-standard-4",
+    "zone": "europe-west6-c"
+  },
+  {
+    "name": "g2-standard-8",
+    "zone": "europe-west6-c"
+  },
+  {
     "name": "m1-megamem-96",
     "zone": "europe-west6-c"
   },
@@ -57172,14 +57196,6 @@
     "zone": "us-east5-c"
   },
   {
-    "name": "ct5p-hightpu-1t",
-    "zone": "us-east5-c"
-  },
-  {
-    "name": "ct5p-hightpu-2t",
-    "zone": "us-east5-c"
-  },
-  {
     "name": "ct5p-hightpu-4t",
     "zone": "us-east5-c"
   },
@@ -59298,14 +59314,6 @@
   {
     "name": "n2-standard-96",
     "zone": "us-south1-b"
-  },
-  {
-    "name": "ct5p-hightpu-1t",
-    "zone": "us-south1-c"
-  },
-  {
-    "name": "ct5p-hightpu-2t",
-    "zone": "us-south1-c"
   },
   {
     "name": "ct5p-hightpu-4t",
