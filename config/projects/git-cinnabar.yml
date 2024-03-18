@@ -10,7 +10,7 @@ git-cinnabar:
       imageset: generic-worker-ubuntu-22-04
       cloud: gcp
       maxCapacity: 5
-      machineType: "zones/{zone}/machineTypes/n2-standard-4"
+      machineType: "zones/{zone}/machineTypes/n2-highmem-4"
     win2012r2:
       imageset: generic-worker-win2022
       cloud: aws
