@@ -64,6 +64,10 @@ cat > /etc/modprobe.d/kvm-backdoor.conf << "EOF"
 options kvm enable_vmware_backdoor=y
 EOF
 
+# configure core dumps to be in the process' current directory with filename 'core'
+# (required for 3 legacy JS engine fuzzers)
+echo 'core' > /proc/sys/kernel/core_pattern
+
 # create group for running snap
 groupadd snap_sudo
 echo '%snap_sudo ALL=(ALL:ALL) NOPASSWD: /usr/bin/snap' | EDITOR='tee -a' visudo
