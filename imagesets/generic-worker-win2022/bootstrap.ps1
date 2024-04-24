@@ -29,11 +29,19 @@ Set-ExecutionPolicy Unrestricted -Force -Scope Process
 # TestAbortAfterMaxRunTime from running as intended.
 Uninstall-WindowsFeature -Name Windows-Defender
 
-# Disable SysMain (Superfetch)
-Set-Service "SysMain" -StartupType Disabled -Status Stopped
-
-# Disable disk indexing
-Set-Service "WSearch" -StartupType Disabled -Status Stopped
+# Services to disable
+# taken (and edited) from GitHub Actions Windows runners
+# https://github.com/actions/runner-images/blob/3b976c7acb0ce875060102c0c80f655b479aa5d4/images/windows/scripts/build/Configure-System.ps1#L140-L153
+$servicesToDisable = @(
+    'wuauserv' # Windows Update
+    'usosvc' # update orchestrator
+    'DiagTrack' # telemetry service
+    'SysMain' # (Superfetch)
+    'WSearch' # disk indexing
+) | Get-Service -ErrorAction SilentlyContinue
+Stop-Service $servicesToDisable
+$servicesToDisable.WaitForStatus('Stopped', "00:01:00")
+$servicesToDisable | Set-Service -StartupType Disabled
 
 # install chocolatey package manager
 Invoke-Expression ($client.DownloadString('https://chocolatey.org/install.ps1'))
