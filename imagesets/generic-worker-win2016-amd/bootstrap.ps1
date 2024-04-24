@@ -37,11 +37,19 @@ Set-ExecutionPolicy Unrestricted -Force -Scope Process
 # TestAbortAfterMaxRunTime from running as intended.
 Uninstall-WindowsFeature -Name Windows-Defender
 
-# Disable SysMain (Superfetch)
-Set-Service "SysMain" -StartupType Disabled -Status Stopped
-
-# Disable disk indexing
-Set-Service "WSearch" -StartupType Disabled -Status Stopped
+# Services to disable
+# taken (and edited) from GitHub Actions Windows runners
+# https://github.com/actions/runner-images/blob/3b976c7acb0ce875060102c0c80f655b479aa5d4/images/windows/scripts/build/Configure-System.ps1#L140-L153
+$servicesToDisable = @(
+    'wuauserv' # Windows Update
+    'usosvc' # update orchestrator
+    'DiagTrack' # telemetry service
+    'SysMain' # (Superfetch)
+    'WSearch' # disk indexing
+) | Get-Service -ErrorAction SilentlyContinue
+Stop-Service $servicesToDisable
+$servicesToDisable.WaitForStatus('Stopped', "00:01:00")
+$servicesToDisable | Set-Service -StartupType Disabled
 
 # install chocolatey package manager
 Invoke-Expression ($client.DownloadString('https://chocolatey.org/install.ps1'))
@@ -134,19 +142,19 @@ New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound
 
 # install go (not required, but useful)
 md "C:\gopath"
-Expand-ZIPFile -File "C:\go1.21.4.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.21.4.windows-amd64.zip"
+Expand-ZIPFile -File "C:\go1.22.2.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.22.2.windows-amd64.zip"
 
 # install git
-$client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.41.0.windows.1/Git-2.41.0-64-bit.exe", "C:\Git-2.41.0-64-bit.exe")
-Start-Process "C:\Git-2.41.0-64-bit.exe" -ArgumentList "/VERYSILENT /LOG=C:\git_install.log /NORESTART /SUPPRESSMSGBOXES" -Wait -NoNewWindow
+$client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.44.0.windows.1/Git-2.44.0-64-bit.exe", "C:\Git-2.44.0-64-bit.exe")
+Start-Process "C:\Git-2.44.0-64-bit.exe" -ArgumentList "/VERYSILENT /LOG=C:\git_install.log /NORESTART /SUPPRESSMSGBOXES" -Wait -NoNewWindow
 
 # install node
-$client.DownloadFile("https://nodejs.org/dist/v18.16.1/node-v18.16.1-x64.msi", "C:\NodeSetup.msi")
+$client.DownloadFile("https://nodejs.org/dist/v20.12.2/node-v20.12.2-x64.msi", "C:\NodeSetup.msi")
 Start-Process "msiexec" -ArgumentList "/i C:\NodeSetup.msi /quiet" -Wait -NoNewWindow -PassThru
 
-# install python 3.11.4
-$client.DownloadFile("https://www.python.org/ftp/python/3.11.4/python-3.11.4-amd64.exe", "C:\python-3.11.4-amd64.exe")
-Start-Process "C:\python-3.11.4-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1" -Wait -NoNewWindow -PassThru
+# install python 3.11.9
+$client.DownloadFile("https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe", "C:\python-3.11.9-amd64.exe")
+Start-Process "C:\python-3.11.9-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1" -Wait -NoNewWindow -PassThru
 
 # set permanent env vars
 [Environment]::SetEnvironmentVariable("GOROOT", "C:\go", "Machine")
