@@ -4,7 +4,7 @@ set -exv
 exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
-TASKCLUSTER_VERSION='v64.2.6'
+TASKCLUSTER_VERSION='v64.2.8'
 ######################################
 
 function retry {
