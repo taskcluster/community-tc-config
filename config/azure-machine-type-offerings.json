@@ -2896,86 +2896,6 @@
     "zone": "eastus"
   },
   {
-    "name": "Standard_NV4as_v4",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_NV8as_v4",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_NV16as_v4",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_NV32as_v4",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC1s_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC2s_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC4s_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC8s_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC16s_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC24s_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC32s_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC48s_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC1ds_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC2ds_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC4ds_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC8ds_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC16ds_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC24ds_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC32ds_v3",
-    "zone": "eastus"
-  },
-  {
-    "name": "Standard_DC48ds_v3",
-    "zone": "eastus"
-  },
-  {
     "name": "Standard_HB120-16rs_v3",
     "zone": "eastus"
   },
@@ -3068,6 +2988,26 @@
     "zone": "eastus"
   },
   {
+    "name": "Standard_NV4as_v4",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_NV8as_v4",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_NV16as_v4",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_NV32as_v4",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_ND96amsr_A100_v4",
+    "zone": "eastus"
+  },
+  {
     "name": "Standard_NC6s_v3",
     "zone": "eastus"
   },
@@ -3084,7 +3024,67 @@
     "zone": "eastus"
   },
   {
-    "name": "Standard_ND96amsr_A100_v4",
+    "name": "Standard_DC1s_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC2s_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC4s_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC8s_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC16s_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC24s_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC32s_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC48s_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC1ds_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC2ds_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC4ds_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC8ds_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC16ds_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC24ds_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC32ds_v3",
+    "zone": "eastus"
+  },
+  {
+    "name": "Standard_DC48ds_v3",
     "zone": "eastus"
   },
   {
@@ -8180,11 +8180,15 @@
     "zone": "southcentralus"
   },
   {
-    "name": "Standard_M416-208ms_v2",
+    "name": "Standard_M416-208s_v2",
     "zone": "southcentralus"
   },
   {
-    "name": "Standard_M416-208s_v2",
+    "name": "Standard_M416s_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M416-208ms_v2",
     "zone": "southcentralus"
   },
   {
@@ -8196,7 +8200,27 @@
     "zone": "southcentralus"
   },
   {
-    "name": "Standard_M416s_v2",
+    "name": "Standard_NV6s_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_NV12s_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_NV24s_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_NV12s_v3",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_NV24s_v3",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_NV48s_v3",
     "zone": "southcentralus"
   },
   {
@@ -8229,30 +8253,6 @@
   },
   {
     "name": "Standard_NC24r_Promo",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_NV6s_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_NV12s_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_NV24s_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_NV12s_v3",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_NV24s_v3",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_NV48s_v3",
     "zone": "southcentralus"
   },
   {
@@ -8452,6 +8452,66 @@
     "zone": "southcentralus"
   },
   {
+    "name": "Standard_M32ms_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M64ms_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M64s_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M128s_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M192is_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M32dms_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M64dms_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M64ds_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M128ds_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M192ids_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M128ms_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M192ims_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M128dms_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_M192idms_v2",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_ND40rs_v2",
+    "zone": "southcentralus"
+  },
+  {
     "name": "Standard_L8s_v2",
     "zone": "southcentralus"
   },
@@ -8476,82 +8536,6 @@
     "zone": "southcentralus"
   },
   {
-    "name": "Standard_NV4as_v4",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_NV8as_v4",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_NV16as_v4",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_NV32as_v4",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_ND40rs_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M32ms_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M64ms_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M64s_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M128ms_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M128s_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M192ims_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M192is_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M32dms_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M64dms_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M64ds_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M128dms_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M128ds_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M192idms_v2",
-    "zone": "southcentralus"
-  },
-  {
-    "name": "Standard_M192ids_v2",
-    "zone": "southcentralus"
-  },
-  {
     "name": "Standard_NV6ads_A10_v5",
     "zone": "southcentralus"
   },
@@ -8573,6 +8557,22 @@
   },
   {
     "name": "Standard_NV72ads_A10_v5",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_NV4as_v4",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_NV8as_v4",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_NV16as_v4",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_NV32as_v4",
     "zone": "southcentralus"
   },
   {
@@ -8752,10 +8752,6 @@
     "zone": "southcentralus"
   },
   {
-    "name": "Standard_ND96amsr_A100_v4",
-    "zone": "southcentralus"
-  },
-  {
     "name": "Standard_NP10s",
     "zone": "southcentralus"
   },
@@ -8765,6 +8761,10 @@
   },
   {
     "name": "Standard_NP40s",
+    "zone": "southcentralus"
+  },
+  {
+    "name": "Standard_ND96amsr_A100_v4",
     "zone": "southcentralus"
   },
   {
@@ -16192,6 +16192,38 @@
     "zone": "australiaeast"
   },
   {
+    "name": "Standard_HB120-16rs_v2",
+    "zone": "australiaeast"
+  },
+  {
+    "name": "Standard_HB120-32rs_v2",
+    "zone": "australiaeast"
+  },
+  {
+    "name": "Standard_HB120-64rs_v2",
+    "zone": "australiaeast"
+  },
+  {
+    "name": "Standard_HB120-96rs_v2",
+    "zone": "australiaeast"
+  },
+  {
+    "name": "Standard_HB120rs_v2",
+    "zone": "australiaeast"
+  },
+  {
+    "name": "Standard_NC24ads_A100_v4",
+    "zone": "australiaeast"
+  },
+  {
+    "name": "Standard_NC48ads_A100_v4",
+    "zone": "australiaeast"
+  },
+  {
+    "name": "Standard_NC96ads_A100_v4",
+    "zone": "australiaeast"
+  },
+  {
     "name": "Standard_DC1s_v3",
     "zone": "australiaeast"
   },
@@ -16449,38 +16481,6 @@
   },
   {
     "name": "Standard_B16ps_v2",
-    "zone": "australiaeast"
-  },
-  {
-    "name": "Standard_HB120-16rs_v2",
-    "zone": "australiaeast"
-  },
-  {
-    "name": "Standard_HB120-32rs_v2",
-    "zone": "australiaeast"
-  },
-  {
-    "name": "Standard_HB120-64rs_v2",
-    "zone": "australiaeast"
-  },
-  {
-    "name": "Standard_HB120-96rs_v2",
-    "zone": "australiaeast"
-  },
-  {
-    "name": "Standard_HB120rs_v2",
-    "zone": "australiaeast"
-  },
-  {
-    "name": "Standard_NC24ads_A100_v4",
-    "zone": "australiaeast"
-  },
-  {
-    "name": "Standard_NC48ads_A100_v4",
-    "zone": "australiaeast"
-  },
-  {
-    "name": "Standard_NC96ads_A100_v4",
     "zone": "australiaeast"
   },
   {
@@ -18400,6 +18400,114 @@
     "zone": "southeastasia"
   },
   {
+    "name": "Standard_D2ls_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D4ls_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D8ls_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D16ls_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D32ls_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D48ls_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D64ls_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D96ls_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D2lds_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D4lds_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D8lds_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D16lds_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D32lds_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D48lds_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D64lds_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_D96lds_v5",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_B2ls_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_B2s_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_B2ts_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_B4ls_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_B4s_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_B8ls_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_B8s_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_B16ls_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_B16s_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_B32ls_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_B32s_v2",
+    "zone": "southeastasia"
+  },
+  {
     "name": "Standard_E2ds_v5",
     "zone": "southeastasia"
   },
@@ -18720,114 +18828,6 @@
     "zone": "southeastasia"
   },
   {
-    "name": "Standard_D2ls_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D4ls_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D8ls_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D16ls_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D32ls_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D48ls_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D64ls_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D96ls_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D2lds_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D4lds_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D8lds_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D16lds_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D32lds_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D48lds_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D64lds_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_D96lds_v5",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_B2ls_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_B2s_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_B2ts_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_B4ls_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_B4s_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_B8ls_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_B8s_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_B16ls_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_B16s_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_B32ls_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_B32s_v2",
-    "zone": "southeastasia"
-  },
-  {
     "name": "Standard_L8s_v3",
     "zone": "southeastasia"
   },
@@ -18849,6 +18849,30 @@
   },
   {
     "name": "Standard_L80s_v3",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_L8s_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_L16s_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_L32s_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_L48s_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_L64s_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_L80s_v2",
     "zone": "southeastasia"
   },
   {
@@ -18916,39 +18940,75 @@
     "zone": "southeastasia"
   },
   {
-    "name": "Standard_L8s_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_L16s_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_L32s_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_L48s_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_L64s_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_L80s_v2",
-    "zone": "southeastasia"
-  },
-  {
     "name": "Standard_M64",
     "zone": "southeastasia"
   },
   {
-    "name": "Standard_M64m",
+    "name": "Standard_M128",
     "zone": "southeastasia"
   },
   {
-    "name": "Standard_M128",
+    "name": "Standard_M32ls",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M32ts",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M64ls",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M64s",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M128s",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M32ms_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M64ms_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M64s_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M128s_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M192is_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M32dms_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M64dms_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M64ds_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M128ds_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M192ids_v2",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_M64m",
     "zone": "southeastasia"
   },
   {
@@ -18988,15 +19048,7 @@
     "zone": "southeastasia"
   },
   {
-    "name": "Standard_M32ls",
-    "zone": "southeastasia"
-  },
-  {
     "name": "Standard_M32ms",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_M32ts",
     "zone": "southeastasia"
   },
   {
@@ -19008,15 +19060,7 @@
     "zone": "southeastasia"
   },
   {
-    "name": "Standard_M64ls",
-    "zone": "southeastasia"
-  },
-  {
     "name": "Standard_M64ms",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_M64s",
     "zone": "southeastasia"
   },
   {
@@ -19032,27 +19076,7 @@
     "zone": "southeastasia"
   },
   {
-    "name": "Standard_M128s",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_M32ms_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_M64ms_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_M64s_v2",
-    "zone": "southeastasia"
-  },
-  {
     "name": "Standard_M128ms_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_M128s_v2",
     "zone": "southeastasia"
   },
   {
@@ -19060,51 +19084,11 @@
     "zone": "southeastasia"
   },
   {
-    "name": "Standard_M192is_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_M32dms_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_M64dms_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_M64ds_v2",
-    "zone": "southeastasia"
-  },
-  {
     "name": "Standard_M128dms_v2",
     "zone": "southeastasia"
   },
   {
-    "name": "Standard_M128ds_v2",
-    "zone": "southeastasia"
-  },
-  {
     "name": "Standard_M192idms_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_M192ids_v2",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_NV4as_v4",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_NV8as_v4",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_NV16as_v4",
-    "zone": "southeastasia"
-  },
-  {
-    "name": "Standard_NV32as_v4",
     "zone": "southeastasia"
   },
   {
@@ -19133,6 +19117,22 @@
   },
   {
     "name": "Standard_HC44rs",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_NV4as_v4",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_NV8as_v4",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_NV16as_v4",
+    "zone": "southeastasia"
+  },
+  {
+    "name": "Standard_NV32as_v4",
     "zone": "southeastasia"
   },
   {
@@ -21844,6 +21844,74 @@
     "zone": "northeurope"
   },
   {
+    "name": "Standard_NV4as_v4",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_NV8as_v4",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_NV16as_v4",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_NV32as_v4",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_L8s_v3",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_L16s_v3",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_L32s_v3",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_L48s_v3",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_L64s_v3",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_L80s_v3",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_M208ms_v2",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_M208s_v2",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_M416-208ms_v2",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_M416-208s_v2",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_M416ms_v2",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_M416s_8_v2",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_M416s_v2",
+    "zone": "northeurope"
+  },
+  {
     "name": "Standard_M12s_v3",
     "zone": "northeurope"
   },
@@ -21900,30 +21968,6 @@
     "zone": "northeurope"
   },
   {
-    "name": "Standard_L8s_v3",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_L16s_v3",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_L32s_v3",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_L48s_v3",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_L64s_v3",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_L80s_v3",
-    "zone": "northeurope"
-  },
-  {
     "name": "Standard_NC6s_v3",
     "zone": "northeurope"
   },
@@ -21937,22 +21981,6 @@
   },
   {
     "name": "Standard_NC24s_v3",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_NV4as_v4",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_NV8as_v4",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_NV16as_v4",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_NV32as_v4",
     "zone": "northeurope"
   },
   {
@@ -21980,34 +22008,6 @@
     "zone": "northeurope"
   },
   {
-    "name": "Standard_M208ms_v2",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_M208s_v2",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_M416-208ms_v2",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_M416-208s_v2",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_M416ms_v2",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_M416s_8_v2",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_M416s_v2",
-    "zone": "northeurope"
-  },
-  {
     "name": "Standard_NV6ads_A10_v5",
     "zone": "northeurope"
   },
@@ -22029,6 +22029,30 @@
   },
   {
     "name": "Standard_NV72ads_A10_v5",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_NC24ads_A100_v4",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_NC48ads_A100_v4",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_NC96ads_A100_v4",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_HC44-16rs",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_HC44-32rs",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_HC44rs",
     "zone": "northeurope"
   },
   {
@@ -22296,46 +22320,6 @@
     "zone": "northeurope"
   },
   {
-    "name": "Standard_NC24ads_A100_v4",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_NC48ads_A100_v4",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_NC96ads_A100_v4",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_HC44-16rs",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_HC44-32rs",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_HC44rs",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_DC8_v2",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_DC1s_v2",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_DC2s_v2",
-    "zone": "northeurope"
-  },
-  {
-    "name": "Standard_DC4s_v2",
-    "zone": "northeurope"
-  },
-  {
     "name": "Standard_DC1s_v3",
     "zone": "northeurope"
   },
@@ -22397,6 +22381,22 @@
   },
   {
     "name": "Standard_DC48ds_v3",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_DC8_v2",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_DC1s_v2",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_DC2s_v2",
+    "zone": "northeurope"
+  },
+  {
+    "name": "Standard_DC4s_v2",
     "zone": "northeurope"
   },
   {
@@ -24696,6 +24696,22 @@
     "zone": "swedencentral"
   },
   {
+    "name": "Standard_NG8ads_V620_v1",
+    "zone": "swedencentral"
+  },
+  {
+    "name": "Standard_NG16ads_V620_v1",
+    "zone": "swedencentral"
+  },
+  {
+    "name": "Standard_NG32adms_V620_v1",
+    "zone": "swedencentral"
+  },
+  {
+    "name": "Standard_NG32ads_V620_v1",
+    "zone": "swedencentral"
+  },
+  {
     "name": "Standard_NV4as_v4",
     "zone": "swedencentral"
   },
@@ -24905,22 +24921,6 @@
   },
   {
     "name": "Standard_B16ps_v2",
-    "zone": "swedencentral"
-  },
-  {
-    "name": "Standard_NG8ads_V620_v1",
-    "zone": "swedencentral"
-  },
-  {
-    "name": "Standard_NG16ads_V620_v1",
-    "zone": "swedencentral"
-  },
-  {
-    "name": "Standard_NG32adms_V620_v1",
-    "zone": "swedencentral"
-  },
-  {
-    "name": "Standard_NG32ads_V620_v1",
     "zone": "swedencentral"
   },
   {
@@ -27312,7 +27312,31 @@
     "zone": "uksouth"
   },
   {
-    "name": "Standard_ND96amsr_A100_v4",
+    "name": "Standard_NC24ads_A100_v4",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_NC48ads_A100_v4",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_NC96ads_A100_v4",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_NC6s_v3",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_NC12s_v3",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_NC24rs_v3",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_NC24s_v3",
     "zone": "uksouth"
   },
   {
@@ -27341,18 +27365,6 @@
   },
   {
     "name": "Standard_M416s_v2",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_NC24ads_A100_v4",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_NC48ads_A100_v4",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_NC96ads_A100_v4",
     "zone": "uksouth"
   },
   {
@@ -27417,6 +27429,50 @@
   },
   {
     "name": "Standard_DC48ds_v3",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_ND96amsr_A100_v4",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_L8s_v2",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_L16s_v2",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_L32s_v2",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_L48s_v2",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_L64s_v2",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_L80s_v2",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_NC4as_T4_v3",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_NC8as_T4_v3",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_NC16as_T4_v3",
+    "zone": "uksouth"
+  },
+  {
+    "name": "Standard_NC64as_T4_v3",
     "zone": "uksouth"
   },
   {
@@ -27492,46 +27548,6 @@
     "zone": "uksouth"
   },
   {
-    "name": "Standard_L8s_v2",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_L16s_v2",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_L32s_v2",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_L48s_v2",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_L64s_v2",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_L80s_v2",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_NC6s_v3",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_NC12s_v3",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_NC24rs_v3",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_NC24s_v3",
-    "zone": "uksouth"
-  },
-  {
     "name": "Standard_NV4as_v4",
     "zone": "uksouth"
   },
@@ -27545,22 +27561,6 @@
   },
   {
     "name": "Standard_NV32as_v4",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_NC4as_T4_v3",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_NC8as_T4_v3",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_NC16as_T4_v3",
-    "zone": "uksouth"
-  },
-  {
-    "name": "Standard_NC64as_T4_v3",
     "zone": "uksouth"
   },
   {
@@ -33184,6 +33184,34 @@
     "zone": "centralus"
   },
   {
+    "name": "Standard_E96ias_v4",
+    "zone": "centralus"
+  },
+  {
+    "name": "Standard_L8s_v2",
+    "zone": "centralus"
+  },
+  {
+    "name": "Standard_L16s_v2",
+    "zone": "centralus"
+  },
+  {
+    "name": "Standard_L32s_v2",
+    "zone": "centralus"
+  },
+  {
+    "name": "Standard_L48s_v2",
+    "zone": "centralus"
+  },
+  {
+    "name": "Standard_L64s_v2",
+    "zone": "centralus"
+  },
+  {
+    "name": "Standard_L80s_v2",
+    "zone": "centralus"
+  },
+  {
     "name": "Standard_M12s_v3",
     "zone": "centralus"
   },
@@ -33240,10 +33268,6 @@
     "zone": "centralus"
   },
   {
-    "name": "Standard_E96ias_v4",
-    "zone": "centralus"
-  },
-  {
     "name": "Standard_M208ms_v2",
     "zone": "centralus"
   },
@@ -33269,30 +33293,6 @@
   },
   {
     "name": "Standard_M416s_v2",
-    "zone": "centralus"
-  },
-  {
-    "name": "Standard_L8s_v2",
-    "zone": "centralus"
-  },
-  {
-    "name": "Standard_L16s_v2",
-    "zone": "centralus"
-  },
-  {
-    "name": "Standard_L32s_v2",
-    "zone": "centralus"
-  },
-  {
-    "name": "Standard_L48s_v2",
-    "zone": "centralus"
-  },
-  {
-    "name": "Standard_L64s_v2",
-    "zone": "centralus"
-  },
-  {
-    "name": "Standard_L80s_v2",
     "zone": "centralus"
   },
   {
@@ -35552,6 +35552,10 @@
     "zone": "southafricanorth"
   },
   {
+    "name": "Standard_ND96isr_H100_v5",
+    "zone": "southafricanorth"
+  },
+  {
     "name": "Standard_NV6s_v2",
     "zone": "southafricanorth"
   },
@@ -35573,10 +35577,6 @@
   },
   {
     "name": "Standard_NV48s_v3",
-    "zone": "southafricanorth"
-  },
-  {
-    "name": "Standard_ND96isr_H100_v5",
     "zone": "southafricanorth"
   },
   {
@@ -37988,6 +37988,38 @@
     "zone": "centralindia"
   },
   {
+    "name": "Standard_NC24ads_A100_v4",
+    "zone": "centralindia"
+  },
+  {
+    "name": "Standard_NC48ads_A100_v4",
+    "zone": "centralindia"
+  },
+  {
+    "name": "Standard_NC96ads_A100_v4",
+    "zone": "centralindia"
+  },
+  {
+    "name": "Standard_E96ias_v4",
+    "zone": "centralindia"
+  },
+  {
+    "name": "Standard_NC4as_T4_v3",
+    "zone": "centralindia"
+  },
+  {
+    "name": "Standard_NC8as_T4_v3",
+    "zone": "centralindia"
+  },
+  {
+    "name": "Standard_NC16as_T4_v3",
+    "zone": "centralindia"
+  },
+  {
+    "name": "Standard_NC64as_T4_v3",
+    "zone": "centralindia"
+  },
+  {
     "name": "Standard_NV4as_v4",
     "zone": "centralindia"
   },
@@ -38025,26 +38057,6 @@
   },
   {
     "name": "Standard_NV72ads_A10_v5",
-    "zone": "centralindia"
-  },
-  {
-    "name": "Standard_NC4as_T4_v3",
-    "zone": "centralindia"
-  },
-  {
-    "name": "Standard_NC8as_T4_v3",
-    "zone": "centralindia"
-  },
-  {
-    "name": "Standard_NC16as_T4_v3",
-    "zone": "centralindia"
-  },
-  {
-    "name": "Standard_NC64as_T4_v3",
-    "zone": "centralindia"
-  },
-  {
-    "name": "Standard_E96ias_v4",
     "zone": "centralindia"
   },
   {
@@ -38089,18 +38101,6 @@
   },
   {
     "name": "Standard_HB120rs_v3",
-    "zone": "centralindia"
-  },
-  {
-    "name": "Standard_NC24ads_A100_v4",
-    "zone": "centralindia"
-  },
-  {
-    "name": "Standard_NC48ads_A100_v4",
-    "zone": "centralindia"
-  },
-  {
-    "name": "Standard_NC96ads_A100_v4",
     "zone": "centralindia"
   },
   {
@@ -38244,30 +38244,6 @@
     "zone": "centralindia"
   },
   {
-    "name": "Standard_L8s_v2",
-    "zone": "centralindia"
-  },
-  {
-    "name": "Standard_L16s_v2",
-    "zone": "centralindia"
-  },
-  {
-    "name": "Standard_L32s_v2",
-    "zone": "centralindia"
-  },
-  {
-    "name": "Standard_L48s_v2",
-    "zone": "centralindia"
-  },
-  {
-    "name": "Standard_L64s_v2",
-    "zone": "centralindia"
-  },
-  {
-    "name": "Standard_L80s_v2",
-    "zone": "centralindia"
-  },
-  {
     "name": "Standard_DC1s_v3",
     "zone": "centralindia"
   },
@@ -38329,6 +38305,30 @@
   },
   {
     "name": "Standard_DC48ds_v3",
+    "zone": "centralindia"
+  },
+  {
+    "name": "Standard_L8s_v2",
+    "zone": "centralindia"
+  },
+  {
+    "name": "Standard_L16s_v2",
+    "zone": "centralindia"
+  },
+  {
+    "name": "Standard_L32s_v2",
+    "zone": "centralindia"
+  },
+  {
+    "name": "Standard_L48s_v2",
+    "zone": "centralindia"
+  },
+  {
+    "name": "Standard_L64s_v2",
+    "zone": "centralindia"
+  },
+  {
+    "name": "Standard_L80s_v2",
     "zone": "centralindia"
   },
   {
@@ -40612,34 +40612,6 @@
     "zone": "eastasia"
   },
   {
-    "name": "Standard_M208ms_v2",
-    "zone": "eastasia"
-  },
-  {
-    "name": "Standard_M208s_v2",
-    "zone": "eastasia"
-  },
-  {
-    "name": "Standard_M416-208ms_v2",
-    "zone": "eastasia"
-  },
-  {
-    "name": "Standard_M416-208s_v2",
-    "zone": "eastasia"
-  },
-  {
-    "name": "Standard_M416ms_v2",
-    "zone": "eastasia"
-  },
-  {
-    "name": "Standard_M416s_8_v2",
-    "zone": "eastasia"
-  },
-  {
-    "name": "Standard_M416s_v2",
-    "zone": "eastasia"
-  },
-  {
     "name": "Standard_D2plds_v5",
     "zone": "eastasia"
   },
@@ -40833,6 +40805,34 @@
   },
   {
     "name": "Standard_B16ps_v2",
+    "zone": "eastasia"
+  },
+  {
+    "name": "Standard_M208ms_v2",
+    "zone": "eastasia"
+  },
+  {
+    "name": "Standard_M208s_v2",
+    "zone": "eastasia"
+  },
+  {
+    "name": "Standard_M416-208ms_v2",
+    "zone": "eastasia"
+  },
+  {
+    "name": "Standard_M416-208s_v2",
+    "zone": "eastasia"
+  },
+  {
+    "name": "Standard_M416ms_v2",
+    "zone": "eastasia"
+  },
+  {
+    "name": "Standard_M416s_8_v2",
+    "zone": "eastasia"
+  },
+  {
+    "name": "Standard_M416s_v2",
     "zone": "eastasia"
   },
   {
@@ -43644,27 +43644,27 @@
     "zone": "japaneast"
   },
   {
-    "name": "Standard_L8s_v3",
+    "name": "Standard_NV6ads_A10_v5",
     "zone": "japaneast"
   },
   {
-    "name": "Standard_L16s_v3",
+    "name": "Standard_NV12ads_A10_v5",
     "zone": "japaneast"
   },
   {
-    "name": "Standard_L32s_v3",
+    "name": "Standard_NV18ads_A10_v5",
     "zone": "japaneast"
   },
   {
-    "name": "Standard_L48s_v3",
+    "name": "Standard_NV36adms_A10_v5",
     "zone": "japaneast"
   },
   {
-    "name": "Standard_L64s_v3",
+    "name": "Standard_NV36ads_A10_v5",
     "zone": "japaneast"
   },
   {
-    "name": "Standard_L80s_v3",
+    "name": "Standard_NV72ads_A10_v5",
     "zone": "japaneast"
   },
   {
@@ -43764,47 +43764,31 @@
     "zone": "japaneast"
   },
   {
-    "name": "Standard_NV6ads_A10_v5",
+    "name": "Standard_L8s_v3",
     "zone": "japaneast"
   },
   {
-    "name": "Standard_NV12ads_A10_v5",
+    "name": "Standard_L16s_v3",
     "zone": "japaneast"
   },
   {
-    "name": "Standard_NV18ads_A10_v5",
+    "name": "Standard_L32s_v3",
     "zone": "japaneast"
   },
   {
-    "name": "Standard_NV36adms_A10_v5",
+    "name": "Standard_L48s_v3",
     "zone": "japaneast"
   },
   {
-    "name": "Standard_NV36ads_A10_v5",
+    "name": "Standard_L64s_v3",
     "zone": "japaneast"
   },
   {
-    "name": "Standard_NV72ads_A10_v5",
+    "name": "Standard_L80s_v3",
     "zone": "japaneast"
   },
   {
     "name": "Standard_ND96isr_H100_v5",
-    "zone": "japaneast"
-  },
-  {
-    "name": "Standard_NC6s_v3",
-    "zone": "japaneast"
-  },
-  {
-    "name": "Standard_NC12s_v3",
-    "zone": "japaneast"
-  },
-  {
-    "name": "Standard_NC24rs_v3",
-    "zone": "japaneast"
-  },
-  {
-    "name": "Standard_NC24s_v3",
     "zone": "japaneast"
   },
   {
@@ -43837,6 +43821,22 @@
   },
   {
     "name": "Standard_HB120rs_v2",
+    "zone": "japaneast"
+  },
+  {
+    "name": "Standard_NC6s_v3",
+    "zone": "japaneast"
+  },
+  {
+    "name": "Standard_NC12s_v3",
+    "zone": "japaneast"
+  },
+  {
+    "name": "Standard_NC24rs_v3",
+    "zone": "japaneast"
+  },
+  {
+    "name": "Standard_NC24s_v3",
     "zone": "japaneast"
   },
   {
@@ -46004,14 +46004,6 @@
     "zone": "koreacentral"
   },
   {
-    "name": "Standard_E112ias_v5",
-    "zone": "koreacentral"
-  },
-  {
-    "name": "Standard_E112iads_v5",
-    "zone": "koreacentral"
-  },
-  {
     "name": "Standard_FX4mds",
     "zone": "koreacentral"
   },
@@ -46029,6 +46021,14 @@
   },
   {
     "name": "Standard_FX48mds",
+    "zone": "koreacentral"
+  },
+  {
+    "name": "Standard_E112ias_v5",
+    "zone": "koreacentral"
+  },
+  {
+    "name": "Standard_E112iads_v5",
     "zone": "koreacentral"
   },
   {
@@ -48368,6 +48368,14 @@
     "zone": "canadacentral"
   },
   {
+    "name": "Standard_E112ias_v5",
+    "zone": "canadacentral"
+  },
+  {
+    "name": "Standard_E112iads_v5",
+    "zone": "canadacentral"
+  },
+  {
     "name": "Standard_B2als_v2",
     "zone": "canadacentral"
   },
@@ -48409,14 +48417,6 @@
   },
   {
     "name": "Standard_B32as_v2",
-    "zone": "canadacentral"
-  },
-  {
-    "name": "Standard_E112ias_v5",
-    "zone": "canadacentral"
-  },
-  {
-    "name": "Standard_E112iads_v5",
     "zone": "canadacentral"
   },
   {
@@ -50864,6 +50864,18 @@
     "zone": "francecentral"
   },
   {
+    "name": "Standard_NC24ads_A100_v4",
+    "zone": "francecentral"
+  },
+  {
+    "name": "Standard_NC48ads_A100_v4",
+    "zone": "francecentral"
+  },
+  {
+    "name": "Standard_NC96ads_A100_v4",
+    "zone": "francecentral"
+  },
+  {
     "name": "Standard_D2plds_v5",
     "zone": "francecentral"
   },
@@ -51060,18 +51072,6 @@
     "zone": "francecentral"
   },
   {
-    "name": "Standard_NC24ads_A100_v4",
-    "zone": "francecentral"
-  },
-  {
-    "name": "Standard_NC48ads_A100_v4",
-    "zone": "francecentral"
-  },
-  {
-    "name": "Standard_NC96ads_A100_v4",
-    "zone": "francecentral"
-  },
-  {
     "name": "Standard_M32ms_v2",
     "zone": "francecentral"
   },
@@ -51084,15 +51084,7 @@
     "zone": "francecentral"
   },
   {
-    "name": "Standard_M128ms_v2",
-    "zone": "francecentral"
-  },
-  {
     "name": "Standard_M128s_v2",
-    "zone": "francecentral"
-  },
-  {
-    "name": "Standard_M192ims_v2",
     "zone": "francecentral"
   },
   {
@@ -51112,19 +51104,27 @@
     "zone": "francecentral"
   },
   {
-    "name": "Standard_M128dms_v2",
-    "zone": "francecentral"
-  },
-  {
     "name": "Standard_M128ds_v2",
     "zone": "francecentral"
   },
   {
-    "name": "Standard_M192idms_v2",
+    "name": "Standard_M192ids_v2",
     "zone": "francecentral"
   },
   {
-    "name": "Standard_M192ids_v2",
+    "name": "Standard_M128ms_v2",
+    "zone": "francecentral"
+  },
+  {
+    "name": "Standard_M192ims_v2",
+    "zone": "francecentral"
+  },
+  {
+    "name": "Standard_M128dms_v2",
+    "zone": "francecentral"
+  },
+  {
+    "name": "Standard_M192idms_v2",
     "zone": "francecentral"
   },
   {
@@ -53664,30 +53664,6 @@
     "zone": "germanywestcentral"
   },
   {
-    "name": "Standard_NV6ads_A10_v5",
-    "zone": "germanywestcentral"
-  },
-  {
-    "name": "Standard_NV12ads_A10_v5",
-    "zone": "germanywestcentral"
-  },
-  {
-    "name": "Standard_NV18ads_A10_v5",
-    "zone": "germanywestcentral"
-  },
-  {
-    "name": "Standard_NV36adms_A10_v5",
-    "zone": "germanywestcentral"
-  },
-  {
-    "name": "Standard_NV36ads_A10_v5",
-    "zone": "germanywestcentral"
-  },
-  {
-    "name": "Standard_NV72ads_A10_v5",
-    "zone": "germanywestcentral"
-  },
-  {
     "name": "Standard_L8s_v2",
     "zone": "germanywestcentral"
   },
@@ -53712,6 +53688,46 @@
     "zone": "germanywestcentral"
   },
   {
+    "name": "Standard_NV6ads_A10_v5",
+    "zone": "germanywestcentral"
+  },
+  {
+    "name": "Standard_NV12ads_A10_v5",
+    "zone": "germanywestcentral"
+  },
+  {
+    "name": "Standard_NV18ads_A10_v5",
+    "zone": "germanywestcentral"
+  },
+  {
+    "name": "Standard_NV36adms_A10_v5",
+    "zone": "germanywestcentral"
+  },
+  {
+    "name": "Standard_NV36ads_A10_v5",
+    "zone": "germanywestcentral"
+  },
+  {
+    "name": "Standard_NV72ads_A10_v5",
+    "zone": "germanywestcentral"
+  },
+  {
+    "name": "Standard_NV4as_v4",
+    "zone": "germanywestcentral"
+  },
+  {
+    "name": "Standard_NV8as_v4",
+    "zone": "germanywestcentral"
+  },
+  {
+    "name": "Standard_NV16as_v4",
+    "zone": "germanywestcentral"
+  },
+  {
+    "name": "Standard_NV32as_v4",
+    "zone": "germanywestcentral"
+  },
+  {
     "name": "Standard_L8as_v3",
     "zone": "germanywestcentral"
   },
@@ -53733,22 +53749,6 @@
   },
   {
     "name": "Standard_L80as_v3",
-    "zone": "germanywestcentral"
-  },
-  {
-    "name": "Standard_NV4as_v4",
-    "zone": "germanywestcentral"
-  },
-  {
-    "name": "Standard_NV8as_v4",
-    "zone": "germanywestcentral"
-  },
-  {
-    "name": "Standard_NV16as_v4",
-    "zone": "germanywestcentral"
-  },
-  {
-    "name": "Standard_NV32as_v4",
     "zone": "germanywestcentral"
   },
   {
@@ -55968,19 +55968,7 @@
     "zone": "italynorth"
   },
   {
-    "name": "Standard_NV4as_v4",
-    "zone": "italynorth"
-  },
-  {
-    "name": "Standard_NV8as_v4",
-    "zone": "italynorth"
-  },
-  {
-    "name": "Standard_NV16as_v4",
-    "zone": "italynorth"
-  },
-  {
-    "name": "Standard_NV32as_v4",
+    "name": "Standard_ND96amsr_A100_v4",
     "zone": "italynorth"
   },
   {
@@ -55997,6 +55985,46 @@
   },
   {
     "name": "Standard_NC64as_T4_v3",
+    "zone": "italynorth"
+  },
+  {
+    "name": "Standard_NV6ads_A10_v5",
+    "zone": "italynorth"
+  },
+  {
+    "name": "Standard_NV12ads_A10_v5",
+    "zone": "italynorth"
+  },
+  {
+    "name": "Standard_NV18ads_A10_v5",
+    "zone": "italynorth"
+  },
+  {
+    "name": "Standard_NV36adms_A10_v5",
+    "zone": "italynorth"
+  },
+  {
+    "name": "Standard_NV36ads_A10_v5",
+    "zone": "italynorth"
+  },
+  {
+    "name": "Standard_NV72ads_A10_v5",
+    "zone": "italynorth"
+  },
+  {
+    "name": "Standard_NV4as_v4",
+    "zone": "italynorth"
+  },
+  {
+    "name": "Standard_NV8as_v4",
+    "zone": "italynorth"
+  },
+  {
+    "name": "Standard_NV16as_v4",
+    "zone": "italynorth"
+  },
+  {
+    "name": "Standard_NV32as_v4",
     "zone": "italynorth"
   },
   {
@@ -56052,34 +56080,6 @@
     "zone": "italynorth"
   },
   {
-    "name": "Standard_NV6ads_A10_v5",
-    "zone": "italynorth"
-  },
-  {
-    "name": "Standard_NV12ads_A10_v5",
-    "zone": "italynorth"
-  },
-  {
-    "name": "Standard_NV18ads_A10_v5",
-    "zone": "italynorth"
-  },
-  {
-    "name": "Standard_NV36adms_A10_v5",
-    "zone": "italynorth"
-  },
-  {
-    "name": "Standard_NV36ads_A10_v5",
-    "zone": "italynorth"
-  },
-  {
-    "name": "Standard_NV72ads_A10_v5",
-    "zone": "italynorth"
-  },
-  {
-    "name": "Standard_ND96amsr_A100_v4",
-    "zone": "italynorth"
-  },
-  {
     "name": "Standard_NC24ads_A100_v4",
     "zone": "italynorth"
   },
@@ -56090,6 +56090,34 @@
   {
     "name": "Standard_NC96ads_A100_v4",
     "zone": "italynorth"
+  },
+  {
+    "name": "Standard_A1_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_A2m_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_A2_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_A4m_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_A4_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_A8m_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_A8_v2",
+    "zone": "norwayeast"
   },
   {
     "name": "Standard_B1ls",
@@ -56132,95 +56160,123 @@
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D1_v2",
+    "name": "Standard_D2ds_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D2_v2",
+    "name": "Standard_D4ds_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D3_v2",
+    "name": "Standard_D8ds_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D4_v2",
+    "name": "Standard_D16ds_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D5_v2",
+    "name": "Standard_D32ds_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D11_v2",
+    "name": "Standard_D48ds_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D12_v2",
+    "name": "Standard_D64ds_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D13_v2",
+    "name": "Standard_D2ds_v5",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D14_v2",
+    "name": "Standard_D4ds_v5",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D15_v2",
+    "name": "Standard_D8ds_v5",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D2_v2_Promo",
+    "name": "Standard_D16ds_v5",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D3_v2_Promo",
+    "name": "Standard_D32ds_v5",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D4_v2_Promo",
+    "name": "Standard_D48ds_v5",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D5_v2_Promo",
+    "name": "Standard_D64ds_v5",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D11_v2_Promo",
+    "name": "Standard_D96ds_v5",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D12_v2_Promo",
+    "name": "Standard_D2d_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D13_v2_Promo",
+    "name": "Standard_D4d_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D14_v2_Promo",
+    "name": "Standard_D8d_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_F1",
+    "name": "Standard_D16d_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_F2",
+    "name": "Standard_D32d_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_F4",
+    "name": "Standard_D48d_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_F8",
+    "name": "Standard_D64d_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_F16",
+    "name": "Standard_D2d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D4d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D8d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D16d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D32d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D48d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D64d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D96d_v5",
     "zone": "norwayeast"
   },
   {
@@ -56324,51 +56380,163 @@
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_F1s",
+    "name": "Standard_D2s_v3",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_F2s",
+    "name": "Standard_D4s_v3",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_F4s",
+    "name": "Standard_D8s_v3",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_F8s",
+    "name": "Standard_D16s_v3",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_F16s",
+    "name": "Standard_D32s_v3",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_A1_v2",
+    "name": "Standard_D48s_v3",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_A2m_v2",
+    "name": "Standard_D64s_v3",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_A2_v2",
+    "name": "Standard_D2s_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_A4m_v2",
+    "name": "Standard_D4s_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_A4_v2",
+    "name": "Standard_D8s_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_A8m_v2",
+    "name": "Standard_D16s_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_A8_v2",
+    "name": "Standard_D32s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D48s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D64s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D2s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D4s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D8s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D16s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D32s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D48s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D64s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D96s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D1_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D2_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D3_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D4_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D5_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D11_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D12_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D13_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D14_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D15_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D2_v2_Promo",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D3_v2_Promo",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D4_v2_Promo",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D5_v2_Promo",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D11_v2_Promo",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D12_v2_Promo",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D13_v2_Promo",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D14_v2_Promo",
     "zone": "norwayeast"
   },
   {
@@ -56400,31 +56568,395 @@
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D2s_v3",
+    "name": "Standard_D2_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D4s_v3",
+    "name": "Standard_D4_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D8s_v3",
+    "name": "Standard_D8_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D16s_v3",
+    "name": "Standard_D16_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D32s_v3",
+    "name": "Standard_D32_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D48s_v3",
+    "name": "Standard_D48_v4",
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_D64s_v3",
+    "name": "Standard_D64_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D2_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D4_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D8_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D16_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D32_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D48_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D64_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D96_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F1",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F8",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F16",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F1s",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F2s",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F4s",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F8s",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F16s",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F2s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F4s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F8s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F16s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F32s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F48s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F64s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_F72s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D2ls_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D4ls_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D8ls_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D16ls_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D32ls_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D48ls_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D64ls_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D96ls_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D2lds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D4lds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D8lds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D16lds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D32lds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D48lds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D64lds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D96lds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B2ls_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B2s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B2ts_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B4ls_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B4s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B8ls_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B8s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B16ls_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B16s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B32ls_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B32s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M64",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M64m",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M128",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M128m",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M8-2ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M8-4ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M8ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M16-4ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M16-8ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M16ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M32-8ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M32-16ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M32ls",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M32ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M32ts",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M64-16ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M64-32ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M64ls",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M64ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M64s",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M128-32ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M128-64ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M128ms",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M128s",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M32ms_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M64ms_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M64s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M128ms_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M128s_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M192ims_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M192is_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M32dms_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M64dms_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M64ds_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M128dms_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M128ds_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M192idms_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_M192ids_v2",
     "zone": "norwayeast"
   },
   {
@@ -56453,6 +56985,1070 @@
   },
   {
     "name": "Standard_E48_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4-2s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-2s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-4s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-4s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-8s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E20s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-8s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-16s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-16s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-32s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64s_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_L8as_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_L16as_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_L32as_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_L48as_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_L64as_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_L80as_v3",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D2a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D4a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D8a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D16a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D32a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D48a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D64a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D96a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D2as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D4as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D8as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D16as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D32as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D48as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D64as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D96as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E20a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96a_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4-2as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-2as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-4as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-4as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-8as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E20as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-8as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-16as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-16as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-32as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96-24as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96-48as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96as_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D2as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D4as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D8as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D16as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D32as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D48as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D64as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D96as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4-2as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-2as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-4as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-4as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-8as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E20as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-8as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-16as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-16as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-32as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96-24as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96-48as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96as_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D2ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D4ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D8ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D16ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D32ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D48ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D64ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_D96ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4-2ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-2ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-4ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-4ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-8ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E20ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-8ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-16ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-16ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-32ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96-24ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96-48ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96ads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4-2ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-2ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-4ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-4ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-8ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E20ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-8ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-16ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-16ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-32ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64ds_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4-2ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-2ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-4ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-4ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-8ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E20ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-8ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-16ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-16ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-32ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96-24ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96-48ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96ds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E104ids_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2d_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4d_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8d_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16d_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E20d_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32d_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48d_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64d_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E20d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96d_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E104id_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4-2s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-2s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-4s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-4s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-8s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E20s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-8s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-16s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-16s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-32s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64s_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4-2s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-2s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8-4s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-4s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16-8s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E20s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-8s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32-16s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-16s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64-32s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96-24s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96-48s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96s_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E104is_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E20_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64_v4",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E20_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E96_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E104i_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2bs_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4bs_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8bs_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16bs_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32bs_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48bs_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64bs_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E112ibs_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E2bds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E4bds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E8bds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E16bds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E32bds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E48bds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E64bds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E112ibds_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E112ias_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_E112iads_v5",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B2als_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B2as_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B2ats_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B4als_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B4as_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B8als_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B8as_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B16als_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B16as_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B32als_v2",
+    "zone": "norwayeast"
+  },
+  {
+    "name": "Standard_B32as_v2",
     "zone": "norwayeast"
   },
   {
@@ -56460,1427 +58056,7 @@
     "zone": "norwayeast"
   },
   {
-    "name": "Standard_E64_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4-2s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-2s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-4s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-4s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-8s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E20s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-8s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-16s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-16s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-32s_v3",
-    "zone": "norwayeast"
-  },
-  {
     "name": "Standard_E64is_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D96ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D96d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D96s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D96_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4-2ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-2ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-4ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-4ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-8ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E20ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-8ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-16ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-16ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-32ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64ds_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4-2ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-2ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-4ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-4ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-8ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E20ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-8ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-16ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-16ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-32ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96-24ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96-48ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96ds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E104ids_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E20d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64d_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E20d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96d_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E104id_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4-2s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-2s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-4s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-4s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-8s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E20s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-8s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-16s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-16s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-32s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64s_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4-2s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-2s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-4s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-4s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-8s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E20s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-8s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-16s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-16s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-32s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96-24s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96-48s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96s_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E104is_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E20_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E20_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E104i_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_F2s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_F4s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_F8s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_F16s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_F32s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_F48s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_F64s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_F72s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2bs_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4bs_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8bs_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16bs_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32bs_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48bs_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64bs_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E112ibs_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2bds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4bds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8bds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16bds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32bds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48bds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64bds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E112ibds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2ls_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4ls_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8ls_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16ls_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32ls_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48ls_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64ls_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D96ls_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2lds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4lds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8lds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16lds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32lds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48lds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64lds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D96lds_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B2ls_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B2s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B2ts_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B4ls_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B4s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B8ls_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B8s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B16ls_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B16s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B32ls_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B32s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D96a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D96as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E20a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96a_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4-2as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-2as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-4as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-4as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-8as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E20as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-8as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-16as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-16as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-32as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96-24as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96-48as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96as_v4",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D96as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4-2as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-2as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-4as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-4as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-8as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E20as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-8as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-16as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-16as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-32as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96-24as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96-48as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96as_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E112ias_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D2ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D4ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D8ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D16ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D32ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D48ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D64ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_D96ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E2ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4-2ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E4ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-2ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8-4ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E8ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-4ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16-8ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E16ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E20ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-8ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32-16ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E32ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E48ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-16ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64-32ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E64ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96-24ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96-48ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E96ads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_E112iads_v5",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B2als_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B2as_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B2ats_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B4als_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B4as_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B8als_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B8as_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B16als_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B16as_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B32als_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_B32as_v2",
     "zone": "norwayeast"
   },
   {
@@ -57913,182 +58089,6 @@
   },
   {
     "name": "Standard_NV48s_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_L8as_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_L16as_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_L32as_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_L48as_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_L64as_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_L80as_v3",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M64",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M64m",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M128",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M128m",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M8-2ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M8-4ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M8ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M16-4ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M16-8ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M16ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M32-8ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M32-16ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M32ls",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M32ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M32ts",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M64-16ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M64-32ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M64ls",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M64ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M64s",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M128-32ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M128-64ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M128ms",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M128s",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M32ms_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M64ms_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M64s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M128ms_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M128s_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M192ims_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M192is_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M32dms_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M64dms_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M64ds_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M128dms_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M128ds_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M192idms_v2",
-    "zone": "norwayeast"
-  },
-  {
-    "name": "Standard_M192ids_v2",
     "zone": "norwayeast"
   },
   {
@@ -61704,15 +61704,103 @@
     "zone": "switzerlandnorth"
   },
   {
+    "name": "Standard_M208ms_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M208s_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M416-208s_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M416s_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M416-208ms_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M416ms_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M416s_8_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
     "name": "Standard_M64",
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M64m",
+    "name": "Standard_M128",
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M128",
+    "name": "Standard_M32ls",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M32ts",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M64ls",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M64s",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M128s",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M32ms_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M64ms_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M64s_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M128s_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M192is_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M32dms_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M64dms_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M64ds_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M128ds_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M192ids_v2",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_M64m",
     "zone": "switzerlandnorth"
   },
   {
@@ -61752,15 +61840,7 @@
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M32ls",
-    "zone": "switzerlandnorth"
-  },
-  {
     "name": "Standard_M32ms",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_M32ts",
     "zone": "switzerlandnorth"
   },
   {
@@ -61772,15 +61852,7 @@
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M64ls",
-    "zone": "switzerlandnorth"
-  },
-  {
     "name": "Standard_M64ms",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_M64s",
     "zone": "switzerlandnorth"
   },
   {
@@ -61796,27 +61868,7 @@
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M128s",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_M32ms_v2",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_M64ms_v2",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_M64s_v2",
-    "zone": "switzerlandnorth"
-  },
-  {
     "name": "Standard_M128ms_v2",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_M128s_v2",
     "zone": "switzerlandnorth"
   },
   {
@@ -61824,323 +61876,11 @@
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M192is_v2",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_M32dms_v2",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_M64dms_v2",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_M64ds_v2",
-    "zone": "switzerlandnorth"
-  },
-  {
     "name": "Standard_M128dms_v2",
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M128ds_v2",
-    "zone": "switzerlandnorth"
-  },
-  {
     "name": "Standard_M192idms_v2",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_M192ids_v2",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E2a_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E4a_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E8a_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E16a_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E20a_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E32a_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E48a_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E64a_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E96a_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E2as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E4-2as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E4as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E8-2as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E8-4as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E8as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E16-4as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E16-8as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E16as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E20as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E32-8as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E32-16as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E32as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E48as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E64-16as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E64-32as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E64as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E96-24as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E96-48as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E96as_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E2as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E4-2as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E4as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E8-2as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E8-4as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E8as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E16-4as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E16-8as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E16as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E20as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E32-8as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E32-16as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E32as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E48as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E64-16as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E64-32as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E64as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E96-24as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E96-48as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E96as_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E112ias_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_D96ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E2ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E4-2ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E4ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E8-2ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E8-4ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E8ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E16-4ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E16-8ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E16ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E20ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E32-8ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E32-16ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E32ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E48ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E64-16ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E64-32ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E64ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E96-24ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E96-48ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E96ads_v5",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_E112iads_v5",
     "zone": "switzerlandnorth"
   },
   {
@@ -62160,31 +61900,291 @@
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M208ms_v2",
+    "name": "Standard_E2a_v4",
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M208s_v2",
+    "name": "Standard_E4a_v4",
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M416-208s_v2",
+    "name": "Standard_E8a_v4",
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M416s_v2",
+    "name": "Standard_E16a_v4",
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M416-208ms_v2",
+    "name": "Standard_E20a_v4",
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M416ms_v2",
+    "name": "Standard_E32a_v4",
     "zone": "switzerlandnorth"
   },
   {
-    "name": "Standard_M416s_8_v2",
+    "name": "Standard_E48a_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E64a_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E96a_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E2as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E4-2as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E4as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E8-2as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E8-4as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E8as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E16-4as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E16-8as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E16as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E20as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E32-8as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E32-16as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E32as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E48as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E64-16as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E64-32as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E64as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E96-24as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E96-48as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E96as_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E2as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E4-2as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E4as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E8-2as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E8-4as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E8as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E16-4as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E16-8as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E16as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E20as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E32-8as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E32-16as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E32as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E48as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E64-16as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E64-32as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E64as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E96-24as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E96-48as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E96as_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E112ias_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_D96ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E2ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E4-2ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E4ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E8-2ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E8-4ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E8ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E16-4ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E16-8ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E16ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E20ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E32-8ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E32-16ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E32ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E48ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E64-16ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E64-32ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E64ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E96-24ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E96-48ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E96ads_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_E112iads_v5",
     "zone": "switzerlandnorth"
   },
   {
@@ -62241,6 +62241,18 @@
   },
   {
     "name": "Standard_NV72ads_A10_v5",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_NC24ads_A100_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_NC48ads_A100_v4",
+    "zone": "switzerlandnorth"
+  },
+  {
+    "name": "Standard_NC96ads_A100_v4",
     "zone": "switzerlandnorth"
   },
   {
@@ -62305,18 +62317,6 @@
   },
   {
     "name": "Standard_DC48ds_v3",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_NC24ads_A100_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_NC48ads_A100_v4",
-    "zone": "switzerlandnorth"
-  },
-  {
-    "name": "Standard_NC96ads_A100_v4",
     "zone": "switzerlandnorth"
   },
   {
@@ -65140,6 +65140,550 @@
     "zone": "uaenorth"
   },
   {
+    "name": "Standard_NV6s_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_NV12s_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_NV24s_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_NV12s_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_NV24s_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_NV48s_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC1s_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC2s_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC4s_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC8s_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC16s_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC24s_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC32s_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC48s_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC1ds_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC2ds_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC4ds_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC8ds_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC16ds_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC24ds_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC32ds_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_DC48ds_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D2a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D4a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D8a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D16a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D32a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D48a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D64a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D96a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D2as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D4as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D8as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D16as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D32as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D48as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D64as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D96as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E2a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E4a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E8a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E16a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E20a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E32a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E48a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E64a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E96a_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E2as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E4-2as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E4as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E8-2as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E8-4as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E8as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E16-4as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E16-8as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E16as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E20as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E32-8as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E32-16as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E32as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E48as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E64-16as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E64-32as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E64as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E96-24as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E96-48as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E96as_v4",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D2as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D4as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D8as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D16as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D32as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D48as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D64as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D96as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E2as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E4-2as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E4as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E8-2as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E8-4as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E8as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E16-4as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E16-8as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E16as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E20as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E32-8as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E32-16as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E32as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E48as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E64-16as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E64-32as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E64as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E96-24as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E96-48as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E96as_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E112ias_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D2ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D4ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D8ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D16ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D32ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D48ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D64ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_D96ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E2ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E4-2ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E4ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E8-2ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E8-4ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E8ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E16-4ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E16-8ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E16ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E20ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E32-8ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E32-16ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E32ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E48ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E64-16ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E64-32ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E64ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E96-24ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E96-48ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E96ads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_E112iads_v5",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_B2als_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_B2as_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_B2ats_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_B4als_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_B4as_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_B8als_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_B8as_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_B16als_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_B16as_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_B32als_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_B32as_v2",
+    "zone": "uaenorth"
+  },
+  {
     "name": "Standard_D2ds_v5",
     "zone": "uaenorth"
   },
@@ -65688,67 +66232,31 @@
     "zone": "uaenorth"
   },
   {
-    "name": "Standard_DC1s_v3",
+    "name": "Standard_M208ms_v2",
     "zone": "uaenorth"
   },
   {
-    "name": "Standard_DC2s_v3",
+    "name": "Standard_M208s_v2",
     "zone": "uaenorth"
   },
   {
-    "name": "Standard_DC4s_v3",
+    "name": "Standard_M416-208s_v2",
     "zone": "uaenorth"
   },
   {
-    "name": "Standard_DC8s_v3",
+    "name": "Standard_M416s_v2",
     "zone": "uaenorth"
   },
   {
-    "name": "Standard_DC16s_v3",
+    "name": "Standard_M416-208ms_v2",
     "zone": "uaenorth"
   },
   {
-    "name": "Standard_DC24s_v3",
+    "name": "Standard_M416ms_v2",
     "zone": "uaenorth"
   },
   {
-    "name": "Standard_DC32s_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_DC48s_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_DC1ds_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_DC2ds_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_DC4ds_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_DC8ds_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_DC16ds_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_DC24ds_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_DC32ds_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_DC48ds_v3",
+    "name": "Standard_M416s_8_v2",
     "zone": "uaenorth"
   },
   {
@@ -65901,538 +66409,6 @@
   },
   {
     "name": "Standard_M192idms_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_L8as_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_L16as_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_L32as_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_L48as_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_L64as_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_L80as_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D2a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D4a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D8a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D16a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D32a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D48a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D64a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D96a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D2as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D4as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D8as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D16as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D32as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D48as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D64as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D96as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E2a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E4a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E8a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E16a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E20a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E32a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E48a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E64a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E96a_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E2as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E4-2as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E4as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E8-2as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E8-4as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E8as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E16-4as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E16-8as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E16as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E20as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E32-8as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E32-16as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E32as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E48as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E64-16as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E64-32as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E64as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E96-24as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E96-48as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E96as_v4",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D2as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D4as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D8as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D16as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D32as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D48as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D64as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D96as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E2as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E4-2as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E4as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E8-2as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E8-4as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E8as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E16-4as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E16-8as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E16as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E20as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E32-8as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E32-16as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E32as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E48as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E64-16as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E64-32as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E64as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E96-24as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E96-48as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E96as_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D2ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D4ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D8ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D16ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D32ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D48ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D64ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_D96ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E2ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E4-2ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E4ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E8-2ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E8-4ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E8ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E16-4ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E16-8ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E16ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E20ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E32-8ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E32-16ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E32ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E48ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E64-16ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E64-32ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E64ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E96-24ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E96-48ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E96ads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_M208ms_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_M208s_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_M416-208s_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_M416s_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_M416-208ms_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_M416ms_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_M416s_8_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_B2als_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_B2as_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_B2ats_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_B4als_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_B4as_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_B8als_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_B8as_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_B16als_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_B16as_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_B32als_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_B32as_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E112ias_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_E112iads_v5",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_NV6s_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_NV12s_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_NV24s_v2",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_NV12s_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_NV24s_v3",
-    "zone": "uaenorth"
-  },
-  {
-    "name": "Standard_NV48s_v3",
     "zone": "uaenorth"
   },
   {
@@ -66453,6 +66429,30 @@
   },
   {
     "name": "Standard_HB120rs_v2",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_L8as_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_L16as_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_L32as_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_L48as_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_L64as_v3",
+    "zone": "uaenorth"
+  },
+  {
+    "name": "Standard_L80as_v3",
     "zone": "uaenorth"
   },
   {
@@ -74680,6 +74680,26 @@
     "zone": "northcentralus"
   },
   {
+    "name": "Standard_HB120-16rs_v2",
+    "zone": "northcentralus"
+  },
+  {
+    "name": "Standard_HB120-32rs_v2",
+    "zone": "northcentralus"
+  },
+  {
+    "name": "Standard_HB120-64rs_v2",
+    "zone": "northcentralus"
+  },
+  {
+    "name": "Standard_HB120-96rs_v2",
+    "zone": "northcentralus"
+  },
+  {
+    "name": "Standard_HB120rs_v2",
+    "zone": "northcentralus"
+  },
+  {
     "name": "Standard_NV6",
     "zone": "northcentralus"
   },
@@ -74701,26 +74721,6 @@
   },
   {
     "name": "Standard_NV24_Promo",
-    "zone": "northcentralus"
-  },
-  {
-    "name": "Standard_HB120-16rs_v2",
-    "zone": "northcentralus"
-  },
-  {
-    "name": "Standard_HB120-32rs_v2",
-    "zone": "northcentralus"
-  },
-  {
-    "name": "Standard_HB120-64rs_v2",
-    "zone": "northcentralus"
-  },
-  {
-    "name": "Standard_HB120-96rs_v2",
-    "zone": "northcentralus"
-  },
-  {
-    "name": "Standard_HB120rs_v2",
     "zone": "northcentralus"
   },
   {
@@ -79588,83 +79588,31 @@
     "zone": "japanwest"
   },
   {
-    "name": "Standard_DC1s_v3",
+    "name": "Standard_M208ms_v2",
     "zone": "japanwest"
   },
   {
-    "name": "Standard_DC2s_v3",
+    "name": "Standard_M208s_v2",
     "zone": "japanwest"
   },
   {
-    "name": "Standard_DC4s_v3",
+    "name": "Standard_M416-208ms_v2",
     "zone": "japanwest"
   },
   {
-    "name": "Standard_DC8s_v3",
+    "name": "Standard_M416-208s_v2",
     "zone": "japanwest"
   },
   {
-    "name": "Standard_DC16s_v3",
+    "name": "Standard_M416ms_v2",
     "zone": "japanwest"
   },
   {
-    "name": "Standard_DC24s_v3",
+    "name": "Standard_M416s_8_v2",
     "zone": "japanwest"
   },
   {
-    "name": "Standard_DC32s_v3",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_DC48s_v3",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_DC1ds_v3",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_DC2ds_v3",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_DC4ds_v3",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_DC8ds_v3",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_DC16ds_v3",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_DC24ds_v3",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_DC32ds_v3",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_DC48ds_v3",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_M64",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_M64m",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_M128",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_M128m",
+    "name": "Standard_M416s_v2",
     "zone": "japanwest"
   },
   {
@@ -79748,6 +79696,86 @@
     "zone": "japanwest"
   },
   {
+    "name": "Standard_M64",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_M64m",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_M128",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_M128m",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC1s_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC2s_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC4s_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC8s_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC16s_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC24s_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC32s_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC48s_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC1ds_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC2ds_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC4ds_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC8ds_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC16ds_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC24ds_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC32ds_v3",
+    "zone": "japanwest"
+  },
+  {
+    "name": "Standard_DC48ds_v3",
+    "zone": "japanwest"
+  },
+  {
     "name": "Standard_M32ms_v2",
     "zone": "japanwest"
   },
@@ -79801,34 +79829,6 @@
   },
   {
     "name": "Standard_M192ids_v2",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_M208ms_v2",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_M208s_v2",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_M416-208ms_v2",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_M416-208s_v2",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_M416ms_v2",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_M416s_8_v2",
-    "zone": "japanwest"
-  },
-  {
-    "name": "Standard_M416s_v2",
     "zone": "japanwest"
   },
   {
@@ -80740,6 +80740,158 @@
     "zone": "jioindiawest"
   },
   {
+    "name": "Standard_M64",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M64m",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M128",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M128m",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M8-2ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M8-4ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M8ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M16-4ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M16-8ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M16ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M32-8ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M32-16ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M32ls",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M32ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M32ts",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M64-16ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M64-32ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M64ls",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M64ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M64s",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M128-32ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M128-64ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M128ms",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M128s",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M32ms_v2",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M64ms_v2",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M64s_v2",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M128ms_v2",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M128s_v2",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M192ims_v2",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M192is_v2",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M32dms_v2",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M64dms_v2",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M64ds_v2",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M128dms_v2",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M128ds_v2",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M192idms_v2",
+    "zone": "jioindiawest"
+  },
+  {
+    "name": "Standard_M192ids_v2",
+    "zone": "jioindiawest"
+  },
+  {
     "name": "Standard_D2ds_v4",
     "zone": "jioindiawest"
   },
@@ -81629,158 +81781,6 @@
   },
   {
     "name": "Standard_B32s_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M64",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M128",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M32ls",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M32ts",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M64ls",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M64s",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M128s",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M32ms_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M64ms_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M64s_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M128s_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M192is_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M32dms_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M64dms_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M64ds_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M128ds_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M192ids_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M64m",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M128m",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M8-2ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M8-4ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M8ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M16-4ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M16-8ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M16ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M32-8ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M32-16ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M32ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M64-16ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M64-32ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M64ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M128-32ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M128-64ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M128ms",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M128ms_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M192ims_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M128dms_v2",
-    "zone": "jioindiawest"
-  },
-  {
-    "name": "Standard_M192idms_v2",
     "zone": "jioindiawest"
   },
   {
@@ -95284,22 +95284,6 @@
     "zone": "canadaeast"
   },
   {
-    "name": "Standard_DC8_v2",
-    "zone": "canadaeast"
-  },
-  {
-    "name": "Standard_DC1s_v2",
-    "zone": "canadaeast"
-  },
-  {
-    "name": "Standard_DC2s_v2",
-    "zone": "canadaeast"
-  },
-  {
-    "name": "Standard_DC4s_v2",
-    "zone": "canadaeast"
-  },
-  {
     "name": "Standard_M208ms_v2",
     "zone": "canadaeast"
   },
@@ -95308,11 +95292,15 @@
     "zone": "canadaeast"
   },
   {
-    "name": "Standard_M416-208ms_v2",
+    "name": "Standard_M416-208s_v2",
     "zone": "canadaeast"
   },
   {
-    "name": "Standard_M416-208s_v2",
+    "name": "Standard_M416s_v2",
+    "zone": "canadaeast"
+  },
+  {
+    "name": "Standard_M416-208ms_v2",
     "zone": "canadaeast"
   },
   {
@@ -95324,7 +95312,55 @@
     "zone": "canadaeast"
   },
   {
-    "name": "Standard_M416s_v2",
+    "name": "Standard_E112ias_v5",
+    "zone": "canadaeast"
+  },
+  {
+    "name": "Standard_E112iads_v5",
+    "zone": "canadaeast"
+  },
+  {
+    "name": "Standard_B2als_v2",
+    "zone": "canadaeast"
+  },
+  {
+    "name": "Standard_B2as_v2",
+    "zone": "canadaeast"
+  },
+  {
+    "name": "Standard_B2ats_v2",
+    "zone": "canadaeast"
+  },
+  {
+    "name": "Standard_B4als_v2",
+    "zone": "canadaeast"
+  },
+  {
+    "name": "Standard_B4as_v2",
+    "zone": "canadaeast"
+  },
+  {
+    "name": "Standard_B8als_v2",
+    "zone": "canadaeast"
+  },
+  {
+    "name": "Standard_B8as_v2",
+    "zone": "canadaeast"
+  },
+  {
+    "name": "Standard_B16als_v2",
+    "zone": "canadaeast"
+  },
+  {
+    "name": "Standard_B16as_v2",
+    "zone": "canadaeast"
+  },
+  {
+    "name": "Standard_B32als_v2",
+    "zone": "canadaeast"
+  },
+  {
+    "name": "Standard_B32as_v2",
     "zone": "canadaeast"
   },
   {
@@ -95400,55 +95436,19 @@
     "zone": "canadaeast"
   },
   {
-    "name": "Standard_E112ias_v5",
+    "name": "Standard_DC8_v2",
     "zone": "canadaeast"
   },
   {
-    "name": "Standard_E112iads_v5",
+    "name": "Standard_DC1s_v2",
     "zone": "canadaeast"
   },
   {
-    "name": "Standard_B2als_v2",
+    "name": "Standard_DC2s_v2",
     "zone": "canadaeast"
   },
   {
-    "name": "Standard_B2as_v2",
-    "zone": "canadaeast"
-  },
-  {
-    "name": "Standard_B2ats_v2",
-    "zone": "canadaeast"
-  },
-  {
-    "name": "Standard_B4als_v2",
-    "zone": "canadaeast"
-  },
-  {
-    "name": "Standard_B4as_v2",
-    "zone": "canadaeast"
-  },
-  {
-    "name": "Standard_B8als_v2",
-    "zone": "canadaeast"
-  },
-  {
-    "name": "Standard_B8as_v2",
-    "zone": "canadaeast"
-  },
-  {
-    "name": "Standard_B16als_v2",
-    "zone": "canadaeast"
-  },
-  {
-    "name": "Standard_B16as_v2",
-    "zone": "canadaeast"
-  },
-  {
-    "name": "Standard_B32als_v2",
-    "zone": "canadaeast"
-  },
-  {
-    "name": "Standard_B32as_v2",
+    "name": "Standard_DC4s_v2",
     "zone": "canadaeast"
   },
   {
