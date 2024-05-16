@@ -107,3 +107,4 @@ venv.bak/
 *.id_rsa
 *.secrets
 pip-wheel-metadata/
+azure_move_image.lock

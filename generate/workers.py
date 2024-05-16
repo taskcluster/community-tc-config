@@ -455,6 +455,122 @@ def aws(
     return wp
 
 
+@lru_cache(maxsize=2)
+def azure_machine_types_by_location():
+    """
+    Return the set of machine types (such as "Standard_F32s_v2") in an Azure location.
+
+      location: The Azure location, such as "centralus"
+
+    The instances are read from config/azure-machine-type-offerings.json and
+    cached in memory.
+    See /misc/update-azure-machine-types.sh for how this file is generated and updated.
+    """
+    offerings_file = os.path.join(config_path(), "azure-machine-type-offerings.json")
+    with open(offerings_file, "r") as the_file:
+        data = json.load(the_file)
+    machine_types_by_zone = defaultdict(set)
+    for pair in data:
+        machine_types_by_zone[pair["zone"]].add(pair["name"])
+    return machine_types_by_zone
+
+
+@cloud
+def azure(
+    *,
+    image_set=None,
+    locations=None,
+    minCapacity=0,
+    maxCapacity=None,
+    instanceTypes=[
+        "Standard_F16s_v2",
+    ],
+    **cfg,
+):
+    """
+    Build a worker pool in Azure.
+
+      image_set: ImageSets.Item class instance with worker config, image names etc
+      locations: locations to deploy to (required)
+      minCapacity: minimum capacity to run at any time (default 0)
+      maxCapacity: maximum capacity to run at any time (required)
+      instanceTypes: list of instance types to provision (default Standard_F16s_v2)
+    """
+
+    assert maxCapacity, "must give a maxCapacity"
+    assert instanceTypes, "must give instanceTypes"
+
+    AZURE_PROVIDER = "community-tc-workers-azure"
+
+    # Use local yaml file for Azure network constants
+    # These constants are set in a separate file to be used by external services
+    # like the fuzzing team decision tasks
+    _config_path = os.path.join(os.path.dirname(__file__), "../config/azure.yml")
+    assert os.path.exists(_config_path), "Missing azure config in {}".format(_config_path)
+    azure_config = yaml.safe_load(open(_config_path))
+
+    # by default, deploy where there are images
+    if "locations" not in cfg:
+        locations = list(image_set.azure["images"])
+    assert locations, "must give locations"
+
+    imageIds = image_set.azure["images"]
+    assert imageIds, "must give imageIds"
+
+    launchConfigs = []
+    for location in locations:
+        subnetId = azure_config["subnets"][location]
+        for instanceType in instanceTypes:
+            # Filter out locations where the required instance type
+            # is not available.
+            if instanceType not in azure_machine_types_by_location()[location]:
+                continue
+            launchConfig = {
+                "capacityPerInstance": 1,
+                "location": location,
+                "launchConfig": {
+                    "storageProfile": {
+                        "osDisk": {
+                            "osType": "Windows",
+                            "caching": "ReadOnly",
+                            "createOption": "FromImage",
+                            "diffDiskSettings": {
+                                "option": "Local",
+                            },
+                        },
+                        "imageReference": {
+                            "id": imageIds[location],
+                        },
+                    },
+                    "osProfile": {
+                        "windowsConfiguration": {
+                            "timeZone": "UTC",
+                            "enableAutomaticUpdates": False,
+                        },
+                    },
+                    "subnetId": subnetId,
+                    "priority": "spot",
+                    "evictionPolicy": "Delete",
+                    "hardwareProfile": {
+                        "vmSize": instanceType,
+                    },
+                },
+            }
+            launchConfigs.append(launchConfig)
+    assert launchConfigs, (
+        f"The locations {locations} do not support instance types"
+        f" {instanceTypes}"
+    )
+
+    wp = DynamicWorkerPoolSettings(AZURE_PROVIDER)
+    wp.config = {
+        "minCapacity": minCapacity,
+        "maxCapacity": maxCapacity,
+        "launchConfigs": launchConfigs,
+    }
+    return wp
+
+
 @worker_implementation
 def generic_worker(wp, **cfg):
     # Default value, if config value not known (static worker pools define

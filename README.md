@@ -85,7 +85,7 @@ These regular expressions describe resource IDs of resources that are managed ex
 
 ### Image Sets
 
-To build a set of machine images in GCP/AWS, see the [imagesets](/imagesets) subdirectory.
+To build a set of machine images in GCP/AWS/Azure, see the [imagesets](/imagesets) subdirectory.
 
 ### Code Style
 

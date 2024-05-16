@@ -18,5 +18,6 @@ class ImageSets(ConfigDict):
         name = attr.ib(type=str)
         workerImplementation = attr.ib(type=str)
         aws = attr.ib(type=dict, factory=lambda: {})
+        azure = attr.ib(type=dict, factory=lambda: {})
         gcp = attr.ib(type=dict, factory=lambda: {})
         workerConfig = attr.ib(type=dict, factory=lambda: {})

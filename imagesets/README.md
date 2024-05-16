@@ -2,7 +2,7 @@
 
 ## Prerequisite Steps
 
-The AWS/GCP image set building machinery requires the following configuration
+The AWS/Azure/GCP image set building machinery requires the following configuration
 to be present:
 
 1) Depending on which cloud you will be deploying to:
@@ -11,6 +11,12 @@ to be present:
 
        You will need an AWS access key configured under `~/.aws` on your host,
        and 2FA should be enabled on your AWS account.
+
+     * Azure only:
+
+       You will need an az installed on your host, and you will need to logon on
+       your host (`az login`) in order that `~/.azure` folder holds your logon
+       information.
 
      * GCP only:
 
@@ -60,6 +66,13 @@ to be present:
  
          No additional steps needed, you will be prompted for MFA codes as necessary.
 
+     * Azure only:
+
+       First, run `export AZURE_IMAGE_RESOURCE_GROUP=<your Azure resource group of choice to deploy image into>`
+       (typically `rg-tc-eng-images`). Worker Manager spawns instances in resource group
+       `rg-tc-eng-worker-manager-VMs` but typically the machine images are stored in resource group
+       `rg-tc-eng-images`.
+
      * GCP only:
 
        First run `export GCP_PROJECT=<your google cloud project of choice to deploy image into>`
@@ -77,7 +90,7 @@ to be able to build image sets.
 To update/delete the image set `IMAGE_SET` whose definition is in the
 subdirectory `<IMAGE_SET>`:
 
-  * `./imageset-under-docker.sh (aws|google) (delete|update) IMAGE_SET`
+  * `./imageset-under-docker.sh (aws|azure|google) (delete|update) IMAGE_SET`
 
 This will launch a docker container to build the image set.
 
@@ -85,11 +98,12 @@ This will launch a docker container to build the image set.
 
 If you instead prefer to build an image set natively on your host (not using docker):
 
-  * `./imageset.sh (aws|google) (delete|update) IMAGE_SET`
+  * `./imageset.sh (aws|azure|google) (delete|update) IMAGE_SET`
 
 All of the following tools must be available in the `PATH`:
 
   * `aws`
+  * `az`
   * `basename`
   * `bash`
   * `cat`
@@ -99,6 +113,7 @@ All of the following tools must be available in the `PATH`:
   * `dirname`
   * `env`
   * `find`
+  * `flock`
   * `gcloud`
   * `git`
   * `grep`
