@@ -14,23 +14,9 @@
 
 cd "$(dirname "${0}")"
 
-rm '../config/azure-machine-type-offerings.json'
-locations=$(az account list-locations --query="[].name" --output tsv)
-
-list="["
-for location in $locations; do
-  types=$(az vm list-sizes --location $location --query="[].name" --output tsv 2>/dev/null || true)
-
-  for type in $types; do
-    list="$list{\"name\": \"$type\", \"zone\": \"$location\"},"
+rm -f '../config/azure-machine-type-offerings.json'
+az account list-locations --query="[].name" --output tsv | sort -u | while read location; do
+  az vm list-sizes --location $location --query="[].name" --output tsv 2>/dev/null | sort -u | while read type; do
+    echo -n "{\"name\": \"$type\", \"zone\": \"$location\"},"
   done
-done
-
-# Remove the last comma and add the closing bracket
-list="${list%?}"
-list="$list]"
-
-tempPath=$(mktemp)
-echo "$list" > $tempPath
-jq '.' $tempPath > ../config/azure-machine-type-offerings.json
-rm $tempPath
+done | sed 's/\(.*\)./[\1]/' | jq '.' > ../config/azure-machine-type-offerings.json
