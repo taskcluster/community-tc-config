@@ -203,7 +203,7 @@ function deploy {
       git commit -m "Built new AWS AMIs for imageset ${IMAGE_SET}"
       ;;
     azure)
-      git commit -m "Built new Azure machine image for imageset ${IMAGE_SET}"
+      git commit -m "Built new Azure machine images for imageset ${IMAGE_SET}"
       ;;
     google)
       git commit -m "Built new google machine image for imageset ${IMAGE_SET}"
