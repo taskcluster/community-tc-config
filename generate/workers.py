@@ -528,32 +528,30 @@ def azure(
             launchConfig = {
                 "capacityPerInstance": 1,
                 "location": location,
-                "launchConfig": {
-                    "storageProfile": {
-                        "osDisk": {
-                            "osType": "Windows",
-                            "caching": "ReadOnly",
-                            "createOption": "FromImage",
-                            "diffDiskSettings": {
-                                "option": "Local",
-                            },
-                        },
-                        "imageReference": {
-                            "id": imageIds[location],
+                "storageProfile": {
+                    "osDisk": {
+                        "osType": "Windows",
+                        "caching": "ReadOnly",
+                        "createOption": "FromImage",
+                        "diffDiskSettings": {
+                            "option": "Local",
                         },
                     },
-                    "osProfile": {
-                        "windowsConfiguration": {
-                            "timeZone": "UTC",
-                            "enableAutomaticUpdates": False,
-                        },
+                    "imageReference": {
+                        "id": imageIds[location],
                     },
-                    "subnetId": subnetId,
-                    "priority": "spot",
-                    "evictionPolicy": "Delete",
-                    "hardwareProfile": {
-                        "vmSize": instanceType,
+                },
+                "osProfile": {
+                    "windowsConfiguration": {
+                        "timeZone": "UTC",
+                        "enableAutomaticUpdates": False,
                     },
+                },
+                "subnetId": subnetId,
+                "priority": "spot",
+                "evictionPolicy": "Delete",
+                "hardwareProfile": {
+                    "vmSize": instanceType,
                 },
             }
             launchConfigs.append(launchConfig)
