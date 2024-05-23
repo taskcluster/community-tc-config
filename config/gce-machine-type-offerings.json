@@ -13016,6 +13016,10 @@
     "zone": "asia-southeast1-b"
   },
   {
+    "name": "a3-megagpu-8g",
+    "zone": "asia-southeast1-b"
+  },
+  {
     "name": "c2-standard-16",
     "zone": "asia-southeast1-b"
   },
@@ -30200,6 +30204,10 @@
     "zone": "europe-west3-b"
   },
   {
+    "name": "c3-highmem-176",
+    "zone": "europe-west3-b"
+  },
+  {
     "name": "c3-highmem-22",
     "zone": "europe-west3-b"
   },
@@ -30213,6 +30221,10 @@
   },
   {
     "name": "c3-highmem-8",
+    "zone": "europe-west3-b"
+  },
+  {
+    "name": "c3-highmem-88",
     "zone": "europe-west3-b"
   },
   {
@@ -32425,6 +32437,10 @@
   },
   {
     "name": "a3-highgpu-8g",
+    "zone": "europe-west4-b"
+  },
+  {
+    "name": "a3-megagpu-8g",
     "zone": "europe-west4-b"
   },
   {
@@ -33456,6 +33472,10 @@
     "zone": "europe-west4-c"
   },
   {
+    "name": "a3-megagpu-8g",
+    "zone": "europe-west4-c"
+  },
+  {
     "name": "c2-standard-16",
     "zone": "europe-west4-c"
   },
@@ -47129,6 +47149,10 @@
   },
   {
     "name": "a3-highgpu-8g",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "a3-megagpu-8g",
     "zone": "us-central1-a"
   },
   {
@@ -49097,6 +49121,10 @@
   },
   {
     "name": "a3-highgpu-8g",
+    "zone": "us-central1-c"
+  },
+  {
+    "name": "a3-megagpu-8g",
     "zone": "us-central1-c"
   },
   {
@@ -55476,6 +55504,10 @@
     "zone": "us-east4-a"
   },
   {
+    "name": "a3-megagpu-8g",
+    "zone": "us-east4-a"
+  },
+  {
     "name": "c2-standard-16",
     "zone": "us-east4-a"
   },
@@ -56433,6 +56465,10 @@
   },
   {
     "name": "a3-highgpu-8g",
+    "zone": "us-east4-b"
+  },
+  {
+    "name": "a3-megagpu-8g",
     "zone": "us-east4-b"
   },
   {
@@ -58301,6 +58337,10 @@
   },
   {
     "name": "a3-highgpu-8g",
+    "zone": "us-east5-a"
+  },
+  {
+    "name": "a3-megagpu-8g",
     "zone": "us-east5-a"
   },
   {
@@ -59997,6 +60037,10 @@
   },
   {
     "name": "a3-highgpu-8g",
+    "zone": "us-east7-b"
+  },
+  {
+    "name": "a3-megagpu-8g",
     "zone": "us-east7-b"
   },
   {
@@ -61912,6 +61956,10 @@
     "zone": "us-west1-a"
   },
   {
+    "name": "a3-megagpu-8g",
+    "zone": "us-west1-a"
+  },
+  {
     "name": "c2-standard-16",
     "zone": "us-west1-a"
   },
@@ -62609,6 +62657,10 @@
   },
   {
     "name": "a3-highgpu-8g",
+    "zone": "us-west1-b"
+  },
+  {
+    "name": "a3-megagpu-8g",
     "zone": "us-west1-b"
   },
   {
@@ -66845,6 +66897,10 @@
   },
   {
     "name": "a3-highgpu-8g",
+    "zone": "us-west4-a"
+  },
+  {
+    "name": "a3-megagpu-8g",
     "zone": "us-west4-a"
   },
   {
