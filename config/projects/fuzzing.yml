@@ -115,6 +115,18 @@ fuzzing:
       instanceTypes:
         g4ad.xlarge: 1
         g4ad.2xlarge: 1
+    grizzly-reduce-worker-windows-ngpu:
+      owner: truber@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2022
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 10
+      instanceTypes:
+        m7i.2xlarge: 1
+        m7i.4xlarge: 1
+        c7i.2xlarge: 1
+        c7i.4xlarge: 1
   hooks:
     fuzzing-tc-config-community-update:
       description: Run Fuzzing pool rebuild when Community-TC config changes
@@ -264,6 +276,8 @@ fuzzing:
           - docker-worker:capability:privileged
           - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows/Administrators
           - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows
+          - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows-ngpu/Administrators
+          - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows-ngpu
           - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker*
           - queue:route:notify.email.truber@mozilla.com.on-failed
           - queue:scheduler-id:fuzzing
@@ -293,6 +307,10 @@ fuzzing:
           routingKeyPattern: primary.#.grizzly-reduce-worker-windows.fuzzing.#
         - exchange: exchange/taskcluster-queue/v1/task-failed
           routingKeyPattern: primary.#.grizzly-reduce-worker-windows.fuzzing.#
+        - exchange: exchange/taskcluster-queue/v1/task-exception
+          routingKeyPattern: primary.#.grizzly-reduce-worker-windows-ngpu.fuzzing.#
+        - exchange: exchange/taskcluster-queue/v1/task-failed
+          routingKeyPattern: primary.#.grizzly-reduce-worker-windows-ngpu.fuzzing.#
         - exchange: exchange/taskcluster-queue/v1/task-exception
           routingKeyPattern: primary.#.grizzly-reduce-worker.fuzzing.#
         - exchange: exchange/taskcluster-queue/v1/task-failed
@@ -742,6 +760,7 @@ fuzzing:
         - queue:create-task:highest:proj-fuzzing/*
         - queue:scheduler-id:-
         - queue:cancel-task:-/*
+        - queue:route:notify.*
         - secrets:get:project/fuzzing/*
         - worker-manager:manage-worker-pool:proj-fuzzing/*
         - worker-manager:provider:community-tc-workers-*
@@ -778,6 +797,8 @@ fuzzing:
         - docker-worker:capability:privileged
         - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows/Administrators
         - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows
+        - generic-worker:os-group:proj-fuzzing/grizzly-reduce-worker-windows-ngpu/Administrators
+        - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows-ngpu
         - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker*
         - secrets:get:project/fuzzing/deploy-bearspray
         - secrets:get:project/fuzzing/deploy-grizzly-private
