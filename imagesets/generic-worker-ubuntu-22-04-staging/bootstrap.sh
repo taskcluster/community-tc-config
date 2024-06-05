@@ -66,6 +66,10 @@ cat > /etc/modprobe.d/kvm-backdoor.conf << "EOF"
 options kvm enable_vmware_backdoor=y
 EOF
 
+# configure core dumps to be in the process' current directory with filename 'core'
+# (required for 3 legacy JS engine fuzzers)
+echo 'core' > /proc/sys/kernel/core_pattern
+
 # create group for running snap
 groupadd snap_sudo
 echo '%snap_sudo ALL=(ALL:ALL) NOPASSWD: /usr/bin/snap' | EDITOR='tee -a' visudo
@@ -152,6 +156,15 @@ system_info:
     network:
       renderers: [ 'netplan', 'eni', 'sysconfig' ]
 EOF
+
+# snd-aloop support
+echo 'options snd-aloop enable=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 index=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31' > /etc/modprobe.d/snd-aloop.conf
+echo 'snd-aloop' >> /etc/modules
+# apt-get install -y linux-generic
+# sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT="1>2"/' /etc/default/grub
+# sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="splash"/' /etc/default/grub
+# sed -i 's/GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX="debug g"/' /etc/default/grub
+# update-grub
 
 end_time="$(date '+%s')"
 echo "UserData execution took: $(($end_time - $start_time)) seconds"
