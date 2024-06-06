@@ -152,6 +152,16 @@ taskcluster:
       minCapacity: 0
       maxCapacity: 10
 
+    gw-windows-2022-gpu:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2022-gpu
+      cloud: azure
+      minCapacity: 0
+      maxCapacity: 3
+      instanceTypes:
+        Standard_NV12s_v3: 1
+
     old-docker-worker:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
@@ -232,7 +242,6 @@ taskcluster:
         - assume:project:taskcluster:worker-test-scopes
         - assume:worker-id:docker-worker/docker-worker
         - assume:worker-id:random-local-worker/docker-worker
-        - aws-provisioner:create-secret:*
         - docker-worker:cache:docker-worker-garbage-*
         - docker-worker:capability:device:hostSharedMemory
         - docker-worker:capability:device:hostSharedMemory:null-provisioner/*

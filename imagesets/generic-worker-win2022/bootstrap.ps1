@@ -216,6 +216,17 @@ choco install -y visualstudio2019buildtools --version 16.5.4.0 --package-paramet
 # install gcc for go race detector
 choco install -y mingw --version 11.2.0.07112021
 
+# Get information about the video controllers (GPUs)
+$gpuInfo = Get-WmiObject -Query "Select * From Win32_VideoController"
+
+# Check if any of the video controllers are from NVIDIA
+$hasNvidiaGpu = $gpuInfo | Where-Object { $_.Name -like "*NVIDIA*" }
+
+if ($hasNvidiaGpu) {
+  $client.DownloadFile("https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe", "C:\nvidia_driver.exe")
+  Start-Process "C:\nvidia_driver.exe" -ArgumentList "-s", "-noreboot" -Wait -NoNewWindow -PassThru
+}
+
 # now shutdown, in preparation for creating an image
 # Stop-Computer isn't working, also not when specifying -AsJob, so reverting to using `shutdown` command instead
 #   * https://www.reddit.com/r/PowerShell/comments/65250s/windows_10_creators_update_stopcomputer_not/dgfofug/?st=j1o3oa29&sh=e0c29c6d

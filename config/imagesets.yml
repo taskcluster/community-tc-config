@@ -152,13 +152,13 @@ generic-worker-win2022:
       us-east-2: ami-0ec83ef759ed8591a
   azure:
     images:
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-wzd4d00w8id6mpkndpp7-centralus
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-wzd4d00w8id6mpkndpp7-eastus
-      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-wzd4d00w8id6mpkndpp7-eastus2
-      northcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-wzd4d00w8id6mpkndpp7-northcentralus
-      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-wzd4d00w8id6mpkndpp7-southcentralus
-      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-wzd4d00w8id6mpkndpp7-westus
-      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-wzd4d00w8id6mpkndpp7-westus2
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-rlgv5xj1752it1ek3d9y-centralus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-rlgv5xj1752it1ek3d9y-eastus
+      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-rlgv5xj1752it1ek3d9y-eastus2
+      northcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-rlgv5xj1752it1ek3d9y-northcentralus
+      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-rlgv5xj1752it1ek3d9y-southcentralus
+      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-rlgv5xj1752it1ek3d9y-westus
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/generic-worker-win2022-rlgv5xj1752it1ek3d9y-westus2
   workerConfig:
     genericWorker:
       config:
@@ -171,7 +171,7 @@ generic-worker-win2022:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://github.com/taskcluster/community-tc-config/blob/57a68400a4c6f0832f75add22b947d8900e1216d/imagesets/generic-worker-win2022/bootstrap.ps1
+            script: https://github.com/taskcluster/community-tc-config/blob/04c12d9bc6ff975476ff53140144937ab0209e6f/imagesets/generic-worker-win2022/bootstrap.ps1
 generic-worker-win2016-amd:
   workerImplementation: generic-worker
   aws:
@@ -192,3 +192,26 @@ generic-worker-win2016-amd:
           machine-setup:
             maintainer: jkratzer@mozilla.com
             script: https://github.com/taskcluster/community-tc-config/blob/7fef75854da4a5cc23a09462b2ef33115e54c4e6/imagesets/generic-worker-win2016-amd/bootstrap.ps1
+generic-worker-win2022-gpu:
+  azure:
+    images:
+      centralus: placeholder
+      eastus: placeholder
+      eastus2: placeholder
+      northcentralus: placeholder
+      southcentralus: placeholder
+      westus: placeholder
+      westus2: placeholder
+  workerImplementation: generic-worker
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
+        livelogExecutable: C:\generic-worker\livelog.exe
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
+        shutdownMachineOnIdle: true
+        idleTimeoutSecs: 15
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: pmoore@mozilla.com
