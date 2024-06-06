@@ -565,7 +565,7 @@ function azure_update {
   log "Creating instance ${NAME_WITH_REGION}..."
   az vm create \
     --name="${NAME_WITH_REGION}" \
-    --image=MicrosoftWindowsServer:WindowsServer:2022-datacenter-azure-edition:latest \
+    --image=$(cat azure_image) \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
     --computer-name="ImageBuilder" \
     --os-disk-delete-option=Delete \
