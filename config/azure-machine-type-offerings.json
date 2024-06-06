@@ -4624,10 +4624,6 @@
     "zone": "australiaeast"
   },
   {
-    "name": "Standard_ND96isr_H100_v5",
-    "zone": "australiaeast"
-  },
-  {
     "name": "Standard_NV12ads_A10_v5",
     "zone": "australiaeast"
   },
@@ -8753,6 +8749,14 @@
   },
   {
     "name": "Standard_E96as_v5",
+    "zone": "brazilsouth"
+  },
+  {
+    "name": "Standard_E96bds_v5",
+    "zone": "brazilsouth"
+  },
+  {
+    "name": "Standard_E96bs_v5",
     "zone": "brazilsouth"
   },
   {
@@ -27940,6 +27944,10 @@
     "zone": "eastus2"
   },
   {
+    "name": "Standard_ND96isr_H100_v5",
+    "zone": "eastus2"
+  },
+  {
     "name": "Standard_NG16ads_V620_v1",
     "zone": "eastus2"
   },
@@ -44472,39 +44480,7 @@
     "zone": "jioindiawest"
   },
   {
-    "name": "Basic_A0",
-    "zone": "koreacentral"
-  },
-  {
-    "name": "Basic_A1",
-    "zone": "koreacentral"
-  },
-  {
-    "name": "Basic_A2",
-    "zone": "koreacentral"
-  },
-  {
-    "name": "Basic_A3",
-    "zone": "koreacentral"
-  },
-  {
-    "name": "Basic_A4",
-    "zone": "koreacentral"
-  },
-  {
-    "name": "Standard_A0",
-    "zone": "koreacentral"
-  },
-  {
-    "name": "Standard_A1",
-    "zone": "koreacentral"
-  },
-  {
     "name": "Standard_A1_v2",
-    "zone": "koreacentral"
-  },
-  {
-    "name": "Standard_A2",
     "zone": "koreacentral"
   },
   {
@@ -44516,31 +44492,11 @@
     "zone": "koreacentral"
   },
   {
-    "name": "Standard_A3",
-    "zone": "koreacentral"
-  },
-  {
-    "name": "Standard_A4",
-    "zone": "koreacentral"
-  },
-  {
     "name": "Standard_A4_v2",
     "zone": "koreacentral"
   },
   {
     "name": "Standard_A4m_v2",
-    "zone": "koreacentral"
-  },
-  {
-    "name": "Standard_A5",
-    "zone": "koreacentral"
-  },
-  {
-    "name": "Standard_A6",
-    "zone": "koreacentral"
-  },
-  {
-    "name": "Standard_A7",
     "zone": "koreacentral"
   },
   {
@@ -52621,10 +52577,6 @@
   },
   {
     "name": "Standard_NC8as_T4_v3",
-    "zone": "northcentralus"
-  },
-  {
-    "name": "Standard_ND96isr_H100_v5",
     "zone": "northcentralus"
   },
   {
@@ -61412,39 +61364,7 @@
     "zone": "qatarcentral"
   },
   {
-    "name": "Basic_A0",
-    "zone": "southafricanorth"
-  },
-  {
-    "name": "Basic_A1",
-    "zone": "southafricanorth"
-  },
-  {
-    "name": "Basic_A2",
-    "zone": "southafricanorth"
-  },
-  {
-    "name": "Basic_A3",
-    "zone": "southafricanorth"
-  },
-  {
-    "name": "Basic_A4",
-    "zone": "southafricanorth"
-  },
-  {
-    "name": "Standard_A0",
-    "zone": "southafricanorth"
-  },
-  {
-    "name": "Standard_A1",
-    "zone": "southafricanorth"
-  },
-  {
     "name": "Standard_A1_v2",
-    "zone": "southafricanorth"
-  },
-  {
-    "name": "Standard_A2",
     "zone": "southafricanorth"
   },
   {
@@ -61456,31 +61376,11 @@
     "zone": "southafricanorth"
   },
   {
-    "name": "Standard_A3",
-    "zone": "southafricanorth"
-  },
-  {
-    "name": "Standard_A4",
-    "zone": "southafricanorth"
-  },
-  {
     "name": "Standard_A4_v2",
     "zone": "southafricanorth"
   },
   {
     "name": "Standard_A4m_v2",
-    "zone": "southafricanorth"
-  },
-  {
-    "name": "Standard_A5",
-    "zone": "southafricanorth"
-  },
-  {
-    "name": "Standard_A6",
-    "zone": "southafricanorth"
-  },
-  {
-    "name": "Standard_A7",
     "zone": "southafricanorth"
   },
   {
@@ -63441,10 +63341,6 @@
   },
   {
     "name": "Standard_M8ms",
-    "zone": "southafricanorth"
-  },
-  {
-    "name": "Standard_ND96isr_H100_v5",
     "zone": "southafricanorth"
   },
   {
@@ -87013,6 +86909,10 @@
   },
   {
     "name": "Standard_L8as_v3",
+    "zone": "westcentralus"
+  },
+  {
+    "name": "Standard_ND96isr_H100_v5",
     "zone": "westcentralus"
   },
   {
