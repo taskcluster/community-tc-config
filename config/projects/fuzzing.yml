@@ -91,7 +91,7 @@ fuzzing:
     grizzly-reduce-worker:
       owner: truber@mozilla.com
       emailOnError: true
-      imageset: docker-worker
+      imageset: generic-worker-ubuntu-22-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
