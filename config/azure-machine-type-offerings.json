@@ -86912,10 +86912,6 @@
     "zone": "westcentralus"
   },
   {
-    "name": "Standard_ND96isr_H100_v5",
-    "zone": "westcentralus"
-  },
-  {
     "name": "Basic_A0",
     "zone": "westeurope"
   },
