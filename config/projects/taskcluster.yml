@@ -93,6 +93,32 @@ taskcluster:
             enableInteractive: true
             shutdownMachineOnInternalError: false
 
+    gw-ubuntu-24-04-aws:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-24-04
+      cloud: aws
+      minCapacity: 0
+      maxCapacity: 50
+      workerConfig:
+        genericWorker:
+          config:
+            enableInteractive: true
+            shutdownMachineOnInternalError: false
+
+    gw-ubuntu-24-04-gcp:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 50
+      workerConfig:
+        genericWorker:
+          config:
+            enableInteractive: true
+            shutdownMachineOnInternalError: false
+
     gw-ubuntu-22-04-arm64:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
