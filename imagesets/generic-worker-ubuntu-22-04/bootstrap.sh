@@ -50,6 +50,9 @@ retry apt-get -y remove docker docker.io containerd runc
 # build-essential is needed for running `go test -race` with the -vet=off flag as of go1.19
 retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common gzip python3-venv build-essential snapd
 
+# needed for kvm, see https://help.ubuntu.com/community/KVM/Installation
+retry apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
+
 # install docker
 retry curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
