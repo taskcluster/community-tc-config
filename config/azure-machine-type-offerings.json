@@ -71296,6 +71296,14 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_B16als_v2",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_B16as_v2",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_B16ls_v2",
     "zone": "spaincentral"
   },
@@ -71324,6 +71332,18 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_B2als_v2",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_B2as_v2",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_B2ats_v2",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_B2ls_v2",
     "zone": "spaincentral"
   },
@@ -71344,11 +71364,27 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_B32als_v2",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_B32as_v2",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_B32ls_v2",
     "zone": "spaincentral"
   },
   {
     "name": "Standard_B32s_v2",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_B4als_v2",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_B4as_v2",
     "zone": "spaincentral"
   },
   {
@@ -71361,6 +71397,14 @@
   },
   {
     "name": "Standard_B4s_v2",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_B8als_v2",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_B8as_v2",
     "zone": "spaincentral"
   },
   {
@@ -71424,6 +71468,22 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_D16a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D16ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D16as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D16as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_D16d_v4",
     "zone": "spaincentral"
   },
@@ -71484,6 +71544,22 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_D2a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D2ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D2as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D2as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_D2d_v4",
     "zone": "spaincentral"
   },
@@ -71529,6 +71605,22 @@
   },
   {
     "name": "Standard_D32_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D32a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D32ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D32as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D32as_v5",
     "zone": "spaincentral"
   },
   {
@@ -71588,6 +71680,22 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_D48a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D48ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D48as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D48as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_D48d_v4",
     "zone": "spaincentral"
   },
@@ -71641,6 +71749,22 @@
   },
   {
     "name": "Standard_D4_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D4a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D4ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D4as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D4as_v5",
     "zone": "spaincentral"
   },
   {
@@ -71700,6 +71824,22 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_D64a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D64ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D64as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D64as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_D64d_v4",
     "zone": "spaincentral"
   },
@@ -71748,6 +71888,22 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_D8a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D8ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D8as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D8as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_D8d_v4",
     "zone": "spaincentral"
   },
@@ -71785,6 +71941,22 @@
   },
   {
     "name": "Standard_D96_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D96a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D96ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D96as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_D96as_v5",
     "zone": "spaincentral"
   },
   {
@@ -71924,11 +72096,31 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_E112iads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E112ias_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_E112ibds_v5",
     "zone": "spaincentral"
   },
   {
     "name": "Standard_E112ibs_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E16-4ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E16-4as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E16-4as_v5",
     "zone": "spaincentral"
   },
   {
@@ -71949,6 +72141,18 @@
   },
   {
     "name": "Standard_E16-4s_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E16-8ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E16-8as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E16-8as_v5",
     "zone": "spaincentral"
   },
   {
@@ -71981,6 +72185,22 @@
   },
   {
     "name": "Standard_E16_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E16a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E16ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E16as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E16as_v5",
     "zone": "spaincentral"
   },
   {
@@ -72032,6 +72252,22 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_E20a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E20ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E20as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E20as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_E20d_v4",
     "zone": "spaincentral"
   },
@@ -72072,6 +72308,22 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_E2a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E2ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E2as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E2as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_E2bds_v5",
     "zone": "spaincentral"
   },
@@ -72108,6 +72360,18 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_E32-16ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E32-16as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E32-16as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_E32-16ds_v4",
     "zone": "spaincentral"
   },
@@ -72125,6 +72389,18 @@
   },
   {
     "name": "Standard_E32-16s_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E32-8ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E32-8as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E32-8as_v5",
     "zone": "spaincentral"
   },
   {
@@ -72157,6 +72433,22 @@
   },
   {
     "name": "Standard_E32_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E32a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E32ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E32as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E32as_v5",
     "zone": "spaincentral"
   },
   {
@@ -72196,6 +72488,18 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_E4-2ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E4-2as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E4-2as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_E4-2ds_v4",
     "zone": "spaincentral"
   },
@@ -72225,6 +72529,22 @@
   },
   {
     "name": "Standard_E48_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E48a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E48ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E48as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E48as_v5",
     "zone": "spaincentral"
   },
   {
@@ -72276,6 +72596,22 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_E4a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E4ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E4as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E4as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_E4bds_v5",
     "zone": "spaincentral"
   },
@@ -72312,6 +72648,18 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_E64-16ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E64-16as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E64-16as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_E64-16ds_v4",
     "zone": "spaincentral"
   },
@@ -72329,6 +72677,18 @@
   },
   {
     "name": "Standard_E64-16s_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E64-32ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E64-32as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E64-32as_v5",
     "zone": "spaincentral"
   },
   {
@@ -72361,6 +72721,22 @@
   },
   {
     "name": "Standard_E64_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E64a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E64ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E64as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E64as_v5",
     "zone": "spaincentral"
   },
   {
@@ -72400,6 +72776,18 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_E8-2ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E8-2as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E8-2as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_E8-2ds_v4",
     "zone": "spaincentral"
   },
@@ -72417,6 +72805,18 @@
   },
   {
     "name": "Standard_E8-2s_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E8-4ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E8-4as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E8-4as_v5",
     "zone": "spaincentral"
   },
   {
@@ -72460,6 +72860,22 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_E8a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E8ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E8as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E8as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_E8bds_v5",
     "zone": "spaincentral"
   },
@@ -72496,11 +72912,35 @@
     "zone": "spaincentral"
   },
   {
+    "name": "Standard_E96-24ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E96-24as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E96-24as_v5",
+    "zone": "spaincentral"
+  },
+  {
     "name": "Standard_E96-24ds_v5",
     "zone": "spaincentral"
   },
   {
     "name": "Standard_E96-24s_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E96-48ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E96-48as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E96-48as_v5",
     "zone": "spaincentral"
   },
   {
@@ -72513,6 +72953,22 @@
   },
   {
     "name": "Standard_E96_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E96a_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E96ads_v5",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E96as_v4",
+    "zone": "spaincentral"
+  },
+  {
+    "name": "Standard_E96as_v5",
     "zone": "spaincentral"
   },
   {
@@ -86909,6 +87365,10 @@
   },
   {
     "name": "Standard_L8as_v3",
+    "zone": "westcentralus"
+  },
+  {
+    "name": "Standard_ND96isr_H100_v5",
     "zone": "westcentralus"
   },
   {
