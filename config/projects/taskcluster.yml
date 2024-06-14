@@ -105,6 +105,9 @@ taskcluster:
           config:
             enableInteractive: true
             shutdownMachineOnInternalError: false
+      # Use c5.metal to test kvm
+      instanceTypes:
+        c5.metal: 1
 
     gw-ubuntu-24-04-gcp:
       owner: taskcluster-notifications+workers@mozilla.com
