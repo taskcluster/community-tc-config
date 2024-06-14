@@ -108,6 +108,26 @@ generic-worker-ubuntu-22-04:
       us-west-2: ami-0d8832a43203fde5e
       us-east-1: ami-0584a96e319ab58bb
       us-east-2: ami-0c50889c46f33e424
+generic-worker-ubuntu-24-04:
+  workerImplementation: generic-worker
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        shutdownMachineOnIdle: true
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: taskcluster-notifications+workers@mozilla.com
+            script: https://github.com/taskcluster/community-tc-config/blob/6745319216ea016a30885c2fb9862865126dad1d/imagesets/generic-worker-ubuntu-24-04/bootstrap.sh
+  gcp:
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-69280wly7ltekf9hq7m8
+  aws:
+    amis:
+      us-west-1: ami-098839ec00292e1ed
+      us-west-2: ami-00af297b3adebc036
+      us-east-1: ami-0777a8f3e025ad0e5
+      us-east-2: ami-0bccf3b52adac8555
 generic-worker-ubuntu-22-04-arm64:
   workerImplementation: generic-worker
   workerConfig:
