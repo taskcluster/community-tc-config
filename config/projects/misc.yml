@@ -26,8 +26,6 @@ misc:
       genericWorker:
         config:
           idleTimeoutSecs: 600
-      instanceTypes:
-        c5.metal: 1
   hooks:
     jcristau-fx-release-metrics:
       description: Taskcluster hook to run fx release metrics
