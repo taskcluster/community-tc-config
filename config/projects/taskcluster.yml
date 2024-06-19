@@ -181,6 +181,20 @@ taskcluster:
       minCapacity: 0
       maxCapacity: 10
 
+    gw-windows-2022-staging:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2022-staging
+      cloud: azure
+      minCapacity: 0
+      maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            # While iterating on the image building process for this worker
+            # pool, useful for workers not to die immediately...
+            idleTimeoutSecs: 3600
+
     gw-windows-2022-gpu:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true

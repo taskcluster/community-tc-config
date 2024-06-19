@@ -192,6 +192,30 @@ generic-worker-win2022:
           machine-setup:
             maintainer: pmoore@mozilla.com
             script: https://github.com/taskcluster/community-tc-config/blob/a8f2ff28f4ddeb97d0a8b83afe396e437460adeb/imagesets/generic-worker-win2022/bootstrap.ps1
+generic-worker-win2022-staging:
+  workerImplementation: generic-worker
+  azure:
+    images:
+      centralus: placeholder
+      eastus: placeholder
+      eastus2: placeholder
+      northcentralus: placeholder
+      southcentralus: placeholder
+      westus: placeholder
+      westus2: placeholder
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
+        livelogExecutable: C:\generic-worker\livelog.exe
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
+        shutdownMachineOnIdle: true
+        idleTimeoutSecs: 15
+        shutdownMachineOnInternalError: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: pmoore@mozilla.com
+            script: placeholder
 generic-worker-win2016-amd:
   workerImplementation: generic-worker
   aws:
