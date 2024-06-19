@@ -50,7 +50,8 @@ tasks:
               git config advice.detachedHead false &&
               git checkout ${repo.ref} &&
               pip install black &&
-              black --diff generate
+              black --diff generate &&
+              black --check generate
         - image: 'python:3.11'
           name: yamllint
           command:
