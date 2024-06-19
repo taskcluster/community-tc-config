@@ -506,7 +506,9 @@ def azure(
     # These constants are set in a separate file to be used by external services
     # like the fuzzing team decision tasks
     _config_path = os.path.join(os.path.dirname(__file__), "../config/azure.yml")
-    assert os.path.exists(_config_path), "Missing azure config in {}".format(_config_path)
+    assert os.path.exists(_config_path), "Missing azure config in {}".format(
+        _config_path
+    )
     azure_config = yaml.safe_load(open(_config_path))
 
     # by default, deploy where there are images
@@ -556,8 +558,7 @@ def azure(
             }
             launchConfigs.append(launchConfig)
     assert launchConfigs, (
-        f"The locations {locations} do not support instance types"
-        f" {instanceTypes}"
+        f"The locations {locations} do not support instance types" f" {instanceTypes}"
     )
 
     wp = DynamicWorkerPoolSettings(AZURE_PROVIDER)
@@ -606,9 +607,9 @@ def generic_worker(wp, **cfg):
         ).hexdigest()
 
         for launchConfig in wp.config["launchConfigs"]:
-            launchConfig["workerConfig"]["genericWorker"]["config"][
-                "deploymentId"
-            ] = hashedConfig[:16]
+            launchConfig["workerConfig"]["genericWorker"]["config"]["deploymentId"] = (
+                hashedConfig[:16]
+            )
 
         # The sentry project may be specified in the image set definition
         # (/config/imagesets.yml), or in the worker pool definition
