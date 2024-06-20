@@ -667,7 +667,7 @@ function azure_update {
   # Try to acquire an exclusive lock
   # as only one `az resource move` can
   # happen at a time
-  exec 200>azure_move_image.lock
+  exec 200> azure_move_image.lock
   flock -x 200
 
   log "Moving image ${NAME_WITH_REGION} to ${AZURE_IMAGE_RESOURCE_GROUP} resource group..."
