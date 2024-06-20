@@ -547,7 +547,9 @@ function azure_update {
 
   azure_find_old_objects
 
-  NAME_WITH_REGION="${UNIQUE_NAME}-${REGION}"
+  # Avoid using UNIQUE_NAME which may be too long, see e.g.
+  # https://bugs.launchpad.net/ubuntu-kernel-tests/+bug/1779107/comments/2
+  NAME_WITH_REGION="imageset-${UUID}-${REGION}"
   TEMP_SETUP_SCRIPT="$(mktemp -t ${NAME_WITH_REGION}.XXXXXXXXXX)"
 
   cat bootstrap.ps1 | sed 's/%MY_CLOUD%/azure/g' >> "${TEMP_SETUP_SCRIPT}"
