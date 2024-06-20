@@ -150,8 +150,8 @@ Start-Process "C:\python-3.11.9-amd64.exe" -ArgumentList "/quiet InstallAllUsers
 
 # set permanent env vars
 [Environment]::SetEnvironmentVariable("GOROOT", "C:\go", "Machine")
-[Environment]::SetEnvironmentVariable("PATH", $Env:Path + ";C:\Program Files\Vim\vim80;C:\go\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs;C:\Program Files\Python311", "Machine")
-[Environment]::SetEnvironmentVariable("PATHEXT", $Env:PathExt + ";.PY", "Machine")
+[Environment]::SetEnvironmentVariable("PATH", [Environment]::GetEnvironmentVariable("PATH", "Machine") + ";C:\Program Files\Vim\vim80;C:\go\bin;C:\Program Files\Python311", "Machine")
+[Environment]::SetEnvironmentVariable("PATHEXT", [Environment]::GetEnvironmentVariable("PATHEXT", "Machine") + ";.PY", "Machine")
 [Environment]::SetEnvironmentVariable("GOPATH", "C:\gopath", "Machine")
 
 # set env vars for the currently running process
