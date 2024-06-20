@@ -16,7 +16,7 @@ cd "$(dirname "${0}")"
 
 rm -f '../config/azure-machine-type-offerings.json'
 az account list-locations --query="[].name" --output tsv | sort -u | while read location; do
-  az vm list-sizes --location $location --query="[].name" --output tsv 2>/dev/null | sort -u | while read type; do
+  az vm list-sizes --location $location --query="[].name" --output tsv 2> /dev/null | sort -u | while read type; do
     echo -n "{\"name\": \"$type\", \"zone\": \"$location\"},"
   done
 done | sed 's/\(.*\)./[\1]/' | jq '.' > ../config/azure-machine-type-offerings.json
