@@ -49200,6 +49200,14 @@
     "zone": "us-central1-b"
   },
   {
+    "name": "a3-highgpu-8g",
+    "zone": "us-central1-b"
+  },
+  {
+    "name": "a3-megagpu-8g",
+    "zone": "us-central1-b"
+  },
+  {
     "name": "c2-standard-16",
     "zone": "us-central1-b"
   },
