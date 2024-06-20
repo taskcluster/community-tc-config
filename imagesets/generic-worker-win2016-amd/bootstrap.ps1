@@ -150,16 +150,16 @@ Start-Process "C:\Git-2.44.0-64-bit.exe" -ArgumentList "/VERYSILENT /LOG=C:\git_
 
 # install node
 $client.DownloadFile("https://nodejs.org/dist/v20.12.2/node-v20.12.2-x64.msi", "C:\NodeSetup.msi")
-Start-Process "msiexec" -ArgumentList "/i C:\NodeSetup.msi /quiet" -Wait -NoNewWindow -PassThru
+Start-Process "msiexec" -ArgumentList "/i C:\NodeSetup.msi /quiet" -Wait -NoNewWindow
 
 # install python 3.11.9
 $client.DownloadFile("https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe", "C:\python-3.11.9-amd64.exe")
-Start-Process "C:\python-3.11.9-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1" -Wait -NoNewWindow -PassThru
+Start-Process "C:\python-3.11.9-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1" -Wait -NoNewWindow -RedirectStandardOutput "C:\python-install-stdout.txt" -RedirectStandardError "C:\python-install-stderr.txt"
 
 # set permanent env vars
 [Environment]::SetEnvironmentVariable("GOROOT", "C:\go", "Machine")
-[Environment]::SetEnvironmentVariable("PATH", $Env:Path + ";C:\Program Files\Vim\vim80;C:\go\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs;C:\Program Files\Python311", "Machine")
-[Environment]::SetEnvironmentVariable("PATHEXT", $Env:PathExt + ";.PY", "Machine")
+[Environment]::SetEnvironmentVariable("PATH", [Environment]::GetEnvironmentVariable("PATH", "Machine") + ";C:\Program Files\Vim\vim80;C:\go\bin;C:\Program Files\Python311", "Machine")
+[Environment]::SetEnvironmentVariable("PATHEXT", [Environment]::GetEnvironmentVariable("PATHEXT", "Machine") + ";.PY", "Machine")
 [Environment]::SetEnvironmentVariable("GOPATH", "C:\gopath", "Machine")
 
 # set env vars for the currently running process
@@ -169,17 +169,17 @@ $env:PATH    = $env:PATH + ";C:\go\bin;C:\gopath\bin;C:\Program Files\Git\cmd;C:
 $env:PATHEXT = $env:PATHEXT + ";.PY"
 
 # get generic-worker and livelog source code (not required, but useful)
-Start-Process "go" -ArgumentList "get -t github.com/taskcluster/generic-worker github.com/taskcluster/livelog" -Wait -NoNewWindow -PassThru
+Start-Process "go" -ArgumentList "get -t github.com/taskcluster/generic-worker github.com/taskcluster/livelog" -Wait -NoNewWindow
 
 # generate ed25519 key
-Start-Process C:\generic-worker\generic-worker.exe -ArgumentList "new-ed25519-keypair --file C:\generic-worker\generic-worker-ed25519-signing-key.key" -Wait -NoNewWindow -PassThru
+Start-Process C:\generic-worker\generic-worker.exe -ArgumentList "new-ed25519-keypair --file C:\generic-worker\generic-worker-ed25519-signing-key.key" -Wait -NoNewWindow
 
 # download cygwin (not required, but useful)
 $client.DownloadFile("https://www.cygwin.com/setup-x86_64.exe", "C:\cygwin-setup-x86_64.exe")
 
 # install cygwin
 # complete package list: https://cygwin.com/packages/package_list.html
-Start-Process "C:\cygwin-setup-x86_64.exe" -ArgumentList "--quiet-mode --wait --root C:\cygwin --site http://cygwin.mirror.constant.com --packages openssh,vim,curl,tar,wget,zip,unzip,diffutils,bzr" -Wait -NoNewWindow -PassThru
+Start-Process "C:\cygwin-setup-x86_64.exe" -ArgumentList "--quiet-mode --wait --root C:\cygwin --site http://cygwin.mirror.constant.com --packages openssh,vim,curl,tar,wget,zip,unzip,diffutils,bzr" -Wait -NoNewWindow
 
 # open up firewall for ssh daemon
 New-NetFirewallRule -DisplayName "Allow SSH inbound" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
@@ -191,16 +191,16 @@ New-NetFirewallRule -DisplayName "Allow SSH inbound" -Direction Inbound -LocalPo
 $env:LOGONSERVER = "\\" + $env:COMPUTERNAME
 
 # configure sshd (not required, but useful)
-Start-Process "C:\cygwin\bin\bash.exe" -ArgumentList "--login -c `"ssh-host-config -y -c 'ntsec mintty' -u 'cygwinsshd' -w 'qwe123QWE!@#'`"" -Wait -NoNewWindow -PassThru
+Start-Process "C:\cygwin\bin\bash.exe" -ArgumentList "--login -c `"ssh-host-config -y -c 'ntsec mintty' -u 'cygwinsshd' -w 'qwe123QWE!@#'`"" -Wait -NoNewWindow
 
 # start sshd
-Start-Process "net" -ArgumentList "start cygsshd" -Wait -NoNewWindow -PassThru
+Start-Process "net" -ArgumentList "start cygsshd" -Wait -NoNewWindow
 
 # download bash setup script
 $client.DownloadFile("https://raw.githubusercontent.com/petemoore/myscrapbook/master/setup.sh", "C:\cygwin\home\Administrator\setup.sh")
 
 # run bash setup script
-Start-Process "C:\cygwin\bin\bash.exe" -ArgumentList "--login -c 'chmod a+x setup.sh; ./setup.sh'" -Wait -NoNewWindow -PassThru
+Start-Process "C:\cygwin\bin\bash.exe" -ArgumentList "--login -c 'chmod a+x setup.sh; ./setup.sh'" -Wait -NoNewWindow
 
 # install dependencywalker (useful utility for troubleshooting, not required)
 md "C:\DependencyWalker"
