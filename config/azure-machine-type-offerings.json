@@ -36820,6 +36820,14 @@
     "zone": "italynorth"
   },
   {
+    "name": "Standard_E80ids_v4",
+    "zone": "italynorth"
+  },
+  {
+    "name": "Standard_E80is_v4",
+    "zone": "italynorth"
+  },
+  {
     "name": "Standard_E8_v3",
     "zone": "italynorth"
   },
@@ -87368,14 +87376,6 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_A10",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_A11",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_A1_v2",
     "zone": "westeurope"
   },
@@ -87420,19 +87420,11 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_A8",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_A8_v2",
     "zone": "westeurope"
   },
   {
     "name": "Standard_A8m_v2",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_A9",
     "zone": "westeurope"
   },
   {
@@ -88376,10 +88368,6 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_DC2s",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_DC2s_v2",
     "zone": "westeurope"
   },
@@ -88480,10 +88468,6 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_DC4s",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_DC4s_v2",
     "zone": "westeurope"
   },
@@ -88545,10 +88529,6 @@
   },
   {
     "name": "Standard_DC8es_v5",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_DC8s",
     "zone": "westeurope"
   },
   {
@@ -90048,54 +90028,6 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_H16",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_H16_Promo",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_H16m",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_H16m_Promo",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_H16mr",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_H16mr_Promo",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_H16r",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_H16r_Promo",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_H8",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_H8_Promo",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_H8m",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_H8m_Promo",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_HB120-16rs_v2",
     "zone": "westeurope"
   },
@@ -90136,46 +90068,6 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_HB176-144rs_v4",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HB176-144s_v4",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HB176-24rs_v4",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HB176-24s_v4",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HB176-48rs_v4",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HB176-48s_v4",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HB176-96rs_v4",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HB176-96s_v4",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HB176rs_v4",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HB176s_v4",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_HB60-15rs",
     "zone": "westeurope"
   },
@@ -90201,46 +90093,6 @@
   },
   {
     "name": "Standard_HC44rs",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HX176-144rs",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HX176-144s",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HX176-24rs",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HX176-24s",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HX176-48rs",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HX176-48s",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HX176-96rs",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HX176-96s",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HX176rs",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_HX176s",
     "zone": "westeurope"
   },
   {
@@ -90568,23 +90420,7 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_NC12",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NC12_Promo",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NC12s_v2",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_NC12s_v3",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NC16ads_A10_v4",
     "zone": "westeurope"
   },
   {
@@ -90592,27 +90428,7 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_NC24",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NC24_Promo",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_NC24ads_A100_v4",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NC24r",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NC24r_Promo",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NC24rs_v2",
     "zone": "westeurope"
   },
   {
@@ -90620,15 +90436,7 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_NC24s_v2",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_NC24s_v3",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NC32ads_A10_v4",
     "zone": "westeurope"
   },
   {
@@ -90644,19 +90452,7 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_NC6",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_NC64as_T4_v3",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NC6_Promo",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NC6s_v2",
     "zone": "westeurope"
   },
   {
@@ -90668,10 +90464,6 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_NC8ads_A10_v4",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_NC8as_T4_v3",
     "zone": "westeurope"
   },
@@ -90680,27 +90472,7 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_ND12s",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_ND24rs",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_ND24s",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_ND40rs_v2",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_ND40s_v3",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_ND6s",
     "zone": "westeurope"
   },
   {
@@ -90712,15 +90484,7 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_ND96is_MI300X_v5",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_ND96isr_H100_v5",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_ND96isr_MI300X_v5",
     "zone": "westeurope"
   },
   {
@@ -90752,18 +90516,6 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_NV10ads_A10_v5",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NV12",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NV12_Promo",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_NV12ads_A10_v5",
     "zone": "westeurope"
   },
@@ -90784,35 +90536,11 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_NV20adms_A10_v5",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NV20ads_A10_v5",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NV24",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NV24_Promo",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_NV24s_v2",
     "zone": "westeurope"
   },
   {
     "name": "Standard_NV24s_v3",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NV30adms_A10_v5",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NV30ads_A10_v5",
     "zone": "westeurope"
   },
   {
@@ -90828,27 +90556,11 @@
     "zone": "westeurope"
   },
   {
-    "name": "Standard_NV40ads_A10_v5",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_NV48s_v3",
     "zone": "westeurope"
   },
   {
-    "name": "Standard_NV4ads_A10_v5",
-    "zone": "westeurope"
-  },
-  {
     "name": "Standard_NV4as_v4",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NV6",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_NV6_Promo",
     "zone": "westeurope"
   },
   {
@@ -90865,10 +90577,6 @@
   },
   {
     "name": "Standard_NV8as_v4",
-    "zone": "westeurope"
-  },
-  {
-    "name": "Standard_PB6s",
     "zone": "westeurope"
   },
   {
