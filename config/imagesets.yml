@@ -196,13 +196,13 @@ generic-worker-win2022-staging:
   workerImplementation: generic-worker
   azure:
     images:
-      centralus: placeholder
-      eastus: placeholder
-      eastus2: placeholder
-      northcentralus: placeholder
-      southcentralus: placeholder
-      westus: placeholder
-      westus2: placeholder
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-oy0eijf5lgdpw3dr2vve-centralus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-oy0eijf5lgdpw3dr2vve-eastus
+      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-oy0eijf5lgdpw3dr2vve-eastus2
+      northcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-oy0eijf5lgdpw3dr2vve-northcentralus
+      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-oy0eijf5lgdpw3dr2vve-southcentralus
+      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-oy0eijf5lgdpw3dr2vve-westus
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-oy0eijf5lgdpw3dr2vve-westus2
   workerConfig:
     genericWorker:
       config:
@@ -215,7 +215,7 @@ generic-worker-win2022-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: placeholder
+            script: https://github.com/taskcluster/community-tc-config/blob/6c76ba35ebfa0d1c0ee1e7bedfb9edc38167cbba/imagesets/generic-worker-win2022-staging/bootstrap.ps1
 generic-worker-win2016-amd:
   workerImplementation: generic-worker
   aws:
