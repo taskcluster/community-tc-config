@@ -240,12 +240,12 @@ generic-worker-win2022-gpu:
   azure:
     images:
       centralus: placeholder
-      eastus: placeholder
-      eastus2: placeholder
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-c6gctlmepvhx594lmbm4-eastus
+      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-c6gctlmepvhx594lmbm4-eastus2
       northcentralus: placeholder
-      southcentralus: placeholder
-      westus: placeholder
-      westus2: placeholder
+      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-c6gctlmepvhx594lmbm4-southcentralus
+      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-c6gctlmepvhx594lmbm4-westus
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-c6gctlmepvhx594lmbm4-westus2
   workerImplementation: generic-worker
   workerConfig:
     genericWorker:
@@ -259,3 +259,4 @@ generic-worker-win2022-gpu:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
+            script: https://github.com/taskcluster/community-tc-config/blob/756748c1a84f4e09f0f4ba4f8ceb09b43c62e493/imagesets/generic-worker-win2022-gpu/bootstrap.ps1
