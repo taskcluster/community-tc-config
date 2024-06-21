@@ -545,6 +545,15 @@ function azure_delete_found {
 
 function azure_update {
 
+  # Note, we could haved alternatively checked availability of the given
+  # machine type in the given location by querying the file database in
+  # /config/azure-machine-type-offerings directory, but that may be out-of-date
+  # and this az cli call is pretty quick to make anyway.
+  if [ -z "$(az vm list-sizes --location "${REGION}" --query="[].name" --output tsv | sed -n "/^$(cat azure_base_instance_type)\$/p")" ]; then
+    log "Cannot deploy in ${REGION} since machine type $(cat azure_base_instance_type) is not supported; skipping."
+    return 0
+  fi
+
   azure_find_old_objects
 
   # Avoid using UNIQUE_NAME which may be too long, see e.g.

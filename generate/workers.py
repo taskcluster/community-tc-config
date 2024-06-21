@@ -361,7 +361,7 @@ def aws_instance_types_in_availability_zone(az):
 
     The instances are read from JSONs file in config/ec2-instance-type-offerings,
     and cached in memory.
-    See /misc/update-instance-types.sh for how these are generated and updated.
+    See /misc/update-ec2-instance-types.sh for how these are generated and updated.
     """
     offerings_file = os.path.join(
         config_path(), "ec2-instance-type-offerings", f"{az}.json"
@@ -455,24 +455,23 @@ def aws(
     return wp
 
 
-@lru_cache(maxsize=2)
-def azure_machine_types_by_location():
+@lru_cache(maxsize=100)
+def azure_machine_types_in_location(location):
     """
     Return the set of machine types (such as "Standard_F32s_v2") in an Azure location.
 
       location: The Azure location, such as "centralus"
 
-    The instances are read from config/azure-machine-type-offerings.json and
+    The instances are read from JSON files in config/azure-machine-type-offerings, and
     cached in memory.
     See /misc/update-azure-machine-types.sh for how this file is generated and updated.
     """
-    offerings_file = os.path.join(config_path(), "azure-machine-type-offerings.json")
+    offerings_file = os.path.join(
+        config_path(), "azure-machine-type-offerings", f"{location}.json"
+    )
     with open(offerings_file, "r") as the_file:
         data = json.load(the_file)
-    machine_types_by_zone = defaultdict(set)
-    for pair in data:
-        machine_types_by_zone[pair["zone"]].add(pair["name"])
-    return machine_types_by_zone
+    return set(data)
 
 
 @cloud
@@ -525,7 +524,7 @@ def azure(
         for instanceType in instanceTypes:
             # Filter out locations where the required instance type
             # is not available.
-            if instanceType not in azure_machine_types_by_location()[location]:
+            if instanceType not in azure_machine_types_in_location(location):
                 continue
             launchConfig = {
                 "capacityPerInstance": 1,
