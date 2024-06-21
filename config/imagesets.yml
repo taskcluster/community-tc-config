@@ -239,10 +239,8 @@ generic-worker-win2016-amd:
 generic-worker-win2022-gpu:
   azure:
     images:
-      centralus: placeholder
       eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-c6gctlmepvhx594lmbm4-eastus
       eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-c6gctlmepvhx594lmbm4-eastus2
-      northcentralus: placeholder
       southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-c6gctlmepvhx594lmbm4-southcentralus
       westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-c6gctlmepvhx594lmbm4-westus
       westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-c6gctlmepvhx594lmbm4-westus2
