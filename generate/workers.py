@@ -462,7 +462,7 @@ def azure_machine_types_in_location(location):
 
       location: The Azure location, such as "centralus"
 
-    The instances are read from JSON files in config/ec2-instance-type-offerings, and
+    The instances are read from JSON files in config/azure-machine-type-offerings, and
     cached in memory.
     See /misc/update-azure-machine-types.sh for how this file is generated and updated.
     """
