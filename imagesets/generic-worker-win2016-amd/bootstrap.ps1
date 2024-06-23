@@ -154,7 +154,8 @@ Start-Process "msiexec" -ArgumentList "/i C:\NodeSetup.msi /quiet" -Wait -NoNewW
 
 # install python 3.11.9
 $client.DownloadFile("https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe", "C:\python-3.11.9-amd64.exe")
-Start-Process "C:\python-3.11.9-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1" -Wait -NoNewWindow -RedirectStandardOutput "C:\python-install-stdout.txt" -RedirectStandardError "C:\python-install-stderr.txt"
+# issue 751: without /log <file> python fails to install on Azure workers, with exit code 1622, maybe default log location isn't writable(?)
+Start-Process "C:\python-3.11.9-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1 /log C:\python-install-log.txt" -Wait -NoNewWindow
 
 # set permanent env vars
 [Environment]::SetEnvironmentVariable("GOROOT", "C:\go", "Machine")
