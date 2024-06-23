@@ -47460,6 +47460,162 @@
     "zone": "southamerica-west1-a"
   },
   {
+    "name": "n2d-highcpu-128",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highcpu-16",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highcpu-2",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highcpu-224",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highcpu-32",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highcpu-4",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highcpu-48",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highcpu-64",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highcpu-8",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highcpu-80",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highcpu-96",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highmem-16",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highmem-2",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highmem-32",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highmem-4",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highmem-48",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highmem-64",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highmem-8",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highmem-80",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-highmem-96",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-standard-128",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-standard-16",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-standard-2",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-standard-224",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-standard-32",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-standard-4",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-standard-48",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-standard-64",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-standard-8",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-standard-80",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "n2d-standard-96",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "t2d-standard-1",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "t2d-standard-16",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "t2d-standard-2",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "t2d-standard-32",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "t2d-standard-4",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "t2d-standard-48",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "t2d-standard-60",
+    "zone": "southamerica-west1-a"
+  },
+  {
+    "name": "t2d-standard-8",
+    "zone": "southamerica-west1-a"
+  },
+  {
     "name": "c2-standard-16",
     "zone": "southamerica-west1-b"
   },
@@ -48469,6 +48625,38 @@
   },
   {
     "name": "c3d-standard-90-lssd",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "c4-standard-16",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "c4-standard-192",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "c4-standard-2",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "c4-standard-32",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "c4-standard-4",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "c4-standard-48",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "c4-standard-8",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "c4-standard-96",
     "zone": "us-central1-a"
   },
   {
@@ -50465,6 +50653,38 @@
   },
   {
     "name": "c3d-standard-90-lssd",
+    "zone": "us-central1-c"
+  },
+  {
+    "name": "c4-standard-16",
+    "zone": "us-central1-c"
+  },
+  {
+    "name": "c4-standard-192",
+    "zone": "us-central1-c"
+  },
+  {
+    "name": "c4-standard-2",
+    "zone": "us-central1-c"
+  },
+  {
+    "name": "c4-standard-32",
+    "zone": "us-central1-c"
+  },
+  {
+    "name": "c4-standard-4",
+    "zone": "us-central1-c"
+  },
+  {
+    "name": "c4-standard-48",
+    "zone": "us-central1-c"
+  },
+  {
+    "name": "c4-standard-8",
+    "zone": "us-central1-c"
+  },
+  {
+    "name": "c4-standard-96",
     "zone": "us-central1-c"
   },
   {
