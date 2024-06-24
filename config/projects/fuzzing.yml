@@ -502,7 +502,10 @@ fuzzing:
             type: indexed-image
             namespace: project.fuzzing.orion.coverage-revision.master
             path: public/coverage-revision.tar.zst
-          maxRunTime: 600
+          maxRunTime: 900
+          onExitStatus:
+            retry:
+              - 124
           artifacts:
             public/coverage-revision.txt:
               path: /coverage-revision.txt
