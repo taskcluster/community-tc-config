@@ -13,13 +13,8 @@ git-cinnabar:
       machineType: "zones/{zone}/machineTypes/n2-highmem-4"
     win2012r2:
       imageset: generic-worker-win2022
-      cloud: aws
+      cloud: azure
       maxCapacity: 2
-      instanceTypes:
-        m7i.2xlarge: 1
-        m7i.4xlarge: 1
-        c7i.2xlarge: 1
-        c7i.4xlarge: 1
   clients:
     worker-osx:
       scopes:
