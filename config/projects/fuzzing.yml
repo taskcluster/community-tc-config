@@ -28,7 +28,6 @@ fuzzing:
       maxCapacity: 10
       instanceTypes:
         g4ad.xlarge: 1
-        g4ad.2xlarge: 1
     bugmon-pernosco-staging:
       owner: pmoore@mozilla.com
       emailOnError: false
@@ -62,13 +61,6 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
-    ci-gw:
-      owner: fuzzing+taskcluster@mozilla.com
-      emailOnError: false
-      imageset: generic-worker-ubuntu-22-04
-      cloud: gcp
-      minCapacity: 0
-      maxCapacity: 20
     ci-windows:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
@@ -78,9 +70,7 @@ fuzzing:
       maxCapacity: 10
       instanceTypes:
         m7i.2xlarge: 1
-        m7i.4xlarge: 1
         c7i.2xlarge: 1
-        c7i.4xlarge: 1
     grizzly-reduce-monitor:
       owner: truber@mozilla.com
       emailOnError: true
@@ -114,7 +104,6 @@ fuzzing:
       maxCapacity: 10
       instanceTypes:
         g4ad.xlarge: 1
-        g4ad.2xlarge: 1
     grizzly-reduce-worker-windows-ngpu:
       owner: truber@mozilla.com
       emailOnError: true
@@ -124,9 +113,7 @@ fuzzing:
       maxCapacity: 10
       instanceTypes:
         m7i.2xlarge: 1
-        m7i.4xlarge: 1
         c7i.2xlarge: 1
-        c7i.4xlarge: 1
   hooks:
     fuzzing-tc-config-community-update:
       description: Run Fuzzing pool rebuild when Community-TC config changes
@@ -515,7 +502,10 @@ fuzzing:
             type: indexed-image
             namespace: project.fuzzing.orion.coverage-revision.master
             path: public/coverage-revision.tar.zst
-          maxRunTime: 600
+          maxRunTime: 900
+          onExitStatus:
+            retry:
+              - 124
           artifacts:
             public/coverage-revision.txt:
               path: /coverage-revision.txt
