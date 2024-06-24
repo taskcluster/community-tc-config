@@ -40,16 +40,11 @@ relman:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: generic-worker-win2022
-      cloud: aws
+      cloud: azure
       securityGroups:
         - rdp
       minCapacity: 0
       maxCapacity: 10
-      instanceTypes:
-        m7i.2xlarge: 1
-        m7i.4xlarge: 1
-        c7i.2xlarge: 1
-        c7i.4xlarge: 1
     generic-worker-ubuntu-22-04:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
