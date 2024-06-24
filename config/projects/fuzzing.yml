@@ -22,7 +22,7 @@ fuzzing:
     bugmon-processor-windows:
       owner: jkratzer@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win2022
+      imageset: generic-worker-win2022-gpu
       cloud: azure
       minCapacity: 0
       maxCapacity: 10
@@ -102,7 +102,7 @@ fuzzing:
     grizzly-reduce-worker-windows:
       owner: truber@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win2022
+      imageset: generic-worker-win2022-gpu
       cloud: azure
       minCapacity: 0
       maxCapacity: 10
