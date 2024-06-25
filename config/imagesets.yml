@@ -119,15 +119,15 @@ generic-worker-ubuntu-24-04:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/taskcluster/community-tc-config/blob/eccf96e37848a5b8f9a4c7ded9e642d9b000de20/imagesets/generic-worker-ubuntu-24-04/bootstrap.sh
+            script: https://github.com/taskcluster/community-tc-config/blob/c044294fb8be49e0d491077befff5f6a403e218e/imagesets/generic-worker-ubuntu-24-04/bootstrap.sh
   gcp:
     image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-krmophte1adibczmkvi9
   aws:
     amis:
-      us-west-1: ami-08dfc84a7fac7159d
-      us-west-2: ami-000e00311d834d9f8
-      us-east-1: ami-006ea99bf9a3e5bd0
-      us-east-2: ami-02bf8057e9afd9bdf
+      us-west-1: ami-03f903faa85bf485d
+      us-west-2: ami-0b4a2b6df1a43e255
+      us-east-1: ami-0743265d375ee455c
+      us-east-2: ami-0e01793fa43769ca5
 generic-worker-ubuntu-22-04-arm64:
   workerImplementation: generic-worker
   workerConfig:
@@ -153,13 +153,13 @@ generic-worker-ubuntu-22-04-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/taskcluster/community-tc-config/blob/dfd7fa1d50e73e1ddc2e4232dfac067cc0221ec4/imagesets/generic-worker-ubuntu-22-04-staging/bootstrap.sh
+            script: https://github.com/taskcluster/community-tc-config/blob/62d941e85265c200e9f2554eb7eaf8aefe1074b1/imagesets/generic-worker-ubuntu-22-04-staging/bootstrap.sh
   aws:
     amis:
-      us-west-1: ami-09d57c9806d82e125
-      us-west-2: ami-020bcb9e070f86ca1
-      us-east-1: ami-0b7dfc4e07a14a0b7
-      us-east-2: ami-09012efe4e0fd942c
+      us-west-1: ami-0a3db3d32aec25140
+      us-west-2: ami-0998d30cd688d2c47
+      us-east-1: ami-02fbca49f6f6e2177
+      us-east-2: ami-09bcbca24ec070ced
   gcp:
     image: projects/community-tc-workers/global/images/generic-worker-ubuntu-22-04-staging-j9vxje88zn6uys9sndjr
 generic-worker-win2022:
