@@ -105,6 +105,7 @@ taskcluster:
           config:
             enableInteractive: true
             shutdownMachineOnInternalError: false
+            idleTimeoutSecs: 3600
       # Use c5.metal to test kvm
       instanceTypes:
         c5.metal: 1
@@ -121,6 +122,7 @@ taskcluster:
           config:
             enableInteractive: true
             shutdownMachineOnInternalError: false
+            idleTimeoutSecs: 3600
 
     gw-ubuntu-22-04-arm64:
       owner: taskcluster-notifications+workers@mozilla.com
