@@ -28,7 +28,7 @@ unset AWS_SECRET_ACCESS_KEY
 unset AWS_ACCESS_KEY_ID
 
 # Expiration time of login session (in seconds)
-DURATION="21600" # 6 hours
+DURATION="86400" # 24 hours
 
 # Attempt to get token from yubikey
 TOKEN=''
