@@ -128,7 +128,7 @@ generic-worker-ubuntu-24-04:
       us-west-2: ami-01b5cc605178e2987
       us-east-1: ami-056ea427d405deb33
       us-east-2: ami-0509d26e360ef21be
-generic-worker-ubuntu-22-04-arm64:
+generic-worker-ubuntu-24-04-arm64:
   workerImplementation: generic-worker
   workerConfig:
     genericWorker:
@@ -139,10 +139,10 @@ generic-worker-ubuntu-22-04-arm64:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/taskcluster/community-tc-config/blob/15c471db1aeba4e747a55a54a94354096b8c9a62/imagesets/generic-worker-ubuntu-22-04-arm64/bootstrap.sh
+            script: placeholder
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-22-04-arm64-q7nsai3ssbj1nwxdzizb
-generic-worker-ubuntu-22-04-staging:
+    image: placeholder
+generic-worker-ubuntu-24-04-staging:
   workerImplementation: generic-worker
   workerConfig:
     genericWorker:
@@ -153,15 +153,15 @@ generic-worker-ubuntu-22-04-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/taskcluster/community-tc-config/blob/8bed556f56f2820bc24152d183f5721dea9e825d/imagesets/generic-worker-ubuntu-22-04-staging/bootstrap.sh
+            script: placeholder
   aws:
     amis:
-      us-west-1: ami-067a0aaad0ecafe72
-      us-west-2: ami-04975f28571710ec3
-      us-east-1: ami-0afb0d724168cd918
-      us-east-2: ami-0d3392d290d547cab
+      us-west-1: placeholder
+      us-west-2: placeholder
+      us-east-1: placeholder
+      us-east-2: placeholder
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-22-04-staging-n8cw9a4l7l1oehnn774h
+    image: placeholder
 generic-worker-win2022:
   workerImplementation: generic-worker
   aws:

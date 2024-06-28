@@ -59,6 +59,18 @@ taskcluster:
     gw-ci-ubuntu-22-04:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
+      imageset: generic-worker-ubuntu-22-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 20
+      workerConfig:
+        genericWorker:
+          config:
+            runTasksAsCurrentUser: true
+
+    gw-ci-ubuntu-24-04:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
       imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
@@ -83,7 +95,7 @@ taskcluster:
     gw-ubuntu-22-04:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-24-04
+      imageset: generic-worker-ubuntu-22-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50
@@ -93,7 +105,7 @@ taskcluster:
             enableInteractive: true
             shutdownMachineOnInternalError: false
 
-    gw-ubuntu-24-04-aws:
+    gw-ubuntu-24-04-metal:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-24-04
@@ -110,7 +122,7 @@ taskcluster:
       instanceTypes:
         c5.metal: 1
 
-    gw-ubuntu-24-04-gcp:
+    gw-ubuntu-24-04:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-24-04
@@ -124,10 +136,10 @@ taskcluster:
             shutdownMachineOnInternalError: false
             idleTimeoutSecs: 3600
 
-    gw-ubuntu-22-04-arm64:
+    gw-ubuntu-24-04-arm64:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-22-04-arm64
+      imageset: generic-worker-ubuntu-24-04-arm64
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5
@@ -140,7 +152,7 @@ taskcluster:
     gw-ubuntu-staging-aws:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-22-04-staging
+      imageset: generic-worker-ubuntu-24-04-staging
       cloud: aws
       minCapacity: 0
       maxCapacity: 1
@@ -155,7 +167,7 @@ taskcluster:
     gw-ubuntu-staging-google:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-22-04-staging
+      imageset: generic-worker-ubuntu-24-04-staging
       cloud: gcp
       minCapacity: 0
       maxCapacity: 1
@@ -232,6 +244,7 @@ taskcluster:
         - queue:create-task:highest:proj-taskcluster/ci
         # For replacing the docker-worker pool (proj-taskcluster/ci) for d2g work
         - queue:create-task:highest:proj-taskcluster/gw-ubuntu-22-04
+        - queue:create-task:highest:proj-taskcluster/gw-ubuntu-24-04
         - queue:create-task:highest:proj-taskcluster/windows2012r2-amd64-ci
         # The account and secret for the Azure testing storage account.
         # This is secret but ok for use by PRs.
@@ -391,6 +404,7 @@ taskcluster:
 
     - grant:
         - queue:create-task:medium:proj-taskcluster/gw-ci-ubuntu-22-04
+        - queue:create-task:medium:proj-taskcluster/gw-ci-ubuntu-24-04
       to:
         - repo:github.com/taskcluster/docker-exec-websocket-server:*
         - repo:github.com/taskcluster/docker-exec-websocket-client:*
