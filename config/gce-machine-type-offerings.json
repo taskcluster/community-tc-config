@@ -4908,6 +4908,30 @@
     "zone": "asia-northeast1-b"
   },
   {
+    "name": "c3-standard-176",
+    "zone": "asia-northeast1-b"
+  },
+  {
+    "name": "c3-standard-22",
+    "zone": "asia-northeast1-b"
+  },
+  {
+    "name": "c3-standard-4",
+    "zone": "asia-northeast1-b"
+  },
+  {
+    "name": "c3-standard-44",
+    "zone": "asia-northeast1-b"
+  },
+  {
+    "name": "c3-standard-8",
+    "zone": "asia-northeast1-b"
+  },
+  {
+    "name": "c3-standard-88",
+    "zone": "asia-northeast1-b"
+  },
+  {
     "name": "e2-highcpu-16",
     "zone": "asia-northeast1-b"
   },
