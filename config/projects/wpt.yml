@@ -13,11 +13,22 @@ wpt:
       launchConfig:
         advancedMachineFeatures:
           enableNestedVirtualization: true
+    ci-gw:
+      owner: pmoore@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 80
+      launchConfig:
+        advancedMachineFeatures:
+          enableNestedVirtualization: true
   repos:
     - github.com/web-platform-tests/*
   grants:
     - grant:
         - queue:create-task:highest:proj-wpt/ci
+        - queue:create-task:highest:proj-wpt/ci-gw
         - queue:create-task:highest:built-in/*
         - docker-worker:capability:privileged
         - queue:scheduler-id:taskcluster-github
