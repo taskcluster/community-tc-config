@@ -8,14 +8,14 @@ fuzzing:
     bugmon-monitor:
       owner: jkratzer@mozilla.com
       emailOnError: false
-      imageset: generic-worker-ubuntu-22-04
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5
     bugmon-processor:
       owner: jkratzer@mozilla.com
       emailOnError: false
-      imageset: generic-worker-ubuntu-22-04
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
@@ -46,7 +46,7 @@ fuzzing:
     ci:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
-      imageset: generic-worker-ubuntu-22-04
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
@@ -70,7 +70,7 @@ fuzzing:
     grizzly-reduce-worker:
       owner: truber@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-22-04
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
