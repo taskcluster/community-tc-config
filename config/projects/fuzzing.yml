@@ -60,10 +60,10 @@ fuzzing:
       instanceTypes:
         m7i.2xlarge: 1
         c7i.2xlarge: 1
-    grizzly-reduce-monitor:
+    decision:
       owner: truber@mozilla.com
       emailOnError: true
-      imageset: docker-worker
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5
@@ -113,7 +113,7 @@ fuzzing:
           routingKeyPattern: primary.taskcluster.community-tc-config
       task:
         provisionerId: proj-fuzzing
-        workerType: ci
+        workerType: decision
         payload:
           features:
             # Needed for access to secret
@@ -222,7 +222,7 @@ fuzzing:
       task:
         provisionerId: proj-fuzzing
         schedulerId: fuzzing
-        workerType: grizzly-reduce-monitor
+        workerType: decision
         payload:
           image:
             type: indexed-image
@@ -294,7 +294,7 @@ fuzzing:
       task:
         provisionerId: proj-fuzzing
         schedulerId: fuzzing
-        workerType: grizzly-reduce-monitor
+        workerType: decision
         payload:
           image:
             type: indexed-image
@@ -653,7 +653,7 @@ fuzzing:
         deadline: {$fromNow: '1 hour'}
         schedulerId: fuzzing
         provisionerId: proj-fuzzing
-        workerType: ci
+        workerType: decision
         payload:
           features:
             taskclusterProxy: true
@@ -686,6 +686,7 @@ fuzzing:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
         - queue:create-task:highest:proj-fuzzing/ci-*
+        - queue:create-task:highest:proj-fuzzing/decision
         - queue:route:checks
         - secrets:get:project/fuzzing/deploy-*
         - secrets:get:project/fuzzing/codecov-*
@@ -696,6 +697,7 @@ fuzzing:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
         - queue:create-task:highest:proj-fuzzing/ci-*
+        - queue:create-task:highest:proj-fuzzing/decision
         - queue:scheduler-id:taskcluster-github
       to:
         - hook-id:project-fuzzing/orion-cron
@@ -786,7 +788,7 @@ fuzzing:
       to:
         - hook-id:project-fuzzing/grizzly-reduce-monitor
     - grant:
-        - queue:create-task:highest:proj-fuzzing/grizzly-reduce-monitor
+        - queue:create-task:highest:proj-fuzzing/decision
         - queue:route:notify.email.truber@mozilla.com.on-failed
         - secrets:get:project/fuzzing/fuzzmanagerconf
       to:
