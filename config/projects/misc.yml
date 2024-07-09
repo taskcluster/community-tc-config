@@ -11,7 +11,7 @@ misc:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
-      imageset: generic-worker-ubuntu-22-04
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
@@ -19,7 +19,7 @@ misc:
     tutorial:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
-      imageset: generic-worker-ubuntu-22-04
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50

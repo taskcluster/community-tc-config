@@ -6,7 +6,7 @@ bors-ng:
     ci:
       owner: michael@notriddle.com
       emailOnError: false
-      imageset: generic-worker-ubuntu-22-04
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 1

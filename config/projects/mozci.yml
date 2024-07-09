@@ -7,14 +7,14 @@ mozci:
     ci:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: generic-worker-ubuntu-22-04
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50
     compute-smaller:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: generic-worker-ubuntu-22-04
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 25
@@ -22,7 +22,7 @@ mozci:
     compute-small:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
-      imageset: generic-worker-ubuntu-22-04
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 25
@@ -31,6 +31,18 @@ mozci:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: generic-worker-ubuntu-22-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 5
+      machineType: "zones/{zone}/machineTypes/c3-standard-8"
+      workerConfig:
+        genericWorker:
+          config:
+            enableInteractive: true
+    generic-worker-ubuntu-24-04:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5

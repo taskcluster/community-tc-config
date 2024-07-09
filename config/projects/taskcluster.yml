@@ -56,18 +56,6 @@ taskcluster:
       lifecycle:
         reregistrationTimeout: 2592000 # 30 days
 
-    gw-ci-ubuntu-22-04:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-ubuntu-22-04
-      cloud: gcp
-      minCapacity: 0
-      maxCapacity: 20
-      workerConfig:
-        genericWorker:
-          config:
-            runTasksAsCurrentUser: true
-
     gw-ci-ubuntu-24-04:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
@@ -91,19 +79,6 @@ taskcluster:
         genericWorker:
           config:
             runTasksAsCurrentUser: true
-
-    gw-ubuntu-22-04:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-ubuntu-22-04
-      cloud: gcp
-      minCapacity: 0
-      maxCapacity: 50
-      workerConfig:
-        genericWorker:
-          config:
-            enableInteractive: true
-            shutdownMachineOnInternalError: false
 
     gw-ubuntu-24-04-metal:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -243,7 +218,6 @@ taskcluster:
     - grant:
         - queue:create-task:highest:proj-taskcluster/ci
         # For replacing the docker-worker pool (proj-taskcluster/ci) for d2g work
-        - queue:create-task:highest:proj-taskcluster/gw-ubuntu-22-04
         - queue:create-task:highest:proj-taskcluster/gw-ubuntu-24-04
         - queue:create-task:highest:proj-taskcluster/windows2012r2-amd64-ci
         # The account and secret for the Azure testing storage account.
@@ -403,7 +377,6 @@ taskcluster:
         - repo:github.com/taskcluster/staging-releases:*
 
     - grant:
-        - queue:create-task:medium:proj-taskcluster/gw-ci-ubuntu-22-04
         - queue:create-task:medium:proj-taskcluster/gw-ci-ubuntu-24-04
       to:
         - repo:github.com/taskcluster/docker-exec-websocket-server:*
