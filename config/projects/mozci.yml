@@ -34,7 +34,6 @@ mozci:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5
-      machineType: "zones/{zone}/machineTypes/c3-standard-8"
       workerConfig:
         genericWorker:
           config:
@@ -46,7 +45,6 @@ mozci:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5
-      machineType: "zones/{zone}/machineTypes/c3-standard-8"
       workerConfig:
         genericWorker:
           config:
