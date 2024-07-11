@@ -83,10 +83,10 @@ taskcluster:
     gw-ubuntu-24-04-metal:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-24-04
+      imageset: generic-worker-ubuntu-24-04-staging
       cloud: aws
       minCapacity: 0
-      maxCapacity: 50
+      maxCapacity: 5
       workerConfig:
         genericWorker:
           config:
@@ -95,7 +95,7 @@ taskcluster:
             idleTimeoutSecs: 3600
       # Use c5.metal to test kvm
       instanceTypes:
-        c5.metal: 1
+        m5d.metal: 1
 
     gw-ubuntu-24-04:
       owner: taskcluster-notifications+workers@mozilla.com
