@@ -1,1 +1,1 @@
-../generic-worker-ubuntu-22-04/bootstrap.sh
+../generic-worker-ubuntu-24-04/bootstrap.sh

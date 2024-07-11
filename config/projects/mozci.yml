@@ -27,17 +27,6 @@ mozci:
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-4"
-    generic-worker-ubuntu-22-04:
-      owner: mcastelluccio@mozilla.com
-      emailOnError: false
-      imageset: generic-worker-ubuntu-22-04
-      cloud: gcp
-      minCapacity: 0
-      maxCapacity: 5
-      workerConfig:
-        genericWorker:
-          config:
-            enableInteractive: true
     generic-worker-ubuntu-24-04:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
