@@ -9,8 +9,8 @@ setup(
     url="https://github.com/taskcluster/community-tc-config",
     packages=find_packages("."),
     install_requires=[
-        "tc-admin>=4.0.0",
-        "json-e>=4.5.0",
+        "tc-admin>=4.0.1",
+        "json-e>=4.7.1",
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest-mock", "pytest-asyncio"],
