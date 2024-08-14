@@ -6,7 +6,7 @@
 # on Windows Server 2022 in the future, dropping support for Windows Server 2016,
 # once the remaining AMD driver issue has been resolved.
 
-$TASKCLUSTER_VERSION = "v67.0.0"
+$TASKCLUSTER_VERSION = "v67.1.0"
 
 # use TLS 1.2 (see bug 1443595)
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
