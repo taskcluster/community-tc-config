@@ -47,7 +47,7 @@ fuzzing:
     bugmon-pernosco-staging:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-22-04-staging
+      imageset: generic-worker-ubuntu-24-04-staging
       cloud: aws
       securityGroups:
         - docker-worker
