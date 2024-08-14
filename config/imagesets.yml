@@ -108,24 +108,6 @@ generic-worker-ubuntu-24-04:
       us-west-2: ami-0a8ac2a60e18a9f78
       us-east-1: ami-0031c7517c06f35fc
       us-east-2: ami-0f796203ffd22c59c
-generic-worker-ubuntu-22-04-staging:
-  workerImplementation: generic-worker
-  workerConfig:
-    genericWorker:
-      config:
-        ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
-        shutdownMachineOnIdle: true
-        shutdownMachineOnInternalError: true
-        workerTypeMetadata:
-          machine-setup:
-            maintainer: taskcluster-notifications+workers@mozilla.com
-            script: placeholder
-  aws:
-    amis:
-      us-west-1: placeholder
-      us-west-2: placeholder
-      us-east-1: placeholder
-      us-east-2: placeholder
 generic-worker-ubuntu-24-04-arm64:
   workerImplementation: generic-worker
   workerConfig:
