@@ -217,11 +217,9 @@ choco install -y visualstudio2019buildtools --version 16.5.4.0 --package-paramet
 # install gcc for go race detector
 choco install -y mingw --version 11.2.0.07112021
 
-# Get information about the video controllers (GPUs)
-$gpuInfo = Get-WmiObject -Query "Select * From Win32_VideoController"
-
 # Check if any of the video controllers are from NVIDIA
-$hasNvidiaGpu = $gpuInfo | Where-Object { $_.Name -like "*NVIDIA*" }
+# Note, 0x10DE is the NVIDIA Corporation Vendor ID
+$hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match "^PCI\\VEN_10DE" }
 
 if ($hasNvidiaGpu) {
   $client.DownloadFile("https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe", "C:\nvidia_driver.exe")
