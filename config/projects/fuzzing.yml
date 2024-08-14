@@ -28,6 +28,7 @@ fuzzing:
       maxCapacity: 10
       instanceTypes:
         g4ad.xlarge: 1
+        g4ad.2xlarge: 1
     bugmon-pernosco:
       owner: jkratzer@mozilla.com
       emailOnError: false
@@ -43,6 +44,18 @@ fuzzing:
           allowDisableSeccomp: true
       securityGroups:
         - docker-worker
+    bugmon-pernosco-staging:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-22-04-staging
+      cloud: aws
+      securityGroups:
+        - docker-worker
+        - ssh
+      minCapacity: 0
+      maxCapacity: 5
+      instanceTypes:
+        m5d.metal: 1
     ci:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
