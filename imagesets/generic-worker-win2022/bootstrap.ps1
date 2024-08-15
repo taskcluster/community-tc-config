@@ -223,7 +223,7 @@ $hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match
 
 if ($hasNvidiaGpu) {
   $client.DownloadFile("https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe", "C:\nvidia_driver.exe")
-  Start-Process "C:\nvidia_driver.exe" -ArgumentList "-s", "-noreboot" -Wait -NoNewWindow  -RedirectStandardOutput "C:\nvidia-install-stdout.txt" -RedirectStandardError "C:\nvidia-install-stderr.txt"
+  Start-Process "C:\nvidia_driver.exe" -ArgumentList "-s", "-noreboot" -Wait -NoNewWindow -RedirectStandardOutput "C:\nvidia-install-stdout.txt" -RedirectStandardError "C:\nvidia-install-stderr.txt"
 }
 
 # now shutdown, in preparation for creating an image
