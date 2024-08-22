@@ -481,9 +481,9 @@ def azure(
     locations=None,
     minCapacity=0,
     maxCapacity=None,
-    instanceTypes=[
-        "Standard_F16s_v2",
-    ],
+    instanceTypes={
+        "Standard_F16s_v2": 1,
+    },
     **cfg,
 ):
     """
@@ -493,7 +493,8 @@ def azure(
       locations: locations to deploy to (required)
       minCapacity: minimum capacity to run at any time (default 0)
       maxCapacity: maximum capacity to run at any time (required)
-      instanceTypes: list of instance types to provision (default Standard_F16s_v2)
+      instanceTypes: dict of instance types to provision, values are
+                     capacityPerInstance (required) (default {Standard_F16s_v2: 1})
     """
 
     assert maxCapacity, "must give a maxCapacity"
@@ -521,13 +522,13 @@ def azure(
     launchConfigs = []
     for location in locations:
         subnetId = azure_config["subnets"][location]
-        for instanceType in instanceTypes:
+        for instanceType, capacityPerInstance in instanceTypes.items():
             # Filter out locations where the required instance type
             # is not available.
             if instanceType not in azure_machine_types_in_location(location):
                 continue
             launchConfig = {
-                "capacityPerInstance": 1,
+                "capacityPerInstance": capacityPerInstance,
                 "location": location,
                 "storageProfile": {
                     "osDisk": {
@@ -557,7 +558,8 @@ def azure(
             }
             launchConfigs.append(launchConfig)
     assert launchConfigs, (
-        f"The locations {locations} do not support instance types" f" {instanceTypes}"
+        f"The locations {locations} do not support instance types"
+        f" {list(instanceTypes.keys())}"
     )
 
     wp = DynamicWorkerPoolSettings(AZURE_PROVIDER)
