@@ -148,11 +148,11 @@ retry apt-get install -y qemu-kvm bridge-utils
 # See
 #   * https://console.aws.amazon.com/support/cases#/6410417131/en
 #   * https://bugzilla.mozilla.org/show_bug.cgi?id=1499054#c12
-# cat > /etc/cloud/cloud.cfg.d/01_network_renderer_policy.cfg << EOF
-# system_info:
-#     network:
-#       renderers: [ 'netplan', 'eni', 'sysconfig' ]
-# EOF
+cat > /etc/cloud/cloud.cfg.d/01_network_renderer_policy.cfg << EOF
+system_info:
+    network:
+      renderers: [ 'netplan', 'eni', 'sysconfig' ]
+EOF
 
 # snd-aloop support
 echo 'options snd-aloop enable=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 index=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31' > /etc/modprobe.d/snd-aloop.conf
