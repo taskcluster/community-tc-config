@@ -69,10 +69,7 @@ EOF
 
 # configure core dumps to be in the process' current directory with filename 'core'
 # (required for 3 legacy JS engine fuzzers)
-echo "kernel.core_pattern = core" >> /etc/sysctl.d/90-custom.conf
-
-# fix 'bugmon-process: error: rr needs /proc/sys/kernel/perf_event_paranoid <= 1, but it is 4'
-echo 'kernel.perf_event_paranoid = 1' >> /etc/sysctl.d/90-custom.conf
+echo 'core' > /proc/sys/kernel/core_pattern
 
 # create group for running snap
 groupadd snap_sudo
