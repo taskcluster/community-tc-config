@@ -103,8 +103,8 @@ Type=simple
 ExecStart=/usr/local/bin/start-worker /etc/start-worker.yml
 # log to console to make output visible in cloud consoles, and syslog for ease of
 # redirecting to external logging services
-StandardOutput=syslog+console
-StandardError=syslog+console
+StandardOutput=journal+console
+StandardError=journal+console
 User=root
 
 [Install]
