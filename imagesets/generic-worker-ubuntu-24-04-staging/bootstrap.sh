@@ -163,6 +163,11 @@ system_info:
       renderers: [ 'netplan', 'eni', 'sysconfig' ]
 EOF
 
+if [ "%MY_CLOUD%" == "google" ]; then
+    retry curl -fsSL https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh -o add-google-cloud-ops-agent-repo.sh
+    retry bash add-google-cloud-ops-agent-repo.sh --also-install
+fi
+
 # snd-aloop support
 echo 'options snd-aloop enable=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 index=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31' > /etc/modprobe.d/snd-aloop.conf
 echo 'snd-aloop' >> /etc/modules
