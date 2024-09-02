@@ -5628,6 +5628,26 @@
     "zone": "asia-northeast1-c"
   },
   {
+    "name": "m3-megamem-128",
+    "zone": "asia-northeast1-c"
+  },
+  {
+    "name": "m3-megamem-64",
+    "zone": "asia-northeast1-c"
+  },
+  {
+    "name": "m3-ultramem-128",
+    "zone": "asia-northeast1-c"
+  },
+  {
+    "name": "m3-ultramem-32",
+    "zone": "asia-northeast1-c"
+  },
+  {
+    "name": "m3-ultramem-64",
+    "zone": "asia-northeast1-c"
+  },
+  {
     "name": "n1-highcpu-16",
     "zone": "asia-northeast1-c"
   },
