@@ -16,7 +16,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
       imageset: generic-worker-ubuntu-24-04
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 10
 
@@ -25,7 +25,7 @@ taskcluster:
       description: "Trusted worker to build Taskcluster releases (only!)"
       emailOnError: true
       imageset: generic-worker-ubuntu-24-04
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 1
       workerConfig:
@@ -60,7 +60,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-24-04
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 20
       workerConfig:
@@ -101,7 +101,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-24-04
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 50
       workerConfig:
@@ -143,7 +143,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-24-04-staging
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 1
       workerConfig:
