@@ -168,15 +168,6 @@ if [ "%MY_CLOUD%" == "google" ]; then
     retry bash add-google-cloud-ops-agent-repo.sh --also-install
 fi
 
-# snd-aloop support
-echo 'options snd-aloop enable=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 index=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31' > /etc/modprobe.d/snd-aloop.conf
-echo 'snd-aloop' >> /etc/modules
-# apt-get install -y linux-generic
-# sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT="1>2"/' /etc/default/grub
-# sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="splash"/' /etc/default/grub
-# sed -i 's/GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX="debug g"/' /etc/default/grub
-# update-grub
-
 end_time="$(date '+%s')"
 echo "UserData execution took: $(($end_time - $start_time)) seconds"
 
