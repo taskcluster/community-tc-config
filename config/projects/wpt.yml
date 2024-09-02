@@ -17,7 +17,7 @@ wpt:
       owner: pmoore@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-24-04
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 80
       launchConfig:

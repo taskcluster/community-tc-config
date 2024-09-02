@@ -9,7 +9,7 @@ bugbug:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: generic-worker-ubuntu-24-04
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 50
       workerConfig:
@@ -21,10 +21,12 @@ bugbug:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: generic-worker-ubuntu-24-04
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-2"
+      instanceTypes:
+        m5.large: 1
       workerConfig:
         genericWorker:
           config:
@@ -34,10 +36,12 @@ bugbug:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: generic-worker-ubuntu-24-04
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-2"
+      instanceTypes:
+        m5.large: 1
       workerConfig:
         genericWorker:
           config:
@@ -47,10 +51,12 @@ bugbug:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: generic-worker-ubuntu-24-04
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-4"
+      instanceTypes:
+        m5.xlarge: 1
       workerConfig:
         genericWorker:
           config:
@@ -60,10 +66,12 @@ bugbug:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: generic-worker-ubuntu-24-04
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-8"
+      instanceTypes:
+        m5.2xlarge: 1
       workerConfig:
         genericWorker:
           config:
@@ -73,10 +81,12 @@ bugbug:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
       imageset: generic-worker-ubuntu-24-04
-      cloud: gcp
+      cloud: aws
       minCapacity: 0
       maxCapacity: 25
       machineType: "zones/{zone}/machineTypes/n2-standard-16"
+      instanceTypes:
+        m5.4xlarge: 1
       workerConfig:
         genericWorker:
           config:
