@@ -6,7 +6,7 @@ exec &> /var/log/bootstrap.log
 ##############################################################################
 # TASKCLUSTER_REF can be a git commit SHA, a git branch name, or a git tag name
 # (i.e. for a taskcluster version number, prefix with 'v' to make it a git tag)
-TASKCLUSTER_REF='v67.1.0'
+TASKCLUSTER_REF='main'
 ##############################################################################
 
 function retry {
@@ -153,6 +153,15 @@ sed '/platform-vkms/d' /lib/udev/rules.d/61-mutter.rules > /etc/udev/rules.d/61-
 # install necessary packages for KVM
 # https://help.ubuntu.com/community/KVM/Installation
 retry apt-get install -y qemu-kvm bridge-utils
+
+# See
+#   * https://console.aws.amazon.com/support/cases#/6410417131/en
+#   * https://bugzilla.mozilla.org/show_bug.cgi?id=1499054#c12
+cat > /etc/cloud/cloud.cfg.d/01_network_renderer_policy.cfg << EOF
+system_info:
+    network:
+      renderers: [ 'netplan', 'eni', 'sysconfig' ]
+EOF
 
 end_time="$(date '+%s')"
 echo "UserData execution took: $(($end_time - $start_time)) seconds"
