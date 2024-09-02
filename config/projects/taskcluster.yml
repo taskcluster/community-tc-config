@@ -143,7 +143,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-24-04-staging
-      cloud: aws
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 1
       workerConfig:
