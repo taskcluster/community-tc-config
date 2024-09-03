@@ -12,7 +12,7 @@ webrender:
       owner: kats@mozilla.com
       emailOnError: false
       imageset: generic-worker-ubuntu-24-04
-      cloud: aws
+      cloud: gcp
       minCapacity: 0
       maxCapacity: 2
   clients:
