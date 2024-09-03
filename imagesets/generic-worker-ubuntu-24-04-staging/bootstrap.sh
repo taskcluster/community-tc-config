@@ -166,6 +166,9 @@ if [ '%MY_CLOUD%' == 'aws' ]; then
   echo 'snd-aloop' >> /etc/modules
 fi
 
+# avoid unnecessary shutdowns during worker startups
+systemctl disable unattended-upgrades
+
 end_time="$(date '+%s')"
 echo "UserData execution took: $(($end_time - $start_time)) seconds"
 
