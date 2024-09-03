@@ -125,6 +125,12 @@ systemctl enable worker
 
 retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
 
+if [ '%MY_CLOUD%' == 'google' ]; then
+    # this is neccessary in GCP because after installing gnome desktop both NetworkManager and systemd-networkd are enabled
+    # which leads to https://bugs.launchpad.net/ubuntu/jammy/+source/systemd/+bug/2036358
+    systemctl disable systemd-networkd-wait-online.service
+fi
+
 # set podman registries conf
 (
   echo '[registries.search]'
@@ -145,23 +151,14 @@ sed '/platform-vkms/d' /lib/udev/rules.d/61-mutter.rules > /etc/udev/rules.d/61-
 # https://help.ubuntu.com/community/KVM/Installation
 retry apt-get install -y qemu-kvm bridge-utils
 
-# See
-#   * https://console.aws.amazon.com/support/cases#/6410417131/en
-#   * https://bugzilla.mozilla.org/show_bug.cgi?id=1499054#c12
-cat > /etc/cloud/cloud.cfg.d/01_network_renderer_policy.cfg << EOF
-system_info:
-    network:
-      renderers: [ 'netplan', 'eni', 'sysconfig' ]
-EOF
+# snd-aloop currently supported in aws kernel, but not in gcp kernel
+if [ '%MY_CLOUD%' == 'aws' ]; then
+  echo 'options snd-aloop enable=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 index=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31' > /etc/modprobe.d/snd-aloop.conf
+  echo 'snd-aloop' >> /etc/modules
+fi
 
-# snd-aloop support
-echo 'options snd-aloop enable=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 index=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31' > /etc/modprobe.d/snd-aloop.conf
-echo 'snd-aloop' >> /etc/modules
-# apt-get install -y linux-generic
-# sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT="1>2"/' /etc/default/grub
-# sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="splash"/' /etc/default/grub
-# sed -i 's/GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX="debug g"/' /etc/default/grub
-# update-grub
+# avoid unnecessary shutdowns during worker startups
+systemctl disable unattended-upgrades
 
 end_time="$(date '+%s')"
 echo "UserData execution took: $(($end_time - $start_time)) seconds"
