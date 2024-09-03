@@ -6,7 +6,7 @@ exec &> /var/log/bootstrap.log
 ##############################################################################
 # TASKCLUSTER_REF can be a git commit SHA, a git branch name, or a git tag name
 # (i.e. for a taskcluster version number, prefix with 'v' to make it a git tag)
-TASKCLUSTER_REF='v67.1.0'
+TASKCLUSTER_REF='main'
 ##############################################################################
 
 function retry {
@@ -153,6 +153,12 @@ sed '/platform-vkms/d' /lib/udev/rules.d/61-mutter.rules > /etc/udev/rules.d/61-
 # install necessary packages for KVM
 # https://help.ubuntu.com/community/KVM/Installation
 retry apt-get install -y qemu-kvm bridge-utils
+
+# snd-aloop currently supported in aws kernel, but not in gcp kernel
+if [ '%MY_CLOUD%' == 'aws' ]; then
+  echo 'options snd-aloop enable=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 index=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31' > /etc/modprobe.d/snd-aloop.conf
+  echo 'snd-aloop' >> /etc/modules
+fi
 
 end_time="$(date '+%s')"
 echo "UserData execution took: $(($end_time - $start_time)) seconds"
