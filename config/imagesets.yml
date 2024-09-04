@@ -76,6 +76,8 @@ generic-worker-freebsd:
     genericWorker:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        enableInteractive: true
+        idleTimeoutSecs: 15
         shutdownMachineOnIdle: true
         shutdownMachineOnInternalError: true
         workerTypeMetadata:
@@ -94,6 +96,8 @@ generic-worker-ubuntu-24-04:
     genericWorker:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        enableInteractive: true
+        idleTimeoutSecs: 15
         shutdownMachineOnIdle: true
         shutdownMachineOnInternalError: true
         workerTypeMetadata:
@@ -114,6 +118,8 @@ generic-worker-ubuntu-24-04-arm64:
     genericWorker:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        enableInteractive: true
+        idleTimeoutSecs: 15
         shutdownMachineOnIdle: true
         shutdownMachineOnInternalError: true
         workerTypeMetadata:
@@ -128,6 +134,8 @@ generic-worker-ubuntu-24-04-staging:
     genericWorker:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        enableInteractive: true
+        idleTimeoutSecs: 15
         shutdownMachineOnIdle: true
         shutdownMachineOnInternalError: false
         workerTypeMetadata:
@@ -163,11 +171,11 @@ generic-worker-win2022:
     genericWorker:
       config:
         ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        livelogExecutable: C:\generic-worker\livelog.exe
-        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
-        shutdownMachineOnIdle: true
         idleTimeoutSecs: 15
+        livelogExecutable: C:\generic-worker\livelog.exe
+        shutdownMachineOnIdle: true
         shutdownMachineOnInternalError: true
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
@@ -187,35 +195,15 @@ generic-worker-win2022-staging:
     genericWorker:
       config:
         ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        livelogExecutable: C:\generic-worker\livelog.exe
-        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
-        shutdownMachineOnIdle: true
         idleTimeoutSecs: 15
+        livelogExecutable: C:\generic-worker\livelog.exe
+        shutdownMachineOnIdle: true
         shutdownMachineOnInternalError: true
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
             script: https://github.com/taskcluster/community-tc-config/blob/60e9f7f090f8ac7e1f9856cc299f934b5a9a0282/imagesets/generic-worker-win2022-staging/bootstrap.ps1
-generic-worker-win2016-amd:
-  workerImplementation: generic-worker
-  aws:
-    amis:
-      us-west-2: ami-096e15bddb0954238
-      us-east-1: ami-02b2b93737a3cbc68
-      us-east-2: ami-0153387cdeeaa0f2b
-  workerConfig:
-    genericWorker:
-      config:
-        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        livelogExecutable: C:\generic-worker\livelog.exe
-        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
-        shutdownMachineOnIdle: true
-        idleTimeoutSecs: 15
-        shutdownMachineOnInternalError: true
-        workerTypeMetadata:
-          machine-setup:
-            maintainer: jkratzer@mozilla.com
-            script: https://github.com/taskcluster/community-tc-config/blob/98b8ad0a86e8407e63c75777ad205e102ee96be1/imagesets/generic-worker-win2016-amd/bootstrap.ps1
 generic-worker-win2022-gpu:
   azure:
     images:
@@ -229,11 +217,11 @@ generic-worker-win2022-gpu:
     genericWorker:
       config:
         ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        livelogExecutable: C:\generic-worker\livelog.exe
-        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
-        shutdownMachineOnIdle: true
         idleTimeoutSecs: 15
+        livelogExecutable: C:\generic-worker\livelog.exe
+        shutdownMachineOnIdle: true
         shutdownMachineOnInternalError: true
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
