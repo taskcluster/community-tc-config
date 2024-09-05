@@ -191,7 +191,7 @@ taskcluster:
       cloud: azure
       minCapacity: 0
       maxCapacity: 3
-      instanceTypes:
+      vmSizes:
         Standard_NV12s_v3: 1
 
     old-docker-worker:

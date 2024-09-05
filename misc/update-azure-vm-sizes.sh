@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-# This script is used to populate the /config/azure-machine-type-offerings
+# This script is used to populate the /config/azure-vm-size-offerings
 # directory. The generated file lists which machine types are available per
 # Azure location.
 #
@@ -15,7 +15,7 @@
 
 cd "$(dirname "${0}")"
 
-rm ../config/azure-machine-type-offerings/*.json
+rm ../config/azure-vm-size-offerings/*.json
 az account list-locations --query="[].name" --output tsv | sort -u | while read location; do
-  az vm list-sizes --location $location --query="[].name" --output json 2> /dev/null | jq sort > "../config/azure-machine-type-offerings/${location}.json"
+  az vm list-sizes --location $location --query="[].name" --output json 2> /dev/null | jq sort > "../config/azure-vm-size-offerings/${location}.json"
 done

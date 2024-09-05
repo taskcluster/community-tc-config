@@ -26,7 +26,7 @@ fuzzing:
       cloud: azure
       minCapacity: 0
       maxCapacity: 10
-      instanceTypes:
+      vmSizes:
         Standard_NV12s_v3: 1
     bugmon-pernosco:
       owner: jkratzer@mozilla.com
@@ -100,7 +100,7 @@ fuzzing:
       cloud: azure
       minCapacity: 0
       maxCapacity: 10
-      instanceTypes:
+      vmSizes:
         Standard_NV12s_v3: 1
     grizzly-reduce-worker-windows-ngpu:
       owner: truber@mozilla.com
