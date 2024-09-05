@@ -15,13 +15,18 @@ git-cinnabar:
         r5.xlarge: 1
     win2012r2:
       imageset: generic-worker-win2022
-      cloud: aws
+      cloud: azure
       maxCapacity: 2
       instanceTypes:
         m7i.2xlarge: 1
         m7i.4xlarge: 1
         c7i.2xlarge: 1
         c7i.4xlarge: 1
+      vmSizes:
+        Standard_F8s_v2: 1
+        Standard_F16s_v2: 1
+        Standard_D8s_v5: 1
+        Standard_D16s_v5: 1
   clients:
     worker-osx:
       scopes:

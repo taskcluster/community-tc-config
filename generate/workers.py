@@ -462,12 +462,12 @@ def azure_machine_types_in_location(location):
 
       location: The Azure location, such as "centralus"
 
-    The instances are read from JSON files in config/azure-machine-type-offerings, and
+    The instances are read from JSON files in config/azure-vm-size-offerings, and
     cached in memory.
-    See /misc/update-azure-machine-types.sh for how this file is generated and updated.
+    See /misc/update-azure-vm-sizes.sh for how this file is generated and updated.
     """
     offerings_file = os.path.join(
-        config_path(), "azure-machine-type-offerings", f"{location}.json"
+        config_path(), "azure-vm-size-offerings", f"{location}.json"
     )
     with open(offerings_file, "r") as the_file:
         data = json.load(the_file)
@@ -481,7 +481,7 @@ def azure(
     locations=None,
     minCapacity=0,
     maxCapacity=None,
-    instanceTypes={
+    vmSizes={
         "Standard_F16s_v2": 1,
     },
     **cfg,
@@ -493,12 +493,12 @@ def azure(
       locations: locations to deploy to (required)
       minCapacity: minimum capacity to run at any time (default 0)
       maxCapacity: maximum capacity to run at any time (required)
-      instanceTypes: dict of instance types to provision, values are
+      vmSizes: dict of VM sizes to provision, values are
                      capacityPerInstance (required) (default {Standard_F16s_v2: 1})
     """
 
     assert maxCapacity, "must give a maxCapacity"
-    assert instanceTypes, "must give instanceTypes"
+    assert vmSizes, "must give vmSizes"
 
     AZURE_PROVIDER = "community-tc-workers-azure"
 
@@ -522,10 +522,10 @@ def azure(
     launchConfigs = []
     for location in locations:
         subnetId = azure_config["subnets"][location]
-        for instanceType, capacityPerInstance in instanceTypes.items():
-            # Filter out locations where the required instance type
+        for vmSize, capacityPerInstance in vmSizes.items():
+            # Filter out locations where the required VM size
             # is not available.
-            if instanceType not in azure_machine_types_in_location(location):
+            if vmSize not in azure_machine_types_in_location(location):
                 continue
             launchConfig = {
                 "capacityPerInstance": capacityPerInstance,
@@ -553,13 +553,12 @@ def azure(
                 "priority": "spot",
                 "evictionPolicy": "Delete",
                 "hardwareProfile": {
-                    "vmSize": instanceType,
+                    "vmSize": vmSize,
                 },
             }
             launchConfigs.append(launchConfig)
     assert launchConfigs, (
-        f"The locations {locations} do not support instance types"
-        f" {list(instanceTypes.keys())}"
+        f"The locations {locations} do not support VM sizes" f" {list(vmSizes.keys())}"
     )
 
     wp = DynamicWorkerPoolSettings(AZURE_PROVIDER)
