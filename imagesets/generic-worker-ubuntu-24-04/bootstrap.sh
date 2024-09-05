@@ -97,6 +97,9 @@ echo 127.0.1.1 taskcluster >> /etc/hosts
 cat > /lib/systemd/system/worker.service << EOF
 [Unit]
 Description=Start TC worker
+# start once networking is online
+Wants=network-online.target
+After=network-online.target
 
 [Service]
 Type=simple
