@@ -371,6 +371,8 @@ taskcluster:
         - secrets:get:project/taskcluster/testing/generic-worker/ci-creds
         - queue:scheduler-id:taskcluster-level-1
         - queue:route:checks
+        - queue:route:index.taskcluster.cache.pr.docker-images.v2.*
+        - queue:route:tc-treeherder.v2.taskcluster-pr.*
       to:
         - repo:github.com/taskcluster/taskcluster:*
         - repo:github.com/taskcluster/staging-releases:*
