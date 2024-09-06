@@ -137,11 +137,11 @@ systemctl enable worker
 
 retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
 
-if [ '%MY_CLOUD%' == 'google' ]; then
-    # this is neccessary in GCP because after installing gnome desktop both NetworkManager and systemd-networkd are enabled
-    # which leads to https://bugs.launchpad.net/ubuntu/jammy/+source/systemd/+bug/2036358
-    systemctl disable systemd-networkd-wait-online.service
-fi
+# if [ '%MY_CLOUD%' == 'google' ]; then
+#     # this is neccessary in GCP because after installing gnome desktop both NetworkManager and systemd-networkd are enabled
+#     # which leads to https://bugs.launchpad.net/ubuntu/jammy/+source/systemd/+bug/2036358
+#     systemctl disable systemd-networkd-wait-online.service
+# fi
 
 # set podman registries conf
 (
