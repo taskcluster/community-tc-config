@@ -332,6 +332,59 @@ fuzzing:
           - secrets:get:project/fuzzing/fuzzmanagerconf
         routes:
           - notify.email.truber@mozilla.com.on-failed
+    failed-log-ingestor:
+      description: Hook for ingesting livelogs from failed fuzzing tasks for bucketing
+      owner: truber@mozilla.com
+      emailOnError: true
+      bindings:
+        - exchange: exchange/taskcluster-queue/v1/task-failed
+          routingKeyPattern: primary.#.proj-fuzzing.#
+      task:
+        provisionerId: proj-fuzzing
+        schedulerId: fuzzing
+        workerType: decision
+        payload:
+          image:
+            type: indexed-image
+            path: public/failed-log-ingestor.tar.zst
+            namespace: project.fuzzing.orion.failed-log-ingestor.master
+          features:
+            taskclusterProxy: true
+          maxRunTime: 600
+          command:
+            - 'ingest'
+            - '--task-id'
+            - '${payload.status.taskId}'
+            - '--run-id'
+            - '${payload.runId}'
+        metadata:
+          name: failed-log-ingestor
+          description: Ingest logs from failed fuzzing tasks
+          owner: truber@mozilla.com
+          source: 'https://github.com/MozillaSecurity/orion'
+        expires:
+          $fromNow: 2 weeks
+        deadline:
+          $fromNow: 1 hour
+        scopes:
+          - queue:route:notify.email.truber@mozilla.com.on-failed
+          - queue:scheduler-id:fuzzing
+          - secrets:get:project/fuzzing/fuzzmanagerconf
+        routes:
+          - notify.email.truber@mozilla.com.on-failed
+      triggerSchema:
+        type: object
+        properties:
+          status:
+            type: object
+            properties:
+              workerType:
+                type: string
+                not:
+                  anyOf:
+                    - pattern: '^ci.*'
+                    - const: decision
+                    - pattern: '^grizzly-reduce.*'
     bugmon:
       description: Hook for triggering bugmon monitor tasks
       owner: jkratzer@mozilla.com
