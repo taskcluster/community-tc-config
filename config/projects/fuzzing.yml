@@ -851,6 +851,11 @@ fuzzing:
         - hook-id:project-fuzzing/grizzly-reduce-reset-error
         - hook-id:project-fuzzing/grizzly-reduce-monitor
     - grant:
+        - queue:route:notify.email.truber@mozilla.com.on-failed
+        - secrets:get:project/fuzzing/fuzzmanagerconf
+      to:
+        - hook-id:project-fuzzing/failed-log-ingestor
+    - grant:
         - docker-worker:capability:privileged
         - index:insert-task:project.fuzzing.orion.*
         - queue:route:index.project.fuzzing.orion.*
