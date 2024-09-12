@@ -372,6 +372,19 @@ fuzzing:
           - secrets:get:project/fuzzing/fuzzmanagerconf
         routes:
           - notify.email.truber@mozilla.com.on-failed
+      triggerSchema:
+        type: object
+        properties:
+          status:
+            type: object
+            properties:
+              workerType:
+                type: string
+                not:
+                  anyOf:
+                    - pattern: '^ci.*'
+                    - const: decision
+                    - pattern: '^grizzly-reduce.*'
     bugmon:
       description: Hook for triggering bugmon monitor tasks
       owner: jkratzer@mozilla.com
