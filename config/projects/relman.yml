@@ -53,8 +53,8 @@ relman:
       vmSizes:
         Standard_F8s_v2: 1
         Standard_F16s_v2: 1
-        Standard_D8s_v5: 1
-        Standard_D16s_v5: 1
+        Standard_D8s_v3: 1
+        Standard_D16s_v3: 1
     generic-worker-ubuntu-24-04:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
