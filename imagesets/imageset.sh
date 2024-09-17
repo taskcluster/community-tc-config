@@ -106,7 +106,7 @@ function deploy {
   export IMAGE_SET_COMMIT_SHA="$(git rev-parse HEAD)"
 
   # generate 20 char random identifier from chars [a-z0-9]
-  export UUID="$(cat /dev/urandom | head -c 256 | base64 | sed 's/[^a-z0-9]//g' | head -c 20)"
+  export UUID="$(cat /dev/urandom | base64 | sed 's/[^a-z0-9]//g' | head -c 20)"
   export UNIQUE_NAME="${IMAGE_SET}-${UUID}"
 
   export TEMP_DIR="$(mktemp -d -t password-store.XXXXXXXXXX)"
@@ -561,7 +561,7 @@ function azure_update {
     --tags "image_set=${IMAGE_SET}" \
     --location="${REGION}" > /dev/null 2>&1
 
-  ADMIN_PASSWORD="$(head /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9!@#$%^&*' | head -c 20)"
+  ADMIN_PASSWORD="$(cat /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9!@#$%^&*' | head -c 20)"
 
   log "Creating instance ${NAME_WITH_REGION}..."
   az vm create \
