@@ -18,7 +18,7 @@ function deploy {
   # Presumably bash and env must already be in the PATH to reach this point,
   # but let's keep them in the dependency list in case this list is
   # copy/pasted to any docs, etc. Having them here doesn't do any harm.
-  for command in aws az base64 basename bash cat chmod cut date dirname env find flock gcloud git head mktemp pass rm sed sleep sort tail touch which xargs yq; do
+  for command in aws az base64 basename bash cat chmod cut date dirname env find flock gcloud git head mktemp pass rm sed sleep sort tail touch tr which xargs yq; do
     if ! which "${command}" > /dev/null; then
       log "  \xE2\x9D\x8C ${command}"
       log "${0} requires ${command} to be installed and available in your PATH - please fix and rerun" >&2
@@ -193,7 +193,7 @@ function deploy {
   # Link to bootstrap script in worker type metadata, if generic-worker worker type
   if [ "$(yq r ../config/imagesets.yml "${IMAGE_SET}.workerImplementation")" == "generic-worker" ]; then
     BOOTSTRAP_SCRIPT="$(echo "${IMAGE_SET}"/bootstrap.*)"
-    yq w -i ../config/imagesets.yml "${IMAGE_SET}.workerConfig.genericWorker.config.workerTypeMetadata.machine-setup.script" "https://github.com/taskcluster/community-tc-config/blob/${IMAGE_SET_COMMIT_SHA}/imagesets/${BOOTSTRAP_SCRIPT}"
+    yq w -i ../config/imagesets.yml "${IMAGE_SET}.workerConfig.genericWorker.config.workerTypeMetadata.machine-setup.script" "https://raw.githubusercontent.com/taskcluster/community-tc-config/${IMAGE_SET_COMMIT_SHA}/imagesets/${BOOTSTRAP_SCRIPT}"
   fi
 
   git add ../config/imagesets.yml
@@ -229,11 +229,11 @@ function aws_find_old_objects {
   log "Querying old instances..."
   OLD_INSTANCES="$(aws --region "${REGION}" ec2 describe-instances --filters "Name=tag:ImageSet,Values=${IMAGE_SET}" --query 'Reservations[*].Instances[*].InstanceId' --output text)"
 
-  # find old amis
+  # find old snapshots
   log "Querying previous AMI..."
   OLD_SNAPSHOTS="$(aws --region "${REGION}" ec2 describe-images --owners self --filters "Name=name,Values=${IMAGE_SET} *" --query 'Images[*].BlockDeviceMappings[*].Ebs.SnapshotId' --output text)"
 
-  # find old snapshots
+  # find old amis
   log "Querying snapshot used in this previous AMI..."
   OLD_AMIS="$(aws --region "${REGION}" ec2 describe-images --owners self --filters "Name=name,Values=${IMAGE_SET} *" --query 'Images[*].ImageId' --output text)"
 }
@@ -285,8 +285,6 @@ function aws_update {
   AMI="$(echo $AMI_METADATA | sed 's/ .*//')"
   AMI_NAME="$(echo $AMI_METADATA | sed 's/.* //')"
   log "Base AMI is: ${AMI} ('${AMI_NAME}')"
-
-  aws_find_old_objects
 
   TEMP_SETUP_SCRIPT="$(mktemp -t ${UNIQUE_NAME}.XXXXXXXXXX)"
 
@@ -387,8 +385,6 @@ function aws_update {
     fi
     echo "AMI:         ${IMAGE_ID}"
   } > "aws.${REGION}.secrets"
-
-  aws_delete_found
 }
 
 ################## GOOGLE ##################
@@ -440,8 +436,6 @@ function google_update {
   # gcloud projects add-iam-policy-binding "${GCP_PROJECT}" --member serviceAccount:taskcluster-worker-manager@taskcluster-temp-workers.iam.gserviceaccount.com --role roles/compute.imageUser
 
   # Prefer no ssh keys, see: https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys
-
-  google_find_old_objects
 
   TEMP_SETUP_SCRIPT="$(mktemp -t ${UNIQUE_NAME}.XXXXXXXXXX)"
 
@@ -496,8 +490,6 @@ function google_update {
   done
 
   echo "projects/${GCP_PROJECT}/global/images/${UNIQUE_NAME}" > gcp.secrets
-
-  google_delete_found
 }
 
 ################## AZURE ##################
@@ -553,8 +545,6 @@ function azure_update {
     log "Cannot deploy in ${REGION} since machine type $(cat azure_base_instance_type) is not supported; skipping."
     return 0
   fi
-
-  azure_find_old_objects
 
   # Avoid using UNIQUE_NAME which may be too long, see e.g.
   # https://bugs.launchpad.net/ubuntu-kernel-tests/+bug/1779107/comments/2
@@ -701,8 +691,6 @@ function azure_update {
     echo "Password:  ${ADMIN_PASSWORD}"
     echo "Image:     ${IMAGE_ID}"
   } > "azure.${REGION}.secrets"
-
-  azure_delete_found
 }
 
 ################## Entry point ##################
