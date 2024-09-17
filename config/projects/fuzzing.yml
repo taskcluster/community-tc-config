@@ -729,7 +729,7 @@ fuzzing:
           - queue:create-task:highest:proj-fuzzing/ci
           - queue:create-task:highest:proj-fuzzing/ci-*
           - queue:route:index.project.fuzzing.orion.*
-          - queue:scheduler-id:taskcluster-github
+          - queue:scheduler-id:fuzzing
           - secrets:get:project/fuzzing/docker-hub
         metadata:
           name: Orion decision task
@@ -754,7 +754,6 @@ fuzzing:
         - queue:create-task:highest:proj-fuzzing/ci
         - queue:create-task:highest:proj-fuzzing/ci-*
         - queue:create-task:highest:proj-fuzzing/decision
-        - queue:scheduler-id:taskcluster-github
       to:
         - hook-id:project-fuzzing/orion-cron
     - grant:
