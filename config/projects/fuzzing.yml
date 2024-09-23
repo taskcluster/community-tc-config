@@ -68,7 +68,8 @@ fuzzing:
       imageset: generic-worker-ubuntu-24-04-arm64
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 2
+      maxCapacity: 10
+      machineType: "zones/{zone}/machineTypes/t2a-standard-4"
     ci-windows:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
