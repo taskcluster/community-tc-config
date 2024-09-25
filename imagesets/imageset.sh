@@ -11,6 +11,17 @@ function log {
   fi
 }
 
+function log-iff-fails {
+  export TEMP_FILE="$(mktemp -t log-iff-fails.XXXXXXXXXX)"
+  "${@}" > "${TEMP_FILE}" 2>&1
+  local exit_code=$?
+  if [ "${exit_code}" != 0 ]; then
+    cat "${TEMP_FILE}"
+  fi
+  rm "${TEMP_FILE}"
+  return "${exit_code}"
+}
+
 function deploy {
 
   log "Checking system dependencies..."
@@ -136,7 +147,7 @@ function deploy {
   # (e.g. because test.gpg is in a gitignore list of the user or repo) then we
   # would end up removing the wrong commit. Using the explicit commit id here
   # protects against those type of edge cases.
-  pass git reset --hard "${head_sha_password_store}" > /dev/null 2>&1
+  log-iff-fails pass git reset --hard "${head_sha_password_store}"
 
   log 'Starting!'
 
@@ -164,7 +175,7 @@ function deploy {
     azure)
       if ! az account show > /dev/null 2>&1; then
         log "Need azure credentials..."
-        az login > /dev/null 2>&1
+        log-iff-fails az login
       fi
       echo centralus 26 215 eastus 15 250 eastus2 33 200 northcentralus 100 175 southcentralus 99 150 westus 75 225 westus2 60 160 | xargs -P7 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
       log "Fetching secrets..."
@@ -521,7 +532,7 @@ function azure_delete_found {
   if [ -n "${OLD_RESOURCE_GROUPS}" ]; then
     for group in ${OLD_RESOURCE_GROUPS}; do
       log "Now deleting previous resource group ${group}..."
-      az group delete --name="${group}" --yes --no-wait > /dev/null 2>&1
+      log-iff-fails az group delete --name="${group}" --yes --no-wait
     done
   else
     log "No previous resource groups to delete."
@@ -529,7 +540,7 @@ function azure_delete_found {
 
   if [ -n "${OLD_IMAGES}" ]; then
     log "Deleting the old image(s) ("${OLD_IMAGES}")..."
-    az image delete --ids ${OLD_IMAGES} --no-wait true > /dev/null 2>&1
+    log-iff-fails az image delete --ids ${OLD_IMAGES} --no-wait true
   else
     log "No old images to delete."
   fi
@@ -556,15 +567,15 @@ function azure_update {
   AZURE_VM_RESOURCE_GROUP="${NAME_WITH_REGION}-rg"
 
   log "Creating temporary resource group ${AZURE_VM_RESOURCE_GROUP} for image building resources..."
-  az group create \
+  log-iff-fails az group create \
     --name="${AZURE_VM_RESOURCE_GROUP}" \
     --tags "image_set=${IMAGE_SET}" \
-    --location="${REGION}" > /dev/null 2>&1
+    --location="${REGION}"
 
-  ADMIN_PASSWORD="$(cat /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9!@#$%^&*' | head -c 20)"
+  ADMIN_PASSWORD="$(head -c 256 /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9!@#$%^&*' | head -c 20)"
 
   log "Creating instance ${NAME_WITH_REGION}..."
-  az vm create \
+  log-iff-fails az vm create \
     --name="${NAME_WITH_REGION}" \
     --image=$(cat azure_image) \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
@@ -580,7 +591,7 @@ function azure_update {
     --size=$(cat azure_base_instance_type) \
     --tags "image_set=${IMAGE_SET}" \
     --admin-username="azureuser" \
-    --admin-password="${ADMIN_PASSWORD}" > /dev/null 2>&1
+    --admin-password="${ADMIN_PASSWORD}"
 
   PUBLIC_IP="$(az vm show -d --name="${NAME_WITH_REGION}" --resource-group="${AZURE_VM_RESOURCE_GROUP}" --query publicIps --output tsv)"
 
@@ -640,13 +651,13 @@ function azure_update {
     --resource-group="${AZURE_VM_RESOURCE_GROUP}"
 
   log "Creating an image from the terminated instance..."
-  az image create \
+  log-iff-fails az image create \
     --name="${NAME_WITH_REGION}" \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
     --hyper-v-generation="V2" \
     --location="${REGION}" \
     --tags "image_set=${IMAGE_SET}" \
-    --source="${NAME_WITH_REGION}" > /dev/null 2>&1
+    --source="${NAME_WITH_REGION}"
 
   IMAGE_ID="$(az image show --name="${NAME_WITH_REGION}" --resource-group="${AZURE_VM_RESOURCE_GROUP}" --query id --output tsv)"
 
