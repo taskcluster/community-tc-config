@@ -575,7 +575,7 @@ function azure_update {
   ADMIN_PASSWORD="$(head -c 256 /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9!@#$%^&*' | head -c 20)"
 
   log "Creating instance ${NAME_WITH_REGION}..."
-  log-iff-fails az vm create \
+  az vm create \
     --name="${NAME_WITH_REGION}" \
     --image=$(cat azure_image) \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
