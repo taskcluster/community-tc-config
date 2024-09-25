@@ -587,7 +587,7 @@ def generic_worker(wp, **cfg):
             {
                 "genericWorker": {
                     "config": {
-                        "enableD2G": true,
+                        "enableD2G": True,
                         "idleTimeoutSecs": 600,
                         "wstAudience": "communitytc",
                         "wstServerURL": "https://community-websocktunnel.services.mozilla.com",
