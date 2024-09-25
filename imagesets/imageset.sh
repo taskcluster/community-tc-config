@@ -508,17 +508,10 @@ function google_update {
 function azure_delete {
   azure_find_old_objects
   azure_delete_found
+  azure_delete_resource_groups
 }
 
 function azure_find_old_objects {
-  log "Querying old resource groups..."
-  OLD_RESOURCE_GROUPS="$(az group list --query="[?tags.image_set == '${IMAGE_SET}' && location == '${REGION}'].id" --output tsv)"
-  if [ -n "${OLD_RESOURCE_GROUPS}" ]; then
-    log "Found old resource group(s):" $OLD_RESOURCE_GROUPS
-  else
-    log "WARNING: No old resource groups found"
-  fi
-
   log "Querying previous images..."
   OLD_IMAGES="$(az image list --query="[?tags.image_set == '${IMAGE_SET}' && location == '${REGION}'].id" --output tsv)"
   if [ -n "${OLD_IMAGES}" ]; then
@@ -529,6 +522,22 @@ function azure_find_old_objects {
 }
 
 function azure_delete_found {
+  if [ -n "${OLD_IMAGES}" ]; then
+    log "Deleting the old image(s) ("${OLD_IMAGES}")..."
+    log-iff-fails az image delete --ids ${OLD_IMAGES} --no-wait true
+  else
+    log "No old images to delete."
+  fi
+}
+
+function azure_delete_resource_groups {
+  log "Querying old resource groups..."
+  OLD_RESOURCE_GROUPS="$(az group list --query="[?tags.image_set == '${IMAGE_SET}' && location == '${REGION}'].id" --output tsv)"
+  if [ -n "${OLD_RESOURCE_GROUPS}" ]; then
+    log "Found old resource group(s):" $OLD_RESOURCE_GROUPS
+  else
+    log "WARNING: No old resource groups found"
+  fi
   if [ -n "${OLD_RESOURCE_GROUPS}" ]; then
     for group in ${OLD_RESOURCE_GROUPS}; do
       log "Now deleting previous resource group ${group}..."
@@ -536,13 +545,6 @@ function azure_delete_found {
     done
   else
     log "No previous resource groups to delete."
-  fi
-
-  if [ -n "${OLD_IMAGES}" ]; then
-    log "Deleting the old image(s) ("${OLD_IMAGES}")..."
-    log-iff-fails az image delete --ids ${OLD_IMAGES} --no-wait true
-  else
-    log "No old images to delete."
   fi
 }
 
@@ -556,6 +558,8 @@ function azure_update {
     log "Cannot deploy in ${REGION} since machine type $(cat azure_base_instance_type) is not supported; skipping."
     return 0
   fi
+
+  azure_delete_resource_groups
 
   # Avoid using UNIQUE_NAME which may be too long, see e.g.
   # https://bugs.launchpad.net/ubuntu-kernel-tests/+bug/1779107/comments/2
