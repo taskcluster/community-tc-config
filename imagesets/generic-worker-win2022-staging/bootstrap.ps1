@@ -90,22 +90,19 @@ $env:GOPATH  = "C:\gopath"
 $env:PATH    = $env:PATH + ";C:\go\bin;C:\gopath\bin;C:\Program Files\Git\cmd;C:\Program Files\Python311"
 $env:PATHEXT = $env:PATHEXT + ";.PY"
 
+md "C:\generic-worker"
+md "C:\worker-runner"
+
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
 git clone https://github.com/taskcluster/taskcluster
 git checkout ${TASKCLUSTER_REF}
 $revision = git rev-parse HEAD
 $env:CGO_ENABLED = "0"
-Set-Location taskcluster\workers\generic-worker
-go install -tags multiuser -ldflags "-X main.revision=$revision" ./...
-Set-Location ..\..\tools\livelog
-go install -tags multiuser -ldflags "-X main.revision=$revision" ./...
-Set-Location ..\taskcluster-proxy
-go install -tags multiuser -ldflags "-X main.revision=$revision" ./...
-md C:\generic-worker
-Move-Item "$env:GOPATH\bin\*" "C:\generic-worker" -Force
-Set-Location ..\worker-runner
-go install -tags multiuser -ldflags "-X main.revision=$revision" ./...
-Move-Item "$env:GOPATH\bin\start-worker.exe" "C:\worker-runner" -Force
+Set-Location taskcluster
+go build -tags multiuser -o "C:\generic-worker\generic-worker.exe" -ldflags "-X main.revision=$revision" .\workers\generic-worker
+go build -o "C:\generic-worker\livelog.exe" .\tools\livelog
+go build -o "C:\generic-worker\taskcluster-proxy.exe" -ldflags "-X main.revision=$revision" .\tools\taskcluster-proxy
+go build -o "C:\worker-runner\start-worker.exe" -ldflags "-X main.revision=$revision" .\tools\worker-runner\cmd\start-worker
 & "C:\generic-worker\generic-worker.exe" --version
 & "C:\generic-worker\generic-worker.exe" new-ed25519-keypair --file "C:\generic-worker\generic-worker-ed25519-signing-key.key"
 
@@ -219,15 +216,17 @@ choco install -y visualstudio2019buildtools --version 16.5.4.0 --package-paramet
 # install gcc for go race detector
 choco install -y mingw --version 11.2.0.07112021
 
-# Get information about the video controllers (GPUs)
-$gpuInfo = Get-WmiObject -Query "Select * From Win32_VideoController"
-
 # Check if any of the video controllers are from NVIDIA
-$hasNvidiaGpu = $gpuInfo | Where-Object { $_.Name -like "*NVIDIA*" }
+# Note, 0x10DE is the NVIDIA Corporation Vendor ID
+$hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match "^PCI\\VEN_10DE" }
 
 if ($hasNvidiaGpu) {
   $client.DownloadFile("https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe", "C:\nvidia_driver.exe")
-  Start-Process "C:\nvidia_driver.exe" -ArgumentList "-s", "-noreboot" -Wait -NoNewWindow  -RedirectStandardOutput "C:\nvidia-install-stdout.txt" -RedirectStandardError "C:\nvidia-install-stderr.txt"
+  Start-Process "C:\nvidia_driver.exe" -ArgumentList "-s", "-noreboot" -Wait -NoNewWindow -RedirectStandardOutput "C:\nvidia-install-stdout.txt" -RedirectStandardError "C:\nvidia-install-stderr.txt"
+  # install CUDA
+  # https://github.com/taskcluster/community-tc-config/issues/713
+  $client.DownloadFile("https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe", "C:\cuda_installer.exe")
+  Start-Process "C:\cuda_installer.exe" -ArgumentList "-s", "-noreboot" -Wait -NoNewWindow -RedirectStandardOutput "C:\cuda-install-stdout.txt" -RedirectStandardError "C:\cuda-install-stderr.txt"
 }
 
 # now shutdown, in preparation for creating an image

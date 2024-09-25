@@ -90,9 +90,14 @@ $env:GOPATH  = "C:\gopath"
 $env:PATH    = $env:PATH + ";C:\go\bin;C:\gopath\bin;C:\Program Files\Git\cmd;C:\Program Files\Python311"
 $env:PATHEXT = $env:PATHEXT + ";.PY"
 
-# download generic-worker
-md C:\generic-worker
+md "C:\generic-worker"
+md "C:\worker-runner"
+
+# download generic-worker, worker-runner, livelog, and taskcluster-proxy
 $client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/generic-worker-multiuser-windows-amd64", "C:\generic-worker\generic-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/livelog-windows-amd64", "C:\generic-worker\livelog.exe")
+$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/taskcluster-proxy-windows-amd64", "C:\generic-worker\taskcluster-proxy.exe")
 & "C:\generic-worker\generic-worker.exe" --version
 & "C:\generic-worker\generic-worker.exe" new-ed25519-keypair --file "C:\generic-worker\generic-worker-ed25519-signing-key.key"
 
@@ -116,10 +121,6 @@ set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% set "Generic Worker" AppRotateFiles 0
 "@
 Start-Process C:\generic-worker\install.bat -Wait -NoNewWindow
-
-# download worker-runner
-md C:\worker-runner
-$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/start-worker-windows-amd64", "C:\worker-runner\start-worker.exe")
 
 # install worker-runner
 Set-Content -Path c:\worker-runner\install.bat @"
@@ -156,12 +157,6 @@ worker:
   protocolPipe: \\.\pipe\generic-worker
 cacheOverRestarts: c:\generic-worker\start-worker-cache.json
 "@
-
-# download livelog
-$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/livelog-windows-amd64", "C:\generic-worker\livelog.exe")
-
-# download taskcluster-proxy
-$client.DownloadFile("https://github.com/taskcluster/taskcluster/releases/download/${TASKCLUSTER_VERSION}/taskcluster-proxy-windows-amd64", "C:\generic-worker\taskcluster-proxy.exe")
 
 # get generic-worker and livelog source code (not required, but useful)
 Start-Process "go" -ArgumentList "get -t github.com/taskcluster/generic-worker github.com/taskcluster/livelog" -Wait -NoNewWindow
