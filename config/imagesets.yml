@@ -50,14 +50,14 @@ generic-worker:
 docker-worker:
   workerImplementation: docker-worker
   gcp:
-    image: projects/community-tc-workers/global/images/docker-worker-lghjz3qes6s4qff4m97a
+    image: projects/community-tc-workers/global/images/docker-worker-bwflbvygp0d2pj8bpvv9
   aws:
     # originally built with the `docker_community_aws` builder in monopacker
     amis:
-      us-east-1: ami-06e1ab8aeb5e47321
-      us-east-2: ami-068f5626eb26d76ac
-      us-west-1: ami-0588be8a239137b1e
-      us-west-2: ami-0d8d99ffe7ba98aec
+      us-east-1: ami-055b3d1aa7c3fdfa8
+      us-east-2: ami-0d8dd6eb2da46785d
+      us-west-1: ami-0d075ea6b252da6e6
+      us-west-2: ami-095e90ca30a20f3fd
 # v44.23.4 docker worker which includes the disableSeccomp feature
 docker-worker-legacy:
   workerImplementation: docker-worker
@@ -103,15 +103,15 @@ generic-worker-ubuntu-24-04:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/taskcluster/community-tc-config/blob/b741ee41edae59d28b55cb72b35be7cc14d11b86/imagesets/generic-worker-ubuntu-24-04/bootstrap.sh
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/833837649e6e9f8f9bc68691f263a2dd4d75a8f5/imagesets/generic-worker-ubuntu-24-04/bootstrap.sh
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-bmxg2g749ndksztpdmoe
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-whh93nh9p4w88ufrq4o3
   aws:
     amis:
-      us-west-1: ami-0f979f33d986d78d5
-      us-west-2: ami-03c8be64a2e2c171d
-      us-east-1: ami-0360e0332501016bf
-      us-east-2: ami-00f5a064a46d4f1c1
+      us-west-1: ami-0581f40a3f33eb839
+      us-west-2: ami-03ded417060df41b3
+      us-east-1: ami-07f857e8e5e4153b5
+      us-east-2: ami-005006f59b08f16a9
 generic-worker-ubuntu-24-04-arm64:
   workerImplementation: generic-worker
   workerConfig:
@@ -125,9 +125,9 @@ generic-worker-ubuntu-24-04-arm64:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/taskcluster/community-tc-config/blob/648ce02975c52e3d62a782bc6b1a684835d85107/imagesets/generic-worker-ubuntu-24-04-arm64/bootstrap.sh
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/833837649e6e9f8f9bc68691f263a2dd4d75a8f5/imagesets/generic-worker-ubuntu-24-04-arm64/bootstrap.sh
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-arm64-2gkdmu4np3gaisbqy3qc
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-arm64-llgq2sluofni3t4k82ae
 generic-worker-ubuntu-24-04-staging:
   workerImplementation: generic-worker
   workerConfig:
@@ -141,23 +141,23 @@ generic-worker-ubuntu-24-04-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://github.com/taskcluster/community-tc-config/blob/add9e6809060f52bf18650e756372acb833c6007/imagesets/generic-worker-ubuntu-24-04-staging/bootstrap.sh
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/833837649e6e9f8f9bc68691f263a2dd4d75a8f5/imagesets/generic-worker-ubuntu-24-04-staging/bootstrap.sh
   aws:
     amis:
-      us-west-1: ami-047d7fa88eae3ff98
-      us-west-2: ami-066dbc6aab46d3d29
-      us-east-1: ami-0cebdd45a9509cc9f
-      us-east-2: ami-031a715b0451b74bc
+      us-west-1: ami-0266997b770ede46d
+      us-west-2: ami-04eb9170d2e628947
+      us-east-1: ami-0d6d1b79e07db1b76
+      us-east-2: ami-03b6d9f1f40aab0ff
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-kdsgohd9gai0th7ppk80
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-4aeio5l5srywcazo1pes
 generic-worker-win2022:
   workerImplementation: generic-worker
   aws:
     amis:
-      us-east-1: ami-017e30a9328338a1a
-      us-west-1: ami-01af7db6b1747a963
-      us-west-2: ami-06fb7a20aea950d8c
-      us-east-2: ami-02a27f9f75c6d77d2
+      us-east-1: ami-0e047fca39eb20ff1
+      us-west-1: ami-0e25d5652be512de8
+      us-west-2: ami-08619ffe2f5920aeb
+      us-east-2: ami-0ae8942c87663f8e4
   azure:
     images:
       centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-ficd5qdorwiwnrhamuck-centralus
@@ -179,7 +179,7 @@ generic-worker-win2022:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://github.com/taskcluster/community-tc-config/blob/6d1dc826958e5181f1066190eb6df95535b2c9f4/imagesets/generic-worker-win2022/bootstrap.ps1
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/6ef12c203416ce7082c7558f868c64da8cc55566/imagesets/generic-worker-win2022/bootstrap.ps1
 generic-worker-win2022-staging:
   workerImplementation: generic-worker
   azure:
