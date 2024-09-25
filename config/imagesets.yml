@@ -54,10 +54,10 @@ docker-worker:
   aws:
     # originally built with the `docker_community_aws` builder in monopacker
     amis:
-      us-east-1: ami-06e1ab8aeb5e47321
-      us-east-2: ami-068f5626eb26d76ac
-      us-west-1: ami-0588be8a239137b1e
-      us-west-2: ami-0d8d99ffe7ba98aec
+      us-east-1: ami-055b3d1aa7c3fdfa8
+      us-east-2: ami-0d8dd6eb2da46785d
+      us-west-1: ami-0d075ea6b252da6e6
+      us-west-2: ami-095e90ca30a20f3fd
 # v44.23.4 docker worker which includes the disableSeccomp feature
 docker-worker-legacy:
   workerImplementation: docker-worker
