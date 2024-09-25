@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -euxv
 set -o pipefail
 
 function log {
