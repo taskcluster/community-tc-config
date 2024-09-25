@@ -63,20 +63,20 @@ New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound
 
 # install go
 md "C:\gopath"
-Expand-ZIPFile -File "C:\go1.22.2.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.22.2.windows-amd64.zip"
+Expand-ZIPFile -File "C:\go1.23.1.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.23.1.windows-amd64.zip"
 
 # install git
-$client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.44.0.windows.1/Git-2.44.0-64-bit.exe", "C:\Git-2.44.0-64-bit.exe")
-Start-Process "C:\Git-2.44.0-64-bit.exe" -ArgumentList "/VERYSILENT /LOG=C:\git_install.log /NORESTART /SUPPRESSMSGBOXES" -Wait -NoNewWindow
+$client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.46.2.windows.1/Git-2.46.2-64-bit.exe", "C:\Git-2.46.2-64-bit.exe")
+Start-Process "C:\Git-2.46.2-64-bit.exe" -ArgumentList "/VERYSILENT /LOG=C:\git_install.log /NORESTART /SUPPRESSMSGBOXES" -Wait -NoNewWindow
 
 # install node
-$client.DownloadFile("https://nodejs.org/dist/v20.12.2/node-v20.12.2-x64.msi", "C:\NodeSetup.msi")
+$client.DownloadFile("https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi", "C:\NodeSetup.msi")
 Start-Process "msiexec" -ArgumentList "/i C:\NodeSetup.msi /quiet" -Wait -NoNewWindow
 
-# install python 3.11.9
-$client.DownloadFile("https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe", "C:\python-3.11.9-amd64.exe")
+# install python 3.11.10
+$client.DownloadFile("https://www.python.org/ftp/python/3.11.10/python-3.11.10-amd64.exe", "C:\python-3.11.10-amd64.exe")
 # issue 751: without /log <file> python fails to install on Azure workers, with exit code 1622, maybe default log location isn't writable(?)
-Start-Process "C:\python-3.11.9-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1 /log C:\python-install-log.txt" -Wait -NoNewWindow
+Start-Process "C:\python-3.11.10-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1 /log C:\python-install-log.txt" -Wait -NoNewWindow
 
 # set permanent env vars
 [Environment]::SetEnvironmentVariable("GOROOT", "C:\go", "Machine")
