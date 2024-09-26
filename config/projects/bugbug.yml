@@ -15,7 +15,6 @@ bugbug:
       workerConfig:
         genericWorker:
           config:
-            enableInteractive: true
             maxTaskRunTime: 87500
     batch:
       owner: mcastelluccio@mozilla.com
@@ -30,7 +29,6 @@ bugbug:
       workerConfig:
         genericWorker:
           config:
-            enableInteractive: true
             maxTaskRunTime: 87500
     compute-smaller:
       owner: mcastelluccio@mozilla.com
@@ -45,7 +43,6 @@ bugbug:
       workerConfig:
         genericWorker:
           config:
-            enableInteractive: true
             maxTaskRunTime: 87500
     compute-small:
       owner: mcastelluccio@mozilla.com
@@ -60,7 +57,6 @@ bugbug:
       workerConfig:
         genericWorker:
           config:
-            enableInteractive: true
             maxTaskRunTime: 87500
     compute-large:
       owner: mcastelluccio@mozilla.com
@@ -75,7 +71,6 @@ bugbug:
       workerConfig:
         genericWorker:
           config:
-            enableInteractive: true
             maxTaskRunTime: 87500
     compute-super-large:
       owner: mcastelluccio@mozilla.com
@@ -90,7 +85,6 @@ bugbug:
       workerConfig:
         genericWorker:
           config:
-            enableInteractive: true
             maxTaskRunTime: 87500
   secrets:
     bugbug/deploy: true

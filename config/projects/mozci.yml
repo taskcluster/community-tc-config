@@ -38,10 +38,6 @@ mozci:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5
-      workerConfig:
-        genericWorker:
-          config:
-            enableInteractive: true
   secrets:
     testing: true
     production: true

@@ -62,10 +62,6 @@ relman:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50
-      workerConfig:
-        genericWorker:
-          config:
-            enableInteractive: true
 
   secrets:
     bugzilla-dashboard-backend/deploy-production: true
