@@ -1,4 +1,4 @@
-$TASKCLUSTER_VERSION = "v70.0.0"
+$TASKCLUSTER_VERSION = "v71.0.0"
 
 # use TLS 1.2 (see bug 1443595)
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -73,10 +73,10 @@ Start-Process "C:\Git-2.46.2-64-bit.exe" -ArgumentList "/VERYSILENT /LOG=C:\git_
 $client.DownloadFile("https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi", "C:\NodeSetup.msi")
 Start-Process "msiexec" -ArgumentList "/i C:\NodeSetup.msi /quiet" -Wait -NoNewWindow
 
-# install python 3.11.10
-$client.DownloadFile("https://www.python.org/ftp/python/3.11.10/python-3.11.10-amd64.exe", "C:\python-3.11.10-amd64.exe")
+# install python 3.11.9
+$client.DownloadFile("https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe", "C:\python-3.11.9-amd64.exe")
 # issue 751: without /log <file> python fails to install on Azure workers, with exit code 1622, maybe default log location isn't writable(?)
-Start-Process "C:\python-3.11.10-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1 /log C:\python-install-log.txt" -Wait -NoNewWindow
+Start-Process "C:\python-3.11.9-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1 /log C:\python-install-log.txt" -Wait -NoNewWindow
 
 # set permanent env vars
 [Environment]::SetEnvironmentVariable("GOROOT", "C:\go", "Machine")
