@@ -76,7 +76,6 @@ generic-worker-freebsd:
     genericWorker:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
-        enableInteractive: true
         idleTimeoutSecs: 15
         shutdownMachineOnIdle: true
         shutdownMachineOnInternalError: true
@@ -96,7 +95,6 @@ generic-worker-ubuntu-24-04:
     genericWorker:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
-        enableInteractive: true
         idleTimeoutSecs: 15
         shutdownMachineOnIdle: true
         shutdownMachineOnInternalError: true
@@ -118,7 +116,6 @@ generic-worker-ubuntu-24-04-arm64:
     genericWorker:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
-        enableInteractive: true
         idleTimeoutSecs: 15
         shutdownMachineOnIdle: true
         shutdownMachineOnInternalError: true
@@ -134,10 +131,8 @@ generic-worker-ubuntu-24-04-staging:
     genericWorker:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
-        enableInteractive: true
         idleTimeoutSecs: 15
         shutdownMachineOnIdle: true
-        shutdownMachineOnInternalError: false
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
@@ -198,7 +193,6 @@ generic-worker-win2022-staging:
         idleTimeoutSecs: 15
         livelogExecutable: C:\generic-worker\livelog.exe
         shutdownMachineOnIdle: true
-        shutdownMachineOnInternalError: true
         taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
         workerTypeMetadata:
           machine-setup:

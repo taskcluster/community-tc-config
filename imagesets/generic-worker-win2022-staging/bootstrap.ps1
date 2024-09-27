@@ -225,8 +225,11 @@ if ($hasNvidiaGpu) {
   Start-Process "C:\nvidia_driver.exe" -ArgumentList "-s", "-noreboot" -Wait -NoNewWindow -RedirectStandardOutput "C:\nvidia-install-stdout.txt" -RedirectStandardError "C:\nvidia-install-stderr.txt"
   # install CUDA
   # https://github.com/taskcluster/community-tc-config/issues/713
-  $client.DownloadFile("https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe", "C:\cuda_installer.exe")
-  Start-Process "C:\cuda_installer.exe" -ArgumentList "-s", "-noreboot" -Wait -NoNewWindow -RedirectStandardOutput "C:\cuda-install-stdout.txt" -RedirectStandardError "C:\cuda-install-stderr.txt"
+
+  # Test removing this in staging to see if it fixes things...
+  # $client.DownloadFile("https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe", "C:\cuda_installer.exe")
+  # Start-Process "C:\cuda_installer.exe" -ArgumentList "-s", "-noreboot" -Wait -NoNewWindow -RedirectStandardOutput "C:\cuda-install-stdout.txt" -RedirectStandardError "C:\cuda-install-stderr.txt"
+
 }
 
 # now shutdown, in preparation for creating an image

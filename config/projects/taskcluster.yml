@@ -90,9 +90,11 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
-            enableInteractive: true
-            shutdownMachineOnInternalError: false
+            # this pool isn't in regular use, and when we use it, it is
+            # typically for testing bare metal stuff, so nice to have
+            # longer timeout
             idleTimeoutSecs: 3600
+            shutdownMachineOnInternalError: false
       # Use c5.metal to test kvm
       instanceTypes:
         m5d.metal: 1
@@ -104,11 +106,6 @@ taskcluster:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50
-      workerConfig:
-        genericWorker:
-          config:
-            enableInteractive: true
-            shutdownMachineOnInternalError: false
 
     gw-ubuntu-24-04-arm64:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -117,10 +114,6 @@ taskcluster:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5
-      workerConfig:
-        genericWorker:
-          config:
-            enableInteractive: true
       machineType: "zones/{zone}/machineTypes/t2a-standard-4"
 
     gw-ubuntu-staging-aws:
@@ -136,7 +129,7 @@ taskcluster:
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
             idleTimeoutSecs: 3600
-            enableInteractive: true
+            shutdownMachineOnInternalError: false
 
     gw-ubuntu-staging-google:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -159,7 +152,7 @@ taskcluster:
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
             idleTimeoutSecs: 3600
-            enableInteractive: true
+            shutdownMachineOnInternalError: false
 
     gw-windows-2022:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -176,12 +169,16 @@ taskcluster:
       cloud: azure
       minCapacity: 0
       maxCapacity: 10
+      # Currently staging uses a GPU pool so we can also test GPU related changes
+      vmSizes:
+        Standard_NV12s_v3: 1
       workerConfig:
         genericWorker:
           config:
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
             idleTimeoutSecs: 3600
+            shutdownMachineOnInternalError: false
 
     gw-windows-2022-gpu:
       owner: taskcluster-notifications+workers@mozilla.com
