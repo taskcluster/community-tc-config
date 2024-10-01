@@ -19,6 +19,10 @@ taskcluster:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            headlessTasks: true
 
     release:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -31,6 +35,7 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            headlessTasks: true
             runTasksAsCurrentUser: true
 
     # gw-ci-* worker pools are for generic-worker CI
@@ -66,6 +71,13 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            # Note, headlessTasks: false is _already_ default, but adding here
+            # to be explicit! The gw-ci pools are used for Generic Worker CI
+            # tasks, and some of those tests require a real GUI, such as
+            # TestDesktopResizeAndMovePointer, in which case the host will need
+            # a GUI, and thus we shouldn't enable Headless (disable GUI) on the
+            # CI environment itself.
+            headlessTasks: false
             runTasksAsCurrentUser: true
 
     gw-ci-windows-2022:
@@ -78,6 +90,13 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            # Note, headlessTasks: false is _already_ default, but adding here
+            # to be explicit! The gw-ci pools are used for Generic Worker CI
+            # tasks, and some of those tests require a real GUI, such as
+            # TestDesktopResizeAndMovePointer, in which case the host will need
+            # a GUI, and thus we shouldn't enable Headless (disable GUI) on the
+            # CI environment itself.
+            headlessTasks: false
             runTasksAsCurrentUser: true
 
     gw-ubuntu-24-04-metal:
@@ -90,10 +109,13 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            headlessTasks: true
             # this pool isn't in regular use, and when we use it, it is
             # typically for testing bare metal stuff, so nice to have
             # longer timeout
             idleTimeoutSecs: 3600
+            # if worker crashes in this pool, we typically want to know
+            # why (worker manager will eventually kill it anyway)
             shutdownMachineOnInternalError: false
       # Use c5.metal to test kvm
       instanceTypes:
@@ -106,6 +128,10 @@ taskcluster:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50
+      workerConfig:
+        genericWorker:
+          config:
+            headlessTasks: true
 
     gw-ubuntu-24-04-arm64:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -114,6 +140,10 @@ taskcluster:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 5
+      workerConfig:
+        genericWorker:
+          config:
+            headlessTasks: true
       machineType: "zones/{zone}/machineTypes/t2a-standard-4"
 
     gw-ubuntu-staging-aws:
@@ -126,11 +156,13 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            headlessTasks: true
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
             idleTimeoutSecs: 3600
+            # if worker crashes in this pool, we typically want to know
+            # why (worker manager will eventually kill it anyway)
             shutdownMachineOnInternalError: false
-
     gw-ubuntu-staging-google:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
@@ -149,9 +181,12 @@ taskcluster:
 #             path: /proc/sys/kernel/core_pattern
 #             content: 'Y29yZQo='
           config:
+            headlessTasks: true
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
             idleTimeoutSecs: 3600
+            # if worker crashes in this pool, we typically want to know
+            # why (worker manager will eventually kill it anyway)
             shutdownMachineOnInternalError: false
 
     gw-windows-2022:
@@ -161,6 +196,10 @@ taskcluster:
       cloud: azure
       minCapacity: 0
       maxCapacity: 10
+      workerConfig:
+        genericWorker:
+          config:
+            headlessTasks: true
 
     gw-windows-2022-staging:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -175,9 +214,12 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            headlessTasks: true
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
             idleTimeoutSecs: 3600
+            # if worker crashes in this pool, we typically want to know
+            # why (worker manager will eventually kill it anyway)
             shutdownMachineOnInternalError: false
 
     gw-windows-2022-gpu:
@@ -189,6 +231,10 @@ taskcluster:
       maxCapacity: 3
       vmSizes:
         Standard_NV12s_v3: 1
+      workerConfig:
+        genericWorker:
+          config:
+            headlessTasks: true
 
     old-docker-worker:
       owner: taskcluster-notifications+workers@mozilla.com
