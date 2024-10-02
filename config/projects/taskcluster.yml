@@ -105,7 +105,7 @@ taskcluster:
       imageset: generic-worker-ubuntu-24-04-staging
       cloud: aws
       minCapacity: 0
-      maxCapacity: 5
+      maxCapacity: 1
       workerConfig:
         genericWorker:
           config:
@@ -163,6 +163,7 @@ taskcluster:
             # if worker crashes in this pool, we typically want to know
             # why (worker manager will eventually kill it anyway)
             shutdownMachineOnInternalError: false
+
     gw-ubuntu-staging-google:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
@@ -207,7 +208,7 @@ taskcluster:
       imageset: generic-worker-win2022-staging
       cloud: azure
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 1
       # Currently staging uses a GPU pool so we can also test GPU related changes
       vmSizes:
         Standard_NV12s_v3: 1
@@ -243,6 +244,31 @@ taskcluster:
             # Headless on GPU instances might make sense if using e.g. CUDA
             # but generally GPU useful when GUI is enabled.
             headlessTasks: false
+
+    gw-windows-11-24h2-staging:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win11-24h2-staging
+      cloud: azure
+      minCapacity: 0
+      maxCapacity: 1
+      vmSizes:
+        # To match what Release SRE have on their Windows 11 24H2 pools...
+        Standard_F8s_v2: 1
+      workerConfig:
+        genericWorker:
+          config:
+            # Same as Release SRE
+            headlessTasks: false
+            # While iterating on the image building process for this worker
+            # pool, useful for workers not to die immediately...
+            idleTimeoutSecs: 3600
+            # if worker crashes in this pool, we typically want to know
+            # why (worker manager will eventually kill it anyway)
+            shutdownMachineOnInternalError: false
+            # See https://github.com/taskcluster/taskcluster/issues/7303
+            # Useful for testing feature runAfterUserCreation; calc.exe returns exit code 0
+            runAfterUserCreation: C:\Windows\System32\calc.exe
 
     old-docker-worker:
       owner: taskcluster-notifications+workers@mozilla.com
