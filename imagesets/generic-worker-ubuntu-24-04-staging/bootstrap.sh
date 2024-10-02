@@ -88,11 +88,15 @@ export HOME=/root
 export GOPATH=~/go
 export GOROOT=/usr/local/go
 export PATH="${GOROOT}/bin:${GOPATH}/bin:${PATH}"
+export GCO_ENABLED=0
 git clone https://github.com/taskcluster/taskcluster
 cd taskcluster
 git checkout "${TASKCLUSTER_REF}"
-CGO_ENABLED=0 go install -tags multiuser -ldflags "-X main.revision=$(git rev-parse HEAD)" ./...
-mv "${GOPATH}/bin"/* /usr/local/bin/
+HEAD_REV="$(git rev-parse HEAD)"
+go build -tags multiuser -o "/usr/local/bin/generic-worker" -ldflags "-X main.revision=${HEAD_REV}" ./workers/generic-worker
+go build -o "/usr/local/bin/livelog" ./tools/livelog
+go build -o "/usr/local/bin/taskcluster-proxy" -ldflags "-X main.revision=${HEAD_REV}" ./tools/taskcluster-proxy
+go build -o "/usr/local/bin/start-worker" -ldflags "-X main.revision=${HEAD_REV}" ./tools/worker-runner/cmd/start-worker
 
 mkdir -p /etc/generic-worker
 mkdir -p /var/local/generic-worker
