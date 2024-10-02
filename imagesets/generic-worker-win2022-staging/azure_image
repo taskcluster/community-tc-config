@@ -1,1 +1,1 @@
-MicrosoftWindowsServer:WindowsServer:2022-datacenter-azure-edition:latest
+../generic-worker-win2022-gpu/azure_image

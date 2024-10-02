@@ -214,13 +214,19 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
-            headlessTasks: true
+            # Currently staging is using GPU pool, so enable GUI. This also
+            # matches what Release SRE have, for the purposes of testing
+            # https://github.com/taskcluster/taskcluster/issues/7303.
+            headlessTasks: false
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
             idleTimeoutSecs: 3600
             # if worker crashes in this pool, we typically want to know
             # why (worker manager will eventually kill it anyway)
             shutdownMachineOnInternalError: false
+            # See https://github.com/taskcluster/taskcluster/issues/7303
+            # Useful for testing feature runAfterUserCreation; calc.exe returns exit code 0
+            runAfterUserCreation: C:\Windows\System32\calc.exe
 
     gw-windows-2022-gpu:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -234,7 +240,9 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
-            headlessTasks: true
+            # Headless on GPU instances might make sense if using e.g. CUDA
+            # but generally GPU useful when GUI is enabled.
+            headlessTasks: false
 
     old-docker-worker:
       owner: taskcluster-notifications+workers@mozilla.com
