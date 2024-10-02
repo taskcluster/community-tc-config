@@ -95,10 +95,10 @@ md "C:\worker-runner"
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
 git clone https://github.com/taskcluster/taskcluster
+Set-Location taskcluster
 git checkout ${TASKCLUSTER_REF}
 $revision = git rev-parse HEAD
 $env:CGO_ENABLED = "0"
-Set-Location taskcluster
 go build -tags multiuser -o "C:\generic-worker\generic-worker.exe" -ldflags "-X main.revision=$revision" .\workers\generic-worker
 go build -o "C:\generic-worker\livelog.exe" .\tools\livelog
 go build -o "C:\generic-worker\taskcluster-proxy.exe" -ldflags "-X main.revision=$revision" .\tools\taskcluster-proxy
