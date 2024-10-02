@@ -227,7 +227,7 @@ taskcluster:
             shutdownMachineOnInternalError: false
             # See https://github.com/taskcluster/taskcluster/issues/7303
             # Useful for testing feature runAfterUserCreation; calc.exe returns exit code 0
-            runAfterUserCreation: C:\Windows\System32\calc.exe
+            runAfterUserCreation: blahhhhhhh
 
     gw-windows-2022-gpu:
       owner: taskcluster-notifications+workers@mozilla.com
