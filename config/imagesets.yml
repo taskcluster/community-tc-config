@@ -224,13 +224,13 @@ generic-worker-win11-24h2-staging:
   workerImplementation: generic-worker
   azure:
     images:
-      centralus: placeholder
-      eastus: placeholder
-      eastus2: placeholder
-      northcentralus: placeholder
-      southcentralus: placeholder
-      westus: placeholder
-      westus2: placeholder
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-49z14erp0a8q2549ixc0-centralus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-49z14erp0a8q2549ixc0-eastus
+      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-49z14erp0a8q2549ixc0-eastus2
+      northcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-49z14erp0a8q2549ixc0-northcentralus
+      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-49z14erp0a8q2549ixc0-southcentralus
+      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-49z14erp0a8q2549ixc0-westus
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-49z14erp0a8q2549ixc0-westus2
   workerConfig:
     genericWorker:
       config:
@@ -242,4 +242,4 @@ generic-worker-win11-24h2-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: placeholder
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/ad69b7deb5fbc7e6c9b6b4f9fb7ac8af6c3a6885/imagesets/generic-worker-win11-24h2-staging/bootstrap.ps1
