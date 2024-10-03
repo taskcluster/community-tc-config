@@ -266,9 +266,9 @@ taskcluster:
             # if worker crashes in this pool, we typically want to know
             # why (worker manager will eventually kill it anyway)
             shutdownMachineOnInternalError: false
-            # See https://github.com/taskcluster/taskcluster/issues/7303
-            # Useful for testing feature runAfterUserCreation; calc.exe returns exit code 0
-            runAfterUserCreation: C:\Windows\System32\calc.exe
+            # # See https://github.com/taskcluster/taskcluster/issues/7303
+            # # Useful for testing feature runAfterUserCreation; calc.exe returns exit code 0
+            # runAfterUserCreation: C:\Windows\System32\calc.exe
 
     old-docker-worker:
       owner: taskcluster-notifications+workers@mozilla.com
