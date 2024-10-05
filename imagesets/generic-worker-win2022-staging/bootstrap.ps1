@@ -3,8 +3,10 @@ $TASKCLUSTER_REF = "main"
 # use TLS 1.2 (see bug 1443595)
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+md "C:\Install Logs"
+
 # capture env
-Get-ChildItem Env: | Out-File "C:\install_env.txt"
+Get-ChildItem Env: | Out-File "C:\Install Logs\env.txt"
 
 # needed for making http requests
 $client = New-Object system.net.WebClient
@@ -43,6 +45,22 @@ Stop-Service $servicesToDisable
 $servicesToDisable.WaitForStatus('Stopped', "00:01:00")
 $servicesToDisable | Set-Service -StartupType Disabled
 
+# skip OOBE (out of box experience)
+@(
+    "HideEULAPage",
+    "HideLocalAccountScreen",
+    "HideOEMRegistrationScreen",
+    "HideOnlineAccountScreens",
+    "HideWirelessSetupInOOBE",
+    "NetworkLocation",
+    "OEMAppId",
+    "ProtectYourPC",
+    "SkipMachineOOBE",
+    "SkipUserOOBE"
+) | ForEach-Object {
+    Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" -Name $psitem -Value 1
+}
+
 # install chocolatey package manager
 Invoke-Expression ($client.DownloadString('https://chocolatey.org/install.ps1'))
 
@@ -62,32 +80,29 @@ New-NetFirewallRule -DisplayName "Allow livelog PUT requests" -Direction Inbound
 New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound -LocalPort 60023 -Protocol TCP -Action Allow
 
 # install go
-md "C:\gopath"
 Expand-ZIPFile -File "C:\go1.23.1.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.23.1.windows-amd64.zip"
 
 # install git
 $client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.46.2.windows.1/Git-2.46.2-64-bit.exe", "C:\Git-2.46.2-64-bit.exe")
-Start-Process "C:\Git-2.46.2-64-bit.exe" -ArgumentList "/VERYSILENT /LOG=C:\git_install.log /NORESTART /SUPPRESSMSGBOXES" -Wait -NoNewWindow
+& "C:\Git-2.46.2-64-bit.exe" /VERYSILENT /LOG="C:\Install Logs\git.txt" /NORESTART /SUPPRESSMSGBOXES
 
 # install node
 $client.DownloadFile("https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi", "C:\NodeSetup.msi")
-Start-Process "msiexec" -ArgumentList "/i C:\NodeSetup.msi /quiet" -Wait -NoNewWindow
+msiexec /i C:\NodeSetup.msi /quiet
 
 # install python 3.11.9
 $client.DownloadFile("https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe", "C:\python-3.11.9-amd64.exe")
 # issue 751: without /log <file> python fails to install on Azure workers, with exit code 1622, maybe default log location isn't writable(?)
-Start-Process "C:\python-3.11.9-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1 /log C:\python-install-log.txt" -Wait -NoNewWindow
+& "C:\python-3.11.9-amd64.exe" /quiet InstallAllUsers=1 /log "C:\Install Logs\python-3.11.9.txt"
 
 # set permanent env vars
-[Environment]::SetEnvironmentVariable("GOROOT", "C:\go", "Machine")
-[Environment]::SetEnvironmentVariable("PATH", [Environment]::GetEnvironmentVariable("PATH", "Machine") + ";C:\Program Files\Vim\vim80;C:\go\bin;C:\Program Files\Python311", "Machine")
+[Environment]::SetEnvironmentVariable("GOROOT", "C:\goroot", "Machine")
+[Environment]::SetEnvironmentVariable("PATH", [Environment]::GetEnvironmentVariable("PATH", "Machine") + ";C:\Program Files\Vim\vim80;C:\goroot\bin;C:\Program Files\Python311", "Machine")
 [Environment]::SetEnvironmentVariable("PATHEXT", [Environment]::GetEnvironmentVariable("PATHEXT", "Machine") + ";.PY", "Machine")
-[Environment]::SetEnvironmentVariable("GOPATH", "C:\gopath", "Machine")
 
 # set env vars for the currently running process
-$env:GOROOT  = "C:\go"
-$env:GOPATH  = "C:\gopath"
-$env:PATH    = $env:PATH + ";C:\go\bin;C:\gopath\bin;C:\Program Files\Git\cmd;C:\Program Files\Python311"
+$env:GOROOT  = "C:\goroot"
+$env:PATH    = $env:PATH + ";C:\goroot\bin\C:\Program Files\Git\cmd;C:\Program Files\Python311"
 $env:PATHEXT = $env:PATHEXT + ";.PY"
 
 md "C:\generic-worker"
@@ -97,7 +112,7 @@ md "C:\worker-runner"
 git clone https://github.com/taskcluster/taskcluster
 Set-Location taskcluster
 git checkout ${TASKCLUSTER_REF}
-$revision = git rev-parse HEAD
+$revision = & git rev-parse HEAD
 $env:CGO_ENABLED = "0"
 go build -tags multiuser -o "C:\generic-worker\generic-worker.exe" -ldflags "-X main.revision=$revision" .\workers\generic-worker
 go build -o "C:\generic-worker\livelog.exe" .\tools\livelog
@@ -107,11 +122,11 @@ go build -o "C:\worker-runner\start-worker.exe" -ldflags "-X main.revision=$revi
 & "C:\generic-worker\generic-worker.exe" new-ed25519-keypair --file "C:\generic-worker\generic-worker-ed25519-signing-key.key"
 
 # install generic-worker, using the steps suggested in https://docs.taskcluster.net/docs/reference/workers/worker-runner/deployment#recommended-setup
-Set-Content -Path c:\generic-worker\install.bat @"
+Set-Content -Path C:\generic-worker\install.bat @"
 set nssm=C:\nssm-2.24\win64\nssm.exe
-%nssm% install "Generic Worker" c:\generic-worker\generic-worker.exe
-%nssm% set "Generic Worker" AppDirectory c:\generic-worker
-%nssm% set "Generic Worker" AppParameters run --config c:\generic-worker\generic-worker-config.yml --worker-runner-protocol-pipe \\.\pipe\generic-worker
+%nssm% install "Generic Worker" C:\generic-worker\generic-worker.exe
+%nssm% set "Generic Worker" AppDirectory C:\generic-worker
+%nssm% set "Generic Worker" AppParameters run --config C:\generic-worker\generic-worker-config.yml --worker-runner-protocol-pipe \\.\pipe\generic-worker
 %nssm% set "Generic Worker" DisplayName "Generic Worker"
 %nssm% set "Generic Worker" Description "A taskcluster worker that runs on all mainstream platforms"
 %nssm% set "Generic Worker" Start SERVICE_DEMAND_START
@@ -121,18 +136,18 @@ set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% set "Generic Worker" AppStopMethodSkip 0
 %nssm% set "Generic Worker" AppExit Default Exit
 %nssm% set "Generic Worker" AppRestartDelay 0
-%nssm% set "Generic Worker" AppStdout c:\generic-worker\generic-worker-service.log
-%nssm% set "Generic Worker" AppStderr c:\generic-worker\generic-worker-service.log
+%nssm% set "Generic Worker" AppStdout C:\generic-worker\generic-worker-service.log
+%nssm% set "Generic Worker" AppStderr C:\generic-worker\generic-worker-service.log
 %nssm% set "Generic Worker" AppRotateFiles 0
 "@
-Start-Process C:\generic-worker\install.bat -Wait -NoNewWindow
+& "C:\generic-worker\install.bat"
 
 # install worker-runner
-Set-Content -Path c:\worker-runner\install.bat @"
+Set-Content -Path C:\worker-runner\install.bat @"
 set nssm=C:\nssm-2.24\win64\nssm.exe
-%nssm% install worker-runner c:\worker-runner\start-worker.exe
-%nssm% set worker-runner AppDirectory c:\worker-runner
-%nssm% set worker-runner AppParameters c:\worker-runner\runner.yml
+%nssm% install worker-runner C:\worker-runner\start-worker.exe
+%nssm% set worker-runner AppDirectory C:\worker-runner
+%nssm% set worker-runner AppParameters C:\worker-runner\runner.yml
 %nssm% set worker-runner DisplayName "Worker Runner"
 %nssm% set worker-runner Description "Interface between workers and Taskcluster services"
 %nssm% set worker-runner Start SERVICE_AUTO_START
@@ -142,36 +157,36 @@ set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% set worker-runner AppStopMethodSkip 0
 %nssm% set worker-runner AppExit Default Exit
 %nssm% set worker-runner AppRestartDelay 0
-%nssm% set worker-runner AppStdout c:\worker-runner\worker-runner-service.log
-%nssm% set worker-runner AppStderr c:\worker-runner\worker-runner-service.log
+%nssm% set worker-runner AppStdout C:\worker-runner\worker-runner-service.log
+%nssm% set worker-runner AppStderr C:\worker-runner\worker-runner-service.log
 %nssm% set worker-runner AppRotateFiles 1
 %nssm% set worker-runner AppRotateOnline 1
 %nssm% set worker-runner AppRotateSeconds 3600
 %nssm% set worker-runner AppRotateBytes 0
 "@
-Start-Process C:\worker-runner\install.bat -Wait -NoNewWindow
+& "C:\worker-runner\install.bat"
 
 # configure worker-runner
-Set-Content -Path c:\worker-runner\runner.yml @"
+Set-Content -Path C:\worker-runner\runner.yml @"
 provider:
     providerType: %MY_CLOUD%
 worker:
   implementation: generic-worker
   service: "Generic Worker"
-  configPath: c:\generic-worker\generic-worker-config.yml
+  configPath: C:\generic-worker\generic-worker-config.yml
   protocolPipe: \\.\pipe\generic-worker
-cacheOverRestarts: c:\generic-worker\start-worker-cache.json
+cacheOverRestarts: C:\generic-worker\start-worker-cache.json
 "@
 
 # get generic-worker and livelog source code (not required, but useful)
-Start-Process "go" -ArgumentList "get -t github.com/taskcluster/generic-worker github.com/taskcluster/livelog" -Wait -NoNewWindow
+go get -t github.com/taskcluster/generic-worker github.com/taskcluster/livelog
 
 # download cygwin (not required, but useful)
 $client.DownloadFile("https://www.cygwin.com/setup-x86_64.exe", "C:\cygwin-setup-x86_64.exe")
 
 # install cygwin
 # complete package list: https://cygwin.com/packages/package_list.html
-Start-Process "C:\cygwin-setup-x86_64.exe" -ArgumentList "--quiet-mode --wait --root C:\cygwin --site http://cygwin.mirror.constant.com --packages openssh,vim,curl,tar,wget,zip,unzip,diffutils,bzr" -Wait -NoNewWindow
+& "C:\cygwin-setup-x86_64.exe" --quiet-mode --wait --root C:\cygwin --site http://cygwin.mirror.constant.com --packages openssh,vim,curl,tar,wget,zip,unzip,diffutils,bzr
 
 # open up firewall for ssh daemon
 New-NetFirewallRule -DisplayName "Allow SSH inbound" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
@@ -183,16 +198,17 @@ New-NetFirewallRule -DisplayName "Allow SSH inbound" -Direction Inbound -LocalPo
 $env:LOGONSERVER = "\\" + $env:COMPUTERNAME
 
 # configure sshd (not required, but useful)
+# use Start-Process for now as not sure how to escape arguments using & notation
 Start-Process "C:\cygwin\bin\bash.exe" -ArgumentList "--login -c `"ssh-host-config -y -c 'ntsec mintty' -u 'cygwinsshd' -w 'qwe123QWE!@#'`"" -Wait -NoNewWindow
 
 # start sshd
-Start-Process "net" -ArgumentList "start cygsshd" -Wait -NoNewWindow
+net start cygsshd
 
 # download bash setup script
 $client.DownloadFile("https://raw.githubusercontent.com/petemoore/myscrapbook/master/setup.sh", "C:\cygwin\home\Administrator\setup.sh")
 
 # run bash setup script
-Start-Process "C:\cygwin\bin\bash.exe" -ArgumentList "--login -c 'chmod a+x setup.sh; ./setup.sh'" -Wait -NoNewWindow
+& "C:\cygwin\bin\bash.exe" --login -c 'chmod a+x setup.sh; ./setup.sh'
 
 # install dependencywalker (useful utility for troubleshooting, not required)
 md "C:\DependencyWalker"
@@ -222,12 +238,12 @@ $hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match
 
 if ($hasNvidiaGpu) {
   $client.DownloadFile("https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe", "C:\nvidia_driver.exe")
-  Start-Process "C:\nvidia_driver.exe" -ArgumentList "-s", "-noreboot" -Wait -NoNewWindow -RedirectStandardOutput "C:\nvidia-install-stdout.txt" -RedirectStandardError "C:\nvidia-install-stderr.txt"
+  & "C:\nvidia_driver.exe" -s -noreboot *> "C:\Install Logs\nvidia.txt"
   # Need to fix this CUDA installation in staging...
   # Removing from here for now...
   # https://github.com/taskcluster/community-tc-config/issues/713
   # $client.DownloadFile("https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe", "C:\cuda_installer.exe")
-  # Start-Process "C:\cuda_installer.exe" -ArgumentList "-s", "-noreboot" -Wait -NoNewWindow -RedirectStandardOutput "C:\cuda-install-stdout.txt" -RedirectStandardError "C:\cuda-install-stderr.txt"
+  # & "C:\cuda_installer.exe" -s -noreboot *> "C:\Install Logs\cuda.txt"
 
 }
 
