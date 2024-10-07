@@ -5,6 +5,10 @@ $TASKCLUSTER_REF = "main"
 
 md "C:\Install Logs"
 
+# Redirect the output (stdout and stderr) from the current powershell script to a log file
+# There is a Stop-Transcript command later on in this script.
+Start-Transcript -Path "C:\Install Logs\bootstrap.txt"
+
 # capture env
 Get-ChildItem Env: | Out-File "C:\Install Logs\env.txt"
 
@@ -246,6 +250,9 @@ if ($hasNvidiaGpu) {
   # & "C:\cuda_installer.exe" -s -noreboot *> "C:\Install Logs\cuda.txt"
 
 }
+
+# This ends logging to the log file specified in the Start-Transcript command earlier on
+Stop-Transcript
 
 # now shutdown, in preparation for creating an image
 # Stop-Computer isn't working, also not when specifying -AsJob, so reverting to using `shutdown` command instead
