@@ -522,5 +522,6 @@
   "Standard_L80as_v3",
   "Standard_L80s_v3",
   "Standard_L8as_v3",
-  "Standard_L8s_v3"
+  "Standard_L8s_v3",
+  "Standard_ND96isr_H100_v5"
 ]
