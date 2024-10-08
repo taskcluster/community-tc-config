@@ -6,7 +6,8 @@ set -o pipefail
 function retry {
   set +e
   local n=0
-  local max=20
+  # 2^10 seconds is plenty
+  local max=10
   while true; do
     "$@" && break || {
       if [[ $n -lt $max ]]; then
@@ -598,7 +599,13 @@ function azure_update {
     --tags "image_set=${IMAGE_SET}" \
     --location="${REGION}"
 
-  ADMIN_PASSWORD="$(head -c 256 /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9!@#$%^&*' | head -c 20)"
+  # The admin password needs to contain 3 of the 4 character ranges specified
+  # in the loop below. To ensure characters from all ranges are present, choose 5
+  # characters randomly from each range.
+  ADMIN_PASSWORD=''
+  for range in 'A-Z' 'a-z' '0-9' '!@#$%^&*'; do
+    ADMIN_PASSWORD="${ADMIN_PASSWORD}$(head -c 256 /dev/urandom | LC_ALL=C tr -dc "${range}" | head -c 5)"
+  done
 
   log "Creating instance ${NAME_WITH_REGION}..."
   log-iff-fails retry az vm create \
