@@ -3,6 +3,28 @@
 set -eu
 set -o pipefail
 
+function retry {
+  set +e
+  local n=0
+  local max=20
+  while true; do
+    "$@" && break || {
+      if [[ $n -lt $max ]]; then
+        ((n++))
+        echo "Command $@ failed" >&2
+        sleep_time=$((2 ** n))
+        echo "Sleeping $sleep_time seconds..." >&2
+        sleep $sleep_time
+        echo "Attempt $n/$max:" >&2
+      else
+        echo "Failed after $n attempts." >&2
+        exit 67
+      fi
+    }
+  done
+  set -e
+}
+
 function log {
   if [ -n "${BACKGROUND_COLOUR-}" ] && [ -n "${FOREGROUND_COLOUR-}" ] && [ -n "${CLOUD-}" ] && [ -n "${IMAGE_SET-}" ] && [ -n "${REGION-}" ]; then
     echo -e "\x1B[48;5;${BACKGROUND_COLOUR}m\x1B[38;5;${FOREGROUND_COLOUR}m$(basename "${0}"): $(date): ${CLOUD}: ${IMAGE_SET}: ${REGION}: ${@}\x1B[K\x1B[0m"
@@ -88,7 +110,7 @@ function deploy {
   # Check that the current HEAD is also the tip of the official repo main
   # branch. If the commits match, it does not matter what the local branch
   # name is, or even if we have a detached head.
-  remoteMasterSha="$(git ls-remote "${OFFICIAL_GIT_REPO}" main | cut -f1)"
+  remoteMasterSha="$(retry git ls-remote "${OFFICIAL_GIT_REPO}" main | cut -f1)"
   localSha="$(git rev-parse HEAD)"
   if [ "${remoteMasterSha}" != "${localSha}" ]; then
     log ""
@@ -132,7 +154,7 @@ function deploy {
   #  IdentityFile <path to your private key>
   #  Port 2022
   #
-  git clone ssh://source.developers.google.com/p/taskcluster-passwords/r/secrets "${PASSWORD_STORE_DIR}"
+  retry git clone ssh://source.developers.google.com/p/taskcluster-passwords/r/secrets "${PASSWORD_STORE_DIR}"
   git -C "${PASSWORD_STORE_DIR}" config pass.signcommits false
   git -C "${PASSWORD_STORE_DIR}" config commit.gpgsign false
 
@@ -159,7 +181,7 @@ function deploy {
       fi
       echo us-west-1 118 246 us-west-2 199 220 us-east-1 4 200 us-east-2 33 210 | xargs -P4 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
       log "Fetching secrets..."
-      pass git pull
+      retry pass git pull
       for REGION in us-west-1 us-west-2 us-east-1 us-east-2; do
         # some regions may not have secrets if they do not support the required instance type
         if [ -f "${IMAGE_SET}/aws.${REGION}.secrets" ]; then
@@ -170,16 +192,16 @@ function deploy {
         fi
       done
       log "Pushing new secrets..."
-      pass git push
+      retry pass git push
       ;;
     azure)
-      if ! az account show > /dev/null 2>&1; then
+      if ! retry az account show > /dev/null 2>&1; then
         log "Need azure credentials..."
-        log-iff-fails az login
+        log-iff-fails retry az login
       fi
       echo centralus 26 215 eastus 15 250 eastus2 33 200 northcentralus 100 175 southcentralus 99 150 westus 75 225 westus2 60 160 | xargs -P7 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
       log "Fetching secrets..."
-      pass git pull
+      retry pass git pull
       for REGION in centralus eastus eastus2 northcentralus southcentralus westus westus2; do
         # some regions may not have secrets if they do not support the required instance type
         if [ -f "${IMAGE_SET}/azure.${REGION}.secrets" ]; then
@@ -189,7 +211,7 @@ function deploy {
         fi
       done
       log "Pushing new secrets..."
-      pass git push
+      retry pass git push
       ;;
     google)
       echo us-central1-a 21 230 | xargs -P1 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
@@ -221,8 +243,8 @@ function deploy {
       ;;
   esac
 
-  git -c pull.rebase=true pull "${OFFICIAL_GIT_REPO}" main
-  git push "${OFFICIAL_GIT_REPO}" "+HEAD:refs/heads/main"
+  retry git -c pull.rebase=true pull "${OFFICIAL_GIT_REPO}" main
+  retry git push "${OFFICIAL_GIT_REPO}" "+HEAD:refs/heads/main"
   log 'Deployment of image sets successful!'
   log ''
   log 'Be sure to run tc-admin in the community-tc-config repo to apply changes to the community cluster!'
@@ -238,15 +260,15 @@ function aws_delete {
 function aws_find_old_objects {
   # query old instances
   log "Querying old instances..."
-  OLD_INSTANCES="$(aws --region "${REGION}" ec2 describe-instances --filters "Name=tag:ImageSet,Values=${IMAGE_SET}" --query 'Reservations[*].Instances[*].InstanceId' --output text)"
+  OLD_INSTANCES="$(retry aws --region "${REGION}" ec2 describe-instances --filters "Name=tag:ImageSet,Values=${IMAGE_SET}" --query 'Reservations[*].Instances[*].InstanceId' --output text)"
 
   # find old snapshots
   log "Querying previous AMI..."
-  OLD_SNAPSHOTS="$(aws --region "${REGION}" ec2 describe-images --owners self --filters "Name=name,Values=${IMAGE_SET} *" --query 'Images[*].BlockDeviceMappings[*].Ebs.SnapshotId' --output text)"
+  OLD_SNAPSHOTS="$(retry aws --region "${REGION}" ec2 describe-images --owners self --filters "Name=name,Values=${IMAGE_SET} *" --query 'Images[*].BlockDeviceMappings[*].Ebs.SnapshotId' --output text)"
 
   # find old amis
   log "Querying snapshot used in this previous AMI..."
-  OLD_AMIS="$(aws --region "${REGION}" ec2 describe-images --owners self --filters "Name=name,Values=${IMAGE_SET} *" --query 'Images[*].ImageId' --output text)"
+  OLD_AMIS="$(retry aws --region "${REGION}" ec2 describe-images --owners self --filters "Name=name,Values=${IMAGE_SET} *" --query 'Images[*].ImageId' --output text)"
 }
 
 function aws_delete_found {
@@ -254,7 +276,7 @@ function aws_delete_found {
   if [ -n "${OLD_INSTANCES}" ]; then
     log "Now terminating instances" ${OLD_INSTANCES}...
     for instance in ${OLD_INSTANCES}; do
-      aws --region "${REGION}" ec2 terminate-instances --instance-ids "${instance}" > /dev/null 2>&1 || log "WARNING: Could not terminate instance ${instance}"
+      retry aws --region "${REGION}" ec2 terminate-instances --instance-ids "${instance}" > /dev/null 2>&1 || log "WARNING: Could not terminate instance ${instance}"
     done
   else
     log "No previous instances to terminate."
@@ -265,7 +287,7 @@ function aws_delete_found {
     log "Deregistering the old AMI(s) ("${OLD_AMIS}")..."
     # note this can fail if it is already in process of being deregistered, so allow to fail...
     for image in ${OLD_AMIS}; do
-      aws --region "${REGION}" ec2 deregister-image --image-id "${image}" > /dev/null 2>&1 || log "WARNING: Could not deregister image ${image}"
+      retry aws --region "${REGION}" ec2 deregister-image --image-id "${image}" > /dev/null 2>&1 || log "WARNING: Could not deregister image ${image}"
     done
   else
     log "No old AMI to deregister."
@@ -275,7 +297,7 @@ function aws_delete_found {
   if [ -n "${OLD_SNAPSHOTS}" ]; then
     log "Deleting the old snapshot(s) ("${OLD_SNAPSHOTS}")..."
     for snapshot in ${OLD_SNAPSHOTS}; do
-      aws --region "${REGION}" ec2 delete-snapshot --snapshot-id ${snapshot} > /dev/null 2>&1 || log "WARNING: Could not delete snapshot ${snapshot}"
+      retry aws --region "${REGION}" ec2 delete-snapshot --snapshot-id ${snapshot} > /dev/null 2>&1 || log "WARNING: Could not delete snapshot ${snapshot}"
     done
   else
     log "No old snapshot to delete."
@@ -287,11 +309,11 @@ function aws_update {
   log "Generating new ssh key..."
   rm -rf "${CLOUD}.${REGION}.id_rsa"
   aws --region "${REGION}" ec2 delete-key-pair --key-name "${IMAGE_SET}_${REGION}" || true
-  aws --region "${REGION}" ec2 create-key-pair --key-name "${IMAGE_SET}_${REGION}" --query 'KeyMaterial' --output text > "${CLOUD}.${REGION}.id_rsa"
+  retry aws --region "${REGION}" ec2 create-key-pair --key-name "${IMAGE_SET}_${REGION}" --query 'KeyMaterial' --output text > "${CLOUD}.${REGION}.id_rsa"
   chmod 400 "${CLOUD}.${REGION}.id_rsa"
 
   # search for latest base AMI to use
-  AMI_METADATA="$(aws --region "${REGION}" ec2 describe-images --owners $(cat aws_owners) --filters $(cat aws_filters) --query 'Images[*].{A:CreationDate,B:ImageId,C:Name}' --output text | sort -u | tail -1 | cut -f2,3)"
+  AMI_METADATA="$(retry aws --region "${REGION}" ec2 describe-images --owners $(cat aws_owners) --filters $(cat aws_filters) --query 'Images[*].{A:CreationDate,B:ImageId,C:Name}' --output text | sort -u | tail -1 | cut -f2,3)"
 
   AMI="$(echo $AMI_METADATA | sed 's/ .*//')"
   AMI_NAME="$(echo $AMI_METADATA | sed 's/.* //')"
@@ -316,8 +338,8 @@ function aws_update {
   echo 'ssh-only 22 SSH only
     rdp-only 3389 RDP only' | while read group_name port description; do
     if ! aws --region "${REGION}" ec2 describe-security-groups --group-names "${group_name}" > /dev/null 2>&1; then
-      SECURITY_GROUP="$(aws --region "${REGION}" ec2 create-security-group --group-name "${group_name}" --description "${description}" --output text 2> /dev/null || true)"
-      aws --region "${REGION}" ec2 authorize-security-group-ingress --group-id "${SECURITY_GROUP}" --ip-permissions '[{"IpProtocol": "tcp", "FromPort": '"${port}"', "ToPort": '"${port}"', "IpRanges": [{"CidrIp": "0.0.0.0/0"}]}]'
+      SECURITY_GROUP="$(retry aws --region "${REGION}" ec2 create-security-group --group-name "${group_name}" --description "${description}" --output text 2> /dev/null || true)"
+      retry aws --region "${REGION}" ec2 authorize-security-group-ingress --group-id "${SECURITY_GROUP}" --ip-permissions '[{"IpProtocol": "tcp", "FromPort": '"${port}"', "ToPort": '"${port}"', "IpRanges": [{"CidrIp": "0.0.0.0/0"}]}]'
     fi
   done
 
@@ -333,19 +355,19 @@ function aws_update {
   fi
 
   log "I've triggered the creation of instance ${INSTANCE_ID} - it can take a \x1B[4mVery Long Time™\x1B[24m for it to be created and bootstrapped..."
-  aws --region "${REGION}" ec2 create-tags --resources "${INSTANCE_ID}" --tags "Key=ImageSet,Value=${IMAGE_SET}" "Key=Name,Value=${IMAGE_SET} base instance ${IMAGE_SET_COMMIT_SHA}" "Key=TC-Windows-Base,Value=true"
+  retry aws --region "${REGION}" ec2 create-tags --resources "${INSTANCE_ID}" --tags "Key=ImageSet,Value=${IMAGE_SET}" "Key=Name,Value=${IMAGE_SET} base instance ${IMAGE_SET_COMMIT_SHA}" "Key=TC-Windows-Base,Value=true"
   log "I've tagged it with \"ImageSet\": \"${IMAGE_SET}\""
 
   sleep 1
 
   # grab public IP before it shuts down and loses it!
-  PUBLIC_IP="$(aws --region "${REGION}" ec2 describe-instances --instance-id "${INSTANCE_ID}" --query 'Reservations[*].Instances[*].NetworkInterfaces[*].Association.PublicIp' --output text)"
+  PUBLIC_IP="$(retry aws --region "${REGION}" ec2 describe-instances --instance-id "${INSTANCE_ID}" --query 'Reservations[*].Instances[*].NetworkInterfaces[*].Association.PublicIp' --output text)"
 
   if [ "${IMAGE_OS}" == "windows" ]; then
     until [ -n "${PASSWORD-}" ]; do
       log "    Waiting for Windows Password from ${INSTANCE_ID} (IP ${PUBLIC_IP})..."
       sleep 10
-      PASSWORD="$(aws --region "${REGION}" ec2 get-password-data --instance-id "${INSTANCE_ID}" --priv-launch-key ${CLOUD}.${REGION}.id_rsa --output text --query PasswordData 2> /dev/null || true)"
+      PASSWORD="$(retry aws --region "${REGION}" ec2 get-password-data --instance-id "${INSTANCE_ID}" --priv-launch-key ${CLOUD}.${REGION}.id_rsa --output text --query PasswordData 2> /dev/null || true)"
     done
   fi
 
@@ -371,7 +393,7 @@ function aws_update {
 
   log "Now snapshotting the instance to create an AMI..."
   # now capture the AMI
-  IMAGE_ID="$(aws --region "${REGION}" ec2 create-image --instance-id "${INSTANCE_ID}" --name "${IMAGE_SET} version ${IMAGE_SET_COMMIT_SHA} (${UUID})" --description "${IMAGE_SET} version ${IMAGE_SET_COMMIT_SHA} (${UUID})" --output text)"
+  IMAGE_ID="$(retry aws --region "${REGION}" ec2 create-image --instance-id "${INSTANCE_ID}" --name "${IMAGE_SET} version ${IMAGE_SET_COMMIT_SHA} (${UUID})" --description "${IMAGE_SET} version ${IMAGE_SET_COMMIT_SHA} (${UUID})" --output text)"
 
   log "The AMI is currently being created: ${IMAGE_ID}"
 
@@ -407,7 +429,7 @@ function google_delete {
 
 function google_find_old_objects {
   log "Querying old instances..."
-  OLD_INSTANCES="$(gcloud compute instances list --project="${GCP_PROJECT}" --filter="labels.image-set=${IMAGE_SET} AND zone:${REGION}" --format='table[no-heading](name)')"
+  OLD_INSTANCES="$(retry gcloud compute instances list --project="${GCP_PROJECT}" --filter="labels.image-set=${IMAGE_SET} AND zone:${REGION}" --format='table[no-heading](name)')"
   if [ -n "${OLD_INSTANCES}" ]; then
     log "Found old instances:" $OLD_INSTANCES
   else
@@ -415,7 +437,7 @@ function google_find_old_objects {
   fi
 
   log "Querying previous images..."
-  OLD_IMAGES="$(gcloud compute images list --project="${GCP_PROJECT}" --filter="labels.image-set=${IMAGE_SET}" --format='table[no-heading](name)')"
+  OLD_IMAGES="$(retry gcloud compute images list --project="${GCP_PROJECT}" --filter="labels.image-set=${IMAGE_SET}" --format='table[no-heading](name)')"
   if [ -n "${OLD_IMAGES}" ]; then
     log "Found old images:" $OLD_IMAGES
   else
@@ -427,7 +449,7 @@ function google_delete_found {
   # terminate old instances
   if [ -n "${OLD_INSTANCES}" ]; then
     log "Now terminating instances" ${OLD_INSTANCES}...
-    gcloud compute instances delete ${OLD_INSTANCES} --zone="${REGION}" --delete-disks=all --project="${GCP_PROJECT}" --quiet
+    retry gcloud compute instances delete ${OLD_INSTANCES} --zone="${REGION}" --delete-disks=all --project="${GCP_PROJECT}" --quiet
   else
     log "No previous instances to terminate."
   fi
@@ -435,7 +457,7 @@ function google_delete_found {
   # delete old images
   if [ -n "${OLD_IMAGES}" ]; then
     log "Deleting the old image(s) ("${OLD_IMAGES}")..."
-    gcloud compute images delete ${OLD_IMAGES} --project="${GCP_PROJECT}" --quiet
+    retry gcloud compute images delete ${OLD_IMAGES} --project="${GCP_PROJECT}" --quiet
   else
     log "No old images to delete."
   fi
@@ -462,7 +484,7 @@ function google_update {
     STARTUP_KEY=startup-script
   fi
 
-  gcloud compute --project="${GCP_PROJECT}" instances create "${UNIQUE_NAME}" --description="instance for image set ${IMAGE_SET}" --zone="${REGION}" --machine-type="$(cat gcp_base_instance_type)" --subnet=default --network-tier=PREMIUM --metadata-from-file="${STARTUP_KEY}=${TEMP_SETUP_SCRIPT}" --no-restart-on-failure --maintenance-policy=MIGRATE --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append $(cat gcp_filters) --boot-disk-device-name="${UNIQUE_NAME}" --labels="image-set=${IMAGE_SET}" --reservation-affinity=any
+  retry gcloud compute --project="${GCP_PROJECT}" instances create "${UNIQUE_NAME}" --description="instance for image set ${IMAGE_SET}" --zone="${REGION}" --machine-type="$(cat gcp_base_instance_type)" --subnet=default --network-tier=PREMIUM --metadata-from-file="${STARTUP_KEY}=${TEMP_SETUP_SCRIPT}" --no-restart-on-failure --maintenance-policy=MIGRATE --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append $(cat gcp_filters) --boot-disk-device-name="${UNIQUE_NAME}" --labels="image-set=${IMAGE_SET}" --reservation-affinity=any
 
   log "I've triggered the creation of instance ${UNIQUE_NAME} - it can take a \x1B[4mVery Long Time™\x1B[24m for it to be created and bootstrapped..."
 
@@ -488,7 +510,7 @@ function google_update {
 
   log "Now creating an image from the terminated instance..."
   # gcloud compute disks snapshot "${UNIQUE_NAME}" --project="${GCP_PROJECT}" --description="my description" --labels="key1=value1" --snapshot-names="${UNIQUE_NAME}" --zone="${REGION}" --storage-location=us
-  gcloud compute images create "${UNIQUE_NAME}" --source-disk="${UNIQUE_NAME}" --source-disk-zone="${REGION}" --labels="image-set=${IMAGE_SET}" --project="${GCP_PROJECT}"
+  retry gcloud compute images create "${UNIQUE_NAME}" --source-disk="${UNIQUE_NAME}" --source-disk-zone="${REGION}" --labels="image-set=${IMAGE_SET}" --project="${GCP_PROJECT}"
 
   log ''
   log "The image is being created here:"
@@ -513,7 +535,7 @@ function azure_delete {
 
 function azure_find_old_objects {
   log "Querying previous images..."
-  OLD_IMAGES="$(az image list --query="[?tags.image_set == '${IMAGE_SET}' && location == '${REGION}'].id" --output tsv)"
+  OLD_IMAGES="$(retry az image list --query="[?tags.image_set == '${IMAGE_SET}' && location == '${REGION}'].id" --output tsv)"
   if [ -n "${OLD_IMAGES}" ]; then
     log "Found old image(s):" $OLD_IMAGES
   else
@@ -524,7 +546,7 @@ function azure_find_old_objects {
 function azure_delete_found {
   if [ -n "${OLD_IMAGES}" ]; then
     log "Deleting the old image(s) ("${OLD_IMAGES}")..."
-    log-iff-fails az image delete --ids ${OLD_IMAGES} --no-wait true
+    log-iff-fails retry az image delete --ids ${OLD_IMAGES} --no-wait true
   else
     log "No old images to delete."
   fi
@@ -532,7 +554,7 @@ function azure_delete_found {
 
 function azure_delete_resource_groups {
   log "Querying old resource groups..."
-  OLD_RESOURCE_GROUPS="$(az group list --query="[?tags.image_set == '${IMAGE_SET}' && location == '${REGION}'].id" --output tsv)"
+  OLD_RESOURCE_GROUPS="$(retry az group list --query="[?tags.image_set == '${IMAGE_SET}' && location == '${REGION}'].id" --output tsv)"
   if [ -n "${OLD_RESOURCE_GROUPS}" ]; then
     log "Found old resource group(s):" $OLD_RESOURCE_GROUPS
   else
@@ -541,7 +563,7 @@ function azure_delete_resource_groups {
   if [ -n "${OLD_RESOURCE_GROUPS}" ]; then
     for group in ${OLD_RESOURCE_GROUPS}; do
       log "Now deleting previous resource group ${group}..."
-      log-iff-fails az group delete --name="${group}" --yes --no-wait
+      log-iff-fails retry az group delete --name="${group}" --yes --no-wait
     done
   else
     log "No previous resource groups to delete."
@@ -554,7 +576,7 @@ function azure_update {
   # machine type in the given location by querying the file database in
   # /config/azure-vm-size-offerings directory, but that may be out-of-date
   # and this az cli call is pretty quick to make anyway.
-  if [ -z "$(az vm list-sizes --location "${REGION}" --query="[].name" --output tsv | sed -n "/^$(cat azure_base_instance_type)\$/p")" ]; then
+  if [ -z "$(retry az vm list-sizes --location "${REGION}" --query="[].name" --output tsv | sed -n "/^$(cat azure_base_instance_type)\$/p")" ]; then
     log "Cannot deploy in ${REGION} since machine type $(cat azure_base_instance_type) is not supported; skipping."
     return 0
   fi
@@ -571,7 +593,7 @@ function azure_update {
   AZURE_VM_RESOURCE_GROUP="${NAME_WITH_REGION}-rg"
 
   log "Creating temporary resource group ${AZURE_VM_RESOURCE_GROUP} for image building resources..."
-  log-iff-fails az group create \
+  log-iff-fails retry az group create \
     --name="${AZURE_VM_RESOURCE_GROUP}" \
     --tags "image_set=${IMAGE_SET}" \
     --location="${REGION}"
@@ -579,7 +601,7 @@ function azure_update {
   ADMIN_PASSWORD="$(head -c 256 /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9!@#$%^&*' | head -c 20)"
 
   log "Creating instance ${NAME_WITH_REGION}..."
-  log-iff-fails az vm create \
+  log-iff-fails retry az vm create \
     --name="${NAME_WITH_REGION}" \
     --image=$(cat azure_image) \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
@@ -597,7 +619,7 @@ function azure_update {
     --admin-username="azureuser" \
     --admin-password="${ADMIN_PASSWORD}"
 
-  PUBLIC_IP="$(az vm show -d --name="${NAME_WITH_REGION}" --resource-group="${AZURE_VM_RESOURCE_GROUP}" --query publicIps --output tsv)"
+  PUBLIC_IP="$(retry az vm show -d --name="${NAME_WITH_REGION}" --resource-group="${AZURE_VM_RESOURCE_GROUP}" --query publicIps --output tsv)"
 
   log "Created instance ${NAME_WITH_REGION}."
 
@@ -609,7 +631,7 @@ function azure_update {
   log ''
 
   log "Running bootstrap script - it can take a \x1B[4mVery Long Time™\x1B[24m..."
-  az vm run-command invoke \
+  retry az vm run-command invoke \
     --command-id="RunPowerShellScript" \
     --name="${NAME_WITH_REGION}" \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
@@ -618,19 +640,19 @@ function azure_update {
   rm "${TEMP_SETUP_SCRIPT}"
 
   log "Waiting for instance ${NAME_WITH_REGION} to shut down..."
-  az vm wait \
+  retry az vm wait \
     --custom="instanceView.statuses[?code=='PowerState/stopped']" \
     --name="${NAME_WITH_REGION}" \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
     --interval=15
 
   log "Starting instance ${NAME_WITH_REGION} to run sysprep..."
-  az vm start \
+  retry az vm start \
     --name="${NAME_WITH_REGION}" \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}"
 
   log "Running Sysprep on instance ${NAME_WITH_REGION}..."
-  az vm run-command invoke \
+  retry az vm run-command invoke \
     --command-id="RunPowerShellScript" \
     --name="${NAME_WITH_REGION}" \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
@@ -638,24 +660,24 @@ function azure_update {
     --no-wait
 
   log "Waiting for instance ${NAME_WITH_REGION} to shut down..."
-  az vm wait \
+  retry az vm wait \
     --custom="instanceView.statuses[?code=='PowerState/stopped']" \
     --name="${NAME_WITH_REGION}" \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
     --interval=15
 
   log "Generalizing VM to allow it to be imaged..."
-  az vm generalize \
+  retry az vm generalize \
     --name="${NAME_WITH_REGION}" \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}"
 
   log "Deallocating VM..."
-  az vm deallocate \
+  retry az vm deallocate \
     --name="${NAME_WITH_REGION}" \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}"
 
   log "Creating an image from the terminated instance..."
-  log-iff-fails az image create \
+  log-iff-fails retry az image create \
     --name="${NAME_WITH_REGION}" \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
     --hyper-v-generation="V2" \
@@ -663,7 +685,7 @@ function azure_update {
     --tags "image_set=${IMAGE_SET}" \
     --source="${NAME_WITH_REGION}"
 
-  IMAGE_ID="$(az image show --name="${NAME_WITH_REGION}" --resource-group="${AZURE_VM_RESOURCE_GROUP}" --query id --output tsv)"
+  IMAGE_ID="$(retry az image show --name="${NAME_WITH_REGION}" --resource-group="${AZURE_VM_RESOURCE_GROUP}" --query id --output tsv)"
 
   log ''
   log "The image is being created here:"
@@ -672,7 +694,7 @@ function azure_update {
   log ''
 
   log "Waiting for image ${NAME_WITH_REGION} to be created..."
-  az image wait \
+  retry az image wait \
     --created \
     --image-name="${NAME_WITH_REGION}" \
     --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
@@ -686,14 +708,14 @@ function azure_update {
   flock -x 200
 
   log "Moving image ${NAME_WITH_REGION} to ${AZURE_IMAGE_RESOURCE_GROUP} resource group..."
-  az resource move \
+  retry az resource move \
     --destination-group="${AZURE_IMAGE_RESOURCE_GROUP}" \
     --ids="${IMAGE_ID}"
 
-  IMAGE_ID="$(az image show --name="${NAME_WITH_REGION}" --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" --query id --output tsv)"
+  IMAGE_ID="$(retry az image show --name="${NAME_WITH_REGION}" --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" --query id --output tsv)"
 
   log "Deleting temporary resource group ${AZURE_VM_RESOURCE_GROUP}..."
-  az group delete \
+  retry az group delete \
     --name="${AZURE_VM_RESOURCE_GROUP}" \
     --yes
 
