@@ -303,13 +303,13 @@ $hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match
 
 if ($hasNvidiaGpu) {
   $client.DownloadFile("https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe", "C:\nvidia_driver.exe")
-  Run-Executable "C:\nvidia_driver.exe" @("-s", "-noreboot" -RedirectStandardOutput "C:\Install Logs\nvidia.txt" -RedirectStandardError "C:\Install Logs\nvidia.txt")
+  Run-Executable "C:\nvidia_driver.exe" @("-s", "-noreboot")
 
   # Need to fix this CUDA installation in staging...
   # Removing from here for now...
   # https://github.com/taskcluster/community-tc-config/issues/713
   # $client.DownloadFile("https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe", "C:\cuda_installer.exe")
-  # Run-Executable "C:\cuda_installer.exe" @("-s", "-noreboot" -RedirectStandardOutput "C:\Install Logs\cuda.txt" -RedirectStandardError "C:\Install Logs\cuda.txt")
+  # Run-Executable "C:\cuda_installer.exe" @("-s", "-noreboot")
 
 }
 
