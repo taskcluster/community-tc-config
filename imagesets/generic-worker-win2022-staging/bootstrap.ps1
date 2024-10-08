@@ -1,5 +1,8 @@
 $TASKCLUSTER_REF = "main"
 
+# Exit the script on any powershell command error
+$ErrorActionPreference = 'Stop'
+
 # use TLS 1.2 (see bug 1443595)
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -15,6 +18,41 @@ Get-ChildItem Env: | Out-File "C:\Install Logs\env.txt"
 # needed for making http requests
 $client = New-Object system.net.WebClient
 $shell = New-Object -com shell.application
+
+# Function to call an executable, log the command and its output, capture both
+# stdout and stderr, and exit powershell script if the called executable fails
+# (non-zero exit code).
+function Run-Executable {
+    param (
+        [string]$exePath,        # Path to the executable
+        [string[]]$arguments     # Arguments to pass to the executable
+    )
+
+    # Escape double quotes and quote each argument if it contains spaces or quotes
+    $escapedArguments = $arguments | ForEach-Object {
+        $_ = $_ -replace '"', '""'  # Escape literal double quotes by doubling them
+        if ($_ -match '\s' -or $_ -match '"') { "`"$_`"" } else { $_ }
+    }
+
+    # Log the command being run (quote arguments with spaces or quotes)
+    $commandString = "$exePath $($escapedArguments -join ' ')"
+    Write-Host "Running command: $commandString"
+
+    # Capture stdout and stderr
+    $output = & $exePath $arguments 2>&1  # Capture both stdout and stderr in the same variable
+
+    # Log the output
+    Write-Host "Command output: $output"
+
+    # Check the exit code and exit if non-zero
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "The command failed with exit code $LASTEXITCODE"
+        exit $LASTEXITCODE
+    }
+
+    # Return the output
+    return $output
+}
 
 # utility function to download a zip file and extract it
 function Expand-ZIPFile($file, $destination, $url)
@@ -39,15 +77,37 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" -Nam
 # taken (and edited) from GitHub Actions Windows runners
 # https://github.com/actions/runner-images/blob/3b976c7acb0ce875060102c0c80f655b479aa5d4/images/windows/scripts/build/Configure-System.ps1#L140-L153
 $servicesToDisable = @(
-    'wuauserv' # Windows Update
-    'usosvc' # update orchestrator
-    'DiagTrack' # telemetry service
-    'SysMain' # (Superfetch)
-    'WSearch' # disk indexing
+    'wuauserv',   # Windows Update
+    'usosvc',     # Update Orchestrator
+    'DiagTrack',  # Telemetry service
+    'SysMain',    # Superfetch
+    'WSearch'     # Disk indexing
 ) | Get-Service -ErrorAction SilentlyContinue
-Stop-Service $servicesToDisable
-$servicesToDisable.WaitForStatus('Stopped', "00:01:00")
-$servicesToDisable | Set-Service -StartupType Disabled
+
+foreach ($service in $servicesToDisable) {
+    Write-Host "Attempting to stop service: $($service.Name)"
+
+    try {
+        if ($service.CanStop) {
+            Stop-Service -Name $service.Name -Force -ErrorAction Stop
+            $service.WaitForStatus('Stopped', '00:01:00')
+            Write-Host "$($service.Name) stopped successfully."
+        } else {
+            Write-Host "$($service.Name) cannot be stopped."
+        }
+    } catch {
+        Write-Host "Failed to stop $($service.Name): $_"
+    }
+
+    # Set the service to Disabled startup type
+    try {
+        Set-Service -Name $service.Name -StartupType Disabled
+        Write-Host "$($service.Name) has been disabled."
+    } catch {
+        Write-Host "Failed to disable $($service.Name): $_"
+    }
+}
+
 
 # skip OOBE (out of box experience)
 @(
@@ -93,16 +153,16 @@ Expand-ZIPFile -File "C:\go1.23.1.windows-amd64.zip" -Destination "C:\" -Url "ht
 
 # install git
 $client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.46.2.windows.1/Git-2.46.2-64-bit.exe", "C:\Git-2.46.2-64-bit.exe")
-Start-Process "C:\Git-2.46.2-64-bit.exe" -ArgumentList "/VERYSILENT", "/LOG=`"C:\Install Logs\git.txt`"", "/NORESTART", "/SUPPRESSMSGBOXES" -Wait -NoNewWindow
+Run-Executable "C:\Git-2.46.2-64-bit.exe" @("/VERYSILENT", "/LOG=`"C:\Install Logs\git.txt`"", "/NORESTART", "/SUPPRESSMSGBOXES")
 
 # install node
 $client.DownloadFile("https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi", "C:\NodeSetup.msi")
-Start-Process "msiexec.exe" -ArgumentList "/i", "C:\NodeSetup.msi", "/quiet" -Wait -NoNewWindow
+Run-Executable "msiexec.exe" @("/i", "C:\NodeSetup.msi", "/quiet")
 
 # install python 3.11.9
 $client.DownloadFile("https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe", "C:\python-3.11.9-amd64.exe")
 # issue 751: without /log <file> python fails to install on Azure workers, with exit code 1622, maybe default log location isn't writable(?)
-Start-Process "C:\python-3.11.9-amd64.exe" -ArgumentList "/quiet", "InstallAllUsers=1", "/log", "C:\Install Logs\python-3.11.9.txt" -Wait -NoNewWindow
+Run-Executable "C:\python-3.11.9-amd64.exe" @("/quiet", "InstallAllUsers=1", "/log", "C:\Install Logs\python-3.11.9.txt")
 
 # set permanent env vars
 [Environment]::SetEnvironmentVariable("GOROOT", "C:\goroot", "Machine")
@@ -111,24 +171,24 @@ Start-Process "C:\python-3.11.9-amd64.exe" -ArgumentList "/quiet", "InstallAllUs
 
 # set env vars for the currently running process
 $env:GOROOT  = "C:\goroot"
-$env:PATH    = $env:PATH + ";C:\goroot\bin\C:\Program Files\Git\cmd;C:\Program Files\Python311"
+$env:PATH    = $env:PATH + ";C:\goroot\bin;C:\Program Files\Git\cmd;C:\Program Files\Python311"
 $env:PATHEXT = $env:PATHEXT + ";.PY"
 
 md "C:\generic-worker"
 md "C:\worker-runner"
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
-Start-Process git -ArgumentList "clone", "https://github.com/taskcluster/taskcluster" -Wait -NoNewWindow
+Run-Executable git @("clone", "https://github.com/taskcluster/taskcluster")
 Set-Location taskcluster
-Start-Process git -ArgumentList "checkout", $TASKCLUSTER_REF -Wait -NoNewWindow
-$revision = Start-Process git -ArgumentList "rev-parse", "HEAD" -Wait -NoNewWindow -PassThru
+Run-Executable git -ArgumentList "checkout", $TASKCLUSTER_REF -Wait -NoNewWindow
+$revision = Run-Executable git @("rev-parse", "HEAD")
 $env:CGO_ENABLED = "0"
-Start-Process go -ArgumentList "build", "-tags", "multiuser", "-o", "C:\generic-worker\generic-worker.exe", "-ldflags", "-X main.revision=$revision", ".\workers\generic-worker" -Wait -NoNewWindow
-Start-Process go -ArgumentList "build", "-o", "C:\generic-worker\livelog.exe", ".\tools\livelog" -Wait -NoNewWindow
-Start-Process go -ArgumentList "build", "-o", "C:\generic-worker\taskcluster-proxy.exe", "-ldflags", "-X main.revision=$revision", ".\tools\taskcluster-proxy" -Wait -NoNewWindow
-Start-Process go -ArgumentList "build", "-o", "C:\worker-runner\start-worker.exe", "-ldflags", "-X main.revision=$revision", ".\tools\worker-runner\cmd\start-worker" -Wait -NoNewWindow
-Start-Process "C:\generic-worker\generic-worker.exe" -ArgumentList "--version" -Wait -NoNewWindow
-Start-Process "C:\generic-worker\generic-worker.exe" -ArgumentList "new-ed25519-keypair", "--file", "C:\generic-worker\generic-worker-ed25519-signing-key.key" -Wait -NoNewWindow
+Run-Executable go @("build", "-tags", "multiuser", "-o", "C:\generic-worker\generic-worker.exe", "-ldflags", "-X main.revision=$revision", ".\workers\generic-worker")
+Run-Executable go @("build", "-o", "C:\generic-worker\livelog.exe", ".\tools\livelog")
+Run-Executable go @("build", "-o", "C:\generic-worker\taskcluster-proxy.exe", "-ldflags", "-X main.revision=$revision", ".\tools\taskcluster-proxy")
+Run-Executable go @("build", "-o", "C:\worker-runner\start-worker.exe", "-ldflags", "-X main.revision=$revision", ".\tools\worker-runner\cmd\start-worker")
+Run-Executable "C:\generic-worker\generic-worker.exe" @("--version")
+Run-Executable "C:\generic-worker\generic-worker.exe" @("new-ed25519-keypair", "--file", "C:\generic-worker\generic-worker-ed25519-signing-key.key")
 
 # install generic-worker, using the steps suggested in https://docs.taskcluster.net/docs/reference/workers/worker-runner/deployment#recommended-setup
 Set-Content -Path C:\generic-worker\install.bat @"
@@ -149,7 +209,7 @@ set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% set "Generic Worker" AppStderr C:\generic-worker\generic-worker-service.log
 %nssm% set "Generic Worker" AppRotateFiles 0
 "@
-Start-Process "C:\generic-worker\install.bat" -Wait -NoNewWindow
+Run-Executable "C:\generic-worker\install.bat" -Wait -NoNewWindow
 
 # install worker-runner
 Set-Content -Path C:\worker-runner\install.bat @"
@@ -173,7 +233,7 @@ set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% set worker-runner AppRotateSeconds 3600
 %nssm% set worker-runner AppRotateBytes 0
 "@
-Start-Process "C:\worker-runner\install.bat" -Wait -NoNewWindow
+Run-Executable "C:\worker-runner\install.bat" -Wait -NoNewWindow
 
 # configure worker-runner
 Set-Content -Path C:\worker-runner\runner.yml @"
@@ -192,7 +252,7 @@ $client.DownloadFile("https://www.cygwin.com/setup-x86_64.exe", "C:\cygwin-setup
 
 # install cygwin
 # complete package list: https://cygwin.com/packages/package_list.html
-Start-Process "C:\cygwin-setup-x86_64.exe" -ArgumentList "--quiet-mode", "--wait", "--root", "C:\cygwin", "--site", "http://cygwin.mirror.constant.com", "--packages", "openssh,vim,curl,tar,wget,zip,unzip,diffutils,bzr" -Wait -NoNewWindow
+Run-Executable "C:\cygwin-setup-x86_64.exe" @("--quiet-mode", "--wait", "--root", "C:\cygwin", "--site", "http://cygwin.mirror.constant.com", "--packages", "openssh,vim,curl,tar,wget,zip,unzip,diffutils,bzr")
 
 # open up firewall for ssh daemon
 New-NetFirewallRule -DisplayName "Allow SSH inbound" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
@@ -204,16 +264,16 @@ New-NetFirewallRule -DisplayName "Allow SSH inbound" -Direction Inbound -LocalPo
 $env:LOGONSERVER = "\\" + $env:COMPUTERNAME
 
 # configure sshd (not required, but useful)
-Start-Process "C:\cygwin\bin\bash.exe" -ArgumentList "--login", "-c", "ssh-host-config -y -c 'ntsec mintty' -u 'cygwinsshd' -w 'qwe123QWE!@#'" -Wait -NoNewWindow
+Run-Executable "C:\cygwin\bin\bash.exe" @("--login", "-c", "ssh-host-config -y -c 'ntsec mintty' -u 'cygwinsshd' -w 'qwe123QWE!@#'")
 
 # start sshd
-Start-Process "net" -ArgumentList "start", "cygsshd" -Wait -NoNewWindow
+Run-Executable "net" @("start", "cygsshd")
 
 # download bash setup script
 $client.DownloadFile("https://raw.githubusercontent.com/petemoore/myscrapbook/master/setup.sh", "C:\cygwin\home\Administrator\setup.sh")
 
 # run bash setup script
-Start-Process "C:\cygwin\bin\bash.exe" -ArgumentList "--login", "-c", "chmod a+x setup.sh; ./setup.sh" -Wait -NoNewWindow
+Run-Executable "C:\cygwin\bin\bash.exe" @("--login", "-c", "chmod a+x setup.sh; ./setup.sh")
 
 # install dependencywalker (useful utility for troubleshooting, not required)
 md "C:\DependencyWalker"
@@ -243,13 +303,13 @@ $hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match
 
 if ($hasNvidiaGpu) {
   $client.DownloadFile("https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe", "C:\nvidia_driver.exe")
-  Start-Process "C:\nvidia_driver.exe" -ArgumentList "-s", "-noreboot" -RedirectStandardOutput "C:\Install Logs\nvidia.txt" -RedirectStandardError "C:\Install Logs\nvidia.txt" -Wait -NoNewWindow
+  Run-Executable "C:\nvidia_driver.exe" @("-s", "-noreboot" -RedirectStandardOutput "C:\Install Logs\nvidia.txt" -RedirectStandardError "C:\Install Logs\nvidia.txt")
 
   # Need to fix this CUDA installation in staging...
   # Removing from here for now...
   # https://github.com/taskcluster/community-tc-config/issues/713
   # $client.DownloadFile("https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe", "C:\cuda_installer.exe")
-  # Start-Process "C:\cuda_installer.exe" -ArgumentList "-s", "-noreboot" -RedirectStandardOutput "C:\Install Logs\cuda.txt" -RedirectStandardError "C:\Install Logs\cuda.txt" -Wait -NoNewWindow
+  # Run-Executable "C:\cuda_installer.exe" @("-s", "-noreboot" -RedirectStandardOutput "C:\Install Logs\cuda.txt" -RedirectStandardError "C:\Install Logs\cuda.txt")
 
 }
 
