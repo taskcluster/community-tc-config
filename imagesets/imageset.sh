@@ -678,10 +678,11 @@ function azure_update {
     --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
     --interval=15
 
-  # Try to acquire an exclusive lock
-  # as only one `az resource move` can
-  # happen at a time
-  exec 200> azure_move_image.lock
+  # Try to acquire an exclusive lock as only one `az resource move` can happen
+  # at a time, and resource group deletions also seem to be affected. Place
+  # lock in parent folder so the lock is shared across all image sets, so they
+  # can be built in parallel.
+  exec 200> ../azure_move_image.lock
   flock -x 200
 
   log "Moving image ${NAME_WITH_REGION} to ${AZURE_IMAGE_RESOURCE_GROUP} resource group..."
