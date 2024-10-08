@@ -6,7 +6,8 @@ set -o pipefail
 function retry {
   set +e
   local n=0
-  local max=20
+  # 2^10 seconds is plenty
+  local max=10
   while true; do
     "$@" && break || {
       if [[ $n -lt $max ]]; then
