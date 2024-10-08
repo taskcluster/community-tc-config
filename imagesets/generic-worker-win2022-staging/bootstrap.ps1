@@ -1,7 +1,7 @@
 $TASKCLUSTER_REF = "main"
 
 # Exit the script on any powershell command error
-# $ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Stop'
 
 # use TLS 1.2 (see bug 1443595)
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -47,7 +47,7 @@ function Run-Executable {
     # Check the exit code and exit if non-zero
     if ($LASTEXITCODE -ne 0) {
         Write-Host "The command failed with exit code $LASTEXITCODE"
-        # exit $LASTEXITCODE
+        exit $LASTEXITCODE
     }
 
     # Return the output
