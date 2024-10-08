@@ -18,28 +18,16 @@ to be present:
        your host (`az login`) in order that `~/.azure` folder holds your logon
        information.
 
-     * GCP only:
-
-       You will need gcloud installed on your host, and you will need to logon on
-       your host (`gcloud auth login <user>@mozilla.com`) in order that
-       `~/.config/gcloud` folder holds your logon information.
-
 2) You will need a valid git configuration under `~/.gitconfig` on your host with
    a valid user/email, for committing changes to community-tc-config repo and the
    taskcluster team password store.
 
-3) You will either need to be connected to the Mozilla VPN in order to access
-   `git-internal.mozilla.org` or you will need to have a proxy configured in your
-   `~/.ssh/config` file, such as:
+3) In order to read/write to taskcluster team password store, you will need
+   `gcloud` installed on your host, and you will need to logon (`gcloud auth login
+   <user>@mozilla.com`) in order that `~/.config/gcloud` folder holds your logon
+   information.
 
-  ```
-  Host git-internal.mozilla.org
-      User gitolite3
-      # IdentityFile ~/.ssh/my-lovely-rsa-key
-      ProxyCommand ssh -W %h:%p -oProxyCommand=none ssh.mozilla.com
-  ```
-
-4) The ssh key for pushing to `git-internal.mozilla.org` should be in a file
+4) The ssh key for pushing to the taskcluster password store should be in a file
    somewhere underneath `~/.ssh` on your host. This directory is mounted in to the
    docker container. If it is not in a standard location (e.g. `~/.ssh/id_rsa`,
    `~/.ssh/id_ed25519`, ...) then the location should be explicitly specified with
@@ -79,6 +67,28 @@ to be present:
        (typically `taskcluster-imaging`). Worker Manager spawns instances in project
        `community-tc-workers` but typically the machine images are stored in project
        `taskcluster-imaging`.
+
+7) You should set the gpg agent appropriately to enable building images without
+   being prompted for your signing key passphrase. For example, by writing the
+   following content to file `~/.gnupg/gpg-agent.conf`:
+
+   ```
+   allow-preset-passphrase
+   default-cache-ttl 86400
+   max-cache-ttl 86400
+   ```
+
+   and having the following executed (e.g. in your .profile / .bashrc), or run manually
+   before you build images:
+
+   ```
+   gpg_email='<your-username>@mozilla.com'
+   read -p "Please enter the GPG passphrase for ${gpg_email}: " gpg_passphrase
+
+   gpg -k --with-keygrip "${gpg_email}" | sed -n 's/.*Keygrip = //p' | while read keygrip; do
+     echo "${gpg_passphrase}" | "$(gpgconf --list-dirs libexecdir)"/gpg-preset-passphrase --preset "${keygrip}"
+   done
+   ```
 
 Once all of the above prerequisite steps have been made, you are in a position
 to be able to build image sets.
@@ -143,33 +153,52 @@ complete:
 2) Apply the config changes by running `tc-admin`. Note, here is a script that
    does this, if you have not already set something up:
 
-
    ```bash
-   #!/bin/bash -e
+   #!/bin/bash
+
+   set -eu
+   set -o pipefail
+
+   cd "$(dirname "${0}")"
+
+   export TASKCLUSTER_CLIENT_ID='static/taskcluster/root'
+   export TASKCLUSTER_ACCESS_TOKEN="$(pass ls community-tc/root | head -1)"
+   export TASKCLUSTER_ROOT_URL='https://community-tc.services.mozilla.com'
+   unset TASKCLUSTER_CERTIFICATE
+
+   pass git pull
+
    rm -rf tc-admin
    mkdir tc-admin
-   pip3 install --upgrade pip
+
    cd tc-admin
-   python3 -m venv tc-admin-venv
+   python3.11 -m venv tc-admin-venv
    source tc-admin-venv/bin/activate
    pip3 install pytest
    pip3 install --upgrade pip
+
    git clone https://github.com/taskcluster/community-tc-config
    cd community-tc-config
+
    pip3 install -e .
    which tc-admin
-   pass git pull
-   TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com tc-admin diff || true
+
+   tc-admin diff || true
    echo
    echo 'Applying in 60 seconds (Ctrl-C to abort)....'
    echo
    sleep 60
    echo 'Applying!'
    echo
-   TASKCLUSTER_ROOT_URL=https://community-tc.services.mozilla.com tc-admin apply
-   cd ../..
-   rm -rf tc-admin
+   tc-admin apply
+
+   echo "All done!"
    ```
 
 3) Don't forget to test your image set changes! Try rerunning some tasks that
    previously ran successfully.
+
+## Building and deploying all image sets in one go in parallel
+
+There is a convenience script for building all image sets in one go in parallel
+[here](https://raw.githubusercontent.com/petemoore/myscrapbook/refs/heads/master/build-gw-images.sh).
