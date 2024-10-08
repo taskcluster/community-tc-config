@@ -77,15 +77,37 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" -Nam
 # taken (and edited) from GitHub Actions Windows runners
 # https://github.com/actions/runner-images/blob/3b976c7acb0ce875060102c0c80f655b479aa5d4/images/windows/scripts/build/Configure-System.ps1#L140-L153
 $servicesToDisable = @(
-    'wuauserv' # Windows Update
-    'usosvc' # update orchestrator
-    'DiagTrack' # telemetry service
-    'SysMain' # (Superfetch)
-    'WSearch' # disk indexing
+    'wuauserv',   # Windows Update
+    'usosvc',     # Update Orchestrator
+    'DiagTrack',  # Telemetry service
+    'SysMain',    # Superfetch
+    'WSearch'     # Disk indexing
 ) | Get-Service -ErrorAction SilentlyContinue
-Stop-Service $servicesToDisable
-$servicesToDisable.WaitForStatus('Stopped', "00:01:00")
-$servicesToDisable | Set-Service -StartupType Disabled
+
+foreach ($service in $servicesToDisable) {
+    Write-Host "Attempting to stop service: $($service.Name)"
+
+    try {
+        if ($service.CanStop) {
+            Stop-Service -Name $service.Name -Force -ErrorAction Stop
+            $service.WaitForStatus('Stopped', '00:01:00')
+            Write-Host "$($service.Name) stopped successfully."
+        } else {
+            Write-Host "$($service.Name) cannot be stopped."
+        }
+    } catch {
+        Write-Host "Failed to stop $($service.Name): $_"
+    }
+
+    # Set the service to Disabled startup type
+    try {
+        Set-Service -Name $service.Name -StartupType Disabled
+        Write-Host "$($service.Name) has been disabled."
+    } catch {
+        Write-Host "Failed to disable $($service.Name): $_"
+    }
+}
+
 
 # skip OOBE (out of box experience)
 @(
@@ -149,7 +171,7 @@ Run-Executable "C:\python-3.11.9-amd64.exe" @("/quiet", "InstallAllUsers=1", "/l
 
 # set env vars for the currently running process
 $env:GOROOT  = "C:\goroot"
-$env:PATH    = $env:PATH + ";C:\goroot\bin\C:\Program Files\Git\cmd;C:\Program Files\Python311"
+$env:PATH    = $env:PATH + ";C:\goroot\bin;C:\Program Files\Git\cmd;C:\Program Files\Python311"
 $env:PATHEXT = $env:PATHEXT + ";.PY"
 
 md "C:\generic-worker"
