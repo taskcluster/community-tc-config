@@ -14,7 +14,7 @@ Get-ChildItem Env: | Out-File "C:\Install Logs\env.txt"
 
 # needed for making http requests
 $client = New-Object system.net.WebClient
-$shell = new-object -com shell.application
+$shell = New-Object -com shell.application
 
 # utility function to download a zip file and extract it
 function Expand-ZIPFile($file, $destination, $url)
@@ -30,10 +30,10 @@ function Expand-ZIPFile($file, $destination, $url)
 # allow powershell scripts to run
 Set-ExecutionPolicy Unrestricted -Force -Scope Process
 
-# Issue 681: Uninstall Windows Defender as it can interfere with tasks,
+# Issue 681: Disable Windows Defender as it can interfere with tasks,
 # degrade their performance, and e.g. prevents Generic Worker unit test
 # TestAbortAfterMaxRunTime from running as intended.
-Uninstall-WindowsFeature -Name Windows-Defender
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" -Name "DisableAntiSpyware" -Value 1
 
 # Services to disable
 # taken (and edited) from GitHub Actions Windows runners
@@ -71,10 +71,15 @@ Invoke-Expression ($client.DownloadString('https://chocolatey.org/install.ps1'))
 # install nssm
 Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "http://www.nssm.cc/release/nssm-2.24.zip"
 
-# configure hosts file for taskcluster-proxy access via http://taskcluster
-$HostsFile_Base64 = "IyBDb3B5cmlnaHQgKGMpIDE5OTMtMjAwOSBNaWNyb3NvZnQgQ29ycC4NCiMNCiMgVGhpcyBpcyBhIHNhbXBsZSBIT1NUUyBmaWxlIHVzZWQgYnkgTWljcm9zb2Z0IFRDUC9JUCBmb3IgV2luZG93cy4NCiMNCiMgVGhpcyBmaWxlIGNvbnRhaW5zIHRoZSBtYXBwaW5ncyBvZiBJUCBhZGRyZXNzZXMgdG8gaG9zdCBuYW1lcy4gRWFjaA0KIyBlbnRyeSBzaG91bGQgYmUga2VwdCBvbiBhbiBpbmRpdmlkdWFsIGxpbmUuIFRoZSBJUCBhZGRyZXNzIHNob3VsZA0KIyBiZSBwbGFjZWQgaW4gdGhlIGZpcnN0IGNvbHVtbiBmb2xsb3dlZCBieSB0aGUgY29ycmVzcG9uZGluZyBob3N0IG5hbWUuDQojIFRoZSBJUCBhZGRyZXNzIGFuZCB0aGUgaG9zdCBuYW1lIHNob3VsZCBiZSBzZXBhcmF0ZWQgYnkgYXQgbGVhc3Qgb25lDQojIHNwYWNlLg0KIw0KIyBBZGRpdGlvbmFsbHksIGNvbW1lbnRzIChzdWNoIGFzIHRoZXNlKSBtYXkgYmUgaW5zZXJ0ZWQgb24gaW5kaXZpZHVhbA0KIyBsaW5lcyBvciBmb2xsb3dpbmcgdGhlIG1hY2hpbmUgbmFtZSBkZW5vdGVkIGJ5IGEgJyMnIHN5bWJvbC4NCiMNCiMgRm9yIGV4YW1wbGU6DQojDQojICAgICAgMTAyLjU0Ljk0Ljk3ICAgICByaGluby5hY21lLmNvbSAgICAgICAgICAjIHNvdXJjZSBzZXJ2ZXINCiMgICAgICAgMzguMjUuNjMuMTAgICAgIHguYWNtZS5jb20gICAgICAgICAgICAgICMgeCBjbGllbnQgaG9zdA0KDQojIGxvY2FsaG9zdCBuYW1lIHJlc29sdXRpb24gaXMgaGFuZGxlZCB3aXRoaW4gRE5TIGl0c2VsZi4NCiMJMTI3LjAuMC4xICAgICAgIGxvY2FsaG9zdA0KIwk6OjEgICAgICAgICAgICAgbG9jYWxob3N0DQoNCiMgVXNlZnVsIGZvciBnZW5lcmljLXdvcmtlciB0YXNrY2x1c3Rlci1wcm94eSBpbnRlZ3JhdGlvbg0KIyBTZWUgaHR0cHM6Ly9idWd6aWxsYS5tb3ppbGxhLm9yZy9zaG93X2J1Zy5jZ2k/aWQ9MTQ0OTk4MSNjNg0KMTI3LjAuMC4xICAgICAgICB0YXNrY2x1c3RlciAgICANCg=="
-$HostsFile_Content = [System.Convert]::FromBase64String($HostsFile_Base64)
-Set-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $HostsFile_Content -Encoding Byte
+# Add taskcluster entry to the hosts file, for (old) tasks not using $TASKCLUSTER_PROXY_URL
+$hostsFileLines = @(
+    "# Useful for generic-worker taskcluster-proxy integration",
+    "# See https://bugzilla.mozilla.org/show_bug.cgi?id=1449981#c6",
+    "127.0.0.1        taskcluster"
+)
+
+# Append the lines to the hosts file
+Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $hostsFileLines
 
 # download gvim
 $client.DownloadFile("http://artfiles.org/vim.org/pc/gvim80-069.exe", "C:\gvim80-069.exe")
@@ -113,9 +118,9 @@ md "C:\generic-worker"
 md "C:\worker-runner"
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
-git clone https://github.com/taskcluster/taskcluster
+Start-Process git -ArgumentList "clone", "https://github.com/taskcluster/taskcluster" -Wait -NoNewWindow
 Set-Location taskcluster
-git checkout ${TASKCLUSTER_REF}
+Start-Process git -ArgumentList "checkout", $TASKCLUSTER_REF -Wait -NoNewWindow
 $revision = Start-Process git -ArgumentList "rev-parse", "HEAD" -Wait -NoNewWindow -PassThru
 $env:CGO_ENABLED = "0"
 Start-Process go -ArgumentList "build", "-tags", "multiuser", "-o", "C:\generic-worker\generic-worker.exe", "-ldflags", "-X main.revision=$revision", ".\workers\generic-worker" -Wait -NoNewWindow
