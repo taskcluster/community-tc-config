@@ -39,7 +39,7 @@ function Run-Executable {
     Write-Host "Running command: $commandString"
 
     # Capture stdout and stderr
-    $process = Start-Process $exePath -ArgumentList $arguments -RedirectStandardOutput "output.txt" -RedirectStandardError "output.txt" -Wait -NoNewWindow -PassThru
+    $process = Start-Process $exePath -ArgumentList $arguments -RedirectStandardOutput "output.txt" -Wait -NoNewWindow -PassThru
 
     # Log the output
 	$output = Get-Content "output.txt"
@@ -69,10 +69,17 @@ function Expand-ZIPFile($file, $destination, $url)
 # allow powershell scripts to run
 Set-ExecutionPolicy Unrestricted -Force -Scope Process
 
+# Check if the Windows Defender registry key exists
+if (-not (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender")) {
+    # Create the key if it doesn't exist
+    New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft" -Name "Windows Defender" -Force
+}
+
 # Issue 681: Disable Windows Defender as it can interfere with tasks,
 # degrade their performance, and e.g. prevents Generic Worker unit test
 # TestAbortAfterMaxRunTime from running as intended.
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" -Name "DisableAntiSpyware" -Value 1
+Write-Host "Windows Defender's DisableAntiSpyware registry setting has been set."
 
 # Services to disable
 # taken (and edited) from GitHub Actions Windows runners
