@@ -19,7 +19,7 @@ function retry {
         echo "Attempt $n/$max:" >&2
       else
         echo "Failed after $n attempts." >&2
-        exit 67
+        return 67
       fi
     }
   done
@@ -37,12 +37,12 @@ function log {
 function log-iff-fails {
   export TEMP_FILE="$(mktemp -t log-iff-fails.XXXXXXXXXX)"
   "${@}" > "${TEMP_FILE}" 2>&1
-  local exit_code=$?
-  if [ "${exit_code}" != 0 ]; then
+  local return_code=$?
+  if [ "${return_code}" != 0 ]; then
     cat "${TEMP_FILE}"
   fi
   rm "${TEMP_FILE}"
-  return "${exit_code}"
+  return "${return_code}"
 }
 
 function deploy {
@@ -56,7 +56,7 @@ function deploy {
     if ! which "${command}" > /dev/null; then
       log "  \xE2\x9D\x8C ${command}"
       log "${0} requires ${command} to be installed and available in your PATH - please fix and rerun" >&2
-      exit 64
+      return 64
     else
       log "  \xE2\x9C\x94 ${command}"
     fi
@@ -68,7 +68,7 @@ function deploy {
     log "    $(yq --version 2>&1)" >&2
     log "See https://mikefarah.gitbook.io/yq/upgrading-from-v3 about backward incompatibility of version 4 and higher." >&2
     log "Note, an alternative solution is to upgrade this script to use v4 syntax and rebuild/publish docker container etc." >&2
-    exit 65
+    return 65
   else
     log "  \xE2\x9C\x94 yq is version 3"
   fi
@@ -77,19 +77,19 @@ function deploy {
 
   if [ "${#}" -ne 3 ]; then
     log "Please specify a cloud (aws/azure/google), action (delete|update), and image set (e.g. generic-worker-win2022) e.g. ${0} aws update generic-worker-win2022" >&2
-    exit 66
+    return 66
   fi
 
   export CLOUD="${1}"
   if [ "${CLOUD}" != "aws" ] && [ "${CLOUD}" != "azure" ] && [ "${CLOUD}" != "google" ]; then
     log "Provider must be 'aws', 'azure', or 'google' but '${CLOUD}' was specified" >&2
-    exit 67
+    return 67
   fi
 
   ACTION="${2}"
   if [ "${ACTION}" != "update" ] && [ "${ACTION}" != "delete" ]; then
     log "Action must be 'delete' or 'update' but '${ACTION}' was specified" >&2
-    exit 68
+    return 68
   fi
 
   export IMAGE_SET="${3}"
@@ -105,7 +105,7 @@ function deploy {
     log "you'll do something unintentional. For safety's sake, please" >&2
     log 'revert or stash them!' >&2
     git status
-    exit 69
+    return 69
   fi
 
   # Check that the current HEAD is also the tip of the official repo main
@@ -118,23 +118,23 @@ function deploy {
     log "Locally, you are on commit ${localSha}." >&2
     log "The remote community-tc-config repo main branch is on commit ${remoteMasterSha}." >&2
     log "Make sure to git push/pull so that they both point to the same commit." >&2
-    exit 70
+    return 70
   fi
 
   if [ "${CLOUD}" == "google" ] && [ -z "${GCP_PROJECT-}" ]; then
     log "Environment variable GCP_PROJECT must be exported before calling this script" >&2
-    exit 71
+    return 71
   fi
 
   if [ "${CLOUD}" == "azure" ] && [ -z "${AZURE_IMAGE_RESOURCE_GROUP-}" ]; then
     log "Environment variable AZURE_IMAGE_RESOURCE_GROUP must be exported before calling this script" >&2
     log "This resource group will be used for storing your created image(s)." >&2
-    exit 74
+    return 74
   fi
 
   if ! [ -d "${IMAGE_SET}" ]; then
     log "Directory $(pwd)/${IMAGE_SET} not found - please specify a valid directory for image set" >&2
-    exit 72
+    return 72
   fi
 
   export IMAGE_SET_COMMIT_SHA="$(git rev-parse HEAD)"
@@ -163,7 +163,7 @@ function deploy {
   echo test | pass insert -m -f "test"
   if [ "$(pass test)" != "test" ]; then
     log "Problem writing to password store" >&2
-    exit 73
+    return 73
   fi
   # Note, we could have used `HEAD~1` rather than the explicit commit id here,
   # however if the `pass insert` command above didn't result in a git commit
