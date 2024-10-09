@@ -133,6 +133,7 @@ Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "http://www.nssm
 
 # Add taskcluster entry to the hosts file, for (old) tasks not using $TASKCLUSTER_PROXY_URL
 $hostsFileLines = @(
+    "",
     "# Useful for generic-worker taskcluster-proxy integration",
     "# See https://bugzilla.mozilla.org/show_bug.cgi?id=1449981#c6",
     "127.0.0.1        taskcluster"
@@ -150,6 +151,7 @@ New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound
 
 # install go
 Expand-ZIPFile -File "C:\go1.23.1.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.23.1.windows-amd64.zip"
+Move-Item -Path "C:\go" -Destination "C:\goroot"
 
 # install git
 $client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.46.2.windows.1/Git-2.46.2-64-bit.exe", "C:\Git-2.46.2-64-bit.exe")
@@ -176,6 +178,23 @@ $env:PATHEXT = $env:PATHEXT + ";.PY"
 
 md "C:\generic-worker"
 md "C:\worker-runner"
+
+Write-Host "PATH is"
+$env:PATH
+Write-Host "PATHEXT is"
+$env:PATHEXT
+Write-Host "git path"
+(Get-Command git).Path
+Write-Host "& git --version"
+& git --version
+Write-Host "git --version"
+git --version
+Write-Host "Start-Process git --version"
+Start-Process git -ArgumentList --version -Wait -NoNewWindow
+Write-Host "<full path>\git.exe --version"
+Start-Process "C:\Program Files\Git\cmd\git.exe" -ArgumentList --version -Wait -NoNewWindow
+Write-Host "Get-ChildItem Env:"
+Get-ChildItem Env:
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
 Run-Executable git @("clone", "https://github.com/taskcluster/taskcluster")
