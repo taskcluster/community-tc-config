@@ -39,15 +39,16 @@ function Run-Executable {
     Write-Host "Running command: $commandString"
 
     # Capture stdout and stderr
-    $output = & $exePath $arguments 2>&1  # Capture both stdout and stderr in the same variable
+    $process = Start-Process $exePath -ArgumentList $arguments -RedirectStandardOutput "output.txt" -RedirectStandardError "output.txt" -Wait -NoNewWindow -PassThru
 
     # Log the output
+	$output = Get-Content "output.txt"
     Write-Host "Command output: $output"
 
     # Check the exit code and exit if non-zero
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "The command failed with exit code $LASTEXITCODE"
-        # exit $LASTEXITCODE
+    if ($process.ExitCode -ne 0) {
+        # throw "$commandString failed with exit code $process.ExitCode"
+        Write-Host "$commandString failed with exit code $process.ExitCode"
     }
 
     # Return the output
@@ -159,7 +160,7 @@ Run-Executable "C:\Git-2.46.2-64-bit.exe" @("/VERYSILENT", "/LOG=`"C:\Install Lo
 
 # install node
 $client.DownloadFile("https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi", "C:\NodeSetup.msi")
-Run-Executable "msiexec.exe" @("/i", "C:\NodeSetup.msi", "/quiet")
+Run-Executable "msiexec" @("/i", "C:\NodeSetup.msi", "/quiet")
 
 # install python 3.11.9
 $client.DownloadFile("https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe", "C:\python-3.11.9-amd64.exe")
@@ -179,27 +180,10 @@ $env:PATHEXT = $env:PATHEXT + ";.PY"
 md "C:\generic-worker"
 md "C:\worker-runner"
 
-Write-Host "PATH is"
-$env:PATH
-Write-Host "PATHEXT is"
-$env:PATHEXT
-Write-Host "git path"
-(Get-Command git).Path
-Write-Host "& git --version"
-& git --version
-Write-Host "git --version"
-git --version
-Write-Host "Start-Process git --version"
-Start-Process git -ArgumentList --version -Wait -NoNewWindow
-Write-Host "<full path>\git.exe --version"
-Start-Process "C:\Program Files\Git\cmd\git.exe" -ArgumentList --version -Wait -NoNewWindow
-Write-Host "Get-ChildItem Env:"
-Get-ChildItem Env:
-
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
 Run-Executable git @("clone", "https://github.com/taskcluster/taskcluster")
 Set-Location taskcluster
-Run-Executable git -ArgumentList "checkout", $TASKCLUSTER_REF -Wait -NoNewWindow
+Run-Executable git @("checkout", $TASKCLUSTER_REF)
 $revision = Run-Executable git @("rev-parse", "HEAD")
 $env:CGO_ENABLED = "0"
 Run-Executable go @("build", "-tags", "multiuser", "-o", "C:\generic-worker\generic-worker.exe", "-ldflags", "-X main.revision=$revision", ".\workers\generic-worker")
