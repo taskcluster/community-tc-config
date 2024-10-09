@@ -228,7 +228,7 @@ set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% set "Generic Worker" AppStderr C:\generic-worker\generic-worker-service.log
 %nssm% set "Generic Worker" AppRotateFiles 0
 "@
-Run-Executable "C:\generic-worker\install.bat" -Wait -NoNewWindow
+Run-Executable "C:\generic-worker\install.bat"
 
 # install worker-runner
 Set-Content -Path C:\worker-runner\install.bat @"
@@ -252,7 +252,7 @@ set nssm=C:\nssm-2.24\win64\nssm.exe
 %nssm% set worker-runner AppRotateSeconds 3600
 %nssm% set worker-runner AppRotateBytes 0
 "@
-Run-Executable "C:\worker-runner\install.bat" -Wait -NoNewWindow
+Run-Executable "C:\worker-runner\install.bat"
 
 # configure worker-runner
 Set-Content -Path C:\worker-runner\runner.yml @"
