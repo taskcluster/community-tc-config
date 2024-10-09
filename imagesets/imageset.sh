@@ -708,9 +708,8 @@ function azure_update {
     --interval=15
 
   # Try to acquire an exclusive lock as only one `az resource move` can happen
-  # at a time, and resource group deletions also seem to be affected. Place
-  # lock in parent folder so the lock is shared across all image sets, so they
-  # can be built in parallel.
+  # at a time. Place lock in parent folder so the lock is shared across all
+  # image sets, otherwise it appears image sets cannot be built in parallel.
   exec 200> ../azure_move_image.lock
   flock -x 200
 
@@ -719,15 +718,10 @@ function azure_update {
     --destination-group="${AZURE_IMAGE_RESOURCE_GROUP}" \
     --ids="${IMAGE_ID}"
 
-  IMAGE_ID="$(retry az image show --name="${NAME_WITH_REGION}" --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" --query id --output tsv)"
-
-  log "Deleting temporary resource group ${AZURE_VM_RESOURCE_GROUP}..."
-  retry az group delete \
-    --name="${AZURE_VM_RESOURCE_GROUP}" \
-    --yes
-
   # Release the lock
   flock -u 200
+
+  IMAGE_ID="$(retry az image show --name="${NAME_WITH_REGION}" --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" --query id --output tsv)"
 
   {
     echo "Instance:  ${NAME_WITH_REGION}"
