@@ -32,8 +32,10 @@ function Run-Executable {
     $commandString = "$exePath $($escapedArguments -join ' ')"
     Write-Log "Running command: $commandString"
 
-    # Start the process and capture both stdout and stderr
-    $process = Start-Process $exePath -ArgumentList $arguments -RedirectStandardOutput "stdout.txt" -RedirectStandardError "stderr.txt" -Wait -NoNewWindow -PassThru
+    # Start the process and capture both stdout and stderr.
+    # Even though $arguments is an array, -ArgumentList requires an escaped
+    # string rather than an array, if arguments contain spaces...
+    $process = Start-Process $exePath -ArgumentList $escapedArguments -RedirectStandardOutput "stdout.txt" -RedirectStandardError "stderr.txt" -Wait -NoNewWindow -PassThru
 
     # Read the stdout and stderr as raw text to preserve line breaks
     $stdout = Get-Content "stdout.txt" -Raw
@@ -212,15 +214,15 @@ md "C:\generic-worker"
 md "C:\worker-runner"
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
-Run-Executable git @("clone", "https://github.com/taskcluster/taskcluster")
+Run-Executable "git" @("clone", "https://github.com/taskcluster/taskcluster")
 Set-Location taskcluster
-Run-Executable git @("checkout", $TASKCLUSTER_REF)
+Run-Executable "git" @("checkout", $TASKCLUSTER_REF)
 $revision = Run-Executable git @("rev-parse", "HEAD")
 $env:CGO_ENABLED = "0"
-Run-Executable go @("build", "-tags", "multiuser", "-o", "C:\generic-worker\generic-worker.exe", "-ldflags", "-X main.revision=$revision", ".\workers\generic-worker")
-Run-Executable go @("build", "-o", "C:\generic-worker\livelog.exe", ".\tools\livelog")
-Run-Executable go @("build", "-o", "C:\generic-worker\taskcluster-proxy.exe", "-ldflags", "-X main.revision=$revision", ".\tools\taskcluster-proxy")
-Run-Executable go @("build", "-o", "C:\worker-runner\start-worker.exe", "-ldflags", "-X main.revision=$revision", ".\tools\worker-runner\cmd\start-worker")
+Run-Executable "go" @("build", "-tags", "multiuser", "-o", "C:\generic-worker\generic-worker.exe", "-ldflags", "-X main.revision=$revision", ".\workers\generic-worker")
+Run-Executable "go" @("build", "-o", "C:\generic-worker\livelog.exe", ".\tools\livelog")
+Run-Executable "go" @("build", "-o", "C:\generic-worker\taskcluster-proxy.exe", "-ldflags", "-X main.revision=$revision", ".\tools\taskcluster-proxy")
+Run-Executable "go" @("build", "-o", "C:\worker-runner\start-worker.exe", "-ldflags", "-X main.revision=$revision", ".\tools\worker-runner\cmd\start-worker")
 Run-Executable "C:\generic-worker\generic-worker.exe" @("--version")
 Run-Executable "C:\generic-worker\generic-worker.exe" @("new-ed25519-keypair", "--file", "C:\generic-worker\generic-worker-ed25519-signing-key.key")
 
