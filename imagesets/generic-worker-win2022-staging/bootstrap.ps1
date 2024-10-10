@@ -39,11 +39,19 @@ function Run-Executable {
     Write-Host "Running command: $commandString"
 
     # Capture stdout and stderr
-    $process = Start-Process $exePath -ArgumentList $arguments -RedirectStandardOutput "output.txt" -Wait -NoNewWindow -PassThru
+    $process = Start-Process $exePath -ArgumentList $arguments -RedirectStandardOutput "stdout.txt" -RedirectStandardError "stderr.txt" -Wait -NoNewWindow -PassThru
 
-    # Log the output
-	$output = Get-Content "output.txt"
-    Write-Host "Command output: $output"
+    # Read the stdout and stderr
+    $stdout = Get-Content "stdout.txt"
+    $stderr = Get-Content "stderr.txt"
+
+    # Log the stdout
+    Write-Host "Command output (stdout): $stdout"
+
+    # Only log the stderr if there is any content in stderr.txt
+    if ($stderr -and $stderr.Trim()) {
+        Write-Host "Command error (stderr): $stderr"
+    }
 
     # Check the exit code and exit if non-zero
     if ($process.ExitCode -ne 0) {
