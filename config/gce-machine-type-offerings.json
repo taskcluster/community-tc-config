@@ -32624,7 +32624,15 @@
     "zone": "europe-west3-b"
   },
   {
+    "name": "c3-standard-176-lssd",
+    "zone": "europe-west3-b"
+  },
+  {
     "name": "c3-standard-22",
+    "zone": "europe-west3-b"
+  },
+  {
+    "name": "c3-standard-22-lssd",
     "zone": "europe-west3-b"
   },
   {
@@ -32632,7 +32640,15 @@
     "zone": "europe-west3-b"
   },
   {
+    "name": "c3-standard-4-lssd",
+    "zone": "europe-west3-b"
+  },
+  {
     "name": "c3-standard-44",
+    "zone": "europe-west3-b"
+  },
+  {
+    "name": "c3-standard-44-lssd",
     "zone": "europe-west3-b"
   },
   {
@@ -32640,7 +32656,15 @@
     "zone": "europe-west3-b"
   },
   {
+    "name": "c3-standard-8-lssd",
+    "zone": "europe-west3-b"
+  },
+  {
     "name": "c3-standard-88",
+    "zone": "europe-west3-b"
+  },
+  {
+    "name": "c3-standard-88-lssd",
     "zone": "europe-west3-b"
   },
   {
@@ -57772,6 +57796,10 @@
     "zone": "us-east1-a"
   },
   {
+    "name": "n2-highmem-128",
+    "zone": "us-east1-a"
+  },
+  {
     "name": "n2-highmem-16",
     "zone": "us-east1-a"
   },
@@ -57801,6 +57829,14 @@
   },
   {
     "name": "n2-highmem-80",
+    "zone": "us-east1-a"
+  },
+  {
+    "name": "n2-highmem-96",
+    "zone": "us-east1-a"
+  },
+  {
+    "name": "n2-standard-128",
     "zone": "us-east1-a"
   },
   {
