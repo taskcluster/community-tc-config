@@ -1,23 +1,17 @@
 $TASKCLUSTER_REF = "main"
 
-# Exit the script on any powershell command error
-$ErrorActionPreference = 'Stop'
+# Write-Log function for logging with RFC3339 format timestamps
+function Write-Log {
+    param (
+        [string]$message
+    )
 
-# use TLS 1.2 (see bug 1443595)
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    # Get the current time in RFC3339 format with UTC (Z)
+    $timestamp = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
 
-md "C:\Install Logs"
-
-# Redirect the output (stdout and stderr) from the current powershell script to a log file
-# There is a Stop-Transcript command later on in this script.
-Start-Transcript -Path "C:\Install Logs\bootstrap.txt"
-
-# capture env
-Get-ChildItem Env: | Out-File "C:\Install Logs\env.txt"
-
-# needed for making http requests
-$client = New-Object system.net.WebClient
-$shell = New-Object -com shell.application
+    # Prefix the message with the timestamp and write to the host
+    Write-Host "$timestamp $message"
+}
 
 # Function to call an executable, log the command and its output, capture both
 # stdout and stderr, and exit powershell script if the called executable fails
@@ -36,21 +30,21 @@ function Run-Executable {
 
     # Log the command being run (quote arguments with spaces or quotes)
     $commandString = "$exePath $($escapedArguments -join ' ')"
-    Write-Host "Running command: $commandString"
+    Write-Log "Running command: $commandString"
 
-    # Capture stdout and stderr
+    # Start the process and capture both stdout and stderr
     $process = Start-Process $exePath -ArgumentList $arguments -RedirectStandardOutput "stdout.txt" -RedirectStandardError "stderr.txt" -Wait -NoNewWindow -PassThru
 
-    # Read the stdout and stderr
-    $stdout = Get-Content "stdout.txt"
-    $stderr = Get-Content "stderr.txt"
+    # Read the stdout and stderr as raw text to preserve line breaks
+    $stdout = Get-Content "stdout.txt" -Raw
+    $stderr = Get-Content "stderr.txt" -Raw
 
     # Log the stdout
-    Write-Host "Command output (stdout): $stdout"
+    Write-Log "Command output (stdout): $stdout"
 
     # Only log the stderr if there is any content in stderr.txt
     if ($stderr -and $stderr.Trim()) {
-        Write-Host "Command error (stderr): $stderr"
+        Write-Log "Command error (stderr): $stderr"
     }
 
     # Check the exit code and exit if non-zero
@@ -58,8 +52,8 @@ function Run-Executable {
         throw "$commandString failed with exit code $($process.ExitCode.ToString())"
     }
 
-    # Return the output
-    return $output
+    # Return the stdout
+    return $stdout
 }
 
 # utility function to download a zip file and extract it
@@ -73,8 +67,27 @@ function Expand-ZIPFile($file, $destination, $url)
     }
 }
 
+# Exit the script on any powershell command error
+$ErrorActionPreference = 'Stop'
+
 # allow powershell scripts to run
 Set-ExecutionPolicy Unrestricted -Force -Scope Process
+
+# use TLS 1.2 (see bug 1443595)
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+md "C:\Install Logs"
+
+# Redirect the output (stdout and stderr) from the current powershell script to a log file
+# There is a Stop-Transcript command later on in this script.
+Start-Transcript -Path "C:\Install Logs\bootstrap.txt"
+
+# capture env
+Get-ChildItem Env: | Out-File "C:\Install Logs\env.txt"
+
+# needed for making http requests
+$client = New-Object system.net.WebClient
+$shell = New-Object -com shell.application
 
 # Check if the Windows Defender registry key exists
 if (-not (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender")) {
@@ -86,7 +99,7 @@ if (-not (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender")) {
 # degrade their performance, and e.g. prevents Generic Worker unit test
 # TestAbortAfterMaxRunTime from running as intended.
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" -Name "DisableAntiSpyware" -Value 1
-Write-Host "Windows Defender's DisableAntiSpyware registry setting has been set."
+Write-Log "Windows Defender's DisableAntiSpyware registry setting has been set."
 
 # Services to disable
 # taken (and edited) from GitHub Actions Windows runners
@@ -100,26 +113,26 @@ $servicesToDisable = @(
 ) | Get-Service -ErrorAction SilentlyContinue
 
 foreach ($service in $servicesToDisable) {
-    Write-Host "Attempting to stop service: $($service.Name)"
+    Write-Log "Attempting to stop service: $($service.Name)"
 
     try {
         if ($service.CanStop) {
             Stop-Service -Name $service.Name -Force -ErrorAction Stop
             $service.WaitForStatus('Stopped', '00:01:00')
-            Write-Host "$($service.Name) stopped successfully."
+            Write-Log "$($service.Name) stopped successfully."
         } else {
-            Write-Host "$($service.Name) cannot be stopped."
+            Write-Log "$($service.Name) cannot be stopped."
         }
     } catch {
-        Write-Host "Failed to stop $($service.Name): $_"
+        Write-Log "Failed to stop $($service.Name): $_"
     }
 
     # Set the service to Disabled startup type
     try {
         Set-Service -Name $service.Name -StartupType Disabled
-        Write-Host "$($service.Name) has been disabled."
+        Write-Log "$($service.Name) has been disabled."
     } catch {
-        Write-Host "Failed to disable $($service.Name): $_"
+        Write-Log "Failed to disable $($service.Name): $_"
     }
 }
 
@@ -257,10 +270,10 @@ Set-Content -Path C:\worker-runner\runner.yml @"
 provider:
     providerType: %MY_CLOUD%
 worker:
-  implementation: generic-worker
-  service: "Generic Worker"
-  configPath: C:\generic-worker\generic-worker-config.yml
-  protocolPipe: \\.\pipe\generic-worker
+    implementation: generic-worker
+    service: "Generic Worker"
+    configPath: C:\generic-worker\generic-worker-config.yml
+    protocolPipe: \\.\pipe\generic-worker
 cacheOverRestarts: C:\generic-worker\start-worker-cache.json
 "@
 
@@ -319,14 +332,14 @@ choco install -y mingw --version 11.2.0.07112021
 $hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match "^PCI\\VEN_10DE" }
 
 if ($hasNvidiaGpu) {
-  $client.DownloadFile("https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe", "C:\nvidia_driver.exe")
-  Run-Executable "C:\nvidia_driver.exe" @("-s", "-noreboot")
+    $client.DownloadFile("https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe", "C:\nvidia_driver.exe")
+    Run-Executable "C:\nvidia_driver.exe" @("-s", "-noreboot")
 
-  # Need to fix this CUDA installation in staging...
-  # Removing from here for now...
-  # https://github.com/taskcluster/community-tc-config/issues/713
-  # $client.DownloadFile("https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe", "C:\cuda_installer.exe")
-  # Run-Executable "C:\cuda_installer.exe" @("-s", "-noreboot")
+    # Need to fix this CUDA installation in staging...
+    # Removing from here for now...
+    # https://github.com/taskcluster/community-tc-config/issues/713
+    # $client.DownloadFile("https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe", "C:\cuda_installer.exe")
+    # Run-Executable "C:\cuda_installer.exe" @("-s", "-noreboot")
 
 }
 
