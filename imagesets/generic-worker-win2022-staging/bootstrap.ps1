@@ -52,8 +52,12 @@ function Run-Executable {
         throw "$commandString failed with exit code $($process.ExitCode.ToString())"
     }
 
-    # Return the stdout, removing trailing whitespace (e.g. final line return)
-    return $stdout.TrimEnd()
+    # Bizarrely, if stdout.txt is 0 bytes, $stdout will not be empty string, but null instead.
+    if ($stdout -eq $null) {
+        return $null
+    } else {
+        return $stdout.TrimEnd()
+    }
 }
 
 # utility function to download a zip file and extract it
