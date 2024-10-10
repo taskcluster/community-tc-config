@@ -52,8 +52,8 @@ function Run-Executable {
         throw "$commandString failed with exit code $($process.ExitCode.ToString())"
     }
 
-    # Return the stdout
-    return $stdout
+    # Return the stdout, removing trailing whitespace (e.g. final line return)
+    return $stdout.TrimEnd()
 }
 
 # utility function to download a zip file and extract it
