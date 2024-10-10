@@ -343,6 +343,9 @@ if ($hasNvidiaGpu) {
 
 }
 
+# Log before stopping transcript to make sure message is included in transcript.
+Write-Log "Bootstrap process completed. Shutting down..."
+
 # This ends logging to the log file specified in the Start-Transcript command earlier on
 Stop-Transcript
 
