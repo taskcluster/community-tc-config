@@ -156,8 +156,8 @@ function deploy {
   #  Port 2022
   #
   retry git clone ssh://source.developers.google.com/p/taskcluster-passwords/r/secrets "${PASSWORD_STORE_DIR}"
-  git -C "${PASSWORD_STORE_DIR}" config pass.signcommits false
-  git -C "${PASSWORD_STORE_DIR}" config commit.gpgsign false
+  git -C "${PASSWORD_STORE_DIR}" config pass.signcommits true
+  git -C "${PASSWORD_STORE_DIR}" config commit.gpgsign true
 
   head_sha_password_store="$(pass git rev-parse HEAD)"
   echo test | pass insert -m -f "test"
