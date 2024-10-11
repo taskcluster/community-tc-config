@@ -318,7 +318,7 @@ Run-Executable "C:\cygwin\bin\bash.exe" @("--login", "-c", "ssh-host-config -y -
 Run-Executable "net" @("start", "cygsshd")
 
 # download bash setup script
-$client.DownloadFile("https://raw.githubusercontent.com/petemoore/myscrapbook/master/setup.sh", "C:\cygwin\home\Administrator\setup.sh")
+$client.DownloadFile("https://raw.githubusercontent.com/petemoore/myscrapbook/master/setup.sh", "C:\cygwin\home\$env:USERNAME\setup.sh")
 
 # run bash setup script
 Run-Executable "C:\cygwin\bin\bash.exe" @("--login", "-c", "chmod a+x setup.sh; ./setup.sh")
@@ -336,7 +336,7 @@ md "C:\ProcessMonitor"
 Expand-ZIPFile -File "C:\ProcessMonitor.zip" -Destination "C:\ProcessMonitor" -Url "https://download.sysinternals.com/files/ProcessMonitor.zip"
 
 # install Windows 10 SDK
-Run-Executable "choco" @("install -y windows-sdk-10.0")
+Run-Executable "choco" @("install", "-y", "windows-sdk-10.0")
 
 # install VisualStudio 2019 Community
 Run-Executable "choco" @("install", "-y", "visualstudio2019community", "--version", "16.5.4.0", "--package-parameters", "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.160 --passive --locale en-US")
