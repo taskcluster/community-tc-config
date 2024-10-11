@@ -106,6 +106,7 @@ Set-ExecutionPolicy Unrestricted -Force -Scope Process
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 md "C:\Install Logs"
+md "C:\Downloads"
 
 # Redirect the output (stdout and stderr) from the current powershell script to a log file
 # There is a Stop-Transcript command later on in this script.
@@ -181,7 +182,7 @@ foreach ($service in $servicesToDisable) {
 Invoke-RestMethod -Uri 'https://chocolatey.org/install.ps1' | Invoke-Expression
 
 # install nssm
-Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "https://www.nssm.cc/release/nssm-2.24.zip"
+Expand-ZIPFile -File "C:\Downloads\nssm-2.24.zip" -Destination "C:\" -Url "https://www.nssm.cc/release/nssm-2.24.zip"
 
 # Add taskcluster entry to the hosts file, for (old) tasks not using $TASKCLUSTER_PROXY_URL
 $hostsFileLines = @(
@@ -195,28 +196,28 @@ $hostsFileLines = @(
 Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $hostsFileLines
 
 # download gvim
-Invoke-WebRequest -Uri "https://artfiles.org/vim.org/pc/gvim80-069.exe" -OutFile "C:\gvim80-069.exe"
+Invoke-WebRequest -Uri "https://artfiles.org/vim.org/pc/gvim80-069.exe" -OutFile "C:\Downloads\gvim80-069.exe"
 
 # open up firewall for livelog (both PUT and GET interfaces)
 New-NetFirewallRule -DisplayName "Allow livelog PUT requests" -Direction Inbound -LocalPort 60022 -Protocol TCP -Action Allow
 New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound -LocalPort 60023 -Protocol TCP -Action Allow
 
 # install go
-Expand-ZIPFile -File "C:\go1.23.1.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.23.1.windows-amd64.zip"
+Expand-ZIPFile -File "C:\Downloads\go1.23.1.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.23.1.windows-amd64.zip"
 Move-Item -Path "C:\go" -Destination "C:\goroot"
 
 # install git
-Invoke-WebRequest -Uri "https://github.com/git-for-windows/git/releases/download/v2.46.2.windows.1/Git-2.46.2-64-bit.exe" -OutFile "C:\Git-2.46.2-64-bit.exe"
-Run-Executable "C:\Git-2.46.2-64-bit.exe" @("/VERYSILENT", "/LOG=`"C:\Install Logs\git.txt`"", "/NORESTART", "/SUPPRESSMSGBOXES")
+Invoke-WebRequest -Uri "https://github.com/git-for-windows/git/releases/download/v2.46.2.windows.1/Git-2.46.2-64-bit.exe" -OutFile "C:\Downloads\Git-2.46.2-64-bit.exe"
+Run-Executable "C:\Downloads\Git-2.46.2-64-bit.exe" @("/VERYSILENT", "/LOG=`"C:\Install Logs\git.txt`"", "/NORESTART", "/SUPPRESSMSGBOXES")
 
 # install node
-Invoke-WebRequest -Uri "https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi" -OutFile "C:\NodeSetup.msi"
-Run-Executable "msiexec" @("/i", "C:\NodeSetup.msi", "/quiet")
+Invoke-WebRequest -Uri "https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi" -OutFile "C:\Downloads\NodeSetup.msi"
+Run-Executable "msiexec" @("/i", "C:\Downloads\NodeSetup.msi", "/quiet")
 
 # install python 3.11.9
-Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe" -OutFile "C:\python-3.11.9-amd64.exe"
+Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe" -OutFile "C:\Downloads\python-3.11.9-amd64.exe"
 # issue 751: without /log <file> python fails to install on Azure workers, with exit code 1622, maybe default log location isn't writable(?)
-Run-Executable "C:\python-3.11.9-amd64.exe" @("/quiet", "InstallAllUsers=1", "/log", "C:\Install Logs\python-3.11.9.txt")
+Run-Executable "C:\Downloads\python-3.11.9-amd64.exe" @("/quiet", "InstallAllUsers=1", "/log", "C:\Install Logs\python-3.11.9.txt")
 
 # set permanent env vars
 [Environment]::SetEnvironmentVariable("GOROOT", "C:\goroot", "Machine")
@@ -295,11 +296,11 @@ cacheOverRestarts: C:\generic-worker\start-worker-cache.json
 "@
 
 # download cygwin (not required, but useful)
-Invoke-WebRequest -Uri "https://www.cygwin.com/setup-x86_64.exe" -OutFile "C:\cygwin-setup-x86_64.exe"
+Invoke-WebRequest -Uri "https://www.cygwin.com/setup-x86_64.exe" -OutFile "C:\Downloads\cygwin-setup-x86_64.exe"
 
 # install cygwin
 # complete package list: https://cygwin.com/packages/package_list.html
-Run-Executable "C:\cygwin-setup-x86_64.exe" @("--quiet-mode", "--wait", "--root", "C:\cygwin", "--site", "https://cygwin.mirror.constant.com", "--packages", "openssh,vim,curl,tar,wget,zip,unzip,diffutils,bzr")
+Run-Executable "C:\Downloads\cygwin-setup-x86_64.exe" @("--quiet-mode", "--wait", "--root", "C:\cygwin", "--site", "https://cygwin.mirror.constant.com", "--packages", "openssh,vim,curl,tar,wget,zip,unzip,diffutils,bzr")
 
 # open up firewall for ssh daemon
 New-NetFirewallRule -DisplayName "Allow SSH inbound" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
@@ -324,15 +325,15 @@ Run-Executable "C:\cygwin\bin\bash.exe" @("--login", "-c", "chmod a+x /tmp/setup
 
 # install dependencywalker (useful utility for troubleshooting, not required)
 md "C:\DependencyWalker"
-Expand-ZIPFile -File "C:\depends22_x64.zip" -Destination "C:\DependencyWalker" -Url "https://dependencywalker.com/depends22_x64.zip"
+Expand-ZIPFile -File "C:\Downloads\depends22_x64.zip" -Destination "C:\DependencyWalker" -Url "https://dependencywalker.com/depends22_x64.zip"
 
 # install ProcessExplorer (useful utility for troubleshooting, not required)
 md "C:\ProcessExplorer"
-Expand-ZIPFile -File "C:\ProcessExplorer.zip" -Destination "C:\ProcessExplorer" -Url "https://download.sysinternals.com/files/ProcessExplorer.zip"
+Expand-ZIPFile -File "C:\Downloads\ProcessExplorer.zip" -Destination "C:\ProcessExplorer" -Url "https://download.sysinternals.com/files/ProcessExplorer.zip"
 
 # install ProcessMonitor (useful utility for troubleshooting, not required)
 md "C:\ProcessMonitor"
-Expand-ZIPFile -File "C:\ProcessMonitor.zip" -Destination "C:\ProcessMonitor" -Url "https://download.sysinternals.com/files/ProcessMonitor.zip"
+Expand-ZIPFile -File "C:\Downloads\ProcessMonitor.zip" -Destination "C:\ProcessMonitor" -Url "https://download.sysinternals.com/files/ProcessMonitor.zip"
 
 # install Windows 10 SDK
 Run-Executable "choco" @("install", "-y", "windows-sdk-10.0")
@@ -349,14 +350,14 @@ Run-Executable "choco" @("install", "-y", "mingw", "--version", "11.2.0.07112021
 $hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match "^PCI\\VEN_10DE" }
 
 if ($hasNvidiaGpu) {
-    Invoke-WebRequest -Uri "https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe" -OutFile "C:\nvidia_driver.exe"
-    Run-Executable "C:\nvidia_driver.exe" @("-s", "-noreboot")
+    Invoke-WebRequest -Uri "https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe" -OutFile "C:\Downloads\nvidia_driver.exe"
+    Run-Executable "C:\Downloads\nvidia_driver.exe" @("-s", "-noreboot")
 
     # Need to fix this CUDA installation in staging...
     # Removing from here for now...
     # https://github.com/taskcluster/community-tc-config/issues/713
-    # Invoke-WebRequest -Uri "https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe" -OutFile "C:\cuda_installer.exe"
-    # Run-Executable "C:\cuda_installer.exe" @("-s", "-noreboot")
+    # Invoke-WebRequest -Uri "https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe" -OutFile "C:\Downloads\cuda_installer.exe"
+    # Run-Executable "C:\Downloads\cuda_installer.exe" @("-s", "-noreboot")
 
 }
 
