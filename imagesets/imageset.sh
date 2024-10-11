@@ -350,6 +350,7 @@ function aws_update {
   # Create new base AMI, and apply user-data filter output, to get instance ID.
   if ! INSTANCE_ID="$(aws --region "${REGION}" ec2 run-instances --image-id "${AMI}" --key-name "${IMAGE_SET}_${REGION}" --security-groups "rdp-only" "ssh-only" --user-data "$(cat "${TEMP_SETUP_SCRIPT}")" --instance-type $(cat aws_base_instance_type) --block-device-mappings DeviceName=/dev/sda1,Ebs='{VolumeSize=75,DeleteOnTermination=true,VolumeType=gp2}' --instance-initiated-shutdown-behavior stop --client-token "${UNIQUE_NAME}" --query 'Instances[*].InstanceId' --output text ${PROFILE:+--iam-instance-profile $PROFILE} 2>&1)"; then
     log "Cannot deploy in ${REGION} since instance type $(cat aws_base_instance_type) is not supported; skipping."
+    log "Failure was: ${INSTANCE_ID}"
     return 0
   fi
 
@@ -909,6 +910,17 @@ cd "$(dirname "${0}")"
 IMAGESETS_DIR="$(pwd)"
 
 export OFFICIAL_GIT_REPO='git@github.com:taskcluster/community-tc-config'
+
+if [ -z "${GPG_SIGNING_CONFIGURED}" ]; then
+  gpg_email="$(git config user.email)"
+  read -p "Please enter the GPG passphrase (for ${gpg_email}): " gpg_passphrase
+  gpg -k --with-keygrip "${gpg_email}" | sed -n 's/.*Keygrip = //p' | while read keygrip; do
+    echo "${gpg_passphrase}" | "$(gpgconf --list-dirs libexecdir)"/gpg-preset-passphrase --preset "${keygrip}"
+  done
+  unset gpg_passphrase
+  export GPG_SIGNING_CONFIGURED=true
+fi
+echo "Ensuring gpg signing is working before proceeding..." | gpg --clearsign
 
 if [ "${1-}" == "all" ]; then
   all-in-parallel
