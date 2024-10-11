@@ -582,8 +582,6 @@ function azure_update {
     return 0
   fi
 
-  azure_delete_resource_groups
-
   # Avoid using UNIQUE_NAME which may be too long, see e.g.
   # https://bugs.launchpad.net/ubuntu-kernel-tests/+bug/1779107/comments/2
   NAME_WITH_REGION="imageset-${UUID}-${REGION}"
@@ -732,7 +730,185 @@ function azure_update {
   } > "azure.${REGION}.secrets"
 }
 
+############### Deploy all image sets ###############
+
+function all-in-parallel {
+
+  # Hardcode for now, add command line options to disable later...
+
+  BUILD_IMAGES=true
+  DELETE_OLD_RGS=true
+
+  DEPLOY_IMAGES=true
+  DEPLOY_MACS=true
+
+  LOGIN_AWS=true
+  LOGIN_AZURE=true
+
+  UPDATE_GCLOUD=true
+  UPDATE_OFFERINGS=true
+  UPDATE_TASKCLUSTER_VERSION=true
+
+  USE_LATEST_TASKCLUSTER_VERSION=true
+
+  export GCP_PROJECT=community-tc-workers
+  export AZURE_IMAGE_RESOURCE_GROUP=rg-tc-eng-images
+
+  export TASKCLUSTER_CLIENT_ID='static/taskcluster/root'
+  export TASKCLUSTER_ROOT_URL='https://community-tc.services.mozilla.com'
+  unset TASKCLUSTER_CERTIFICATE
+
+  if [ -n "${LOGIN_AZURE}" ]; then
+    retry az login
+  fi
+
+  if [ -n "${DELETE_OLD_RGS}" ]; then
+    for rg in $(az group list --query "[?starts_with(name, 'imageset-')].name" -o tsv); do
+      echo "Deleting old resource group ${rg}..."
+      az group delete --name $rg --yes --no-wait
+    done
+  fi
+
+  if [ -n "${UPDATE_GCLOUD}" ]; then
+    retry gcloud components update -q
+  fi
+  retry gcloud auth login
+
+  PREP_DIR="$(mktemp -t deploy-worker-pools.XXXXXXXXXX -d)"
+  cd "${PREP_DIR}"
+
+  echo
+  echo "Preparing in directory ${PREP_DIR}..."
+  echo
+
+  if [ -n "${USE_LATEST_TASKCLUSTER_VERSION}" ]; then
+    VERSION="$(retry curl https://api.github.com/repos/taskcluster/taskcluster/releases/latest 2>/dev/null | jq -r .tag_name)"
+    if [ -z "${VERSION}" ]; then
+      echo "Cannot retrieve latest taskcluster version" >&2
+      return 64
+    fi
+  fi
+  if [ -n "${UPDATE_TASKCLUSTER_VERSION}" ] && [ -z "${VERSION}" ]; then
+    echo "No taskcluster version specified" >&2
+    return 75
+  fi
+
+  mkdir tc-admin
+
+  cd tc-admin
+  python3.11 -m venv tc-admin-venv
+  source tc-admin-venv/bin/activate
+  pip3 install pytest
+  pip3 install --upgrade pip
+
+  cd "$(dirname "${0}")/.."
+
+  pip3 install -e .
+  which tc-admin
+  export TASKCLUSTER_ACCESS_TOKEN="$(pass ls community-tc/root | head -1)"
+
+  if [ -n "${LOGIN_AWS}" ]; then
+    eval $(imagesets/signin-aws.sh)
+  fi
+
+  if [ -n "${UPDATE_OFFERINGS}" ]; then
+    echo "Updating EC2 instance types..."
+    misc/update-ec2-instance-types.sh
+    git add 'config/ec2-instance-type-offerings'
+    git commit -m "Ran script misc/update-ec2-instance-types.sh" || true
+
+    echo "Updating Azure VM sizes..."
+    misc/update-azure-vm-sizes.sh
+    git add 'config/azure-vm-size-offerings'
+    git commit -m "Ran script misc/update-azure-vm-sizes.sh" || true
+
+    echo "Updating GCE machine types..."
+    misc/update-gce-machine-types.sh
+    git add 'config/gce-machine-type-offerings.json'
+    git commit -m "Ran script misc/update-gce-machine-types.sh" || true
+
+    retry git push origin "${BRANCH}"
+    retry tc-admin apply
+  fi
+
+  if [ -n "${UPDATE_TASKCLUSTER_VERSION}" ]; then
+    cd imagesets
+    git ls-files | grep -F 'bootstrap.' | while read file; do
+      cat "${file}" > "${file}.bak"
+      cat "${file}.bak" | sed 's/^ *setenv TASKCLUSTER_VERSION .*/setenv TASKCLUSTER_VERSION '"${VERSION}"'/' \
+        | sed 's/^ *TASKCLUSTER_VERSION=.*/TASKCLUSTER_VERSION='"'${VERSION}'"'/' \
+        | sed 's/^ *\$TASKCLUSTER_VERSION *=.*/$TASKCLUSTER_VERSION = "'"${VERSION}"'"/' \
+        > "${file}"
+      rm "${file}.bak"
+      git add "${file}"
+    done
+    git commit -m "chore: bump to TC ${VERSION}" || true
+    retry git push origin "${BRANCH}"
+    cd ..
+  fi
+
+  #######################################################################################
+  ######## Comment out image sets / macOS workers that don't need to be updated! ########
+  #######################################################################################
+
+
+  ##################################
+  ###### Update macOS workers ######
+  ##################################
+  #
+  # Remeber to vnc as administrator onto macs before running this script, to avoid ssh connection problems!
+
+  # TODO: fetch these IPs automatically, and report if they need to be logged into first with vnc
+  if [ -n "${DEPLOY_MACS}" ]; then
+    for IP in 207.254.55.60 207.254.55.167; do
+      pass "macstadium/generic-worker-ci/${IP}" | tail -1 | ssh "administrator@${IP}" sudo -S "bash" -c /var/root/update.sh
+    done
+  fi
+
+
+  if [ -n "${BUILD_IMAGES}" ]; then
+    # TODO: inspect configs to determine full set of image sets to build, rather than maintain a static list
+
+    ########## Azure Windows ##########
+    imagesets/imageset.sh azure update generic-worker-win2022 &
+    imagesets/imageset.sh azure update generic-worker-win2022-staging &
+    imagesets/imageset.sh azure update generic-worker-win2022-gpu &
+    imagesets/imageset.sh azure update generic-worker-win11-24h2-staging &
+
+    ########## Non-Azure Windows ##########
+    imagesets/imageset.sh aws update generic-worker-win2022 &
+
+    ########## Ubuntu ##########
+    imagesets/imageset.sh google update generic-worker-ubuntu-24-04 &
+    imagesets/imageset.sh aws update generic-worker-ubuntu-24-04 &
+    imagesets/imageset.sh google update generic-worker-ubuntu-24-04-arm64 &
+    imagesets/imageset.sh google update generic-worker-ubuntu-24-04-staging &
+    imagesets/imageset.sh aws update generic-worker-ubuntu-24-04-staging &
+
+    ########## Docker Worker ##########
+    imagesets/imageset.sh google update docker-worker &
+    imagesets/imageset.sh aws update docker-worker &
+
+    wait
+  fi
+
+  if [ -n "${DEPLOY_IMAGES}" ]; then
+    retry tc-admin apply
+  fi
+
+  echo
+  echo "Deleting preparation directory: ${PREP_DIR}..."
+  echo
+  cd
+  rm -rf "${PREP_DIR}"
+  echo "All done!"
+}
+
 ################## Entry point ##################
+
+if [ "${1-}" == "all" ]; then
+  all-in-parallel
+fi
 
 if [ "${1-}" == "process-region" ]; then
   # Step into directory containing image set definition.
