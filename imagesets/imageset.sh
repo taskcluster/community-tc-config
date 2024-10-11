@@ -28,7 +28,7 @@ function retry {
 
 function log {
   if [ -n "${BACKGROUND_COLOUR-}" ] && [ -n "${FOREGROUND_COLOUR-}" ] && [ -n "${CLOUD-}" ] && [ -n "${IMAGE_SET-}" ] && [ -n "${REGION-}" ]; then
-    echo -e "\x1B[48;5;${BACKGROUND_COLOUR}m\x1B[38;5;${FOREGROUND_COLOUR}m$(basename "${0}"): $(date): ${CLOUD}: ${IMAGE_SET}: ${REGION}: ${@}\x1B[K\x1B[0m"
+    echo -e "\x1B[48;5;${BACKGROUND_COLOUR}m\x1B[38;5;${FOREGROUND_COLOUR}m$(basename "${0}"): $(date -u +"%Y-%m-%dT%H:%M:%SZ"): ${CLOUD}: ${IMAGE_SET}: ${REGION}: ${@}\x1B[K\x1B[0m"
   else
     echo -e "\x1B[48;5;123m\x1B[38;5;0m$(basename "${0}"): $(date): ${@}\x1B[K\x1B[0m"
   fi
