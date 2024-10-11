@@ -1,4 +1,9 @@
+##############################################################################
+# TASKCLUSTER_REF can be a git commit SHA, a git branch name, or a git tag name
+# (i.e. for a taskcluster version number, prefix with 'v' to make it a git tag)
 $TASKCLUSTER_REF = "main"
+$TASKCLUSTER_REPO = "https://github.com/taskcluster/taskcluster"
+##############################################################################
 
 # Write-Log function for logging with RFC3339 format timestamps
 function Write-Log {
@@ -233,7 +238,7 @@ md "C:\generic-worker"
 md "C:\worker-runner"
 
 # build generic-worker/livelog/start-worker/taskcluster-proxy from ${TASKCLUSTER_REF} commit / branch / tag etc
-Run-Executable "git" @("clone", "https://github.com/taskcluster/taskcluster")
+Run-Executable "git" @("clone", $TASKCLUSTER_REPO)
 Set-Location taskcluster
 Run-Executable "git" @("checkout", $TASKCLUSTER_REF)
 $revision = Run-Executable git @("rev-parse", "HEAD")

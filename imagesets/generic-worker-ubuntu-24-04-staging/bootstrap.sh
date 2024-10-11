@@ -6,7 +6,8 @@ exec &> /var/log/bootstrap.log
 ##############################################################################
 # TASKCLUSTER_REF can be a git commit SHA, a git branch name, or a git tag name
 # (i.e. for a taskcluster version number, prefix with 'v' to make it a git tag)
-TASKCLUSTER_REF='7e43aeb6160630d07060b4b35f84486f18ab83b8'
+TASKCLUSTER_REF='d2g-proxy'
+TASKCLUSTER_REPO='https://github.com/jcristau/taskcluster'
 ##############################################################################
 
 function retry {
@@ -89,7 +90,7 @@ export GOPATH=~/go
 export GOROOT=/usr/local/go
 export PATH="${GOROOT}/bin:${GOPATH}/bin:${PATH}"
 export GCO_ENABLED=0
-git clone https://github.com/taskcluster/taskcluster
+git clone "${TASKCLUSTER_REPO}"
 cd taskcluster
 git checkout "${TASKCLUSTER_REF}"
 HEAD_REV="$(git rev-parse HEAD)"
