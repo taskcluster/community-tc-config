@@ -22,20 +22,39 @@ function Run-Executable {
         [string[]]$arguments     # Arguments to pass to the executable
     )
 
-    # Escape double quotes and quote each argument if it contains spaces or quotes
+    # Even though $arguments is an array, Start-Process -ArgumentList requires
+    # an escaped string rather than an array, if any argument contain spaces,
+    # since it simply joins the array elements internally with a ' ' between
+    # each one. Therefore escape double quotes and quote each argument if it
+    # contains spaces or quotes.
     $escapedArguments = $arguments | ForEach-Object {
         $_ = $_ -replace '"', '""'  # Escape literal double quotes by doubling them
         if ($_ -match '\s' -or $_ -match '"') { "`"$_`"" } else { $_ }
     }
 
-    # Log the command being run (quote arguments with spaces or quotes)
+    # Log the command being run
     $commandString = "$exePath $($escapedArguments -join ' ')"
     Write-Log "Running command: $commandString"
 
-    # Start the process and capture both stdout and stderr.
-    # Even though $arguments is an array, -ArgumentList requires an escaped
-    # string rather than an array, if arguments contain spaces...
-    $process = Start-Process $exePath -ArgumentList $escapedArguments -RedirectStandardOutput "stdout.txt" -RedirectStandardError "stderr.txt" -Wait -NoNewWindow -PassThru
+    # Start-Process parameters to capture both stdout and stderr
+    $startProcessParams = @{
+        FilePath              = $exePath
+        # RedirectStandardOutput and RedirectStandardError are not allowed to
+        # be the same file
+        RedirectStandardOutput = "stdout.txt"
+        RedirectStandardError  = "stderr.txt"
+        Wait                  = $true
+        NoNewWindow           = $true
+        PassThru              = $true
+    }
+
+    # ArgumentList is not allowed to be empty
+    if ($escapedArguments) {
+        $startProcessParams['ArgumentList'] = $escapedArguments
+    }
+
+    # Run the executable by splatting the parameters to Start-Process
+    $process = Start-Process @startProcessParams
 
     # Read the stdout and stderr as raw text to preserve line breaks
     $stdout = Get-Content "stdout.txt" -Raw
