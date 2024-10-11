@@ -246,49 +246,42 @@ Run-Executable "C:\generic-worker\generic-worker.exe" @("--version")
 Run-Executable "C:\generic-worker\generic-worker.exe" @("new-ed25519-keypair", "--file", "C:\generic-worker\generic-worker-ed25519-signing-key.key")
 
 # install generic-worker, using the steps suggested in https://docs.taskcluster.net/docs/reference/workers/worker-runner/deployment#recommended-setup
-Set-Content -Path C:\generic-worker\install.bat @"
-set nssm=C:\nssm-2.24\win64\nssm.exe
-%nssm% install "Generic Worker" C:\generic-worker\generic-worker.exe
-%nssm% set "Generic Worker" AppDirectory C:\generic-worker
-%nssm% set "Generic Worker" AppParameters run --config C:\generic-worker\generic-worker-config.yml --worker-runner-protocol-pipe \\.\pipe\generic-worker
-%nssm% set "Generic Worker" DisplayName "Generic Worker"
-%nssm% set "Generic Worker" Description "A taskcluster worker that runs on all mainstream platforms"
-%nssm% set "Generic Worker" Start SERVICE_DEMAND_START
-%nssm% set "Generic Worker" Type SERVICE_WIN32_OWN_PROCESS
-%nssm% set "Generic Worker" AppNoConsole 1
-%nssm% set "Generic Worker" AppAffinity All
-%nssm% set "Generic Worker" AppStopMethodSkip 0
-%nssm% set "Generic Worker" AppExit Default Exit
-%nssm% set "Generic Worker" AppRestartDelay 0
-%nssm% set "Generic Worker" AppStdout C:\generic-worker\generic-worker-service.log
-%nssm% set "Generic Worker" AppStderr C:\generic-worker\generic-worker-service.log
-%nssm% set "Generic Worker" AppRotateFiles 0
-"@
-Run-Executable "C:\generic-worker\install.bat"
+$nssm = "C:\nssm-2.24\win64\nssm.exe"
+Run-Executable $nssm @("install", "Generic Worker", "C:\generic-worker\generic-worker.exe")
+Run-Executable $nssm @("set", "Generic Worker", "AppDirectory", "C:\generic-worker")
+Run-Executable $nssm @("set", "Generic Worker", "AppParameters", "run", "--config", "C:\generic-worker\generic-worker-config.yml", "--worker-runner-protocol-pipe", "\\.\pipe\generic-worker")
+Run-Executable $nssm @("set", "Generic Worker", "DisplayName", "Generic Worker")
+Run-Executable $nssm @("set", "Generic Worker", "Description", "A taskcluster worker that runs on all mainstream platforms")
+Run-Executable $nssm @("set", "Generic Worker", "Start", "SERVICE_DEMAND_START")
+Run-Executable $nssm @("set", "Generic Worker", "Type", "SERVICE_WIN32_OWN_PROCESS")
+Run-Executable $nssm @("set", "Generic Worker", "AppNoConsole", "1")
+Run-Executable $nssm @("set", "Generic Worker", "AppAffinity", "All")
+Run-Executable $nssm @("set", "Generic Worker", "AppStopMethodSkip", "0")
+Run-Executable $nssm @("set", "Generic Worker", "AppExit", "Default", "Exit")
+Run-Executable $nssm @("set", "Generic Worker", "AppRestartDelay", "0")
+Run-Executable $nssm @("set", "Generic Worker", "AppStdout", "C:\generic-worker\generic-worker-service.log")
+Run-Executable $nssm @("set", "Generic Worker", "AppStderr", "C:\generic-worker\generic-worker-service.log")
+Run-Executable $nssm @("set", "Generic Worker", "AppRotateFiles", "0")
 
 # install worker-runner
-Set-Content -Path C:\worker-runner\install.bat @"
-set nssm=C:\nssm-2.24\win64\nssm.exe
-%nssm% install worker-runner C:\worker-runner\start-worker.exe
-%nssm% set worker-runner AppDirectory C:\worker-runner
-%nssm% set worker-runner AppParameters C:\worker-runner\runner.yml
-%nssm% set worker-runner DisplayName "Worker Runner"
-%nssm% set worker-runner Description "Interface between workers and Taskcluster services"
-%nssm% set worker-runner Start SERVICE_AUTO_START
-%nssm% set worker-runner Type SERVICE_WIN32_OWN_PROCESS
-%nssm% set worker-runner AppNoConsole 1
-%nssm% set worker-runner AppAffinity All
-%nssm% set worker-runner AppStopMethodSkip 0
-%nssm% set worker-runner AppExit Default Exit
-%nssm% set worker-runner AppRestartDelay 0
-%nssm% set worker-runner AppStdout C:\worker-runner\worker-runner-service.log
-%nssm% set worker-runner AppStderr C:\worker-runner\worker-runner-service.log
-%nssm% set worker-runner AppRotateFiles 1
-%nssm% set worker-runner AppRotateOnline 1
-%nssm% set worker-runner AppRotateSeconds 3600
-%nssm% set worker-runner AppRotateBytes 0
-"@
-Run-Executable "C:\worker-runner\install.bat"
+Run-Executable $nssm @("install", "worker-runner", "C:\worker-runner\start-worker.exe")
+Run-Executable $nssm @("set", "worker-runner", "AppDirectory", "C:\worker-runner")
+Run-Executable $nssm @("set", "worker-runner", "AppParameters", "C:\worker-runner\runner.yml")
+Run-Executable $nssm @("set", "worker-runner", "DisplayName", "Worker Runner")
+Run-Executable $nssm @("set", "worker-runner", "Description", "Interface between workers and Taskcluster services")
+Run-Executable $nssm @("set", "worker-runner", "Start", "SERVICE_AUTO_START")
+Run-Executable $nssm @("set", "worker-runner", "Type", "SERVICE_WIN32_OWN_PROCESS")
+Run-Executable $nssm @("set", "worker-runner", "AppNoConsole", "1")
+Run-Executable $nssm @("set", "worker-runner", "AppAffinity", "All")
+Run-Executable $nssm @("set", "worker-runner", "AppStopMethodSkip", "0")
+Run-Executable $nssm @("set", "worker-runner", "AppExit", "Default", "Exit")
+Run-Executable $nssm @("set", "worker-runner", "AppRestartDelay", "0")
+Run-Executable $nssm @("set", "worker-runner", "AppStdout", "C:\worker-runner\worker-runner-service.log")
+Run-Executable $nssm @("set", "worker-runner", "AppStderr", "C:\worker-runner\worker-runner-service.log")
+Run-Executable $nssm @("set", "worker-runner", "AppRotateFiles", "1")
+Run-Executable $nssm @("set", "worker-runner", "AppRotateOnline", "1")
+Run-Executable $nssm @("set", "worker-runner", "AppRotateSeconds", "3600")
+Run-Executable $nssm @("set", "worker-runner", "AppRotateBytes", "0")
 
 # configure worker-runner
 Set-Content -Path C:\worker-runner\runner.yml @"
@@ -343,14 +336,14 @@ md "C:\ProcessMonitor"
 Expand-ZIPFile -File "C:\ProcessMonitor.zip" -Destination "C:\ProcessMonitor" -Url "https://download.sysinternals.com/files/ProcessMonitor.zip"
 
 # install Windows 10 SDK
-choco install -y windows-sdk-10.0
+Run-Executable "choco" @("install -y windows-sdk-10.0")
 
 # install VisualStudio 2019 Community
-choco install -y visualstudio2019community --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.160 --passive --locale en-US"
-choco install -y visualstudio2019buildtools --version 16.5.4.0 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Component.NuGet.BuildTools --add Microsoft.VisualStudio.Workload.UniversalBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.NetCoreBuildTools;includeRecommended --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US"
+Run-Executable "choco" @("install", "-y", "visualstudio2019community", "--version", "16.5.4.0", "--package-parameters", "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.160 --passive --locale en-US")
+Run-Executable "choco" @("install", "-y", "visualstudio2019buildtools", "--version", "16.5.4.0", "--package-parameters", "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Component.NuGet.BuildTools --add Microsoft.VisualStudio.Workload.UniversalBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.NetCoreBuildTools;includeRecommended --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US")
 
 # install gcc for go race detector
-choco install -y mingw --version 11.2.0.07112021
+Run-Executable "choco" @("install", "-y", "mingw", "--version", "11.2.0.07112021")
 
 # Check if any of the video controllers are from NVIDIA
 # Note, 0x10DE is the NVIDIA Corporation Vendor ID
