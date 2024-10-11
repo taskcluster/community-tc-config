@@ -94,8 +94,6 @@ function deploy {
 
   export IMAGE_SET="${3}"
 
-  OFFICIAL_GIT_REPO='git@github.com:taskcluster/community-tc-config'
-
   # Local changes should be dealt with before continuing. git stash can help
   # here! Untracked files shouldn't get pushed, so let's make sure we have none.
   modified="$(git status --porcelain)"
@@ -827,7 +825,7 @@ function all-in-parallel {
     git add 'config/gce-machine-type-offerings.json'
     git commit -m "Ran script misc/update-gce-machine-types.sh" || true
 
-    retry git push origin "${BRANCH}"
+    retry git push "${OFFICIAL_GIT_REPO}"
     retry tc-admin apply
   fi
 
@@ -843,7 +841,7 @@ function all-in-parallel {
       git add "${file}"
     done
     git commit -m "chore: bump to TC ${VERSION}" || true
-    retry git push origin "${BRANCH}"
+    retry git push "${OFFICIAL_GIT_REPO}"
     cd ..
   fi
 
@@ -907,7 +905,10 @@ function all-in-parallel {
 ################## Entry point ##################
 
 cd "$(dirname "${0}")"
+
 IMAGESETS_DIR="$(pwd)"
+
+export OFFICIAL_GIT_REPO='git@github.com:taskcluster/community-tc-config'
 
 if [ "${1-}" == "all" ]; then
   all-in-parallel
