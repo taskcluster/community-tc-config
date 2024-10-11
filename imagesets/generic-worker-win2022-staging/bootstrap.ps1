@@ -161,7 +161,6 @@ foreach ($service in $servicesToDisable) {
     }
 }
 
-
 # skip OOBE (out of box experience)
 @(
     "HideEULAPage",
@@ -180,7 +179,6 @@ foreach ($service in $servicesToDisable) {
 
 # install chocolatey package manager
 Invoke-RestMethod -Uri 'https://chocolatey.org/install.ps1' | Invoke-Expression
-
 
 # install nssm
 Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "https://www.nssm.cc/release/nssm-2.24.zip"
@@ -346,8 +344,8 @@ Run-Executable "choco" @("install", "-y", "visualstudio2019buildtools", "--versi
 # install gcc for go race detector
 Run-Executable "choco" @("install", "-y", "mingw", "--version", "11.2.0.07112021")
 
-# Check if any of the video controllers are from NVIDIA
-# Note, 0x10DE is the NVIDIA Corporation Vendor ID
+# Check if any of the video controllers are from NVIDIA.
+# Note, 0x10DE is the NVIDIA Corporation Vendor ID.
 $hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match "^PCI\\VEN_10DE" }
 
 if ($hasNvidiaGpu) {
@@ -365,12 +363,17 @@ if ($hasNvidiaGpu) {
 # Log before stopping transcript to make sure message is included in transcript.
 Write-Log "Bootstrap process completed. Shutting down..."
 
-# This ends logging to the log file specified in the Start-Transcript command earlier on
-Stop-Transcript
-
-# now shutdown, in preparation for creating an image
-# Stop-Computer isn't working, also not when specifying -AsJob, so reverting to using `shutdown` command instead
+# Shut down, in preparation for creating an image. Stop-Computer isn't working,
+# also not when specifying -AsJob, so reverting to using `shutdown` command
+# instead. See:
 #   * https://www.reddit.com/r/PowerShell/comments/65250s/windows_10_creators_update_stopcomputer_not/dgfofug/?st=j1o3oa29&sh=e0c29c6d
 #   * https://support.microsoft.com/en-in/help/4014551/description-of-the-security-and-quality-rollup-for-the-net-framework-4
 #   * https://support.microsoft.com/en-us/help/4020459
-shutdown -s
+Run-Executable "shutdown" @("-s")
+
+# Technically the transcript will be stopped here anyway, since Powershell
+# stops the transcript when the script exits, but it is a useful reminder to
+# the reader that there is an open transcript which will get closed here. We
+# issue the Stop-Transcript after the shutdown command, because if that were to
+# fail, we would want to see the output in the transcript.
+Stop-Transcript
