@@ -317,10 +317,10 @@ Run-Executable "C:\cygwin\bin\bash.exe" @("--login", "-c", "ssh-host-config -y -
 Run-Executable "net" @("start", "cygsshd")
 
 # download bash setup script
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/petemoore/myscrapbook/master/setup.sh" -OutFile "C:\cygwin\home\$env:USERNAME\setup.sh"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/petemoore/myscrapbook/master/setup.sh" -OutFile "C:\cygwin\tmp\setup.sh"
 
 # run bash setup script
-Run-Executable "C:\cygwin\bin\bash.exe" @("--login", "-c", "chmod a+x setup.sh; ./setup.sh")
+Run-Executable "C:\cygwin\bin\bash.exe" @("--login", "-c", "chmod a+x /tmp/setup.sh; /tmp/setup.sh")
 
 # install dependencywalker (useful utility for troubleshooting, not required)
 md "C:\DependencyWalker"
