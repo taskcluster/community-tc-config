@@ -244,9 +244,9 @@ function deploy {
 
   retry git -c pull.rebase=true pull "${OFFICIAL_GIT_REPO}" main
   retry git push "${OFFICIAL_GIT_REPO}" "+HEAD:refs/heads/main"
-  log 'Deployment of image sets successful!'
+  log "Deployment of image set ${IMAGE_SET} successful"
   log ''
-  log 'Be sure to run tc-admin in the community-tc-config repo to apply changes to the community cluster!'
+  log 'Be sure to run tc-admin to apply changes to the community cluster!'
 }
 
 ################## AWS ##################
