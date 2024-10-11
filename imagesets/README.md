@@ -95,7 +95,13 @@ to be able to build image sets.
 
 ## Building
 
-### Under Docker (recommended)
+### Building and deploying all image sets in one go in parallel
+
+Run:
+
+  * `./imageset.sh all`
+
+### Build single image set under Docker
 
 To update/delete the image set `IMAGE_SET` whose definition is in the
 subdirectory `<IMAGE_SET>`:
@@ -104,7 +110,7 @@ subdirectory `<IMAGE_SET>`:
 
 This will launch a docker container to build the image set.
 
-### Outside of Docker (not recommended)
+### Build single image set natively on host
 
 If you instead prefer to build an image set natively on your host (not using docker):
 
@@ -141,7 +147,9 @@ All of the following tools must be available in the `PATH`:
   * `xargs`
   * `yq` **version 3** (version 4 is [backwardly incompatible](https://mikefarah.gitbook.io/yq/upgrading-from-v3))
 
-## Post image set building steps
+## Post image set building steps when building a single image set
+
+Note, this is not required when running `./imageset.sh all`.
 
 There are some important, currently manual, post-image-set-building steps to
 complete:
@@ -197,8 +205,3 @@ complete:
 
 3) Don't forget to test your image set changes! Try rerunning some tasks that
    previously ran successfully.
-
-## Building and deploying all image sets in one go in parallel
-
-There is a convenience script for building all image sets in one go in parallel
-[here](https://raw.githubusercontent.com/petemoore/myscrapbook/refs/heads/master/build-gw-images.sh).
