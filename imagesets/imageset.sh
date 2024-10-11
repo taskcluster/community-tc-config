@@ -28,7 +28,7 @@ function retry {
 
 function log {
   if [ -n "${BACKGROUND_COLOUR-}" ] && [ -n "${FOREGROUND_COLOUR-}" ] && [ -n "${CLOUD-}" ] && [ -n "${IMAGE_SET-}" ] && [ -n "${REGION-}" ]; then
-    echo -e "\x1B[48;5;${BACKGROUND_COLOUR}m\x1B[38;5;${FOREGROUND_COLOUR}m$(basename "${0}"): $(date): ${CLOUD}: ${IMAGE_SET}: ${REGION}: ${@}\x1B[K\x1B[0m"
+    echo -e "\x1B[48;5;${BACKGROUND_COLOUR}m\x1B[38;5;${FOREGROUND_COLOUR}m$(basename "${0}"): $(date -u +"%Y-%m-%dT%H:%M:%SZ"): ${CLOUD}: ${IMAGE_SET}: ${REGION}: ${@}\x1B[K\x1B[0m"
   else
     echo -e "\x1B[48;5;123m\x1B[38;5;0m$(basename "${0}"): $(date): ${@}\x1B[K\x1B[0m"
   fi
@@ -156,8 +156,8 @@ function deploy {
   #  Port 2022
   #
   retry git clone ssh://source.developers.google.com/p/taskcluster-passwords/r/secrets "${PASSWORD_STORE_DIR}"
-  git -C "${PASSWORD_STORE_DIR}" config pass.signcommits false
-  git -C "${PASSWORD_STORE_DIR}" config commit.gpgsign false
+  git -C "${PASSWORD_STORE_DIR}" config pass.signcommits true
+  git -C "${PASSWORD_STORE_DIR}" config commit.gpgsign true
 
   head_sha_password_store="$(pass git rev-parse HEAD)"
   echo test | pass insert -m -f "test"
