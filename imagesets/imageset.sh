@@ -801,7 +801,7 @@ function all-in-parallel {
   pip3 install pytest
   pip3 install --upgrade pip
 
-  cd "$(dirname "${0}")/.."
+  cd "${IMAGESETS_DIR}/.."
 
   pip3 install -e .
   which tc-admin
@@ -906,13 +906,17 @@ function all-in-parallel {
 
 ################## Entry point ##################
 
+cd "$(dirname "${0}")"
+IMAGESETS_DIR="$(pwd)"
+
 if [ "${1-}" == "all" ]; then
   all-in-parallel
+  exit 0
 fi
 
 if [ "${1-}" == "process-region" ]; then
   # Step into directory containing image set definition.
-  cd "$(dirname "${0}")/${IMAGE_SET}"
+  cd "${IMAGE_SET}"
   REGION="${3}"
   FOREGROUND_COLOUR="${4}"
   BACKGROUND_COLOUR="${5}"
@@ -920,5 +924,4 @@ if [ "${1-}" == "process-region" ]; then
   exit 0
 fi
 
-cd "$(dirname "${0}")"
 deploy "${@}"
