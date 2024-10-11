@@ -81,15 +81,19 @@ function Run-Executable {
     }
 }
 
-# utility function to download a zip file and extract it
-function Expand-ZIPFile($file, $destination, $url)
-{
-    $client.DownloadFile($url, $file)
-    $zip = $shell.NameSpace($file)
-    foreach($item in $zip.items())
-    {
-        $shell.Namespace($destination).copyhere($item)
-    }
+# Utility function to download a zip file and extract it
+function Expand-ZIPFile {
+    param (
+        [string]$file,        # Path to save the downloaded ZIP file
+        [string]$destination, # Directory to extract the ZIP contents
+        [string]$url          # URL to download the ZIP file from
+    )
+
+    # Download the file using Invoke-WebRequest
+    Invoke-WebRequest -Uri $url -OutFile $file
+
+    # Extract the ZIP file using Expand-Archive
+    Expand-Archive -Path $file -DestinationPath $destination -Force
 }
 
 # Exit the script on any powershell command error
@@ -109,10 +113,6 @@ Start-Transcript -Path "C:\Install Logs\bootstrap.txt"
 
 # capture env
 Get-ChildItem Env: | Out-File "C:\Install Logs\env.txt"
-
-# needed for making http requests
-$client = New-Object system.net.WebClient
-$shell = New-Object -com shell.application
 
 # Check if the Windows Defender registry key exists
 if (-not (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender")) {
@@ -179,10 +179,11 @@ foreach ($service in $servicesToDisable) {
 }
 
 # install chocolatey package manager
-Invoke-Expression ($client.DownloadString('https://chocolatey.org/install.ps1'))
+Invoke-RestMethod -Uri 'https://chocolatey.org/install.ps1' | Invoke-Expression
+
 
 # install nssm
-Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "http://www.nssm.cc/release/nssm-2.24.zip"
+Expand-ZIPFile -File "C:\nssm-2.24.zip" -Destination "C:\" -Url "https://www.nssm.cc/release/nssm-2.24.zip"
 
 # Add taskcluster entry to the hosts file, for (old) tasks not using $TASKCLUSTER_PROXY_URL
 $hostsFileLines = @(
@@ -196,7 +197,7 @@ $hostsFileLines = @(
 Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $hostsFileLines
 
 # download gvim
-$client.DownloadFile("http://artfiles.org/vim.org/pc/gvim80-069.exe", "C:\gvim80-069.exe")
+Invoke-WebRequest -Uri "https://artfiles.org/vim.org/pc/gvim80-069.exe" -OutFile "C:\gvim80-069.exe"
 
 # open up firewall for livelog (both PUT and GET interfaces)
 New-NetFirewallRule -DisplayName "Allow livelog PUT requests" -Direction Inbound -LocalPort 60022 -Protocol TCP -Action Allow
@@ -207,15 +208,15 @@ Expand-ZIPFile -File "C:\go1.23.1.windows-amd64.zip" -Destination "C:\" -Url "ht
 Move-Item -Path "C:\go" -Destination "C:\goroot"
 
 # install git
-$client.DownloadFile("https://github.com/git-for-windows/git/releases/download/v2.46.2.windows.1/Git-2.46.2-64-bit.exe", "C:\Git-2.46.2-64-bit.exe")
+Invoke-WebRequest -Uri "https://github.com/git-for-windows/git/releases/download/v2.46.2.windows.1/Git-2.46.2-64-bit.exe" -OutFile "C:\Git-2.46.2-64-bit.exe"
 Run-Executable "C:\Git-2.46.2-64-bit.exe" @("/VERYSILENT", "/LOG=`"C:\Install Logs\git.txt`"", "/NORESTART", "/SUPPRESSMSGBOXES")
 
 # install node
-$client.DownloadFile("https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi", "C:\NodeSetup.msi")
+Invoke-WebRequest -Uri "https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi" -OutFile "C:\NodeSetup.msi"
 Run-Executable "msiexec" @("/i", "C:\NodeSetup.msi", "/quiet")
 
 # install python 3.11.9
-$client.DownloadFile("https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe", "C:\python-3.11.9-amd64.exe")
+Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe" -OutFile "C:\python-3.11.9-amd64.exe"
 # issue 751: without /log <file> python fails to install on Azure workers, with exit code 1622, maybe default log location isn't writable(?)
 Run-Executable "C:\python-3.11.9-amd64.exe" @("/quiet", "InstallAllUsers=1", "/log", "C:\Install Logs\python-3.11.9.txt")
 
@@ -296,11 +297,11 @@ cacheOverRestarts: C:\generic-worker\start-worker-cache.json
 "@
 
 # download cygwin (not required, but useful)
-$client.DownloadFile("https://www.cygwin.com/setup-x86_64.exe", "C:\cygwin-setup-x86_64.exe")
+Invoke-WebRequest -Uri "https://www.cygwin.com/setup-x86_64.exe" -OutFile "C:\cygwin-setup-x86_64.exe"
 
 # install cygwin
 # complete package list: https://cygwin.com/packages/package_list.html
-Run-Executable "C:\cygwin-setup-x86_64.exe" @("--quiet-mode", "--wait", "--root", "C:\cygwin", "--site", "http://cygwin.mirror.constant.com", "--packages", "openssh,vim,curl,tar,wget,zip,unzip,diffutils,bzr")
+Run-Executable "C:\cygwin-setup-x86_64.exe" @("--quiet-mode", "--wait", "--root", "C:\cygwin", "--site", "https://cygwin.mirror.constant.com", "--packages", "openssh,vim,curl,tar,wget,zip,unzip,diffutils,bzr")
 
 # open up firewall for ssh daemon
 New-NetFirewallRule -DisplayName "Allow SSH inbound" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
@@ -318,14 +319,14 @@ Run-Executable "C:\cygwin\bin\bash.exe" @("--login", "-c", "ssh-host-config -y -
 Run-Executable "net" @("start", "cygsshd")
 
 # download bash setup script
-$client.DownloadFile("https://raw.githubusercontent.com/petemoore/myscrapbook/master/setup.sh", "C:\cygwin\home\$env:USERNAME\setup.sh")
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/petemoore/myscrapbook/master/setup.sh" -OutFile "C:\cygwin\home\$env:USERNAME\setup.sh"
 
 # run bash setup script
 Run-Executable "C:\cygwin\bin\bash.exe" @("--login", "-c", "chmod a+x setup.sh; ./setup.sh")
 
 # install dependencywalker (useful utility for troubleshooting, not required)
 md "C:\DependencyWalker"
-Expand-ZIPFile -File "C:\depends22_x64.zip" -Destination "C:\DependencyWalker" -Url "http://dependencywalker.com/depends22_x64.zip"
+Expand-ZIPFile -File "C:\depends22_x64.zip" -Destination "C:\DependencyWalker" -Url "https://dependencywalker.com/depends22_x64.zip"
 
 # install ProcessExplorer (useful utility for troubleshooting, not required)
 md "C:\ProcessExplorer"
@@ -350,13 +351,13 @@ Run-Executable "choco" @("install", "-y", "mingw", "--version", "11.2.0.07112021
 $hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match "^PCI\\VEN_10DE" }
 
 if ($hasNvidiaGpu) {
-    $client.DownloadFile("https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe", "C:\nvidia_driver.exe")
+    Invoke-WebRequest -Uri "https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe" -OutFile "C:\nvidia_driver.exe"
     Run-Executable "C:\nvidia_driver.exe" @("-s", "-noreboot")
 
     # Need to fix this CUDA installation in staging...
     # Removing from here for now...
     # https://github.com/taskcluster/community-tc-config/issues/713
-    # $client.DownloadFile("https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe", "C:\cuda_installer.exe")
+    # Invoke-WebRequest -Uri "https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe" -OutFile "C:\cuda_installer.exe"
     # Run-Executable "C:\cuda_installer.exe" @("-s", "-noreboot")
 
 }
