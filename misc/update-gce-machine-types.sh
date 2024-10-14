@@ -14,5 +14,5 @@
 
 cd "$(dirname "${0}")"
 
-rm '../config/gce-machine-type-offerings.json'
+rm -f '../config/gce-machine-type-offerings.json'
 gcloud compute machine-types list '--format=json(name,zone)' '--sort-by=zone,name' '--project=community-tc-workers' > '../config/gce-machine-type-offerings.json'

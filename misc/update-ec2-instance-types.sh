@@ -17,7 +17,7 @@
 
 cd "$(dirname "${0}")"
 
-rm ../config/ec2-instance-type-offerings/*.json
+rm -f ../config/ec2-instance-type-offerings/*.json
 aws ec2 describe-regions --no-paginate --query 'Regions[*].[RegionName]' --output text | while read region; do
   aws --region "${region}" ec2 describe-availability-zones --no-paginate --filters "Name=region-name,Values=${region}" --query 'AvailabilityZones[*].[ZoneName]' --output text | while read availability_zone; do
     aws --region "${region}" ec2 describe-instance-type-offerings --region "${region}" --no-paginate --query 'sort(InstanceTypeOfferings[*].InstanceType)' --location-type availability-zone --filters Name=location,Values="${availability_zone}" > "../config/ec2-instance-type-offerings/${availability_zone}.json"

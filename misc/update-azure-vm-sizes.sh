@@ -15,7 +15,7 @@
 
 cd "$(dirname "${0}")"
 
-rm ../config/azure-vm-size-offerings/*.json
+rm -f ../config/azure-vm-size-offerings/*.json
 az account list-locations --query="[].name" --output tsv | sort -u | while read location; do
   az vm list-sizes --location $location --query="[].name" --output json 2> /dev/null | jq sort > "../config/azure-vm-size-offerings/${location}.json"
 done
