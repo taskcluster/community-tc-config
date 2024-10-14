@@ -73,21 +73,8 @@ to be present:
    following content to file `~/.gnupg/gpg-agent.conf`:
 
    ```
-   allow-preset-passphrase
    default-cache-ttl 86400
    max-cache-ttl 86400
-   ```
-
-   and having the following executed (e.g. in your .profile / .bashrc), or run manually
-   before you build images:
-
-   ```
-   gpg_email='<your-username>@mozilla.com'
-   read -p "Please enter the GPG passphrase for ${gpg_email}: " gpg_passphrase
-
-   gpg -k --with-keygrip "${gpg_email}" | sed -n 's/.*Keygrip = //p' | while read keygrip; do
-     echo "${gpg_passphrase}" | "$(gpgconf --list-dirs libexecdir)"/gpg-preset-passphrase --preset "${keygrip}"
-   done
    ```
 
 Once all of the above prerequisite steps have been made, you are in a position

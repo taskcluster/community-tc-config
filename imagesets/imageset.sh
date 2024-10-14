@@ -920,17 +920,6 @@ IMAGESETS_DIR="$(pwd)"
 
 export OFFICIAL_GIT_REPO='git@github.com:taskcluster/community-tc-config'
 
-if [ -z "${GPG_SIGNING_CONFIGURED-}" ]; then
-  gpg_email="$(git config user.email)"
-  read -s -p "Please enter the GPG passphrase (for ${gpg_email}): " gpg_passphrase
-  gpg -k --with-keygrip "${gpg_email}" | sed -n 's/.*Keygrip = //p' | while read keygrip; do
-    echo "${gpg_passphrase}" | "$(gpgconf --list-dirs libexecdir)"/gpg-preset-passphrase --preset "${keygrip}"
-  done
-  unset gpg_passphrase
-  export GPG_SIGNING_CONFIGURED=true
-fi
-echo "Ensuring gpg signing is working before proceeding..." | gpg --clearsign
-
 if [ "${1-}" == "all" ]; then
   all-in-parallel
   exit 0
