@@ -174,7 +174,7 @@ generic-worker-win2022:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/c4a6aacc55838338216fd441ba879af03d5a0821/imagesets/generic-worker-win2022/bootstrap.ps1
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/96fd02e63972055e9e62c18a5bdf87f9e78ce505/imagesets/generic-worker-win2022/bootstrap.ps1
 generic-worker-win2022-staging:
   workerImplementation: generic-worker
   azure:
