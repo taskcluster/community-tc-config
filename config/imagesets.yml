@@ -144,7 +144,7 @@ generic-worker-ubuntu-24-04-staging:
       us-east-1: ami-0cc04f8a7d77fc8e2
       us-east-2: ami-04ece7240def263e6
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-wrgu6cn13izr3677wm0i
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-buqibo1skqkkne0jkwtc
 generic-worker-win2022:
   workerImplementation: generic-worker
   aws:
