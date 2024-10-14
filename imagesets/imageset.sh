@@ -182,6 +182,10 @@ function deploy {
       log "Fetching secrets..."
       retry pass git pull
       for REGION in us-west-1 us-west-2 us-east-1 us-east-2; do
+        # Delete any preexisting value, in case we don't have a new one, e.g.
+        # because we have switched instance type and the new one is not available
+        # in a given region.
+        yq d -i ../config/imagesets.yml "${IMAGE_SET}.aws.amis.${REGION}" # returns with exit code 0 even if entry doesn't exist
         # some regions may not have secrets if they do not support the required instance type
         if [ -f "${IMAGE_SET}/aws.${REGION}.secrets" ]; then
           IMAGE_ID="$(cat "${IMAGE_SET}/aws.${REGION}.secrets" | sed -n 's/^AMI: *//p')"
@@ -202,6 +206,11 @@ function deploy {
       log "Fetching secrets..."
       retry pass git pull
       for REGION in centralus eastus eastus2 northcentralus southcentralus westus westus2; do
+        # Delete any preexisting value, in case we don't have a new one, e.g.
+        # because we have switched instance type and the new one is not available
+        # in a given region.
+        yq d -i ../config/imagesets.yml "${IMAGE_SET}.azure.images.${REGION}" # returns with exit code 0 even if entry doesn't exist
+        # some regions may not have secrets if they do not support the required instance type
         # some regions may not have secrets if they do not support the required instance type
         if [ -f "${IMAGE_SET}/azure.${REGION}.secrets" ]; then
           IMAGE_ID="$(cat "${IMAGE_SET}/azure.${REGION}.secrets" | sed -n 's/^Image: *//p')"
