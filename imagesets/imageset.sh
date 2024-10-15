@@ -898,6 +898,13 @@ function all-in-parallel {
     imagesets/imageset.sh aws update docker-worker &
 
     wait
+
+    if [ -n "${DELETE_OLD_RGS}" ]; then
+      for rg in $(az group list --query "[?starts_with(name, 'imageset-')].name" -o tsv); do
+        echo "Deleting old resource group ${rg}..."
+        az group delete --name $rg --yes --no-wait
+      done
+    fi
   fi
 
   if [ -n "${DEPLOY_IMAGES}" ]; then
