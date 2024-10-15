@@ -884,7 +884,9 @@ function all-in-parallel {
     imagesets/imageset.sh azure update generic-worker-win11-24h2-staging &
 
     ########## Non-Azure Windows ##########
-    imagesets/imageset.sh aws update generic-worker-win2022 &
+    # Commenting out for now due to https://github.com/taskcluster/community-tc-config/issues/872
+    # and the fact that we no longer run windows workloads on AWS
+    # imagesets/imageset.sh aws update generic-worker-win2022 &
 
     ########## Ubuntu ##########
     imagesets/imageset.sh google update generic-worker-ubuntu-24-04 &
