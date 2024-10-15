@@ -139,10 +139,10 @@ generic-worker-ubuntu-24-04-staging:
             script: https://raw.githubusercontent.com/taskcluster/community-tc-config/eaf5f2a0f1a1509ff464a52c2e372190dda45494/imagesets/generic-worker-ubuntu-24-04-staging/bootstrap.sh
   aws:
     amis:
-      us-west-1: ami-0f6a01bf7dda7f4f6
-      us-west-2: ami-0d1138a6548733408
-      us-east-1: ami-02233a15a4788cdeb
-      us-east-2: ami-000b57e8514f93002
+      us-west-1: ami-0240b823c433f584c
+      us-west-2: ami-045a52fb6966779f1
+      us-east-1: ami-0839122ec22e10653
+      us-east-2: ami-053f65cbe10966650
   gcp:
     image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-ff11cxom9rbo47ein52m
 generic-worker-win2022:
