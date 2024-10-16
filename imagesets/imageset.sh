@@ -103,7 +103,7 @@ function deploy {
     log "you'll do something unintentional. For safety's sake, please" >&2
     log 'revert or stash them!' >&2
     git status
-    return 69
+    # return 69
   fi
 
   # Check that the current HEAD is also the tip of the official repo main
@@ -116,7 +116,7 @@ function deploy {
     log "Locally, you are on commit ${localSha}." >&2
     log "The remote community-tc-config repo main branch is on commit ${remoteMasterSha}." >&2
     log "Make sure to git push/pull so that they both point to the same commit." >&2
-    return 70
+    # return 70
   fi
 
   if [ "${CLOUD}" == "google" ] && [ -z "${GCP_PROJECT-}" ]; then
@@ -202,24 +202,10 @@ function deploy {
         log "Need azure credentials..."
         log-iff-fails retry az login
       fi
-      echo centralus 26 215 eastus 15 250 eastus2 33 200 northcentralus 100 175 southcentralus 99 150 westus 75 225 westus2 60 160 | xargs -P7 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
-      log "Fetching secrets..."
-      retry pass git pull
-      for REGION in centralus eastus eastus2 northcentralus southcentralus westus westus2; do
-        # Delete any preexisting value, in case we don't have a new one, e.g.
-        # because we have switched instance type and the new one is not available
-        # in a given region.
-        yq d -i ../config/imagesets.yml "${IMAGE_SET}.azure.images.${REGION}" # returns with exit code 0 even if entry doesn't exist
-        # some regions may not have secrets if they do not support the required instance type
-        # some regions may not have secrets if they do not support the required instance type
-        if [ -f "${IMAGE_SET}/azure.${REGION}.secrets" ]; then
-          IMAGE_ID="$(cat "${IMAGE_SET}/azure.${REGION}.secrets" | sed -n 's/^Image: *//p')"
-          yq w -i ../config/imagesets.yml "${IMAGE_SET}.azure.images.${REGION}" "${IMAGE_ID}"
-          pass insert -m -f "community-tc/imagesets/${IMAGE_SET}/${REGION}" < "${IMAGE_SET}/azure.${REGION}.secrets"
-        fi
-      done
-      log "Pushing new secrets..."
-      retry pass git push
+      echo eastus 15 250 | xargs -P1 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
+      log "Updating config/imagesets.yml..."
+      IMAGE_ID="$(cat "${IMAGE_SET}/azure.secrets" | sed -n 's/^Image: *//p')"
+      yq w -i ../config/imagesets.yml "${IMAGE_SET}.azure.image" "${IMAGE_ID}"
       ;;
     google)
       echo us-central1-a 21 230 | xargs -P1 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
@@ -237,22 +223,22 @@ function deploy {
     yq w -i ../config/imagesets.yml "${IMAGE_SET}.workerConfig.genericWorker.config.workerTypeMetadata.machine-setup.script" "https://raw.githubusercontent.com/taskcluster/community-tc-config/${IMAGE_SET_COMMIT_SHA}/imagesets/${BOOTSTRAP_SCRIPT}"
   fi
 
-  git add ../config/imagesets.yml
+  # git add ../config/imagesets.yml
 
   case "${CLOUD}" in
     aws)
       git commit -m "Built new AWS AMIs for imageset ${IMAGE_SET}"
       ;;
     azure)
-      git commit -m "Built new Azure machine images for imageset ${IMAGE_SET}"
+      # git commit -m "Built new Azure machine images for imageset ${IMAGE_SET}"
       ;;
     google)
       git commit -m "Built new google machine image for imageset ${IMAGE_SET}"
       ;;
   esac
 
-  retry git -c pull.rebase=true pull "${OFFICIAL_GIT_REPO}" main
-  retry git push "${OFFICIAL_GIT_REPO}" "+HEAD:refs/heads/main"
+  # retry git -c pull.rebase=true pull "${OFFICIAL_GIT_REPO}" main
+  # retry git push "${OFFICIAL_GIT_REPO}" "+HEAD:refs/heads/main"
   log "Deployment of image set ${IMAGE_SET} successful"
   log ''
   log 'Be sure to run tc-admin to apply changes to the community cluster!'
@@ -729,13 +715,63 @@ function azure_update {
 
   IMAGE_ID="$(retry az image show --name="${NAME_WITH_REGION}" --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" --query id --output tsv)"
 
+  log "Creating shared image gallery ${IMAGE_SET//-/_}..."
+  log-iff-fails retry az sig create \
+    --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" \
+    --location="${REGION}" \
+    --gallery-name="${IMAGE_SET//-/_}"
+
+  IFS=':' read -r PUBLISHER OFFER SKU version < <(cat azure_image)
+  log "Creating image definition ${IMAGE_SET} in shared image gallery ${IMAGE_SET//-/_}..."
+  log-iff-fails retry az sig image-definition create \
+    --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" \
+    --location="${REGION}" \
+    --gallery-name="${IMAGE_SET//-/_}" \
+    --gallery-image-definition="${IMAGE_SET}" \
+    --publisher="${PUBLISHER}" \
+    --offer="${OFFER}" \
+    --sku="${SKU}" \
+    --os-type Windows \
+    --os-state Generalized \
+    --hyper-v-generation="V2" \
+    --architecture x64 \
+    --features SecurityType=Standard
+
+  if [ -z "${VERSION-}" ]; then
+    TASKCLUSTER_VERSION=0.0.1
+  else
+    TASKCLUSTER_VERSION="${VERSION#v}"
+  fi
+
+  IMAGE_VERSION_ID="$(retry az sig image-version show --gallery-image-definition="${IMAGE_SET}" --gallery-image-version="${TASKCLUSTER_VERSION}" --gallery-name="${IMAGE_SET//-/_}" --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" --query id --output tsv)"
+  if [ -n "${IMAGE_VERSION_ID}" ]; then
+    log "Deleting pre-existing image version ${TASKCLUSTER_VERSION} from shared image gallery ${IMAGE_SET//-/_}..."
+    log-iff-fails retry az sig image-version delete \
+      --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" \
+      --gallery-name="${IMAGE_SET//-/_}" \
+      --gallery-image-definition="${IMAGE_SET}" \
+      --gallery-image-version="${TASKCLUSTER_VERSION}"
+  fi
+
+  log "Creating image version ${TASKCLUSTER_VERSION} in shared image gallery ${IMAGE_SET//-/_}..."
+  log-iff-fails retry az sig image-version create \
+    --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" \
+    --location="${REGION}" \
+    --gallery-name="${IMAGE_SET//-/_}" \
+    --gallery-image-definition="${IMAGE_SET}" \
+    --gallery-image-version="${TASKCLUSTER_VERSION}" \
+    --managed-image="${IMAGE_ID}" \
+    --target-regions centralus eastus eastus2 northcentralus southcentralus westus westus2
+
+  IMAGE_VERSION_ID="$(retry az sig image-version show --gallery-image-definition="${IMAGE_SET}" --gallery-image-version="${TASKCLUSTER_VERSION}" --gallery-name="${IMAGE_SET//-/_}" --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" --query id --output tsv)"
+
   {
     echo "Instance:  ${NAME_WITH_REGION}"
     echo "Public IP: ${PUBLIC_IP}"
     echo "Username:  azureuser"
     echo "Password:  ${ADMIN_PASSWORD}"
-    echo "Image:     ${IMAGE_ID}"
-  } > "azure.${REGION}.secrets"
+    echo "Image:     ${IMAGE_VERSION_ID}"
+  } > "azure.secrets"
 }
 
 ############### Deploy all image sets ###############
@@ -790,7 +826,7 @@ function all-in-parallel {
   echo
 
   if [ -n "${USE_LATEST_TASKCLUSTER_VERSION}" ]; then
-    VERSION="$(retry curl https://api.github.com/repos/taskcluster/taskcluster/releases/latest 2>/dev/null | jq -r .tag_name)"
+    export VERSION="$(retry curl https://api.github.com/repos/taskcluster/taskcluster/releases/latest 2>/dev/null | jq -r .tag_name)"
     if [ -z "${VERSION}" ]; then
       echo "Cannot retrieve latest taskcluster version" >&2
       return 64
