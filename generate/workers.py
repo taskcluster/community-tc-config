@@ -478,7 +478,6 @@ def azure_machine_types_in_location(location):
 def azure(
     *,
     image_set=None,
-    locations=None,
     minCapacity=0,
     maxCapacity=None,
     vmSizes={
@@ -490,7 +489,6 @@ def azure(
     Build a worker pool in Azure.
 
       image_set: ImageSets.Item class instance with worker config, image names etc
-      locations: locations to deploy to (required)
       minCapacity: minimum capacity to run at any time (default 0)
       maxCapacity: maximum capacity to run at any time (required)
       vmSizes: dict of VM sizes to provision, values are
@@ -511,13 +509,11 @@ def azure(
     )
     azure_config = yaml.safe_load(open(_config_path))
 
-    # by default, deploy where there are images
-    if "locations" not in cfg:
-        locations = list(image_set.azure["images"])
+    locations = azure_config["locations"]
     assert locations, "must give locations"
 
-    imageIds = image_set.azure["images"]
-    assert imageIds, "must give imageIds"
+    imageId = image_set.azure["image"]
+    assert imageId, "must give imageId"
 
     launchConfigs = []
     for location in locations:
@@ -540,7 +536,7 @@ def azure(
                         },
                     },
                     "imageReference": {
-                        "id": imageIds[location],
+                        "id": imageId,
                     },
                 },
                 "osProfile": {
