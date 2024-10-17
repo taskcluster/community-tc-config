@@ -1,6 +1,10 @@
 ---
 # This file describes Azure constants used to build worker pools
-# It supports one top level dictionary:
+# It supports two top level dictionaries:
+#
+# # List all the available locations
+# locations:
+#   - <azure-location-name>
 #
 # # List all the available subnets in supported locations
 # subnets:
@@ -9,7 +13,16 @@
 # Please do not move or edit the structure of that file as
 # it's being actively used by the fuzzing team decision task
 # to manage worker pools
-# If you remove a region, please reach out to fuzzing+taskcluster@mozilla.com
+# If you remove a location, please reach out to fuzzing+taskcluster@mozilla.com
+
+locations:
+  - centralus
+  - eastus
+  - eastus2
+  - northcentralus
+  - southcentralus
+  - westus
+  - westus2
 
 subnets:
   centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-vnets/providers/Microsoft.Network/virtualNetworks/tc-vnet-centralus/subnets/default
