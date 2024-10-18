@@ -114,6 +114,13 @@ fuzzing:
       cloud: azure
       minCapacity: 0
       maxCapacity: 10
+    nss-corpus-update-worker:
+      owner: mdauer@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 5
   hooks:
     fuzzing-tc-config-community-update:
       description: Run Fuzzing pool rebuild when Community-TC config changes
@@ -746,6 +753,41 @@ fuzzing:
           source: https://github.com/MozillaSecurity/orion
       schedule:
         - "0 0 * * 0"
+    nss-corpus-update:
+      description: Hook for updating the NSS fuzzing corpus
+      owner: mdauer@mozilla.com
+      emailOnError: true
+      task:
+        provisionerId: proj-fuzzing
+        workerType: nss-corpus-update-worker
+        expires:
+          $fromNow: 1 months
+        deadline:
+          $fromNow: 6 hours
+        payload:
+          image:
+            path: public/nss-corpus-update.tar.zst
+            type: indexed-image
+            namespace: project.fuzzing.orion.nss-corpus-update.master
+          maxRunTime: 32400
+        routes:
+          - notify.email.mdauer@mozilla.com.on-failed
+          - notify.email.jkratzer@mozilla.com.on-failed
+        scopes:
+          - docker-worker:capability:privileged
+          - queue:get-artifact:project/fuzzing/nss-corpus-update/*
+          - queue:route:notify.email.mdauer@mozilla.com.on-failed
+          - queue:route:notify.email.jkratzer@mozilla.com.on-failed
+          - queue:scheduler-id:-
+          - secrets:get:project/fuzzing/deploy-nss-fuzzing-corpus
+          - secrets:get:project/fuzzing/ossfuzz-gutils
+        metadata:
+          name: nss-corpus-update
+          owner: mdauer@mozilla.com
+          source: https://github.com/MozillaSecurity/orion/tree/master/services/nss-corpus-update
+          description: Hook for updating the NSS fuzzing corpus
+      schedule:
+        - "0 0 1 * *"
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
@@ -929,3 +971,14 @@ fuzzing:
         - secrets:get:project/fuzzing/moz-ci-coverage-key
       to:
         - hook-id:project-fuzzing/covdiff
+    - grant:
+        - docker-worker:capability:privileged
+        - queue:create-task:highest:proj-fuzzing/nss-corpus-update-worker
+        - queue:get-artifact:project/fuzzing/nss-corpus-update/*
+        - queue:route:notify.email.mdauer@mozilla.com.on-failed
+        - queue:route:notify.email.jkratzer@mozilla.com.on-failed
+        - queue:scheduler-id:-
+        - secrets:get:project/fuzzing/deploy-nss-fuzzing-corpus
+        - secrets:get:project/fuzzing/ossfuzz-gutils
+      to:
+        - hook-id:project-fuzzing/nss-corpus-update
