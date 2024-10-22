@@ -425,6 +425,10 @@ taskcluster:
         - auth:create-client:project/taskcluster:generic-worker-tester/TestResolveResolvedTask
         - auth:sentry:generic-worker-tests
         - docker-worker:cache:d2g-test
+        - docker-worker:capability:privileged:test-provisioner/test-*
+        - docker-worker:capability:device:hostSharedMemory:test-provisioner/test-*
+        - docker-worker:capability:device:kvm:test-provisioner/test-*
+        - docker-worker:feature:allowPtrace
         - generic-worker:cache:apple-cache
         - generic-worker:cache:banana-cache
         - generic-worker:cache:devtools-app
@@ -432,6 +436,8 @@ taskcluster:
         - generic-worker:cache:unknown-issuer-app-cache
         - generic-worker:os-group:test-provisioner/*
         - generic-worker:run-as-administrator:test-provisioner/*
+        - generic-worker:loopback-audio:test-provisioner/test-*
+        - generic-worker:loopback-video:test-provisioner/test-*
         - index:find-task:garbage.generic-worker-tests.*
         - index:insert-task:garbage.generic-worker-tests.*
         - queue:cancel-task:test-scheduler/*
@@ -483,7 +489,6 @@ taskcluster:
     generic-worker/taskcluster-ci:
       scopes:
         - assume:project:taskcluster:generic-worker-tester
-        - generic-worker:loopback-*
     # This client is used to test the client libraries in Taskcluster CI
     # Its access token is in `community-tc-secret-values.yml`.
     testing/client-libraries:
