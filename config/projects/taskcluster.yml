@@ -311,6 +311,9 @@ taskcluster:
         - secrets:get:project/taskcluster/testing/client-libraries
         - secrets:get:project/taskcluster/testing/taskcluster-*
         - docker-worker:cache:taskcluster-*
+        # can remove once https://github.com/taskcluster/taskcluster/pull/7343
+        # is released and deployed on the decision workers
+        - generic-worker:cache:taskcluster-*
       to: repo:github.com/taskcluster/taskcluster:*
 
     - grant:
