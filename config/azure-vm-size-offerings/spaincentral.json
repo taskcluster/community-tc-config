@@ -490,5 +490,7 @@
   "Standard_M64s_v2",
   "Standard_M8-2ms",
   "Standard_M8-4ms",
-  "Standard_M8ms"
+  "Standard_M8ms",
+  "Standard_NC40ads_H100_v5",
+  "Standard_NC80adis_H100_v5"
 ]
