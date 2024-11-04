@@ -789,7 +789,7 @@ fuzzing:
           source: https://github.com/MozillaSecurity/orion/tree/master/services/nss-corpus-update
           description: Hook for updating the NSS fuzzing corpus
       schedule:
-        - "0 0 1 * *"
+        - "0 0 1,15 * *"
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
