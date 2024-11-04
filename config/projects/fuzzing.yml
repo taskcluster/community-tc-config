@@ -765,6 +765,8 @@ fuzzing:
         deadline:
           $fromNow: 6 hours
         payload:
+          features:
+            taskclusterProxy: true
           image:
             path: public/nss-corpus-update.tar.zst
             type: indexed-image
