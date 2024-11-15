@@ -385,6 +385,7 @@ fuzzing:
           - queue:route:notify.email.truber@mozilla.com.on-failed
           - queue:scheduler-id:fuzzing
           - secrets:get:project/fuzzing/fuzzmanagerconf
+          - queue:get-artifact:project/fuzzing/private/logs/*
         routes:
           - notify.email.truber@mozilla.com.on-failed
       triggerSchema:
@@ -901,6 +902,10 @@ fuzzing:
       to:
         - hook-id:project-fuzzing/grizzly-reduce-reset-error
         - hook-id:project-fuzzing/grizzly-reduce-monitor
+        - hook-id:project-fuzzing/failed-log-ingestor
+    - grant:
+        - queue:get-artifact:project/fuzzing/private/logs/*
+      to:
         - hook-id:project-fuzzing/failed-log-ingestor
     - grant:
         - docker-worker:capability:privileged
