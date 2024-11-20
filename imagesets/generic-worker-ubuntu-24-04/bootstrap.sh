@@ -126,7 +126,7 @@ EOF
 
 systemctl enable worker
 
-retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman
+retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman gnome-initial-setup-
 
 if [ '%MY_CLOUD%' == 'google' ]; then
     # this is neccessary in GCP because after installing gnome desktop both NetworkManager and systemd-networkd are enabled
