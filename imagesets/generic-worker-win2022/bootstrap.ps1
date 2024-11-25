@@ -131,11 +131,13 @@ Write-Log "Windows Defender's DisableAntiSpyware registry setting has been set."
 # taken (and edited) from GitHub Actions Windows runners
 # https://github.com/actions/runner-images/blob/3b976c7acb0ce875060102c0c80f655b479aa5d4/images/windows/scripts/build/Configure-System.ps1#L140-L153
 $servicesToDisable = @(
-    'wuauserv',   # Windows Update
-    'usosvc',     # Update Orchestrator
-    'DiagTrack',  # Telemetry service
-    'SysMain',    # Superfetch
-    'WSearch'     # Disk indexing
+    'edgeupdate',   # Microsoft Edge Update
+    'edgeupdatem',  # Microsoft Edge Update
+    'wuauserv',     # Windows Update
+    'usosvc',       # Update Orchestrator
+    'DiagTrack',    # Telemetry service
+    'SysMain',      # Superfetch
+    'WSearch'       # Disk indexing
 ) | Get-Service -ErrorAction SilentlyContinue
 
 foreach ($service in $servicesToDisable) {
