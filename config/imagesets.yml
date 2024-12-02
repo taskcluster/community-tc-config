@@ -50,14 +50,14 @@ generic-worker:
 docker-worker:
   workerImplementation: docker-worker
   gcp:
-    image: projects/community-tc-workers/global/images/docker-worker-ofodppgos9x3nle7uqzz
+    image: projects/community-tc-workers/global/images/docker-worker-2nnt9g23nml7bodzi7fn
   aws:
     # originally built with the `docker_community_aws` builder in monopacker
     amis:
-      us-west-1: ami-0dd20e4b2cc58354b
-      us-west-2: ami-0148b70ae39d0ebbc
-      us-east-1: ami-0153711232fa8b925
-      us-east-2: ami-0f46f12fcca882b64
+      us-west-1: ami-084129d23653768f2
+      us-west-2: ami-09cf61ea7f2de7aeb
+      us-east-1: ami-03070ed369893c83a
+      us-east-2: ami-08d67f47a3be34472
 # v44.23.4 docker worker which includes the disableSeccomp feature
 docker-worker-legacy:
   workerImplementation: docker-worker
@@ -101,15 +101,15 @@ generic-worker-ubuntu-24-04:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/4c6600ec749918b8d0ef677d7cec2ef65209074e/imagesets/generic-worker-ubuntu-24-04/bootstrap.sh
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/4909017836625a209874e56c6bc5fc585aeb685d/imagesets/generic-worker-ubuntu-24-04/bootstrap.sh
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-3h7p1s34a3ita9ol73mw
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-s40adw6ki8n724herxu4
   aws:
     amis:
-      us-west-1: ami-0a26daf4218677388
-      us-west-2: ami-04ee5789cedb65bb3
-      us-east-1: ami-0418e57a06e3e30bb
-      us-east-2: ami-0d9fd77594a68b4af
+      us-west-1: ami-0f3df01c3d979544c
+      us-west-2: ami-02b5eb5313c0b8b7a
+      us-east-1: ami-0e428039face0a502
+      us-east-2: ami-0d0481007414ab5c1
 generic-worker-ubuntu-24-04-arm64:
   workerImplementation: generic-worker
   workerConfig:
@@ -122,9 +122,9 @@ generic-worker-ubuntu-24-04-arm64:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/4c6600ec749918b8d0ef677d7cec2ef65209074e/imagesets/generic-worker-ubuntu-24-04-arm64/bootstrap.sh
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/4909017836625a209874e56c6bc5fc585aeb685d/imagesets/generic-worker-ubuntu-24-04-arm64/bootstrap.sh
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-arm64-1ns3z7h7cgajqecge0k1
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-arm64-xjrp32neblpqeuk68zqp
 generic-worker-ubuntu-24-04-staging:
   workerImplementation: generic-worker
   workerConfig:
@@ -136,15 +136,15 @@ generic-worker-ubuntu-24-04-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/4c6600ec749918b8d0ef677d7cec2ef65209074e/imagesets/generic-worker-ubuntu-24-04-staging/bootstrap.sh
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/4909017836625a209874e56c6bc5fc585aeb685d/imagesets/generic-worker-ubuntu-24-04-staging/bootstrap.sh
   aws:
     amis:
-      us-west-1: ami-0f4c4d528d1ba93c8
-      us-west-2: ami-086fb1304dccd4863
-      us-east-1: ami-00c2befebc2b347b5
-      us-east-2: ami-09914bdb586149420
+      us-west-1: ami-047be3aa8ee9187cc
+      us-west-2: ami-0e0ce76bbb75943e4
+      us-east-1: ami-044750d8d2315a0f2
+      us-east-2: ami-07d8c2c66b647ee2a
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-h0xlh17aphieoqyg8m1o
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-jpthqjiglp0sdqmrfqo2
 generic-worker-win2022:
   workerImplementation: generic-worker
   aws:
@@ -155,13 +155,13 @@ generic-worker-win2022:
       us-east-2: ami-055bc18ba30433c29
   azure:
     images:
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qqbsou7y3xdqjpfwnowu-centralus
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qqbsou7y3xdqjpfwnowu-eastus
-      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qqbsou7y3xdqjpfwnowu-eastus2
-      northcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qqbsou7y3xdqjpfwnowu-northcentralus
-      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qqbsou7y3xdqjpfwnowu-southcentralus
-      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qqbsou7y3xdqjpfwnowu-westus
-      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qqbsou7y3xdqjpfwnowu-westus2
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-imgant3h4tekax3ohy6s-centralus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-imgant3h4tekax3ohy6s-eastus
+      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-imgant3h4tekax3ohy6s-eastus2
+      northcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-imgant3h4tekax3ohy6s-northcentralus
+      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-imgant3h4tekax3ohy6s-southcentralus
+      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-imgant3h4tekax3ohy6s-westus
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-imgant3h4tekax3ohy6s-westus2
   workerConfig:
     genericWorker:
       config:
@@ -174,16 +174,16 @@ generic-worker-win2022:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/4c6600ec749918b8d0ef677d7cec2ef65209074e/imagesets/generic-worker-win2022/bootstrap.ps1
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/4909017836625a209874e56c6bc5fc585aeb685d/imagesets/generic-worker-win2022/bootstrap.ps1
 generic-worker-win2022-staging:
   workerImplementation: generic-worker
   azure:
     images:
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qk2wfj8m9c04lsfneyjq-eastus
-      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qk2wfj8m9c04lsfneyjq-eastus2
-      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qk2wfj8m9c04lsfneyjq-southcentralus
-      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qk2wfj8m9c04lsfneyjq-westus
-      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qk2wfj8m9c04lsfneyjq-westus2
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-0br41q7ehwkice1egrt5-eastus
+      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-0br41q7ehwkice1egrt5-eastus2
+      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-0br41q7ehwkice1egrt5-southcentralus
+      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-0br41q7ehwkice1egrt5-westus
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-0br41q7ehwkice1egrt5-westus2
   workerConfig:
     genericWorker:
       config:
@@ -195,15 +195,15 @@ generic-worker-win2022-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/4c6600ec749918b8d0ef677d7cec2ef65209074e/imagesets/generic-worker-win2022-staging/bootstrap.ps1
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/4909017836625a209874e56c6bc5fc585aeb685d/imagesets/generic-worker-win2022-staging/bootstrap.ps1
 generic-worker-win2022-gpu:
   azure:
     images:
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-uh2ujfiqwmg07vgcu1hb-eastus
-      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-uh2ujfiqwmg07vgcu1hb-eastus2
-      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-uh2ujfiqwmg07vgcu1hb-southcentralus
-      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-uh2ujfiqwmg07vgcu1hb-westus
-      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-uh2ujfiqwmg07vgcu1hb-westus2
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qgqrm1bzvcksz1r1bl2x-eastus
+      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qgqrm1bzvcksz1r1bl2x-eastus2
+      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qgqrm1bzvcksz1r1bl2x-southcentralus
+      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qgqrm1bzvcksz1r1bl2x-westus
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qgqrm1bzvcksz1r1bl2x-westus2
   workerImplementation: generic-worker
   workerConfig:
     genericWorker:
@@ -217,7 +217,7 @@ generic-worker-win2022-gpu:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/4c6600ec749918b8d0ef677d7cec2ef65209074e/imagesets/generic-worker-win2022-gpu/bootstrap.ps1
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/4909017836625a209874e56c6bc5fc585aeb685d/imagesets/generic-worker-win2022-gpu/bootstrap.ps1
 generic-worker-win11-24h2-staging:
   workerImplementation: generic-worker
   azure:
