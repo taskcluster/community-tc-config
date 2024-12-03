@@ -168,7 +168,11 @@ sed '/platform-vkms/d' /lib/udev/rules.d/61-mutter.rules > /etc/udev/rules.d/61-
 # https://help.ubuntu.com/community/KVM/Installation
 retry apt-get install -y qemu-kvm bridge-utils
 
-retry apt-get install -y linux-modules-extra-$(uname -r)
+if [ '%MY_CLOUD%' == 'google' ]; then
+  retry apt-get install -y linux-modules-extra-gcp
+elif [ '%MY_CLOUD%' == 'aws' ]; then
+  retry apt-get install -y linux-modules-extra-aws
+fi
 echo 'snd-aloop' >> /etc/modules
 
 # avoid unnecessary shutdowns during worker startups
