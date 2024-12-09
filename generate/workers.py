@@ -113,6 +113,13 @@ class WorkerPoolSettings:
         """
         raise NotImplementedError
 
+    def supports_worker_manager_config(self):
+        """
+        Returns true if this worker pool supports setting worker manager
+        configuration values.
+        """
+        raise NotImplementedError
+
     def merge_config(self, key, *configDictionaries):
         """
         Merge the given dictionaries into the worker pool's configuration
@@ -127,6 +134,9 @@ class StaticWorkerPoolSettings(WorkerPoolSettings):
     def supports_worker_config(self):
         return False
 
+    def supports_worker_manager_config(self):
+        return False
+
     def merge_config(self, key, *configDictionaries):
         raise RuntimeError(
             "static worker pools do not allow setting worker pool configuration"
@@ -138,6 +148,9 @@ class DynamicWorkerPoolSettings(WorkerPoolSettings):
 
     def supports_worker_config(self):
         return True
+
+    def supports_worker_manager_config(self):
+        return self.provider_id == "community-tc-workers-azure"
 
     def merge_config(self, key, *configDictionaries):
         assert WorkerPoolSettings.EXISTING_CONFIG in configDictionaries
@@ -171,6 +184,7 @@ async def build_worker_pool(workerPoolId, cfg, secret_values):
                 WorkerPoolSettings.EXISTING_CONFIG,
             )
 
+        if wp.supports_worker_manager_config():
             wp.merge_config(
                 "workerManager",
                 # The order is important here: earlier entries take precendence
