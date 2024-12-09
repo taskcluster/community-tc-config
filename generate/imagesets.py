@@ -21,3 +21,4 @@ class ImageSets(ConfigDict):
         azure = attr.ib(type=dict, factory=lambda: {})
         gcp = attr.ib(type=dict, factory=lambda: {})
         workerConfig = attr.ib(type=dict, factory=lambda: {})
+        workerManager = attr.ib(type=dict, factory=lambda: {})

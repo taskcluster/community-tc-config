@@ -113,10 +113,10 @@ class WorkerPoolSettings:
         """
         raise NotImplementedError
 
-    def merge_worker_config(self, *configDictionaries):
+    def merge_config(self, key, *configDictionaries):
         """
-        Merge the given dictionaries into the worker pool's worker
-        configuration.  Earlier entries take precedence over later entries.
+        Merge the given dictionaries into the worker pool's configuration
+        specified at key.  Earlier entries take precedence over later entries.
         The constant WorkerPoolSettings.EXISTING_CONFIG is replaced with the
         existing config.
         """
@@ -127,9 +127,9 @@ class StaticWorkerPoolSettings(WorkerPoolSettings):
     def supports_worker_config(self):
         return False
 
-    def merge_worker_config(self, *configDictionaries):
+    def merge_config(self, key, *configDictionaries):
         raise RuntimeError(
-            "static worker pools do not allow setting worker configuration"
+            "static worker pools do not allow setting worker pool configuration"
         )
 
 
@@ -139,11 +139,11 @@ class DynamicWorkerPoolSettings(WorkerPoolSettings):
     def supports_worker_config(self):
         return True
 
-    def merge_worker_config(self, *configDictionaries):
+    def merge_config(self, key, *configDictionaries):
         assert WorkerPoolSettings.EXISTING_CONFIG in configDictionaries
         for launchConfig in self.config["launchConfigs"]:
-            existing = launchConfig.get("workerConfig", {})
-            launchConfig["workerConfig"] = merge(
+            existing = launchConfig.get(key, {})
+            launchConfig[key] = merge(
                 *[
                     existing if d is WorkerPoolSettings.EXISTING_CONFIG else d
                     for d in configDictionaries
@@ -162,11 +162,21 @@ async def build_worker_pool(workerPoolId, cfg, secret_values):
         )
 
         if wp.supports_worker_config():
-            wp.merge_worker_config(
+            wp.merge_config(
+                "workerConfig",
                 # The order is important here: earlier entries take precendence
                 # over later entries.
                 cfg.get("workerConfig", {}),
                 image_set.workerConfig,
+                WorkerPoolSettings.EXISTING_CONFIG,
+            )
+
+            wp.merge_config(
+                "workerManager",
+                # The order is important here: earlier entries take precendence
+                # over later entries.
+                cfg.get("workerManager", {}),
+                image_set.workerManager,
                 WorkerPoolSettings.EXISTING_CONFIG,
             )
 
@@ -582,7 +592,8 @@ def generic_worker(wp, **cfg):
     # being reported.
     sentryProject = "generic-worker"
     if wp.supports_worker_config():
-        wp.merge_worker_config(
+        wp.merge_config(
+            "workerConfig",
             WorkerPoolSettings.EXISTING_CONFIG,
             {
                 "genericWorker": {
@@ -631,7 +642,8 @@ def generic_worker(wp, **cfg):
 @worker_implementation
 def docker_worker(wp, **cfg):
     if wp.supports_worker_config():
-        wp.merge_worker_config(
+        wp.merge_config(
+            "workerConfig",
             WorkerPoolSettings.EXISTING_CONFIG,
             {
                 "shutdown": {
