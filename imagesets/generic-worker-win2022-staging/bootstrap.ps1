@@ -200,9 +200,6 @@ $hostsFileLines = @(
 # Append the lines to the hosts file
 Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $hostsFileLines
 
-# download gvim
-Invoke-WebRequest -Uri "https://artfiles.org/vim.org/pc/gvim80-069.exe" -OutFile "C:\Downloads\gvim80-069.exe"
-
 # open up firewall for livelog (both PUT and GET interfaces)
 New-NetFirewallRule -DisplayName "Allow livelog PUT requests" -Direction Inbound -LocalPort 60022 -Protocol TCP -Action Allow
 New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound -LocalPort 60023 -Protocol TCP -Action Allow
