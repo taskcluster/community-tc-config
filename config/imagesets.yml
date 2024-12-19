@@ -76,6 +76,7 @@ generic-worker-freebsd:
     genericWorker:
       config:
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        enableInteractive: true
         idleTimeoutSecs: 15
         shutdownMachineOnIdle: true
         shutdownMachineOnInternalError: true
@@ -94,7 +95,10 @@ generic-worker-ubuntu-24-04:
   workerConfig:
     genericWorker:
       config:
+        d2gConfig:
+          enableD2G: true
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        enableInteractive: true
         idleTimeoutSecs: 15
         shutdownMachineOnIdle: true
         shutdownMachineOnInternalError: true
@@ -115,7 +119,10 @@ generic-worker-ubuntu-24-04-arm64:
   workerConfig:
     genericWorker:
       config:
+        d2gConfig:
+          enableD2G: true
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        enableInteractive: true
         idleTimeoutSecs: 15
         shutdownMachineOnIdle: true
         shutdownMachineOnInternalError: true
@@ -130,7 +137,10 @@ generic-worker-ubuntu-24-04-staging:
   workerConfig:
     genericWorker:
       config:
+        d2gConfig:
+          enableD2G: true
         ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        enableInteractive: true
         idleTimeoutSecs: 15
         shutdownMachineOnIdle: true
         workerTypeMetadata:
