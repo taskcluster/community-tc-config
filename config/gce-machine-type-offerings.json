@@ -15356,6 +15356,10 @@
     "zone": "asia-southeast1-a"
   },
   {
+    "name": "c4a-highmem-16-lssd",
+    "zone": "asia-southeast1-a"
+  },
+  {
     "name": "c4a-highmem-2",
     "zone": "asia-southeast1-a"
   },
@@ -15364,7 +15368,15 @@
     "zone": "asia-southeast1-a"
   },
   {
+    "name": "c4a-highmem-32-lssd",
+    "zone": "asia-southeast1-a"
+  },
+  {
     "name": "c4a-highmem-4",
+    "zone": "asia-southeast1-a"
+  },
+  {
+    "name": "c4a-highmem-4-lssd",
     "zone": "asia-southeast1-a"
   },
   {
@@ -15372,7 +15384,15 @@
     "zone": "asia-southeast1-a"
   },
   {
+    "name": "c4a-highmem-48-lssd",
+    "zone": "asia-southeast1-a"
+  },
+  {
     "name": "c4a-highmem-64",
+    "zone": "asia-southeast1-a"
+  },
+  {
+    "name": "c4a-highmem-64-lssd",
     "zone": "asia-southeast1-a"
   },
   {
@@ -15380,7 +15400,15 @@
     "zone": "asia-southeast1-a"
   },
   {
+    "name": "c4a-highmem-72-lssd",
+    "zone": "asia-southeast1-a"
+  },
+  {
     "name": "c4a-highmem-8",
+    "zone": "asia-southeast1-a"
+  },
+  {
+    "name": "c4a-highmem-8-lssd",
     "zone": "asia-southeast1-a"
   },
   {
@@ -15392,6 +15420,10 @@
     "zone": "asia-southeast1-a"
   },
   {
+    "name": "c4a-standard-16-lssd",
+    "zone": "asia-southeast1-a"
+  },
+  {
     "name": "c4a-standard-2",
     "zone": "asia-southeast1-a"
   },
@@ -15400,7 +15432,15 @@
     "zone": "asia-southeast1-a"
   },
   {
+    "name": "c4a-standard-32-lssd",
+    "zone": "asia-southeast1-a"
+  },
+  {
     "name": "c4a-standard-4",
+    "zone": "asia-southeast1-a"
+  },
+  {
+    "name": "c4a-standard-4-lssd",
     "zone": "asia-southeast1-a"
   },
   {
@@ -15408,7 +15448,15 @@
     "zone": "asia-southeast1-a"
   },
   {
+    "name": "c4a-standard-48-lssd",
+    "zone": "asia-southeast1-a"
+  },
+  {
     "name": "c4a-standard-64",
+    "zone": "asia-southeast1-a"
+  },
+  {
+    "name": "c4a-standard-64-lssd",
     "zone": "asia-southeast1-a"
   },
   {
@@ -15416,7 +15464,15 @@
     "zone": "asia-southeast1-a"
   },
   {
+    "name": "c4a-standard-72-lssd",
+    "zone": "asia-southeast1-a"
+  },
+  {
     "name": "c4a-standard-8",
+    "zone": "asia-southeast1-a"
+  },
+  {
+    "name": "c4a-standard-8-lssd",
     "zone": "asia-southeast1-a"
   },
   {
@@ -27476,6 +27532,10 @@
     "zone": "europe-west1-b"
   },
   {
+    "name": "c4a-highmem-16-lssd",
+    "zone": "europe-west1-b"
+  },
+  {
     "name": "c4a-highmem-2",
     "zone": "europe-west1-b"
   },
@@ -27484,7 +27544,15 @@
     "zone": "europe-west1-b"
   },
   {
+    "name": "c4a-highmem-32-lssd",
+    "zone": "europe-west1-b"
+  },
+  {
     "name": "c4a-highmem-4",
+    "zone": "europe-west1-b"
+  },
+  {
+    "name": "c4a-highmem-4-lssd",
     "zone": "europe-west1-b"
   },
   {
@@ -27492,7 +27560,15 @@
     "zone": "europe-west1-b"
   },
   {
+    "name": "c4a-highmem-48-lssd",
+    "zone": "europe-west1-b"
+  },
+  {
     "name": "c4a-highmem-64",
+    "zone": "europe-west1-b"
+  },
+  {
+    "name": "c4a-highmem-64-lssd",
     "zone": "europe-west1-b"
   },
   {
@@ -27500,7 +27576,15 @@
     "zone": "europe-west1-b"
   },
   {
+    "name": "c4a-highmem-72-lssd",
+    "zone": "europe-west1-b"
+  },
+  {
     "name": "c4a-highmem-8",
+    "zone": "europe-west1-b"
+  },
+  {
+    "name": "c4a-highmem-8-lssd",
     "zone": "europe-west1-b"
   },
   {
@@ -27512,6 +27596,10 @@
     "zone": "europe-west1-b"
   },
   {
+    "name": "c4a-standard-16-lssd",
+    "zone": "europe-west1-b"
+  },
+  {
     "name": "c4a-standard-2",
     "zone": "europe-west1-b"
   },
@@ -27520,7 +27608,15 @@
     "zone": "europe-west1-b"
   },
   {
+    "name": "c4a-standard-32-lssd",
+    "zone": "europe-west1-b"
+  },
+  {
     "name": "c4a-standard-4",
+    "zone": "europe-west1-b"
+  },
+  {
+    "name": "c4a-standard-4-lssd",
     "zone": "europe-west1-b"
   },
   {
@@ -27528,7 +27624,15 @@
     "zone": "europe-west1-b"
   },
   {
+    "name": "c4a-standard-48-lssd",
+    "zone": "europe-west1-b"
+  },
+  {
     "name": "c4a-standard-64",
+    "zone": "europe-west1-b"
+  },
+  {
+    "name": "c4a-standard-64-lssd",
     "zone": "europe-west1-b"
   },
   {
@@ -27536,7 +27640,15 @@
     "zone": "europe-west1-b"
   },
   {
+    "name": "c4a-standard-72-lssd",
+    "zone": "europe-west1-b"
+  },
+  {
     "name": "c4a-standard-8",
+    "zone": "europe-west1-b"
+  },
+  {
+    "name": "c4a-standard-8-lssd",
     "zone": "europe-west1-b"
   },
   {
