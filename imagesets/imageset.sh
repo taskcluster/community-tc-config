@@ -741,23 +741,21 @@ function azure_update {
 ############### Deploy all image sets ###############
 
 function all-in-parallel {
+  : ${BUILD_IMAGES:=true}
+  : ${BUILD_STAGING_IMAGES:=false}
+  : ${DELETE_OLD_RGS:=true}
 
-  # Hardcode for now, add command line options to disable later...
+  : ${DEPLOY_IMAGES:=true}
+  : ${DEPLOY_MACS:=true}
 
-  BUILD_IMAGES=true
-  DELETE_OLD_RGS=true
+  : ${LOGIN_AWS:=true}
+  : ${LOGIN_AZURE:=true}
 
-  DEPLOY_IMAGES=true
-  DEPLOY_MACS=true
+  : ${UPDATE_GCLOUD:=true}
+  : ${UPDATE_OFFERINGS:=true}
+  : ${UPDATE_TASKCLUSTER_VERSION:=true}
 
-  LOGIN_AWS=true
-  LOGIN_AZURE=true
-
-  UPDATE_GCLOUD=true
-  UPDATE_OFFERINGS=true
-  UPDATE_TASKCLUSTER_VERSION=true
-
-  USE_LATEST_TASKCLUSTER_VERSION=true
+  : ${USE_LATEST_TASKCLUSTER_VERSION:=true}
 
   export GCP_PROJECT=community-tc-workers
   export AZURE_IMAGE_RESOURCE_GROUP=rg-tc-eng-images
@@ -766,18 +764,18 @@ function all-in-parallel {
   export TASKCLUSTER_ROOT_URL='https://community-tc.services.mozilla.com'
   unset TASKCLUSTER_CERTIFICATE
 
-  if [ -n "${LOGIN_AZURE}" ]; then
+  if "${LOGIN_AZURE}"; then
     retry az login
   fi
 
-  if [ -n "${DELETE_OLD_RGS}" ]; then
+  if "${DELETE_OLD_RGS}"; then
     for rg in $(az group list --query "[?starts_with(name, 'imageset-')].name" -o tsv); do
       echo "Deleting old resource group ${rg}..."
       az group delete --name $rg --yes --no-wait
     done
   fi
 
-  if [ -n "${UPDATE_GCLOUD}" ]; then
+  if "${UPDATE_GCLOUD}"; then
     retry gcloud components update -q
   fi
   retry gcloud auth login
@@ -789,14 +787,14 @@ function all-in-parallel {
   echo "Preparing in directory ${PREP_DIR}..."
   echo
 
-  if [ -n "${USE_LATEST_TASKCLUSTER_VERSION}" ]; then
+  if "${USE_LATEST_TASKCLUSTER_VERSION}"; then
     VERSION="$(retry curl https://api.github.com/repos/taskcluster/taskcluster/releases/latest 2>/dev/null | jq -r .tag_name)"
     if [ -z "${VERSION}" ]; then
       echo "Cannot retrieve latest taskcluster version" >&2
       return 64
     fi
   fi
-  if [ -n "${UPDATE_TASKCLUSTER_VERSION}" ] && [ -z "${VERSION}" ]; then
+  if "${UPDATE_TASKCLUSTER_VERSION}" && [ -z "${VERSION}" ]; then
     echo "No taskcluster version specified" >&2
     return 75
   fi
@@ -815,11 +813,11 @@ function all-in-parallel {
   which tc-admin
   export TASKCLUSTER_ACCESS_TOKEN="$(pass ls community-tc/root | head -1)"
 
-  if [ -n "${LOGIN_AWS}" ]; then
+  if "${LOGIN_AWS}"; then
     eval $(imagesets/signin-aws.sh)
   fi
 
-  if [ -n "${UPDATE_OFFERINGS}" ]; then
+  if "${UPDATE_OFFERINGS}"; then
     echo "Updating EC2 instance types..."
     misc/update-ec2-instance-types.sh
     git add 'config/ec2-instance-type-offerings'
@@ -839,7 +837,7 @@ function all-in-parallel {
     retry tc-admin apply
   fi
 
-  if [ -n "${UPDATE_TASKCLUSTER_VERSION}" ]; then
+  if "${UPDATE_TASKCLUSTER_VERSION}"; then
     cd imagesets
     git ls-files | grep -F 'bootstrap.' | while read file; do
       cat "${file}" > "${file}.bak"
@@ -867,21 +865,19 @@ function all-in-parallel {
   # Remeber to vnc as administrator onto macs before running this script, to avoid ssh connection problems!
 
   # TODO: fetch these IPs automatically, and report if they need to be logged into first with vnc
-  if [ -n "${DEPLOY_MACS}" ]; then
+  if "${DEPLOY_MACS}"; then
     for IP in 207.254.55.60 207.254.55.167; do
       pass "macstadium/generic-worker-ci/${IP}" | tail -1 | ssh "administrator@${IP}" sudo -S "bash" -c /var/root/update.sh
     done
   fi
 
 
-  if [ -n "${BUILD_IMAGES}" ]; then
+  if "${BUILD_IMAGES}"; then
     # TODO: inspect configs to determine full set of image sets to build, rather than maintain a static list
 
     ########## Azure Windows ##########
     imagesets/imageset.sh azure update generic-worker-win2022 &
-    imagesets/imageset.sh azure update generic-worker-win2022-staging &
     imagesets/imageset.sh azure update generic-worker-win2022-gpu &
-    imagesets/imageset.sh azure update generic-worker-win11-24h2-staging &
 
     ########## Non-Azure Windows ##########
     # Commenting out for now due to https://github.com/taskcluster/community-tc-config/issues/872
@@ -892,16 +888,21 @@ function all-in-parallel {
     imagesets/imageset.sh google update generic-worker-ubuntu-24-04 &
     imagesets/imageset.sh aws update generic-worker-ubuntu-24-04 &
     imagesets/imageset.sh google update generic-worker-ubuntu-24-04-arm64 &
-    imagesets/imageset.sh google update generic-worker-ubuntu-24-04-staging &
-    imagesets/imageset.sh aws update generic-worker-ubuntu-24-04-staging &
 
     ########## Docker Worker ##########
     imagesets/imageset.sh google update docker-worker &
     imagesets/imageset.sh aws update docker-worker &
 
+    if "${BUILD_STAGING_IMAGES}"; then
+      imagesets/imageset.sh azure update generic-worker-win2022-staging &
+      imagesets/imageset.sh azure update generic-worker-win11-24h2-staging &
+      imagesets/imageset.sh google update generic-worker-ubuntu-24-04-staging &
+      imagesets/imageset.sh aws update generic-worker-ubuntu-24-04-staging &
+    fi
+
     wait
 
-    if [ -n "${DELETE_OLD_RGS}" ]; then
+    if "${DELETE_OLD_RGS}"; then
       for rg in $(az group list --query "[?starts_with(name, 'imageset-')].name" -o tsv); do
         echo "Deleting old resource group ${rg}..."
         az group delete --name $rg --yes --no-wait
@@ -909,7 +910,7 @@ function all-in-parallel {
     fi
   fi
 
-  if [ -n "${DEPLOY_IMAGES}" ]; then
+  if "${DEPLOY_IMAGES}"; then
     retry tc-admin apply
   fi
 
