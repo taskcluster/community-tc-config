@@ -110,10 +110,10 @@ generic-worker-ubuntu-24-04:
     image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-jdpybp72jqg6q7ejzkus
   aws:
     amis:
-      us-west-1: ami-089ed6342add175ee
-      us-west-2: ami-05b6fac3497e50c5a
-      us-east-1: ami-0d7f41357682cdf93
-      us-east-2: ami-05c10d6908ba54f8a
+      us-west-1: ami-0f58f3d127dbf00bf
+      us-west-2: ami-00239066c64f0a2f6
+      us-east-1: ami-028b8adaf30a18169
+      us-east-2: ami-09bb94361a2932174
 generic-worker-ubuntu-24-04-arm64:
   workerImplementation: generic-worker
   workerConfig:
