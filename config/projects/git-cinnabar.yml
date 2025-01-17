@@ -44,6 +44,7 @@ git-cinnabar:
         - queue:create-task:highest:proj-git-cinnabar/osx
         - queue:create-task:highest:proj-git-cinnabar/macos
         - queue:scheduler-id:taskcluster-github
+        - queue:route:checks
       to:
         - repo:github.com/glandium/git-cinnabar:decision-task
 
