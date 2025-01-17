@@ -428,6 +428,10 @@ taskcluster:
         - docker-worker:capability:privileged:test-provisioner/test-*
         - docker-worker:capability:device:hostSharedMemory:test-provisioner/test-*
         - docker-worker:capability:device:kvm:test-provisioner/test-*
+        - docker-worker:capability:device:loopbackAudio
+        - docker-worker:capability:device:loopbackAudio:test-provisioner/test-*
+        - docker-worker:capability:device:loopbackVideo
+        - docker-worker:capability:device:loopbackVideo:test-provisioner/test-*
         - docker-worker:feature:allowPtrace
         - generic-worker:cache:apple-cache
         - generic-worker:cache:banana-cache
