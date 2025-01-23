@@ -70924,6 +70924,18 @@
     "zone": "us-east4-b"
   },
   {
+    "name": "ct6e-standard-1t",
+    "zone": "us-east4-b"
+  },
+  {
+    "name": "ct6e-standard-4t",
+    "zone": "us-east4-b"
+  },
+  {
+    "name": "ct6e-standard-8t",
+    "zone": "us-east4-b"
+  },
+  {
     "name": "e2-highcpu-16",
     "zone": "us-east4-b"
   },
@@ -79589,6 +79601,18 @@
   },
   {
     "name": "ct5lp-hightpu-8t",
+    "zone": "us-west1-c"
+  },
+  {
+    "name": "ct6e-standard-1t",
+    "zone": "us-west1-c"
+  },
+  {
+    "name": "ct6e-standard-4t",
+    "zone": "us-west1-c"
+  },
+  {
+    "name": "ct6e-standard-8t",
     "zone": "us-west1-c"
   },
   {
