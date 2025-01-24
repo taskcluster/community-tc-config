@@ -50,7 +50,7 @@ generic-worker:
 docker-worker:
   workerImplementation: docker-worker
   gcp:
-    image: projects/community-tc-workers/global/images/docker-worker-9zbna9d0h5wkgae3ud32
+    image: projects/community-tc-workers/global/images/docker-worker-916vzlal610yyoqp5bj3
   aws:
     # originally built with the `docker_community_aws` builder in monopacker
     amis:
