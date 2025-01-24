@@ -142,6 +142,12 @@ systemctl enable worker
 
 retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman gnome-initial-setup-
 
+if [ '%MY_CLOUD%' == 'google' ]; then
+    # this is neccessary in GCP because after installing gnome desktop both NetworkManager and systemd-networkd are enabled
+    # which leads to https://bugs.launchpad.net/ubuntu/jammy/+source/systemd/+bug/2036358
+    systemctl disable systemd-networkd-wait-online.service
+fi
+
 # set podman registries conf
 (
   echo '[registries.search]'
@@ -167,12 +173,6 @@ echo 'snd-aloop' >> /etc/modules
 
 # avoid unnecessary shutdowns during worker startups
 systemctl disable unattended-upgrades
-
-if [ '%MY_CLOUD%' == 'google' ]; then
-    # this is neccessary in GCP because after installing gnome desktop both NetworkManager and systemd-networkd are enabled
-    # which leads to https://bugs.launchpad.net/ubuntu/jammy/+source/systemd/+bug/2036358
-    systemctl disable systemd-networkd-wait-online.service
-fi
 
 end_time="$(date '+%s')"
 echo "UserData execution took: $(($end_time - $start_time)) seconds"
