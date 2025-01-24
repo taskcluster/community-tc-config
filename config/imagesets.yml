@@ -158,11 +158,7 @@ generic-worker-ubuntu-24-04-staging:
 generic-worker-win2022:
   workerImplementation: generic-worker
   aws:
-    amis:
-      us-west-1: ami-0d7bbab1eef03686c
-      us-west-2: ami-08bb06faf264bd144
-      us-east-1: ami-0acf1ae38c2387285
-      us-east-2: ami-055bc18ba30433c29
+    amis: {}
   azure:
     images:
       centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-9n5m4d5x4zfa8boa7lgd-centralus
@@ -184,7 +180,7 @@ generic-worker-win2022:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/1f9aa43a7050464cdfe4365cda8dcb4351dedf9d/imagesets/generic-worker-win2022/bootstrap.ps1
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/b68c2d5b07909a749a958a665c3c9db92fe819b0/imagesets/generic-worker-win2022/bootstrap.ps1
 generic-worker-win2022-staging:
   workerImplementation: generic-worker
   azure:
