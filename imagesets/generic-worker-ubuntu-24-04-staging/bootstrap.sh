@@ -202,7 +202,6 @@ dconf update
 # XorgEnable=false
 crudini --set /etc/gdm3/custom.conf daemon XorgEnable 'false'
 
-
 #
 # gdm wait service file
 #
@@ -215,18 +214,11 @@ crudini --set /etc/gdm3/custom.conf daemon XorgEnable 'false'
 mkdir -p /etc/systemd/system/gdm.service.d/
 cat > /etc/systemd/system/gdm.service.d/gdm-wait.conf << EOF
 [Unit]
-Description=Extra 30s wait
+Description=Extra 5s wait
 
 [Service]
-ExecStartPre=/bin/sleep 30
+ExecStartPre=/bin/sleep 5
 EOF
-
-#
-# extra packages
-#
-# ttf-mscorefonts-installer is part of ubuntu-restricted-extras, accept license
-echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
-retry apt-get install -y gnome-screenshot ubuntu-restricted-extras
 
 #
 # write mutter's monitors.xml
