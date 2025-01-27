@@ -214,10 +214,10 @@ crudini --set /etc/gdm3/custom.conf daemon XorgEnable 'false'
 mkdir -p /etc/systemd/system/gdm.service.d/
 cat > /etc/systemd/system/gdm.service.d/gdm-wait.conf << EOF
 [Unit]
-Description=Extra 5s wait
+Description=Extra 10s wait
 
 [Service]
-ExecStartPre=/bin/sleep 5
+ExecStartPre=/bin/sleep 10
 EOF
 
 #
