@@ -4,7 +4,7 @@ set -exv
 exec &> /var/log/bootstrap.log
 
 # Version numbers ####################
-TASKCLUSTER_VERSION='v78.2.0'
+TASKCLUSTER_VERSION='v79.0.0'
 ######################################
 
 function retry {
@@ -153,6 +153,87 @@ sed '/platform-vkms/d' /lib/udev/rules.d/61-mutter.rules > /etc/udev/rules.d/61-
 
 echo 'options snd-aloop enable=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 index=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31' > /etc/modprobe.d/snd-aloop.conf
 echo 'snd-aloop' >> /etc/modules
+
+# used to modify specific blocks in .conf files
+retry apt-get install -y crudini
+
+#
+# dconf settings
+#
+cat > /etc/dconf/profile/user << EOF
+user-db:user
+system-db:local
+EOF
+
+mkdir /etc/dconf/db/local.d/
+# dconf user settings
+cat > /etc/dconf/db/local.d/00-tc-gnome-settings << EOF
+# /org/gnome/desktop/session/idle-delay
+[org/gnome/desktop/session]
+idle-delay=uint32 0
+
+# /org/gnome/desktop/lockdown/disable-lock-screen
+[org/gnome/desktop/lockdown]
+disable-lock-screen=true
+EOF
+
+# make dbus read the new configuration
+dconf update
+
+#
+# gdm3 settings  
+#
+# in [daemon] block of /etc/gdm3/custom.conf we need:
+#
+# XorgEnable=false
+crudini --set /etc/gdm3/custom.conf daemon XorgEnable 'false'
+
+#
+# gdm wait service file
+#
+# This hack is required because without we end up in a situation where the
+# wayland seat is in a weird state and consequences are:
+#    - either x11 session
+#    - either xwayland fallback
+#    - either wayland but with missing keyboard capability that breaks
+#        things including copy/paste
+mkdir -p /etc/systemd/system/gdm.service.d/
+cat > /etc/systemd/system/gdm.service.d/gdm-wait.conf << EOF
+[Unit]
+Description=Extra 10s wait
+
+[Service]
+ExecStartPre=/bin/sleep 10
+EOF
+
+#
+# write mutter's monitors.xml
+#
+cat > /etc/xdg/monitors.xml << EOF
+<monitors version="2">
+  <configuration>
+    <logicalmonitor>
+      <x>0</x>
+      <y>0</y>
+      <scale>1</scale>
+      <primary>yes</primary>
+      <monitor>
+        <monitorspec>
+          <connector>Virtual-1</connector>
+          <vendor>unknown</vendor>
+          <product>unknown</product>
+          <serial>unknown</serial>
+        </monitorspec>
+        <mode>
+          <width>1920</width>
+          <height>1080</height>
+          <rate>60.000</rate>
+        </mode>
+      </monitor>
+    </logicalmonitor>
+  </configuration>
+</monitors>
+EOF
 
 # avoid unnecessary shutdowns during worker startups
 systemctl disable unattended-upgrades

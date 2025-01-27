@@ -205,7 +205,7 @@ New-NetFirewallRule -DisplayName "Allow livelog PUT requests" -Direction Inbound
 New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound -LocalPort 60023 -Protocol TCP -Action Allow
 
 # install go
-Expand-ZIPFile -File "C:\Downloads\go1.23.1.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.23.1.windows-amd64.zip"
+Expand-ZIPFile -File "C:\Downloads\go1.23.5.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.23.5.windows-amd64.zip"
 Move-Item -Path "C:\go" -Destination "C:\goroot"
 
 # install git
