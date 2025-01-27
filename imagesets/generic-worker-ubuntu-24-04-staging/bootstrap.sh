@@ -111,9 +111,9 @@ echo 127.0.1.1 taskcluster >> /etc/hosts
 cat > /lib/systemd/system/worker.service << EOF
 [Unit]
 Description=Start TC worker
-# start once networking is online
-Wants=network-online.target
-After=network-online.target
+# start once networking and gdm3 are online
+Wants=network-online.target gdm.service
+After=network-online.target gdm.service
 
 [Service]
 Type=simple
