@@ -72,15 +72,17 @@ taskcluster:
         reregistrationTimeout: 2592000 # 30 days
       owner: taskcluster-notifications+workers@mozilla.com
       workerConfig:
-        ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
-        idleTimeoutSecs: 3600
-        livelogExecutable: C:\generic-worker\livelog.exe
-        sentryProject: generic-worker
-        shutdownMachineOnIdle: false
-        shutdownMachineOnInternalError: false
-        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
-        wstAudience: communitytc
-        wstServerURL: https://community-websocktunnel.services.mozilla.com
+        genericWorker:
+          config:
+            ed25519SigningKeyLocation: C:\generic-worker\generic-worker-ed25519-signing-key.key
+            idleTimeoutSecs: 3600
+            livelogExecutable: C:\generic-worker\livelog.exe
+            sentryProject: generic-worker
+            shutdownMachineOnIdle: false
+            shutdownMachineOnInternalError: false
+            taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
+            wstAudience: communitytc
+            wstServerURL: https://community-websocktunnel.services.mozilla.com
 
     gw-dev-ubuntu:
       cloud: static
@@ -93,15 +95,17 @@ taskcluster:
         reregistrationTimeout: 2592000 # 30 days
       owner: taskcluster-notifications+workers@mozilla.com
       workerConfig:
-        ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
-        idleTimeoutSecs: 3600
-        livelogExecutable: /usr/local/bin/livelog
-        sentryProject: generic-worker
-        shutdownMachineOnIdle: false
-        shutdownMachineOnInternalError: false
-        taskclusterProxyExecutable: /usr/local/bin/taskcluster-proxy
-        wstAudience: communitytc
-        wstServerURL: https://community-websocktunnel.services.mozilla.com
+        genericWorker:
+          config:
+            ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+            idleTimeoutSecs: 3600
+            livelogExecutable: /usr/local/bin/livelog
+            sentryProject: generic-worker
+            shutdownMachineOnIdle: false
+            shutdownMachineOnInternalError: false
+            taskclusterProxyExecutable: /usr/local/bin/taskcluster-proxy
+            wstAudience: communitytc
+            wstServerURL: https://community-websocktunnel.services.mozilla.com
 
     gw-ci-ubuntu-24-04:
       owner: taskcluster-notifications+workers@mozilla.com
