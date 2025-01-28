@@ -51,7 +51,7 @@ retry apt-get update
 DEBIAN_FRONTEND=noninteractive retry apt-get upgrade -yq
 retry apt-get remove -y docker docker.io containerd runc
 # build-essential is needed for running `go test -race` with the -vet=off flag as of go1.19
-retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common gzip python3-venv build-essential snapd
+retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common gzip python3-venv build-essential snapd crudini
 
 # needed for kvm, see https://help.ubuntu.com/community/KVM/Installation
 retry apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
@@ -167,9 +167,6 @@ sed '/platform-vkms/d' /lib/udev/rules.d/61-mutter.rules > /etc/udev/rules.d/61-
 
 echo 'options snd-aloop enable=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 index=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31' > /etc/modprobe.d/snd-aloop.conf
 echo 'snd-aloop' >> /etc/modules
-
-# used to modify specific blocks in .conf files
-retry apt-get install -y crudini
 
 #
 # dconf settings
