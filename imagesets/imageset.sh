@@ -517,7 +517,7 @@ function google_update {
 
   rm "${TEMP_SETUP_SCRIPT}"
 
-  log "Now creating an image from the terminated instance..."
+  log "Now creating an image from the stopped instance..."
   # gcloud compute disks snapshot "${UNIQUE_NAME}" --project="${GCP_PROJECT}" --description="my description" --labels="key1=value1" --snapshot-names="${UNIQUE_NAME}" --zone="${REGION}" --storage-location=us
   retry gcloud compute images create "${UNIQUE_NAME}" --source-disk="${UNIQUE_NAME}" --source-disk-zone="${REGION}" --labels="image-set=${IMAGE_SET}" --project="${GCP_PROJECT}"
 
@@ -530,6 +530,9 @@ function google_update {
     log "    Waiting for image ${UNIQUE_NAME} to be created..."
     sleep 15
   done
+
+  log "Now deleting the stopped instance..."
+  retry gcloud compute --project="${GCP_PROJECT}" instances delete --zone="${REGION}" "${UNIQUE_NAME}" --quiet
 
   echo "projects/${GCP_PROJECT}/global/images/${UNIQUE_NAME}" > gcp.secrets
 }
