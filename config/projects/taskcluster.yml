@@ -53,6 +53,16 @@ taskcluster:
       # note: workerConfig not specified here as configuration
       # is stored directly on manually provisioned worker
 
+    gw-ci-macos:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker
+      cloud: static
+      lifecycle:
+        reregistrationTimeout: 2592000 # 30 days
+      # note: workerConfig not specified here as configuration
+      # is stored directly on manually provisioned worker
+
     gw-ci-freebsd:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
@@ -484,6 +494,7 @@ taskcluster:
     generic-worker/ci-macos:
       scopes:
         - assume:worker-pool:proj-taskcluster/gw-ci-macos-13
+        - assume:worker-pool:proj-taskcluster/gw-ci-macos
         - assume:worker-id:proj-taskcluster/*
     # A client whose clientId and accessToken are stored in taskcluster secret
     # `project/taskcluster/testing/generic-worker/ci-creds` and used by
