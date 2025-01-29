@@ -43,16 +43,6 @@ taskcluster:
     # their config so that they can run generic-worker
     # as root user in tests. this should not be used
     # by any other CI tasks!
-    gw-ci-macos-13:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker
-      cloud: static
-      lifecycle:
-        reregistrationTimeout: 2592000 # 30 days
-      # note: workerConfig not specified here as configuration
-      # is stored directly on manually provisioned worker
-
     gw-ci-macos:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
@@ -490,10 +480,9 @@ taskcluster:
     docker-worker/ci:
       scopes:
         - assume:project:taskcluster:docker-worker-tester
-    # Client for workerpool proj-taskcluster/gw-ci-macos-13.
+    # Client for workerpool proj-taskcluster/gw-ci-macos.
     generic-worker/ci-macos:
       scopes:
-        - assume:worker-pool:proj-taskcluster/gw-ci-macos-13
         - assume:worker-pool:proj-taskcluster/gw-ci-macos
         - assume:worker-id:proj-taskcluster/*
     # A client whose clientId and accessToken are stored in taskcluster secret
