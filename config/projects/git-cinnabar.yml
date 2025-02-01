@@ -5,6 +5,7 @@ git-cinnabar:
     - github.com/glandium/git-cinnabar:*
   secrets:
     codecov: true
+    gha: true
   workerPools:
     linux:
       imageset: generic-worker-ubuntu-24-04
@@ -53,7 +54,7 @@ git-cinnabar:
 
     - grant:
         - assume:repo:github.com/glandium/git-cinnabar:decision-task
-        - secrets:get:project/git-cinnabar/codecov
+        - secrets:get:project/git-cinnabar/*
         - queue:route:index.project.git-cinnabar.*
       to:
         - repo:github.com/glandium/git-cinnabar:release
