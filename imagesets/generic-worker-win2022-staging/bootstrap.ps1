@@ -347,7 +347,7 @@ Run-Executable "choco" @("install", "-y", "visualstudio2019buildtools", "--versi
 # install msys2
 Run-Executable "choco" @("install", "-y", "msys2")
 
-$env:PATH = $env:PATH + ";C:\msys64\mingw64\bin;C:\msys64\usr\bin"
+$env:PATH = $env:PATH + ";C:\msys64\mingw64\bin;C:\msys64\usr\bin;C:\tools\msys64\usr\bin"
 
 # update pacman
 Run-Executable "pacman" @("-Syu", "--noconfirm", "--noprogressbar")
