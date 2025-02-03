@@ -344,8 +344,19 @@ Run-Executable "choco" @("install", "-y", "windows-sdk-10.0")
 Run-Executable "choco" @("install", "-y", "visualstudio2019community", "--version", "16.5.4.0", "--package-parameters", "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.160 --passive --locale en-US")
 Run-Executable "choco" @("install", "-y", "visualstudio2019buildtools", "--version", "16.5.4.0", "--package-parameters", "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Component.NuGet.BuildTools --add Microsoft.VisualStudio.Workload.UniversalBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.NetCoreBuildTools;includeRecommended --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US")
 
-# install msys2 for gcc for go race detector
+# install msys2
 Run-Executable "choco" @("install", "-y", "msys2")
+
+$env:PATH = $env:PATH + ";C:\msys64\mingw64\bin;C:\msys64\usr\bin"
+
+# update pacman
+Run-Executable "pacman" @("-Syu", "--noconfirm", "--noprogressbar")
+
+# install gcc for go race detector
+Run-Executable "pacman" @("-S", "--noconfirm", "--noprogressbar", "--needed", "mingw-w64-x86_64-gcc")
+
+# clean package cache
+Run-Executable "pacman" @("-Sc", "--noconfirm", "--noprogressbar")
 
 # Check if any of the video controllers are from NVIDIA.
 # Note, 0x10DE is the NVIDIA Corporation Vendor ID.
