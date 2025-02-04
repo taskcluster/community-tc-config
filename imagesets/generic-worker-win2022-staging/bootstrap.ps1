@@ -342,6 +342,9 @@ Run-Executable "choco" @("install", "-y", "msys2")
 refreshenv
 $env:PATH = $env:PATH + ";C:\tools\msys64\usr\bin;C:\tools\msys64\mingw64\bin"
 
+# set permanent PATH environment variable
+[Environment]::SetEnvironmentVariable("PATH", [Environment]::GetEnvironmentVariable("PATH", "Machine") + ";C:\tools\msys64\usr\bin;C:\tools\msys64\mingw64\bin", "Machine")
+
 # update pacman
 Run-Executable "pacman" @("-Syu", "--noconfirm", "--noprogressbar")
 
