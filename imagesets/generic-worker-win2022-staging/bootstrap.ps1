@@ -207,7 +207,7 @@ New-NetFirewallRule -DisplayName "Allow livelog PUT requests" -Direction Inbound
 New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound -LocalPort 60023 -Protocol TCP -Action Allow
 
 # install go
-Run-Executable "choco" @("install", "-y", "golang", "--version", "1.23.5")
+Run-Executable "choco" @("install", "-y", "golang", "--version", "1.23.6")
 
 # install git
 Run-Executable "choco" @("install", "-y", "git")
