@@ -730,6 +730,9 @@ function azure_update {
   # Release the lock
   flock -u 200
 
+  log "Deleting temporary resource group ${AZURE_VM_RESOURCE_GROUP}..."
+  log-iff-fails retry az group delete --name="${AZURE_VM_RESOURCE_GROUP}" --yes --no-wait
+
   IMAGE_ID="$(retry az image show --name="${NAME_WITH_REGION}" --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" --query id --output tsv)"
 
   {
