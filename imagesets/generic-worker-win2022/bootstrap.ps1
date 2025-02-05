@@ -181,7 +181,7 @@ foreach ($service in $servicesToDisable) {
 }
 
 # install chocolatey package manager
-Invoke-RestMethod -Uri 'https://chocolatey.org/install.ps1' | Invoke-Expression
+Invoke-RestMethod -Uri 'https://community.chocolatey.org/install.ps1' | Invoke-Expression
 
 # install nssm
 Expand-ZIPFile -File "C:\Downloads\nssm-2.24.zip" -Destination "C:\" -Url "https://www.nssm.cc/release/nssm-2.24.zip"
@@ -202,31 +202,20 @@ New-NetFirewallRule -DisplayName "Allow livelog PUT requests" -Direction Inbound
 New-NetFirewallRule -DisplayName "Allow livelog GET requests" -Direction Inbound -LocalPort 60023 -Protocol TCP -Action Allow
 
 # install go
-Expand-ZIPFile -File "C:\Downloads\go1.23.5.windows-amd64.zip" -Destination "C:\" -Url "https://storage.googleapis.com/golang/go1.23.5.windows-amd64.zip"
-Move-Item -Path "C:\go" -Destination "C:\goroot"
+Run-Executable "choco" @("install", "-y", "golang", "--version", "1.23.6")
 
 # install git
-Invoke-WebRequest -Uri "https://github.com/git-for-windows/git/releases/download/v2.46.2.windows.1/Git-2.46.2-64-bit.exe" -OutFile "C:\Downloads\Git-2.46.2-64-bit.exe"
-Run-Executable "C:\Downloads\Git-2.46.2-64-bit.exe" @("/VERYSILENT", "/LOG=`"C:\Install Logs\git.txt`"", "/NORESTART", "/SUPPRESSMSGBOXES")
+Run-Executable "choco" @("install", "-y", "git")
 
 # install node
-Invoke-WebRequest -Uri "https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi" -OutFile "C:\Downloads\NodeSetup.msi"
-Run-Executable "msiexec" @("/i", "C:\Downloads\NodeSetup.msi", "/quiet")
+Run-Executable "choco" @("install", "-y", "nodejs", "--version", "22.13.1")
 
-# install python 3.11.9
-Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe" -OutFile "C:\Downloads\python-3.11.9-amd64.exe"
-# issue 751: without /log <file> python fails to install on Azure workers, with exit code 1622, maybe default log location isn't writable(?)
-Run-Executable "C:\Downloads\python-3.11.9-amd64.exe" @("/quiet", "InstallAllUsers=1", "/log", "C:\Install Logs\python-3.11.9.txt")
+# install python
+Run-Executable "choco" @("install", "-y", "python", "--version", "3.13.1")
 
-# set permanent env vars
-[Environment]::SetEnvironmentVariable("GOROOT", "C:\goroot", "Machine")
-[Environment]::SetEnvironmentVariable("PATH", [Environment]::GetEnvironmentVariable("PATH", "Machine") + ";C:\Program Files\Vim\vim80;C:\goroot\bin;C:\Program Files\Python311", "Machine")
-[Environment]::SetEnvironmentVariable("PATHEXT", [Environment]::GetEnvironmentVariable("PATHEXT", "Machine") + ";.PY", "Machine")
-
-# set env vars for the currently running process
-$env:GOROOT  = "C:\goroot"
-$env:PATH    = $env:PATH + ";C:\goroot\bin;C:\Program Files\Git\cmd;C:\Program Files\Python311"
-$env:PATHEXT = $env:PATHEXT + ";.PY"
+# refresh environment variables
+Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+refreshenv
 
 md "C:\generic-worker"
 md "C:\worker-runner"
@@ -336,8 +325,24 @@ Run-Executable "choco" @("install", "-y", "windows-sdk-10.0")
 Run-Executable "choco" @("install", "-y", "visualstudio2019community", "--version", "16.5.4.0", "--package-parameters", "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.160 --passive --locale en-US")
 Run-Executable "choco" @("install", "-y", "visualstudio2019buildtools", "--version", "16.5.4.0", "--package-parameters", "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Component.NuGet.BuildTools --add Microsoft.VisualStudio.Workload.UniversalBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.NetCoreBuildTools;includeRecommended --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US")
 
+# install msys2
+Run-Executable "choco" @("install", "-y", "msys2")
+
+# refresh environment variables
+refreshenv
+$env:PATH = $env:PATH + ";C:\tools\msys64\usr\bin;C:\tools\msys64\mingw64\bin"
+
+# set permanent PATH environment variable
+[Environment]::SetEnvironmentVariable("PATH", [Environment]::GetEnvironmentVariable("PATH", "Machine") + ";C:\tools\msys64\usr\bin;C:\tools\msys64\mingw64\bin", "Machine")
+
+# update pacman
+Run-Executable "pacman" @("-Syu", "--noconfirm", "--noprogressbar")
+
 # install gcc for go race detector
-Run-Executable "choco" @("install", "-y", "mingw", "--version", "11.2.0.07112021")
+Run-Executable "pacman" @("-S", "--noconfirm", "--noprogressbar", "mingw-w64-x86_64-gcc")
+
+# clean package cache
+Run-Executable "pacman" @("-Sc", "--noconfirm", "--noprogressbar")
 
 # Check if any of the video controllers are from NVIDIA.
 # Note, 0x10DE is the NVIDIA Corporation Vendor ID.
