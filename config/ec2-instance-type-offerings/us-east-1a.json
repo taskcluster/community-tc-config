@@ -511,6 +511,7 @@
     "p3.8xlarge",
     "p3dn.24xlarge",
     "p4d.24xlarge",
+    "p5.48xlarge",
     "r4.16xlarge",
     "r4.2xlarge",
     "r4.4xlarge",

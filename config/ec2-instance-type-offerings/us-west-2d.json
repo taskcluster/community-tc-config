@@ -403,6 +403,7 @@
     "mac1.metal",
     "mac2-m1ultra.metal",
     "mac2.metal",
+    "p5.48xlarge",
     "p5en.48xlarge",
     "r5.12xlarge",
     "r5.16xlarge",
