@@ -440,6 +440,7 @@ taskcluster:
         - generic-worker:cache:unknown-issuer-app-cache
         - generic-worker:os-group:test-provisioner/*
         - generic-worker:run-as-administrator:test-provisioner/*
+        - generic-worker:run-task-as-current-user:test-provisioner/*
         - generic-worker:loopback-audio:test-provisioner/test-*
         - generic-worker:loopback-video:test-provisioner/test-*
         - index:find-task:garbage.generic-worker-tests.*
