@@ -822,6 +822,7 @@ fuzzing:
         - docker-worker:capability:device:loopbackAudio
         - docker-worker:capability:privileged
         - docker-worker:capability:disableSeccomp
+        - queue:cancel-task-group:-/*
         - queue:create-task:highest:proj-fuzzing/bugmon-monitor
         - queue:create-task:highest:proj-fuzzing/bugmon-processor
         - queue:create-task:highest:proj-fuzzing/bugmon-processor-windows
@@ -829,6 +830,7 @@ fuzzing:
         - queue:get-artifact:project/fuzzing/bugmon/*
         - queue:route:notify.email.jkratzer@mozilla.com.on-failed
         - queue:scheduler-id:-
+        - queue:seal-task-group:-/*
         - secrets:get:project/fuzzing/bz-api-key
         - secrets:get:project/fuzzing/pernosco-user
         - secrets:get:project/fuzzing/pernosco-group
