@@ -209,11 +209,11 @@ generic-worker-win2022-staging:
 generic-worker-win2022-gpu:
   azure:
     images:
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-7hwkeoo716bzs16w1rnu-eastus
-      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-7hwkeoo716bzs16w1rnu-eastus2
-      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-7hwkeoo716bzs16w1rnu-southcentralus
-      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-7hwkeoo716bzs16w1rnu-westus
-      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-7hwkeoo716bzs16w1rnu-westus2
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nrqayppc5zqhdz4x3wxl-eastus
+      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nrqayppc5zqhdz4x3wxl-eastus2
+      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nrqayppc5zqhdz4x3wxl-southcentralus
+      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nrqayppc5zqhdz4x3wxl-westus
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nrqayppc5zqhdz4x3wxl-westus2
   workerImplementation: generic-worker
   workerConfig:
     genericWorker:
@@ -227,7 +227,7 @@ generic-worker-win2022-gpu:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/01fc1f8a37f2f9ec5b38dc0772bfc1dfd53fd11c/imagesets/generic-worker-win2022-gpu/bootstrap.ps1
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/d5b59b661ff6611a961279f13797cbc1b87e34cf/imagesets/generic-worker-win2022-gpu/bootstrap.ps1
 generic-worker-win11-24h2-staging:
   workerImplementation: generic-worker
   azure:
