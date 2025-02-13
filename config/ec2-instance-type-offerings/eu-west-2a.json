@@ -359,6 +359,7 @@
     "p3.2xlarge",
     "p3.8xlarge",
     "p5.48xlarge",
+    "p5e.48xlarge",
     "r4.16xlarge",
     "r4.2xlarge",
     "r4.4xlarge",
