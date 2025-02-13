@@ -36,13 +36,10 @@ taskcluster:
         genericWorker:
           config:
             headlessTasks: true
-            runTasksAsCurrentUser: true
 
-    # gw-ci-* worker pools are for generic-worker CI
-    # they all have `runTasksAsCurrentUser: true` in
-    # their config so that they can run generic-worker
-    # as root user in tests. this should not be used
-    # by any other CI tasks!
+    # *-gui worker pools are for generic-worker CI
+    # they all have `headlessTasks: false` in
+    # their config so that a gui is available for tests
     gw-ci-macos:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
@@ -61,7 +58,7 @@ taskcluster:
       lifecycle:
         reregistrationTimeout: 2592000 # 30 days
 
-    gw-ci-ubuntu-24-04:
+    gw-ubuntu-24-04-gui:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-ubuntu-24-04
@@ -72,15 +69,14 @@ taskcluster:
         genericWorker:
           config:
             # Note, headlessTasks: false is _already_ default, but adding here
-            # to be explicit! The gw-ci pools are used for Generic Worker CI
+            # to be explicit! The *-gui pools are used for Generic Worker CI
             # tasks, and some of those tests require a real GUI, such as
             # TestDesktopResizeAndMovePointer, in which case the host will need
             # a GUI, and thus we shouldn't enable Headless (disable GUI) on the
             # CI environment itself.
             headlessTasks: false
-            runTasksAsCurrentUser: true
 
-    gw-ci-windows-2022:
+    gw-windows-2022-gui:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-win2022
@@ -91,13 +87,12 @@ taskcluster:
         genericWorker:
           config:
             # Note, headlessTasks: false is _already_ default, but adding here
-            # to be explicit! The gw-ci pools are used for Generic Worker CI
+            # to be explicit! The *-gui pools are used for Generic Worker CI
             # tasks, and some of those tests require a real GUI, such as
             # TestDesktopResizeAndMovePointer, in which case the host will need
             # a GUI, and thus we shouldn't enable Headless (disable GUI) on the
             # CI environment itself.
             headlessTasks: false
-            runTasksAsCurrentUser: true
 
     gw-ubuntu-24-04-metal:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -314,6 +309,7 @@ taskcluster:
         # can remove once https://github.com/taskcluster/taskcluster/pull/7343
         # is released and deployed on the decision workers
         - generic-worker:cache:taskcluster-*
+        - generic-worker:run-task-as-current-user:proj-taskcluster/*
       to: repo:github.com/taskcluster/taskcluster:*
 
     - grant:
@@ -469,7 +465,7 @@ taskcluster:
         - repo:github.com/taskcluster/staging-releases:*
 
     - grant:
-        - queue:create-task:medium:proj-taskcluster/gw-ci-ubuntu-24-04
+        - queue:create-task:medium:proj-taskcluster/gw-ubuntu-24-04-gui
       to:
         - repo:github.com/taskcluster/docker-exec-websocket-server:*
         - repo:github.com/taskcluster/docker-exec-websocket-client:*
