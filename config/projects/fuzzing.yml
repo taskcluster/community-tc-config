@@ -889,6 +889,7 @@ fuzzing:
     - grant:
         - generic-worker:allow-rdp:proj-fuzzing/*
         - queue:cancel-task:fuzzing/*
+        - queue:cancel-task-group:fuzzing/*
         - queue:seal-task-group:fuzzing/*
       to:
         - project-admin:fuzzing
