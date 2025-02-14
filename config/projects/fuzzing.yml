@@ -131,6 +131,7 @@ fuzzing:
           routingKeyPattern: primary.taskcluster.community-tc-config
       task:
         provisionerId: proj-fuzzing
+        schedulerId: fuzzing
         workerType: decision
         payload:
           features:
@@ -170,7 +171,7 @@ fuzzing:
           - generic-worker:run-as-administrator:proj-fuzzing/*
           - hooks:modify-hook:project-fuzzing/*
           - hooks:trigger-hook:project-fuzzing/*
-          - queue:cancel-task:-/*
+          - queue:cancel-task:fuzzing/*
           - queue:create-task:highest:proj-fuzzing/*
           - secrets:get:project/fuzzing/*
           - worker-manager:manage-worker-pool:proj-fuzzing/*
@@ -200,6 +201,7 @@ fuzzing:
           routingKeyPattern: primary.MozillaSecurity.GrIDL
       task:
         provisionerId: proj-fuzzing
+        schedulerId: fuzzing
         workerType: ci
         payload:
           image:
@@ -407,6 +409,7 @@ fuzzing:
       emailOnError: true
       task:
         provisionerId: proj-fuzzing
+        schedulerId: fuzzing
         workerType: bugmon-monitor
         payload:
           image:
@@ -445,7 +448,7 @@ fuzzing:
           - queue:create-task:highest:proj-fuzzing/bugmon-pernosco
           - queue:get-artifact:project/fuzzing/bugmon/*
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-          - queue:scheduler-id:-
+          - queue:scheduler-id:fuzzing
           - secrets:get:project/fuzzing/bz-api-key
           - secrets:get:project/fuzzing/pernosco-user
           - secrets:get:project/fuzzing/pernosco-group
@@ -460,6 +463,7 @@ fuzzing:
       emailOnError: true
       task:
         provisionerId: proj-fuzzing
+        schedulerId: fuzzing
         workerType: bugmon-monitor
         payload:
           image:
@@ -499,7 +503,7 @@ fuzzing:
           - queue:create-task:highest:proj-fuzzing/bugmon-pernosco
           - queue:get-artifact:project/fuzzing/bugmon/*
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-          - queue:scheduler-id:-
+          - queue:scheduler-id:fuzzing
           - secrets:get:project/fuzzing/bz-api-key
           - secrets:get:project/fuzzing/pernosco-user
           - secrets:get:project/fuzzing/pernosco-group
@@ -598,6 +602,7 @@ fuzzing:
       emailOnError: true
       task:
         provisionerId: proj-fuzzing
+        schedulerId: fuzzing
         workerType: ci
         payload:
           image:
@@ -626,7 +631,7 @@ fuzzing:
           - docker-worker:capability:privileged
           - queue:get-artifact:project/fuzzing/gr-css/*
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-          - queue:scheduler-id:-
+          - queue:scheduler-id:fuzzing
           - secrets:get:project/fuzzing/deploy-gr-css
           - secrets:get:project/fuzzing/deploy-gr-css-generator
           - secrets:get:project/fuzzing/deploy-gr-css-reports
@@ -648,7 +653,7 @@ fuzzing:
           - docker-worker:capability:privileged
           - queue:get-artifact:project/fuzzing/gr-idl-update/*
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-          - queue:scheduler-id:-
+          - queue:scheduler-id:fuzzing
           - secrets:get:project/fuzzing/ci-git-token
           - secrets:get:project/fuzzing/deploy-gridl
           - secrets:get:project/fuzzing/deploy-npm
@@ -675,6 +680,7 @@ fuzzing:
           description: Hook for updating gr.idl grammar
         workerType: ci
         provisionerId: proj-fuzzing
+        schedulerId: fuzzing
       schedule:
         - "0 8 * * 1"
     orion-cron:
@@ -721,6 +727,7 @@ fuzzing:
       emailOnError: true
       task:
         provisionerId: proj-fuzzing
+        schedulerId: fuzzing
         workerType: nss-corpus-update-worker
         expires:
           $fromNow: 1 months
@@ -742,7 +749,7 @@ fuzzing:
           - queue:get-artifact:project/fuzzing/nss-corpus-update/*
           - queue:route:notify.email.mdauer@mozilla.com.on-failed
           - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-          - queue:scheduler-id:-
+          - queue:scheduler-id:fuzzing
           - secrets:get:project/fuzzing/deploy-nss-fuzzing-corpus
           - secrets:get:project/fuzzing/ossfuzz-gutils
         metadata:
@@ -781,7 +788,7 @@ fuzzing:
         - repo:github.com/MozillaSecurity/fuzzing-tc-config:*
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
-        - queue:scheduler-id:-
+        - queue:scheduler-id:fuzzing
         - secrets:get:project/fuzzing/deploy-domino
         - secrets:get:project/fuzzing/deploy-domino-web-tests
         - secrets:get:project/fuzzing/deploy-gridl
@@ -808,8 +815,8 @@ fuzzing:
         - hooks:modify-hook:project-fuzzing/*
         - hooks:trigger-hook:project-fuzzing/*
         - queue:create-task:highest:proj-fuzzing/*
-        - queue:scheduler-id:-
-        - queue:cancel-task:-/*
+        - queue:scheduler-id:fuzzing
+        - queue:cancel-task:fuzzing/*
         - queue:route:notify.*
         - secrets:get:project/fuzzing/*
         - worker-manager:manage-worker-pool:proj-fuzzing/*
@@ -828,7 +835,7 @@ fuzzing:
         - queue:create-task:highest:proj-fuzzing/bugmon-pernosco
         - queue:get-artifact:project/fuzzing/bugmon/*
         - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-        - queue:scheduler-id:-
+        - queue:scheduler-id:fuzzing
         - secrets:get:project/fuzzing/bz-api-key
         - secrets:get:project/fuzzing/pernosco-user
         - secrets:get:project/fuzzing/pernosco-group
@@ -887,6 +894,8 @@ fuzzing:
     - grant:
         - generic-worker:allow-rdp:proj-fuzzing/*
         - queue:cancel-task:fuzzing/*
+        - queue:cancel-task-group:fuzzing/*
+        - queue:seal-task-group:fuzzing/*
       to:
         - project-admin:fuzzing
     - grant:
@@ -909,7 +918,7 @@ fuzzing:
         - queue:create-task:highest:proj-fuzzing/ci
         - queue:get-artifact:project/fuzzing/gr-css/*
         - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-        - queue:scheduler-id:-
+        - queue:scheduler-id:fuzzing
         - secrets:get:project/fuzzing/ci-git-token
         - secrets:get:project/fuzzing/deploy-gr-css
         - secrets:get:project/fuzzing/deploy-gr-css-generator
@@ -923,7 +932,7 @@ fuzzing:
         - queue:create-task:highest:proj-fuzzing/ci
         - queue:get-artifact:project/fuzzing/gr-idl-update/*
         - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-        - queue:scheduler-id:-
+        - queue:scheduler-id:fuzzing
         - secrets:get:project/fuzzing/ci-git-token
         - secrets:get:project/fuzzing/deploy-gridl
         - secrets:get:project/fuzzing/deploy-npm
@@ -935,7 +944,7 @@ fuzzing:
         - queue:get-artifact:project/fuzzing/nss-corpus-update/*
         - queue:route:notify.email.mdauer@mozilla.com.on-failed
         - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-        - queue:scheduler-id:-
+        - queue:scheduler-id:fuzzing
         - secrets:get:project/fuzzing/deploy-nss-fuzzing-corpus
         - secrets:get:project/fuzzing/ossfuzz-gutils
       to:
