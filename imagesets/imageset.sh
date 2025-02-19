@@ -178,7 +178,11 @@ function deploy {
         log "Need AWS credentials..."
         eval "$(./signin-aws.sh)"
       fi
-      echo us-west-1 118 246 us-west-2 199 220 us-east-1 4 200 us-east-2 33 210 | xargs -P4 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
+      if [[ "$IMAGE_SET" == *-staging ]]; then
+        echo us-east-1 4 200 | xargs -P1 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
+      else
+        echo us-west-1 118 246 us-west-2 199 220 us-east-1 4 200 us-east-2 33 210 | xargs -P4 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
+      fi
       log "Fetching secrets..."
       retry pass git pull
       for REGION in us-west-1 us-west-2 us-east-1 us-east-2; do
@@ -202,7 +206,11 @@ function deploy {
         log "Need azure credentials..."
         log-iff-fails retry az login
       fi
-      echo centralus 26 215 eastus 15 250 eastus2 33 200 northcentralus 100 175 southcentralus 99 150 westus 75 225 westus2 60 160 | xargs -P7 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
+      if [[ "$IMAGE_SET" == *-staging ]]; then
+        echo eastus 15 250 | xargs -P1 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
+      else
+        echo centralus 26 215 eastus 15 250 eastus2 33 200 northcentralus 100 175 southcentralus 99 150 westus 75 225 westus2 60 160 | xargs -P7 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
+      fi
       log "Fetching secrets..."
       retry pass git pull
       for REGION in centralus eastus eastus2 northcentralus southcentralus westus westus2; do
@@ -210,7 +218,6 @@ function deploy {
         # because we have switched instance type and the new one is not available
         # in a given region.
         yq d -i ../config/imagesets.yml "${IMAGE_SET}.azure.images.${REGION}" # returns with exit code 0 even if entry doesn't exist
-        # some regions may not have secrets if they do not support the required instance type
         # some regions may not have secrets if they do not support the required instance type
         if [ -f "${IMAGE_SET}/azure.${REGION}.secrets" ]; then
           IMAGE_ID="$(cat "${IMAGE_SET}/azure.${REGION}.secrets" | sed -n 's/^Image: *//p')"
