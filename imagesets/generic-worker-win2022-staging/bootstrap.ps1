@@ -328,12 +328,12 @@ Expand-ZIPFile -File "C:\Downloads\ProcessExplorer.zip" -Destination "C:\Process
 md "C:\ProcessMonitor"
 Expand-ZIPFile -File "C:\Downloads\ProcessMonitor.zip" -Destination "C:\ProcessMonitor" -Url "https://download.sysinternals.com/files/ProcessMonitor.zip"
 
-# # install Windows 10 SDK
-# Run-Executable "choco" @("install", "-y", "windows-sdk-10.0")
+# install Windows 10 SDK
+Run-Executable "choco" @("install", "-y", "windows-sdk-10.0")
 
-# # install VisualStudio 2019 Community
-# Run-Executable "choco" @("install", "-y", "visualstudio2019community", "--version", "16.5.4.0", "--package-parameters", "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.160 --passive --locale en-US")
-# Run-Executable "choco" @("install", "-y", "visualstudio2019buildtools", "--version", "16.5.4.0", "--package-parameters", "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Component.NuGet.BuildTools --add Microsoft.VisualStudio.Workload.UniversalBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.NetCoreBuildTools;includeRecommended --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US")
+# install VisualStudio 2019 Community
+Run-Executable "choco" @("install", "-y", "visualstudio2019community", "--version", "16.5.4.0", "--package-parameters", "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.160 --passive --locale en-US")
+Run-Executable "choco" @("install", "-y", "visualstudio2019buildtools", "--version", "16.5.4.0", "--package-parameters", "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Component.NuGet.BuildTools --add Microsoft.VisualStudio.Workload.UniversalBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.NetCoreBuildTools;includeRecommended --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US")
 
 # install msys2
 Run-Executable "choco" @("install", "-y", "msys2")
@@ -354,21 +354,21 @@ Run-Executable "pacman" @("-S", "--noconfirm", "--noprogressbar", "mingw-w64-x86
 # clean package cache
 Run-Executable "pacman" @("-Sc", "--noconfirm", "--noprogressbar")
 
-# # Check if any of the video controllers are from NVIDIA.
-# # Note, 0x10DE is the NVIDIA Corporation Vendor ID.
-# $hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match "^PCI\\VEN_10DE" }
+# Check if any of the video controllers are from NVIDIA.
+# Note, 0x10DE is the NVIDIA Corporation Vendor ID.
+$hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match "^PCI\\VEN_10DE" }
 
-# if ($hasNvidiaGpu) {
-#     Invoke-WebRequest -Uri "https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe" -OutFile "C:\Downloads\nvidia_driver.exe"
-#     Run-Executable "C:\Downloads\nvidia_driver.exe" @("-s", "-noreboot")
+if ($hasNvidiaGpu) {
+    Invoke-WebRequest -Uri "https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe" -OutFile "C:\Downloads\nvidia_driver.exe"
+    Run-Executable "C:\Downloads\nvidia_driver.exe" @("-s", "-noreboot")
 
-#     # Need to fix this CUDA installation in staging...
-#     # Removing from here for now...
-#     # https://github.com/taskcluster/community-tc-config/issues/713
-#     # Invoke-WebRequest -Uri "https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe" -OutFile "C:\Downloads\cuda_installer.exe"
-#     # Run-Executable "C:\Downloads\cuda_installer.exe" @("-s", "-noreboot")
+    # Need to fix this CUDA installation in staging...
+    # Removing from here for now...
+    # https://github.com/taskcluster/community-tc-config/issues/713
+    # Invoke-WebRequest -Uri "https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe" -OutFile "C:\Downloads\cuda_installer.exe"
+    # Run-Executable "C:\Downloads\cuda_installer.exe" @("-s", "-noreboot")
 
-# }
+}
 
 # Log before stopping transcript to make sure message is included in transcript.
 Write-Log "Bootstrap process completed. Shutting down..."
