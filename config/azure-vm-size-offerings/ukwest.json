@@ -539,5 +539,6 @@
   "Standard_M8-2ms",
   "Standard_M8-4ms",
   "Standard_M8ms",
-  "Standard_ND96amsr_A100_v4"
+  "Standard_ND96amsr_A100_v4",
+  "Standard_ND96isr_H200_v5"
 ]
