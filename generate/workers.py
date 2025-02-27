@@ -150,7 +150,11 @@ class DynamicWorkerPoolSettings(WorkerPoolSettings):
         return True
 
     def supports_worker_manager_config(self):
-        return self.provider_id == "community-tc-workers-azure"
+        return self.provider_id in [
+            "community-tc-workers-aws",
+            "community-tc-workers-azure",
+            "community-tc-workers-google",
+        ]
 
     def merge_config(self, key, *configDictionaries):
         assert WorkerPoolSettings.EXISTING_CONFIG in configDictionaries
@@ -173,6 +177,7 @@ async def build_worker_pool(workerPoolId, cfg, secret_values):
             image_set=image_set,
             **cfg,
         )
+        wp.workerPoolId = workerPoolId
 
         if wp.supports_worker_config():
             wp.merge_config(
@@ -350,7 +355,6 @@ def gcp(
 
 def gcp_launch_config(zone, region, machineType, image, diskSizeGb, **cfg):
     default_launch_config = {
-        "capacityPerInstance": 1,
         "machineType": machineType.format(zone=zone),
         "region": region,
         "zone": zone,
@@ -371,6 +375,9 @@ def gcp_launch_config(zone, region, machineType, image, diskSizeGb, **cfg):
             },
         ],
         "networkInterfaces": [{"accessConfigs": [{"type": "ONE_TO_ONE_NAT"}]}],
+        "workerManager": {
+            "capacityPerInstance": 1,
+        },
     }
     return merge(cfg.get("launchConfig", {}), default_launch_config)
 
@@ -453,7 +460,6 @@ def aws(
                 if instanceType not in aws_instance_types_in_availability_zone(az):
                     continue
                 launchConfig = {
-                    "capacityPerInstance": capacityPerInstance,
                     "region": region,
                     "launchConfig": {
                         "ImageId": imageIds[region],
@@ -462,6 +468,9 @@ def aws(
                         "SecurityGroupIds": groupIds,
                         "InstanceType": instanceType,
                         "InstanceMarketOptions": {"MarketType": "spot"},
+                    },
+                    "workerManager": {
+                        "capacityPerInstance": capacityPerInstance,
                     },
                 }
                 launchConfigs.append(launchConfig)
@@ -552,7 +561,6 @@ def azure(
             if vmSize not in azure_machine_types_in_location(location):
                 continue
             launchConfig = {
-                "capacityPerInstance": capacityPerInstance,
                 "location": location,
                 "storageProfile": {
                     "osDisk": {
@@ -578,6 +586,9 @@ def azure(
                 "evictionPolicy": "Delete",
                 "hardwareProfile": {
                     "vmSize": vmSize,
+                },
+                "workerManager": {
+                    "capacityPerInstance": capacityPerInstance,
                 },
             }
             launchConfigs.append(launchConfig)
@@ -646,6 +657,12 @@ def generic_worker(wp, **cfg):
             "sentryProject", "generic-worker"
         )
 
+    if wp.supports_worker_manager_config():
+        for launchConfig in wp.config["launchConfigs"]:
+            launchConfig.setdefault("workerManager", {}).setdefault(
+                "launchConfigId", get_launch_config_id(launchConfig, wp.workerPoolId)
+            )
+
     wp.scopes.append("auth:sentry:" + sentryProject)
 
     return wp
@@ -665,6 +682,12 @@ def docker_worker(wp, **cfg):
             },
         )
 
+    if wp.supports_worker_manager_config():
+        for launchConfig in wp.config["launchConfigs"]:
+            launchConfig.setdefault("workerManager", {}).setdefault(
+                "launchConfigId", get_launch_config_id(launchConfig, wp.workerPoolId)
+            )
+
     wp.secret_tpl = {
         "config": {
             "statelessHostname": {
@@ -676,3 +699,20 @@ def docker_worker(wp, **cfg):
     wp.scopes.append("auth:sentry:docker-worker")
 
     return wp
+
+
+def get_launch_config_id(config, worker_pool_id):
+    if isinstance(config, dict):
+        worker_manager = config.get("workerManager")
+        if isinstance(worker_manager, dict):
+            launch_config_id = worker_manager.get("launchConfigId")
+            if launch_config_id is not None:
+                return launch_config_id
+        cfg_without_wm = {k: v for k, v in config.items() if k != "workerManager"}
+    else:
+        cfg_without_wm = config
+
+    hashedLaunchConfig = hashlib.sha256(
+        (worker_pool_id + json.dumps(cfg_without_wm, sort_keys=True)).encode("utf8")
+    ).hexdigest()
+    return "lc-" + hashedLaunchConfig[:20]
