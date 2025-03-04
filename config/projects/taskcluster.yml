@@ -36,6 +36,7 @@ taskcluster:
         genericWorker:
           config:
             headlessTasks: true
+            idleTimeoutSecs: 300
 
     # *-gui worker pools are for generic-worker CI
     # they all have `headlessTasks: false` in
@@ -75,6 +76,7 @@ taskcluster:
             # a GUI, and thus we shouldn't enable Headless (disable GUI) on the
             # CI environment itself.
             headlessTasks: false
+            idleTimeoutSecs: 300
 
     gw-windows-2022-gui:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -93,6 +95,7 @@ taskcluster:
             # a GUI, and thus we shouldn't enable Headless (disable GUI) on the
             # CI environment itself.
             headlessTasks: false
+            idleTimeoutSecs: 300
 
     gw-ubuntu-24-04-metal:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -127,6 +130,7 @@ taskcluster:
         genericWorker:
           config:
             headlessTasks: true
+            idleTimeoutSecs: 300
 
     gw-ubuntu-24-04-arm64:
       owner: taskcluster-notifications+workers@mozilla.com
@@ -196,6 +200,7 @@ taskcluster:
         genericWorker:
           config:
             headlessTasks: true
+            idleTimeoutSecs: 300
 
     gw-windows-2022-staging:
       owner: taskcluster-notifications+workers@mozilla.com

@@ -23,9 +23,6 @@ misc:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50
-      genericWorker:
-        config:
-          idleTimeoutSecs: 600
   hooks:
     jcristau-fx-release-metrics:
       description: Taskcluster hook to run fx release metrics
