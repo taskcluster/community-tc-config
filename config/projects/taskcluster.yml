@@ -311,10 +311,6 @@ taskcluster:
         - secrets:get:project/taskcluster/testing/client-libraries
         - secrets:get:project/taskcluster/testing/taskcluster-*
         - docker-worker:cache:taskcluster-*
-        # can remove once https://github.com/taskcluster/taskcluster/pull/7343
-        # is released and deployed on the decision workers
-        - generic-worker:cache:taskcluster-*
-        - generic-worker:run-task-as-current-user:proj-taskcluster/*
       to: repo:github.com/taskcluster/taskcluster:*
 
     - grant:
@@ -459,7 +455,8 @@ taskcluster:
     - grant:
         - assume:project:taskcluster:generic-worker-tester
         - queue:create-task:highest:proj-taskcluster/*
-        - generic-worker:cache:generic-worker-checkout
+        - generic-worker:cache:taskcluster-*
+        - generic-worker:run-task-as-current-user:proj-taskcluster/*
         - secrets:get:project/taskcluster/testing/generic-worker/ci-creds
         - queue:scheduler-id:taskcluster-level-1
         - queue:route:checks
