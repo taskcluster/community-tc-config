@@ -62,6 +62,7 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
+      machineType: "zones/{zone}/machineTypes/c3d-standard-4"
     ci-arm64:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
