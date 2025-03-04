@@ -129,9 +129,9 @@ generic-worker-ubuntu-24-04-arm64:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/a1dfe41aa195dd34ebc3b14c5343b498f16252ca/imagesets/generic-worker-ubuntu-24-04-arm64/bootstrap.sh
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/2338b44240bd5e5a4a7e9e598f6856593ea16648/imagesets/generic-worker-ubuntu-24-04-arm64/bootstrap.sh
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-arm64-cp0or6v559b7x4l40smd
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-arm64-ndg6mdbu01jf223rhf4d
 generic-worker-ubuntu-24-04-staging:
   workerImplementation: generic-worker
   workerConfig:
