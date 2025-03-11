@@ -151,6 +151,8 @@
     "c7gn.medium",
     "c7gn.metal",
     "c7gn.xlarge",
+    "c7i-flex.12xlarge",
+    "c7i-flex.16xlarge",
     "c7i-flex.2xlarge",
     "c7i-flex.4xlarge",
     "c7i-flex.8xlarge",
