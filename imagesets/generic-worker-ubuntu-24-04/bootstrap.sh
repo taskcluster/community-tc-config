@@ -129,7 +129,20 @@ systemctl enable worker
 # Installs the snd-aloop, v4l2loopback kernel modules
 # used for the audio/video devices, and vkms
 # required by Wayland
+#
+# Installs the extra kernel modules for the currently
+# running kernel version as well as the cloud-specific
+# meta-package in case we upgrade to a new kernel version
+# on reboot
 retry apt-get install -y linux-modules-extra-$(uname -r)
+case '%MY_CLOUD%' in
+  google)
+    retry apt-get install -y linux-modules-extra-gcp
+    ;;
+  aws)
+    retry apt-get install -y linux-modules-extra-aws
+    ;;
+esac
 
 retry apt-get install -y ubuntu-desktop ubuntu-gnome-desktop podman gnome-initial-setup-
 
