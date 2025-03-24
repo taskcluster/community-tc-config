@@ -220,7 +220,23 @@ taskcluster:
             # why (worker manager will eventually kill it anyway)
             shutdownMachineOnInternalError: false
 
-    gw-windows-2022-staging-gpu:
+    gw-windows-2022-gpu:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2022-gpu
+      cloud: azure
+      minCapacity: 0
+      maxCapacity: 3
+      vmSizes:
+        Standard_NV12s_v3: 1
+      workerConfig:
+        genericWorker:
+          config:
+            # Headless on GPU instances might make sense if using e.g. CUDA
+            # but generally GPU useful when GUI is enabled.
+            headlessTasks: false
+
+    gw-windows-2022-gpu-staging:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
       imageset: generic-worker-win2022-staging
@@ -246,22 +262,6 @@ taskcluster:
             # See https://github.com/taskcluster/taskcluster/issues/7303
             # Useful for testing feature runAfterUserCreation; calc.exe returns exit code 0
             runAfterUserCreation: C:\Windows\System32\calc.exe
-
-    gw-windows-2022-gpu:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-win2022-gpu
-      cloud: azure
-      minCapacity: 0
-      maxCapacity: 3
-      vmSizes:
-        Standard_NV12s_v3: 1
-      workerConfig:
-        genericWorker:
-          config:
-            # Headless on GPU instances might make sense if using e.g. CUDA
-            # but generally GPU useful when GUI is enabled.
-            headlessTasks: false
 
     gw-windows-11-24h2-staging:
       owner: taskcluster-notifications+workers@mozilla.com
