@@ -209,6 +209,24 @@ taskcluster:
       cloud: azure
       minCapacity: 0
       maxCapacity: 1
+      workerConfig:
+        genericWorker:
+          config:
+            headlessTasks: true
+            # While iterating on the image building process for this worker
+            # pool, useful for workers not to die immediately...
+            idleTimeoutSecs: 3600
+            # if worker crashes in this pool, we typically want to know
+            # why (worker manager will eventually kill it anyway)
+            shutdownMachineOnInternalError: false
+
+    gw-windows-2022-staging-gpu:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2022-staging
+      cloud: azure
+      minCapacity: 0
+      maxCapacity: 1
       # Currently staging uses a GPU pool so we can also test GPU related changes
       vmSizes:
         Standard_NV12s_v3: 1
