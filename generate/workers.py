@@ -13,6 +13,7 @@ import yaml
 
 from .imagesets import ImageSets
 from .loader import loader
+from .utils import evaluate_keyed_by
 
 CLOUD_FUNCS = {}
 WORKER_IMPLEMENTATION_FUNCS = {}
@@ -375,9 +376,15 @@ def gcp_launch_config(zone, region, machineType, image, diskSizeGb, **cfg):
             },
         ],
         "networkInterfaces": [{"accessConfigs": [{"type": "ONE_TO_ONE_NAT"}]}],
-        "workerManager": {
-            "capacityPerInstance": 1,
-        },
+        "workerManager": merge(
+            {
+                "capacityPerInstance": 1,
+            },
+            get_worker_manager_overrides(
+                cfg,
+                {"region": region, "zone": zone, "machineType": machineType},
+            ),
+        ),
     }
     return merge(cfg.get("launchConfig", {}), default_launch_config)
 
@@ -469,10 +476,17 @@ def aws(
                         "InstanceType": instanceType,
                         "InstanceMarketOptions": {"MarketType": "spot"},
                     },
-                    "workerManager": {
-                        "capacityPerInstance": capacityPerInstance,
-                    },
+                    "workerManager": merge(
+                        {
+                            "capacityPerInstance": capacityPerInstance,
+                        },
+                        get_worker_manager_overrides(
+                            cfg,
+                            {"region": region, "az": az, "instanceType": instanceType},
+                        ),
+                    ),
                 }
+
                 launchConfigs.append(launchConfig)
     assert launchConfigs, (
         f"The regions {regions} do not support instance types"
@@ -587,9 +601,15 @@ def azure(
                 "hardwareProfile": {
                     "vmSize": vmSize,
                 },
-                "workerManager": {
-                    "capacityPerInstance": capacityPerInstance,
-                },
+                "workerManager": merge(
+                    {
+                        "capacityPerInstance": capacityPerInstance,
+                    },
+                    get_worker_manager_overrides(
+                        cfg,
+                        {"location": location, "vmSize": vmSize},
+                    ),
+                ),
             }
             launchConfigs.append(launchConfig)
     assert launchConfigs, (
@@ -715,3 +735,22 @@ def get_launch_config_id(config, worker_pool_id):
         (worker_pool_id + json.dumps(cfg_without_wm, sort_keys=True)).encode("utf8")
     ).hexdigest()
     return "lc-" + hashedLaunchConfig[:20]
+
+
+def get_worker_manager_overrides(config, attrs):
+    initial_weight = evaluate_keyed_by(
+        config.get("workerManagerConfig", {}).get("initialWeight", None),
+        "initialWeight",
+        attrs,
+    )
+    max_capacity = evaluate_keyed_by(
+        config.get("workerManagerConfig", {}).get("maxCapacity", None),
+        "maxCapacity",
+        attrs,
+    )
+
+    return merge(
+        {},
+        {"initialWeight": initial_weight} if initial_weight is not None else {},
+        {"maxCapacity": max_capacity} if max_capacity is not None else {},
+    )
