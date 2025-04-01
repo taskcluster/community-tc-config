@@ -22760,6 +22760,70 @@
     "zone": "australia-southeast1-c"
   },
   {
+    "name": "c4-highcpu-16",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-highcpu-192",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-highcpu-2",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-highcpu-32",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-highcpu-4",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-highcpu-48",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-highcpu-8",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-highcpu-96",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-standard-16",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-standard-192",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-standard-2",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-standard-32",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-standard-4",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-standard-48",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-standard-8",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-standard-96",
+    "zone": "australia-southeast2-a"
+  },
+  {
     "name": "e2-highcpu-16",
     "zone": "australia-southeast2-a"
   },
@@ -23164,6 +23228,90 @@
     "zone": "australia-southeast2-a"
   },
   {
+    "name": "n4-highcpu-16",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-highcpu-2",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-highcpu-32",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-highcpu-4",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-highcpu-48",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-highcpu-64",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-highcpu-8",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-highcpu-80",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-highmem-16",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-highmem-2",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-highmem-32",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-highmem-4",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-highmem-8",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-standard-16",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-standard-2",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-standard-32",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-standard-4",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-standard-48",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-standard-64",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-standard-8",
+    "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "n4-standard-80",
+    "zone": "australia-southeast2-a"
+  },
+  {
     "name": "t2d-standard-1",
     "zone": "australia-southeast2-a"
   },
@@ -23194,6 +23342,38 @@
   {
     "name": "t2d-standard-8",
     "zone": "australia-southeast2-a"
+  },
+  {
+    "name": "c4-highcpu-16",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "c4-highcpu-192",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "c4-highcpu-2",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "c4-highcpu-32",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "c4-highcpu-4",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "c4-highcpu-48",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "c4-highcpu-8",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "c4-highcpu-96",
+    "zone": "australia-southeast2-b"
   },
   {
     "name": "e2-highcpu-16",
@@ -23517,6 +23697,90 @@
   },
   {
     "name": "n2-standard-96",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-highcpu-16",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-highcpu-2",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-highcpu-32",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-highcpu-4",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-highcpu-48",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-highcpu-64",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-highcpu-8",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-highcpu-80",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-highmem-16",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-highmem-2",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-highmem-32",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-highmem-4",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-highmem-8",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-standard-16",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-standard-2",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-standard-32",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-standard-4",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-standard-48",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-standard-64",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-standard-8",
+    "zone": "australia-southeast2-b"
+  },
+  {
+    "name": "n4-standard-80",
     "zone": "australia-southeast2-b"
   },
   {
