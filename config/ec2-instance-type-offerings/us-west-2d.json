@@ -224,6 +224,7 @@
     "i8g.16xlarge",
     "i8g.24xlarge",
     "i8g.2xlarge",
+    "i8g.48xlarge",
     "i8g.4xlarge",
     "i8g.8xlarge",
     "i8g.large",
