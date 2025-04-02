@@ -545,6 +545,7 @@
     "p4d.24xlarge",
     "p5.48xlarge",
     "p5e.48xlarge",
+    "p5en.48xlarge",
     "r3.2xlarge",
     "r3.4xlarge",
     "r3.8xlarge",
