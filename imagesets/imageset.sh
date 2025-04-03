@@ -595,7 +595,7 @@ function azure_update {
   # machine type in the given location by querying the file database in
   # /config/azure-vm-size-offerings directory, but that may be out-of-date
   # and this az cli call is pretty quick to make anyway.
-  if [ -z "$(retry az vm list-sizes --location "${REGION}" --query="[].name" --output tsv | sed -n "/^$(cat azure_base_instance_type)\$/p")" ]; then
+  if [ -z "$(retry az vm list-skus --location "${REGION}" --resource-type virtualMachines --query="[].name" --output tsv | sed -n "/^$(cat azure_base_instance_type)\$/p")" ]; then
     log "Cannot deploy in ${REGION} since machine type $(cat azure_base_instance_type) is not supported; skipping."
     return 0
   fi
