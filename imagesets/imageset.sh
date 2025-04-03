@@ -636,7 +636,6 @@ function azure_update {
     --license-type="Windows_Server" \
     --accept-term \
     --location="${REGION}" \
-    --security-type="Standard" \
     --size=$(cat azure_base_instance_type) \
     --tags "image_set=${IMAGE_SET}" \
     --admin-username="azureuser" \
