@@ -165,13 +165,13 @@ generic-worker-win2022:
       us-east-2: ami-055bc18ba30433c29
   azure:
     images:
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-dlw7xfycxp3s7f8dmpzs-centralus
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-dlw7xfycxp3s7f8dmpzs-eastus
-      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-dlw7xfycxp3s7f8dmpzs-eastus2
-      northcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-dlw7xfycxp3s7f8dmpzs-northcentralus
-      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-dlw7xfycxp3s7f8dmpzs-southcentralus
-      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-dlw7xfycxp3s7f8dmpzs-westus
-      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-dlw7xfycxp3s7f8dmpzs-westus2
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nlpucwylgj7f7nzev76g-centralus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nlpucwylgj7f7nzev76g-eastus
+      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nlpucwylgj7f7nzev76g-eastus2
+      northcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nlpucwylgj7f7nzev76g-northcentralus
+      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nlpucwylgj7f7nzev76g-southcentralus
+      westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nlpucwylgj7f7nzev76g-westus
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nlpucwylgj7f7nzev76g-westus2
   workerConfig:
     genericWorker:
       config:
@@ -184,7 +184,7 @@ generic-worker-win2022:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/8427dff7d513ac18bb6ae8a7618486030ec11664/imagesets/generic-worker-win2022/bootstrap.ps1
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/ab795f5227de907e101410ee4bd93d3e75f47c05/imagesets/generic-worker-win2022/bootstrap.ps1
 generic-worker-win2022-staging:
   workerImplementation: generic-worker
   azure:
