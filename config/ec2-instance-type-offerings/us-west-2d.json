@@ -229,6 +229,8 @@
     "i4i.large",
     "i4i.metal",
     "i4i.xlarge",
+    "i7ie.metal-24xl",
+    "i7ie.metal-48xl",
     "i8g.12xlarge",
     "i8g.16xlarge",
     "i8g.24xlarge",
