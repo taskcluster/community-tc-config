@@ -308,6 +308,8 @@
     "i7ie.48xlarge",
     "i7ie.6xlarge",
     "i7ie.large",
+    "i7ie.metal-24xl",
+    "i7ie.metal-48xl",
     "i7ie.xlarge",
     "i8g.12xlarge",
     "i8g.16xlarge",
