@@ -472,6 +472,8 @@
   "Standard_E96ads_v5",
   "Standard_E96as_v4",
   "Standard_E96as_v5",
+  "Standard_E96bds_v5",
+  "Standard_E96bs_v5",
   "Standard_E96d_v5",
   "Standard_E96ds_v5",
   "Standard_E96pds_v6",
@@ -538,5 +540,6 @@
   "Standard_M64s_v2",
   "Standard_M8-2ms",
   "Standard_M8-4ms",
-  "Standard_M8ms"
+  "Standard_M8ms",
+  "Standard_ND96isr_H200_v5"
 ]
