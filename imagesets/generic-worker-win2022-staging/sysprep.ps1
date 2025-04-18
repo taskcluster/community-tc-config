@@ -1,1 +1,1 @@
-../generic-worker-win2022-gpu/sysprep.ps1
+../generic-worker-win2022/sysprep.ps1

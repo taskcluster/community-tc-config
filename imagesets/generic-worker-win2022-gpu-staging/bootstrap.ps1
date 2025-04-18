@@ -1,7 +1,7 @@
 ##############################################################################
 # TASKCLUSTER_REF can be a git commit SHA, a git branch name, or a git tag name
 # (i.e. for a taskcluster version number, prefix with 'v' to make it a git tag)
-$TASKCLUSTER_REF = "matt-boris/go1.24"
+$TASKCLUSTER_REF = "main"
 $TASKCLUSTER_REPO = "https://github.com/taskcluster/taskcluster"
 ##############################################################################
 
@@ -353,6 +353,22 @@ Run-Executable "pacman" @("-S", "--noconfirm", "--noprogressbar", "mingw-w64-x86
 
 # clean package cache
 Run-Executable "pacman" @("-Sc", "--noconfirm", "--noprogressbar")
+
+# Check if any of the video controllers are from NVIDIA.
+# Note, 0x10DE is the NVIDIA Corporation Vendor ID.
+$hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match "^PCI\\VEN_10DE" }
+
+if ($hasNvidiaGpu) {
+    Invoke-WebRequest -Uri "https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe" -OutFile "C:\Downloads\nvidia_driver.exe"
+    Run-Executable "C:\Downloads\nvidia_driver.exe" @("-s", "-noreboot")
+
+    # Need to fix this CUDA installation in staging...
+    # Removing from here for now...
+    # https://github.com/taskcluster/community-tc-config/issues/713
+    # Invoke-WebRequest -Uri "https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe" -OutFile "C:\Downloads\cuda_installer.exe"
+    # Run-Executable "C:\Downloads\cuda_installer.exe" @("-s", "-noreboot")
+
+}
 
 # Log before stopping transcript to make sure message is included in transcript.
 Write-Log "Bootstrap process completed. Shutting down..."
