@@ -905,6 +905,7 @@ function all-in-parallel {
 
     if "${BUILD_STAGING_IMAGES}"; then
       imagesets/imageset.sh azure update generic-worker-win2022-staging &
+      imagesets/imageset.sh azure update generic-worker-win2022-gpu-staging &
       imagesets/imageset.sh azure update generic-worker-win11-24h2-staging &
       imagesets/imageset.sh google update generic-worker-ubuntu-24-04-staging &
       imagesets/imageset.sh aws update generic-worker-ubuntu-24-04-staging &
