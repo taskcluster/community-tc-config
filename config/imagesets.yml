@@ -188,7 +188,7 @@ generic-worker-win2022:
 generic-worker-win2022-staging:
   workerImplementation: generic-worker
   azure:
-    images: {eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-q4oiabud9x99a708z01i-eastus}
+    images: {eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-i5m206kbi58xyx9jlr3x-eastus}
   workerConfig:
     genericWorker:
       config:
@@ -200,7 +200,7 @@ generic-worker-win2022-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/9571960784f19cf307e4630b892c2d8b77567ff1/imagesets/generic-worker-win2022-staging/bootstrap.ps1
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/833992681a975bb3e216c5150edad429cb89ec33/imagesets/generic-worker-win2022-staging/bootstrap.ps1
 generic-worker-win2022-gpu:
   azure:
     images:
