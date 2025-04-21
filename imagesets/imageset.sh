@@ -876,12 +876,13 @@ function all-in-parallel {
   ###### Update macOS workers ######
   ##################################
   #
+  # Remember to connect to the mozilla VPN before running this script in order to access the mac minis!
   # Remeber to vnc as administrator onto macs before running this script, to avoid ssh connection problems!
 
   # TODO: fetch these IPs automatically, and report if they need to be logged into first with vnc
   if "${DEPLOY_MACS}"; then
-    for IP in 207.254.55.60 207.254.55.167; do
-      pass "macstadium/generic-worker-ci/${IP}" | tail -1 | ssh "administrator@${IP}" sudo -S "bash" -c /var/root/update.sh
+    for HOST in macmini-m4-1 macmini-m4-2; do
+      pass "macstadium/generic-worker-ci/${HOST}" | tail -1 | ssh "administrator@${HOST}.test.releng.mslv.mozilla.com" sudo -S "bash" -c /var/root/update.sh
     done
   fi
 
