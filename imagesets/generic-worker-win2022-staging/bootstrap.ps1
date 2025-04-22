@@ -1,7 +1,7 @@
 ##############################################################################
 # TASKCLUSTER_REF can be a git commit SHA, a git branch name, or a git tag name
 # (i.e. for a taskcluster version number, prefix with 'v' to make it a git tag)
-$TASKCLUSTER_REF = "matt-boris/go1.24"
+$TASKCLUSTER_REF = "main"
 $TASKCLUSTER_REPO = "https://github.com/taskcluster/taskcluster"
 ##############################################################################
 
@@ -184,6 +184,37 @@ foreach ($service in $servicesToDisable) {
 ) | ForEach-Object {
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" -Name $psitem -Value 1
 }
+
+# Disable scheduled tasks
+# taken from GitHub Actions Windows runners
+# https://github.com/actions/runner-images/blob/fbc3fb1d0f7629374c71bbbf553480dd7b6b95a5/images/windows/scripts/build/Configure-System.ps1#L106-L135
+@(
+    "\"
+    "\Microsoft\Azure\Security\"
+    "\Microsoft\VisualStudio\"
+    "\Microsoft\VisualStudio\Updates\"
+    "\Microsoft\Windows\Application Experience\"
+    "\Microsoft\Windows\ApplicationData\"
+    "\Microsoft\Windows\Autochk\"
+    "\Microsoft\Windows\Chkdsk\"
+    "\Microsoft\Windows\Customer Experience Improvement Program\"
+    "\Microsoft\Windows\Data Integrity Scan\"
+    "\Microsoft\Windows\Defrag\"
+    "\Microsoft\Windows\Diagnosis\"
+    "\Microsoft\Windows\DiskCleanup\"
+    "\Microsoft\Windows\DiskDiagnostic\"
+    "\Microsoft\Windows\Maintenance\"
+    "\Microsoft\Windows\PI\"
+    "\Microsoft\Windows\Power Efficiency Diagnostics\"
+    "\Microsoft\Windows\Server Manager\"
+    "\Microsoft\Windows\Speech\"
+    "\Microsoft\Windows\UpdateOrchestrator\"
+    "\Microsoft\Windows\Windows Error Reporting\"
+    "\Microsoft\Windows\WindowsUpdate\"
+    "\Microsoft\XblGameSave\"
+) | ForEach-Object {
+    Get-ScheduledTask -TaskPath $_ -ErrorAction Ignore | Disable-ScheduledTask -ErrorAction Ignore
+} | Out-Null
 
 # install chocolatey package manager
 Invoke-RestMethod -Uri 'https://community.chocolatey.org/install.ps1' | Invoke-Expression
