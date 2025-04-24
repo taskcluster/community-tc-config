@@ -83396,11 +83396,19 @@
     "zone": "us-east7-c"
   },
   {
+    "name": "m4-megamem-28",
+    "zone": "us-east7-c"
+  },
+  {
     "name": "m4-megamem-56",
     "zone": "us-east7-c"
   },
   {
     "name": "m4-ultramem-112",
+    "zone": "us-east7-c"
+  },
+  {
+    "name": "m4-ultramem-224",
     "zone": "us-east7-c"
   },
   {
