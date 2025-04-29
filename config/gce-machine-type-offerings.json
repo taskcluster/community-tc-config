@@ -2460,6 +2460,18 @@
     "zone": "asia-east1-b"
   },
   {
+    "name": "ct5lp-hightpu-1t",
+    "zone": "asia-east1-b"
+  },
+  {
+    "name": "ct5lp-hightpu-4t",
+    "zone": "asia-east1-b"
+  },
+  {
+    "name": "ct5lp-hightpu-8t",
+    "zone": "asia-east1-b"
+  },
+  {
     "name": "e2-highcpu-16",
     "zone": "asia-east1-b"
   },
@@ -3337,6 +3349,18 @@
   },
   {
     "name": "c4a-standard-8",
+    "zone": "asia-east1-c"
+  },
+  {
+    "name": "ct5lp-hightpu-1t",
+    "zone": "asia-east1-c"
+  },
+  {
+    "name": "ct5lp-hightpu-4t",
+    "zone": "asia-east1-c"
+  },
+  {
+    "name": "ct5lp-hightpu-8t",
     "zone": "asia-east1-c"
   },
   {
@@ -40704,11 +40728,19 @@
     "zone": "europe-west3-a"
   },
   {
+    "name": "m4-megamem-28",
+    "zone": "europe-west3-a"
+  },
+  {
     "name": "m4-megamem-56",
     "zone": "europe-west3-a"
   },
   {
     "name": "m4-ultramem-112",
+    "zone": "europe-west3-a"
+  },
+  {
+    "name": "m4-ultramem-224",
     "zone": "europe-west3-a"
   },
   {
@@ -41960,11 +41992,19 @@
     "zone": "europe-west3-b"
   },
   {
+    "name": "m4-megamem-28",
+    "zone": "europe-west3-b"
+  },
+  {
     "name": "m4-megamem-56",
     "zone": "europe-west3-b"
   },
   {
     "name": "m4-ultramem-112",
+    "zone": "europe-west3-b"
+  },
+  {
+    "name": "m4-ultramem-224",
     "zone": "europe-west3-b"
   },
   {
@@ -44456,11 +44496,19 @@
     "zone": "europe-west4-a"
   },
   {
+    "name": "m4-megamem-28",
+    "zone": "europe-west4-a"
+  },
+  {
     "name": "m4-megamem-56",
     "zone": "europe-west4-a"
   },
   {
     "name": "m4-ultramem-112",
+    "zone": "europe-west4-a"
+  },
+  {
+    "name": "m4-ultramem-224",
     "zone": "europe-west4-a"
   },
   {
@@ -45921,6 +45969,10 @@
   },
   {
     "name": "m3-ultramem-64",
+    "zone": "europe-west4-b"
+  },
+  {
+    "name": "m4-ultramem-224",
     "zone": "europe-west4-b"
   },
   {
@@ -49714,6 +49766,38 @@
   {
     "name": "x4-megamem-960-metal",
     "zone": "europe-west8-a"
+  },
+  {
+    "name": "c4-standard-16",
+    "zone": "europe-west8-b"
+  },
+  {
+    "name": "c4-standard-192",
+    "zone": "europe-west8-b"
+  },
+  {
+    "name": "c4-standard-2",
+    "zone": "europe-west8-b"
+  },
+  {
+    "name": "c4-standard-32",
+    "zone": "europe-west8-b"
+  },
+  {
+    "name": "c4-standard-4",
+    "zone": "europe-west8-b"
+  },
+  {
+    "name": "c4-standard-48",
+    "zone": "europe-west8-b"
+  },
+  {
+    "name": "c4-standard-8",
+    "zone": "europe-west8-b"
+  },
+  {
+    "name": "c4-standard-96",
+    "zone": "europe-west8-b"
   },
   {
     "name": "e2-highcpu-16",
@@ -64956,11 +65040,19 @@
     "zone": "us-central1-a"
   },
   {
+    "name": "m4-megamem-28",
+    "zone": "us-central1-a"
+  },
+  {
     "name": "m4-megamem-56",
     "zone": "us-central1-a"
   },
   {
     "name": "m4-ultramem-112",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "m4-ultramem-224",
     "zone": "us-central1-a"
   },
   {
@@ -67792,11 +67884,19 @@
     "zone": "us-central1-c"
   },
   {
+    "name": "m4-megamem-28",
+    "zone": "us-central1-c"
+  },
+  {
     "name": "m4-megamem-56",
     "zone": "us-central1-c"
   },
   {
     "name": "m4-ultramem-112",
+    "zone": "us-central1-c"
+  },
+  {
+    "name": "m4-ultramem-224",
     "zone": "us-central1-c"
   },
   {
@@ -77640,11 +77740,19 @@
     "zone": "us-east4-b"
   },
   {
+    "name": "m4-megamem-28",
+    "zone": "us-east4-b"
+  },
+  {
     "name": "m4-megamem-56",
     "zone": "us-east4-b"
   },
   {
     "name": "m4-ultramem-112",
+    "zone": "us-east4-b"
+  },
+  {
+    "name": "m4-ultramem-224",
     "zone": "us-east4-b"
   },
   {
@@ -78904,11 +79012,19 @@
     "zone": "us-east4-c"
   },
   {
+    "name": "m4-megamem-28",
+    "zone": "us-east4-c"
+  },
+  {
     "name": "m4-megamem-56",
     "zone": "us-east4-c"
   },
   {
     "name": "m4-ultramem-112",
+    "zone": "us-east4-c"
+  },
+  {
+    "name": "m4-ultramem-224",
     "zone": "us-east4-c"
   },
   {
@@ -84346,6 +84462,14 @@
   {
     "name": "t2d-standard-8",
     "zone": "us-south1-a"
+  },
+  {
+    "name": "a3-ultragpu-8g",
+    "zone": "us-south1-b"
+  },
+  {
+    "name": "a3-ultragpu-8g-nolssd",
+    "zone": "us-south1-b"
   },
   {
     "name": "c3-highmem-176",
