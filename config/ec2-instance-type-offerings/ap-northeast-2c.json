@@ -256,6 +256,8 @@
     "m7g.medium",
     "m7g.metal",
     "m7g.xlarge",
+    "m7i-flex.12xlarge",
+    "m7i-flex.16xlarge",
     "m7i-flex.2xlarge",
     "m7i-flex.4xlarge",
     "m7i-flex.8xlarge",
