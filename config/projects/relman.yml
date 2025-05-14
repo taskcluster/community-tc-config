@@ -198,7 +198,9 @@ relman:
         - generic-worker:cache:rust-code-analysis-*
       to: repo:github.com/mozilla/rust-code-analysis:*
     - grant: secrets:get:project/relman/rust-code-analysis/deploy
-      to: repo:github.com/mozilla/rust-code-analysis:*
+      to:
+        - repo:github.com/mozilla/rust-code-analysis:tag:*
+        - repo:github.com/mozilla/rust-code-analysis:branch:master
 
     # rust-parsepatch
     - grant: secrets:get:project/relman/rust-parsepatch/deploy
