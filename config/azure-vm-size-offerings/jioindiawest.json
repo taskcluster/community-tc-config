@@ -447,6 +447,12 @@
   "Standard_F8",
   "Standard_F8s",
   "Standard_F8s_v2",
+  "Standard_L16as_v3",
+  "Standard_L32as_v3",
+  "Standard_L48as_v3",
+  "Standard_L64as_v3",
+  "Standard_L80as_v3",
+  "Standard_L8as_v3",
   "Standard_M128",
   "Standard_M128-32ms",
   "Standard_M128-64ms",
@@ -490,5 +496,11 @@
   "Standard_NC24s_v3",
   "Standard_NC40ads_H100_v5",
   "Standard_NC6s_v3",
-  "Standard_NC80adis_H100_v5"
+  "Standard_NC80adis_H100_v5",
+  "Standard_NV12ads_A10_v5",
+  "Standard_NV18ads_A10_v5",
+  "Standard_NV36adms_A10_v5",
+  "Standard_NV36ads_A10_v5",
+  "Standard_NV6ads_A10_v5",
+  "Standard_NV72ads_A10_v5"
 ]
