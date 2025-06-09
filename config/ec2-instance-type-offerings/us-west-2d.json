@@ -452,6 +452,7 @@
     "mac2.metal",
     "p5.48xlarge",
     "p5en.48xlarge",
+    "p6-b200.48xlarge",
     "r5.12xlarge",
     "r5.16xlarge",
     "r5.24xlarge",
