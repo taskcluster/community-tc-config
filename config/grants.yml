@@ -45,8 +45,8 @@
     - queue:create-task:highest:proj-<..>/*
     - queue:claim-work:proj-<..>/*
 
-    # project-specific schedulers
-    - queue:rerun-task:<..>/*
+    # project-specific task reruns
+    - queue:rerun-task-in-project:<..>
 
     # project-specific private artifacts
     - queue:get-artifact:project/<..>/*
