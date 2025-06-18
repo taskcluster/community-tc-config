@@ -483,6 +483,7 @@
     "m8gd.xlarge",
     "mac1.metal",
     "mac2-m2.metal",
+    "p4de.24xlarge",
     "r4.16xlarge",
     "r4.2xlarge",
     "r4.4xlarge",
