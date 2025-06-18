@@ -1,4 +1,4 @@
-$TASKCLUSTER_VERSION = "v84.1.0"
+$TASKCLUSTER_VERSION = "v85.0.1"
 
 # Write-Log function for logging with RFC3339 format timestamps
 function Write-Log {
