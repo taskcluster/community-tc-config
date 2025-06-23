@@ -51,6 +51,18 @@ taskcluster:
       # note: workerConfig not specified here as configuration
       # is stored directly on manually provisioned worker
 
+    # used by pmoore for testing https://github.com/taskcluster/taskcluster/pull/7648
+    # in June 2025
+    gw-ci-macos-beta:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker
+      cloud: static
+      lifecycle:
+        reregistrationTimeout: 2592000 # 30 days
+      # note: workerConfig not specified here as configuration
+      # is stored directly on manually provisioned worker
+
     gw-ci-freebsd:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
