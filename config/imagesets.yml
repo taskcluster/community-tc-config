@@ -196,6 +196,8 @@ generic-worker-win2022-staging:
             script: https://raw.githubusercontent.com/taskcluster/community-tc-config/ecebf83563edcf20a6d6c2129df9db523299979a/imagesets/generic-worker-win2022-staging/bootstrap.ps1
 generic-worker-win2025-staging:
   workerImplementation: generic-worker
+  aws:
+    amis: {}
   azure:
     images: {eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-p669m68qi60axy9ksqb0-eastus}
   workerConfig:
