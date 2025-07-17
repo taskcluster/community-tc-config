@@ -211,7 +211,7 @@ generic-worker-win2025-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/3a56eef7ff267639729eb8c0c1bc22c8a820baac/imagesets/generic-worker-win2025-staging/bootstrap.ps1
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/399564f379c0b28ecb32497558d57cf66b30aa8e/imagesets/generic-worker-win2025-staging/bootstrap.ps1
 generic-worker-win2022-gpu:
   azure:
     images:
