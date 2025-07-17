@@ -197,7 +197,7 @@ generic-worker-win2022-staging:
 generic-worker-win2025-staging:
   workerImplementation: generic-worker
   aws:
-    amis: {}
+    amis: {us-east-1: ami-05fc5e0c31b199d96}
   azure:
     images: {eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-p669m68qi60axy9ksqb0-eastus}
   workerConfig:
@@ -211,7 +211,7 @@ generic-worker-win2025-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/399564f379c0b28ecb32497558d57cf66b30aa8e/imagesets/generic-worker-win2025-staging/bootstrap.ps1
+            script: https://raw.githubusercontent.com/taskcluster/community-tc-config/f7068f3930ba9638fc167b4bcbad0a0c8085c28d/imagesets/generic-worker-win2025-staging/bootstrap.ps1
 generic-worker-win2022-gpu:
   azure:
     images:
