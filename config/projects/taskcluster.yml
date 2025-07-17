@@ -220,6 +220,24 @@ taskcluster:
             # why (worker manager will eventually kill it anyway)
             shutdownMachineOnInternalError: false
 
+    gw-windows-2025-staging:
+      owner: taskcluster-notifications+workers@mozilla.com
+      emailOnError: true
+      imageset: generic-worker-win2025-staging
+      cloud: azure
+      minCapacity: 0
+      maxCapacity: 1
+      workerConfig:
+        genericWorker:
+          config:
+            headlessTasks: true
+            # While iterating on the image building process for this worker
+            # pool, useful for workers not to die immediately...
+            idleTimeoutSecs: 3600
+            # if worker crashes in this pool, we typically want to know
+            # why (worker manager will eventually kill it anyway)
+            shutdownMachineOnInternalError: false
+
     gw-windows-2022-gpu:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
