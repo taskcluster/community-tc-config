@@ -319,87 +319,11 @@ worker:
 cacheOverRestarts: C:\generic-worker\start-worker-cache.json
 "@
 
-# download cygwin (not required, but useful)
-Invoke-WebRequest -Uri "https://www.cygwin.com/setup-x86_64.exe" -OutFile "C:\Downloads\cygwin-setup-x86_64.exe"
-
-# install cygwin
-# complete package list: https://cygwin.com/packages/package_list.html
-Run-Executable "C:\Downloads\cygwin-setup-x86_64.exe" @("--quiet-mode", "--wait", "--root", "C:\cygwin", "--site", "https://cygwin.mirror.constant.com", "--packages", "openssh,vim,curl,tar,wget,zip,unzip,diffutils,bzr")
-
-# open up firewall for ssh daemon
-New-NetFirewallRule -DisplayName "Allow SSH inbound" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
-
 # workaround for https://www.cygwin.com/ml/cygwin/2015-10/msg00036.html
 # see:
 #   1) https://www.cygwin.com/ml/cygwin/2015-10/msg00038.html
 #   2) https://cygwin.com/git/gitweb.cgi?p=cygwin-csih.git;a=blob;f=cygwin-service-installation-helper.sh;h=10ab4fb6d47803c9ffabdde51923fc2c3f0496bb;hb=7ca191bebb52ae414bb2a2e37ef22d94f2658dc7#l2884
 $env:LOGONSERVER = "\\" + $env:COMPUTERNAME
-
-# configure sshd (not required, but useful)
-Run-Executable "C:\cygwin\bin\bash.exe" @("--login", "-c", "ssh-host-config -y -c 'ntsec mintty' -u 'cygwinsshd' -w 'qwe123QWE!@#'")
-
-# # start sshd
-# Run-Executable "net" @("start", "cygsshd")
-
-# download bash setup script
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/petemoore/myscrapbook/master/setup.sh" -OutFile "C:\cygwin\tmp\setup.sh"
-
-# run bash setup script
-Run-Executable "C:\cygwin\bin\bash.exe" @("--login", "-c", "chmod a+x /tmp/setup.sh; /tmp/setup.sh")
-
-# install dependencywalker (useful utility for troubleshooting, not required)
-md "C:\DependencyWalker"
-Expand-ZIPFile -File "C:\Downloads\depends22_x64.zip" -Destination "C:\DependencyWalker" -Url "https://dependencywalker.com/depends22_x64.zip"
-
-# install ProcessExplorer (useful utility for troubleshooting, not required)
-md "C:\ProcessExplorer"
-Expand-ZIPFile -File "C:\Downloads\ProcessExplorer.zip" -Destination "C:\ProcessExplorer" -Url "https://download.sysinternals.com/files/ProcessExplorer.zip"
-
-# install ProcessMonitor (useful utility for troubleshooting, not required)
-md "C:\ProcessMonitor"
-Expand-ZIPFile -File "C:\Downloads\ProcessMonitor.zip" -Destination "C:\ProcessMonitor" -Url "https://download.sysinternals.com/files/ProcessMonitor.zip"
-
-# install Windows 10 SDK
-Run-Executable "choco" @("install", "-y", "windows-sdk-10.0")
-
-# install VisualStudio 2019 Community
-Run-Executable "choco" @("install", "-y", "visualstudio2019community", "--version", "16.5.4.0", "--package-parameters", "--add Microsoft.VisualStudio.Workload.MSBuildTools;Microsoft.VisualStudio.Component.VC.160 --passive --locale en-US")
-Run-Executable "choco" @("install", "-y", "visualstudio2019buildtools", "--version", "16.5.4.0", "--package-parameters", "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --add Microsoft.VisualStudio.Component.VC.160 --add Microsoft.VisualStudio.Component.NuGet.BuildTools --add Microsoft.VisualStudio.Workload.UniversalBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.NetCoreBuildTools;includeRecommended --add Microsoft.Net.Component.4.5.TargetingPack --add Microsoft.Net.Component.4.6.TargetingPack --add Microsoft.Net.Component.4.7.TargetingPack --passive --locale en-US")
-
-# install msys2
-Run-Executable "choco" @("install", "-y", "msys2")
-
-# refresh environment variables
-refreshenv
-$env:PATH = $env:PATH + ";C:\tools\msys64\usr\bin;C:\tools\msys64\mingw64\bin"
-
-# set permanent PATH environment variable
-[Environment]::SetEnvironmentVariable("PATH", [Environment]::GetEnvironmentVariable("PATH", "Machine") + ";C:\tools\msys64\usr\bin;C:\tools\msys64\mingw64\bin", "Machine")
-
-# update pacman
-Run-Executable "pacman" @("-Syu", "--noconfirm", "--noprogressbar")
-
-# install gcc for go race detector
-Run-Executable "pacman" @("-S", "--noconfirm", "--noprogressbar", "mingw-w64-x86_64-gcc")
-
-# clean package cache
-Run-Executable "pacman" @("-Sc", "--noconfirm", "--noprogressbar")
-
-# Check if any of the video controllers are from NVIDIA.
-# Note, 0x10DE is the NVIDIA Corporation Vendor ID.
-$hasNvidiaGpu = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match "^PCI\\VEN_10DE" }
-
-if ($hasNvidiaGpu) {
-    Invoke-WebRequest -Uri "https://download.microsoft.com/download/a/3/1/a3186ac9-1f9f-4351-a8e7-b5b34ea4e4ea/538.46_grid_win10_win11_server2019_server2022_dch_64bit_international_azure_swl.exe" -OutFile "C:\Downloads\nvidia_driver.exe"
-    Run-Executable "C:\Downloads\nvidia_driver.exe" @("-s", "-noreboot")
-
-    # Need to fix this CUDA installation in staging...
-    # Removing from here for now...
-    # https://github.com/taskcluster/community-tc-config/issues/713
-    # Invoke-WebRequest -Uri "https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.94_windows.exe" -OutFile "C:\Downloads\cuda_installer.exe"
-    # Run-Executable "C:\Downloads\cuda_installer.exe" @("-s", "-noreboot")
-
-}
 
 # Log before stopping transcript to make sure message is included in transcript.
 Write-Log "Bootstrap process completed. Shutting down..."
