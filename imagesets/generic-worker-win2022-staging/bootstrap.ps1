@@ -338,8 +338,8 @@ $env:LOGONSERVER = "\\" + $env:COMPUTERNAME
 # configure sshd (not required, but useful)
 Run-Executable "C:\cygwin\bin\bash.exe" @("--login", "-c", "ssh-host-config -y -c 'ntsec mintty' -u 'cygwinsshd' -w 'qwe123QWE!@#'")
 
-# # start sshd
-# Run-Executable "net" @("start", "cygsshd")
+# start sshd
+Run-Executable "net" @("start", "cygsshd")
 
 # download bash setup script
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/petemoore/myscrapbook/master/setup.sh" -OutFile "C:\cygwin\tmp\setup.sh"
