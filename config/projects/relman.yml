@@ -73,6 +73,8 @@ relman:
     code-review/deploy-dev: true
     code-review/deploy-production: true
     code-review/deploy-testing: true
+    code-review/integration-testing: true
+    code-review/integration-production: true
     code-review/release: true
     dump_syms/deploy: true
     microannotate/deploy: true
