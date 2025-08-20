@@ -273,7 +273,7 @@ Run-Executable "C:\generic-worker\generic-worker.exe" @("new-ed25519-keypair", "
 $nssm = "C:\nssm-2.24\win64\nssm.exe"
 Run-Executable $nssm @("install", "Generic Worker", "C:\generic-worker\generic-worker.exe")
 Run-Executable $nssm @("set", "Generic Worker", "AppDirectory", "C:\generic-worker")
-Run-Executable $nssm @("set", "Generic Worker", "AppParameters", "run", "--config", "C:\generic-worker\generic-worker-config.yml", "--worker-runner-protocol-pipe", "\\.\pipe\generic-worker", "--with-worker-runner")
+Run-Executable $nssm @("set", "Generic Worker", "AppParameters", "run", "--config", "C:\generic-worker\generic-worker-config.yml", "--with-worker-runner")
 Run-Executable $nssm @("set", "Generic Worker", "DisplayName", "Generic Worker")
 Run-Executable $nssm @("set", "Generic Worker", "Description", "A taskcluster worker that runs on all mainstream platforms")
 Run-Executable $nssm @("set", "Generic Worker", "Start", "SERVICE_DEMAND_START")
@@ -283,8 +283,8 @@ Run-Executable $nssm @("set", "Generic Worker", "AppAffinity", "All")
 Run-Executable $nssm @("set", "Generic Worker", "AppStopMethodSkip", "0")
 Run-Executable $nssm @("set", "Generic Worker", "AppExit", "Default", "Exit")
 Run-Executable $nssm @("set", "Generic Worker", "AppRestartDelay", "0")
-# Run-Executable $nssm @("set", "Generic Worker", "AppStdout", "C:\generic-worker\generic-worker-service.log")
-# Run-Executable $nssm @("set", "Generic Worker", "AppStderr", "C:\generic-worker\generic-worker-service.log")
+Run-Executable $nssm @("set", "Generic Worker", "AppStdout", "C:\generic-worker\generic-worker-service.log")
+Run-Executable $nssm @("set", "Generic Worker", "AppStderr", "C:\generic-worker\generic-worker-service.log")
 Run-Executable $nssm @("set", "Generic Worker", "AppRotateFiles", "0")
 
 # install worker-runner
@@ -315,7 +315,6 @@ worker:
     implementation: generic-worker
     service: "Generic Worker"
     configPath: C:\generic-worker\generic-worker-config.yml
-    protocolPipe: \\.\pipe\generic-worker
 cacheOverRestarts: C:\generic-worker\start-worker-cache.json
 "@
 
