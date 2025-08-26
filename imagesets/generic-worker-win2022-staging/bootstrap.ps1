@@ -316,8 +316,6 @@ worker:
     service: "Generic Worker"
     configPath: C:\generic-worker\generic-worker-config.yml
     protocolPipe: \\.\pipe\generic-worker
-logging:
-    implementation: stdio
 cacheOverRestarts: C:\generic-worker\start-worker-cache.json
 "@
 
