@@ -283,8 +283,8 @@ Run-Executable $nssm @("set", "Generic Worker", "AppAffinity", "All")
 Run-Executable $nssm @("set", "Generic Worker", "AppStopMethodSkip", "0")
 Run-Executable $nssm @("set", "Generic Worker", "AppExit", "Default", "Exit")
 Run-Executable $nssm @("set", "Generic Worker", "AppRestartDelay", "0")
-# Run-Executable $nssm @("set", "Generic Worker", "AppStdout", "C:\generic-worker\generic-worker-service.log")
-# Run-Executable $nssm @("set", "Generic Worker", "AppStderr", "C:\generic-worker\generic-worker-service.log")
+Run-Executable $nssm @("set", "Generic Worker", "AppStdout", "C:\generic-worker\generic-worker-service.log")
+Run-Executable $nssm @("set", "Generic Worker", "AppStderr", "C:\generic-worker\generic-worker-service.log")
 Run-Executable $nssm @("set", "Generic Worker", "AppRotateFiles", "0")
 
 # install worker-runner
@@ -316,6 +316,8 @@ worker:
     service: "Generic Worker"
     configPath: C:\generic-worker\generic-worker-config.yml
     protocolPipe: \\.\pipe\generic-worker
+logging:
+    implementation: stdio
 cacheOverRestarts: C:\generic-worker\start-worker-cache.json
 "@
 
