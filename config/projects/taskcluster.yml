@@ -492,6 +492,7 @@ taskcluster:
         - queue:create-task:highest:proj-taskcluster/*
         - generic-worker:cache:taskcluster-*
         - generic-worker:run-task-as-current-user:proj-taskcluster/*
+        - generic-worker:os-group:proj-taskcluster/gw-ubuntu-24-04-gui/docker
         - secrets:get:project/taskcluster/testing/generic-worker/ci-creds
         - queue:scheduler-id:taskcluster-level-1
         - queue:route:checks
