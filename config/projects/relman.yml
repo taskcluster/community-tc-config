@@ -1,6 +1,6 @@
 relman:
   adminRoles:
-    - github-team:mozilla/ci-and-quality-tools
+    - github-team:mozilla/ci-engineering-workflow-and-quality-tools
   externallyManaged: true # some hooks are deployed into this space
   repos:
     - github.com/mozilla/microannotate:*

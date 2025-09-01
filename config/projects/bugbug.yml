@@ -1,6 +1,6 @@
 bugbug:
   adminRoles:
-    - github-team:mozilla/ci-and-quality-tools
+    - github-team:mozilla/ci-engineering-workflow-and-quality-tools
   externallyManaged: true # bugbug deploys some hooks into this space
   repos:
     - github.com/mozilla/bugbug:*
