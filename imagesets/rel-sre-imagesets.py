@@ -7,7 +7,7 @@ from ruamel.yaml import YAML
 REPO = "mozilla-platform-ops/worker-images"
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 IMAGESETS_FILE = "config/imagesets.yml"
-RUN_NUMBERS = range(46, 52)  # Run numbers like #46–#51
+RUN_NUMBERS = range(46, 47)  # Run numbers like #46–#51
 HEADERS = {"Authorization": f"Bearer {GITHUB_TOKEN}"}
 API_ROOT = "https://api.github.com"
 
