@@ -107,6 +107,10 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+      machineType: "zones/{zone}/machineTypes/c4-standard-4"
+      launchConfig:
+        advancedMachineFeatures:
+          enableNestedVirtualization: true
     grizzly-reduce-worker-windows:
       owner: truber@mozilla.com
       emailOnError: true
