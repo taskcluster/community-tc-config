@@ -1,6 +1,6 @@
 mozci:
   adminRoles:
-    - github-team:mozilla/ci-and-quality-tools
+    - github-team:mozilla/ci-engineering-workflow-and-quality-tools
   repos:
     - github.com/mozilla/mozci:*
   workerPools:

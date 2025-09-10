@@ -175,7 +175,7 @@
     - project-admin:wpt
 
     # for bugbug, mozci, relman
-    - github-team:mozilla/ci-and-quality-tools
+    - github-team:mozilla/ci-engineering-workflow-and-quality-tools
 
     # for releng
     - github-team:taskcluster/releng
