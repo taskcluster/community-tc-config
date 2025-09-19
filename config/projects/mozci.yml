@@ -240,7 +240,7 @@ mozci:
       description: Run mozci classification tasks for new pushes
       owner: mcastelluccio@mozilla.com
       emailOnError: true
-      schedule: ['0 */6 * * *']
+      schedule: ['*/10 * * * *']
       task:
         provisionerId: proj-mozci
         workerType: compute-smaller
@@ -302,7 +302,7 @@ mozci:
       description: Check backfill completion every few minutes
       owner: mcastelluccio@mozilla.com
       emailOnError: true
-      schedule: ['0 */6 * * *'] # every 5 minutes
+      schedule: ['*/5 * * * *'] # every 5 minutes
       task:
         provisionerId: proj-mozci
         workerType: compute-smaller
