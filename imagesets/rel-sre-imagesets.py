@@ -17,7 +17,7 @@ CONFIGS = [
     "generic-worker-win11-24h2-staging",
     "generic-worker-win2025-staging",
 ]
-IMAGESETS_FILE = "../config/imagesets.yml"
+IMAGESETS_FILE = "config/imagesets.yml"
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 HEADERS = {"Authorization": f"Bearer {GITHUB_TOKEN}"}
