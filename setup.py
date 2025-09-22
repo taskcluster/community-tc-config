@@ -11,6 +11,7 @@ setup(
     install_requires=[
         "tc-admin>=5.0.4",
         "json-e>=4.7.1",
+        "ruamel.yaml",
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest-mock", "pytest-asyncio"],
