@@ -830,6 +830,7 @@ fuzzing:
         - queue:get-artifact:project/fuzzing/private/logs/*
       to:
         - hook-id:project-fuzzing/failed-log-ingestor
+        - login-identity:github/173702880|moz-mdauer
     - grant:
         - docker-worker:capability:privileged
         - index:insert-task:project.fuzzing.orion.*
