@@ -1,1 +1,1 @@
---image=ubuntu-2404-noble-amd64-v20250828 --image-project=ubuntu-os-cloud --boot-disk-size=20GB --boot-disk-type=pd-standard
+--image=ubuntu-2404-noble-amd64-v20250924 --image-project=ubuntu-os-cloud --boot-disk-size=20GB --boot-disk-type=pd-standard
