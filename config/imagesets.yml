@@ -273,3 +273,134 @@ generic-worker-win11-24h2-staging:
           machine-setup:
             maintainer: pmoore@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/community-tc-config/b68c2d5b07909a749a958a665c3c9db92fe819b0/imagesets/generic-worker-win11-24h2-staging/bootstrap.ps1
+generic-worker-win2022-wi:
+  workerImplementation: generic-worker
+  aws:
+    amis: {}
+  azure:
+    images:
+      eastus: 
+        /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-ccdxoddnnodvnpgopnkd-eastus
+      centralus: 
+        /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-cllgkprrpriikmnxnjgi-centralus
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: 
+          C:\generic-worker\generic-worker-ed25519-signing-key.key
+        idleTimeoutSecs: 15
+        livelogExecutable: C:\generic-worker\livelog.exe
+        shutdownMachineOnIdle: true
+        shutdownMachineOnInternalError: true
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: pmoore@mozilla.com
+            script: 
+              https://raw.githubusercontent.com/taskcluster/community-tc-config/7fb58422dbca67046478bf105fded21656bda695/imagesets/generic-worker-win2022/bootstrap.ps1
+generic-worker-win2022-staging-wi:
+  workerImplementation: generic-worker
+  azure:
+    images: {centralus: 
+        /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-gtdjlskeihrqbyicfbde-centralus,
+      eastus: 
+        /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-gjkxnswbkwdydchckehk-eastus}
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: 
+          C:\generic-worker\generic-worker-ed25519-signing-key.key
+        idleTimeoutSecs: 15
+        livelogExecutable: C:\generic-worker\livelog.exe
+        shutdownMachineOnIdle: true
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: pmoore@mozilla.com
+            script: 
+              https://raw.githubusercontent.com/taskcluster/community-tc-config/f04d9acdbfc51eddb56d760829ec552428e17ae7/imagesets/generic-worker-win2022-staging/bootstrap.ps1
+generic-worker-win2025-staging-wi:
+  workerImplementation: generic-worker
+  aws:
+    amis: {us-east-1: ami-05fc5e0c31b199d96}
+  azure:
+    images: {centralus: 
+        /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-hwulwsnoddwmfillxvso-centralus,
+      eastus: 
+        /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-qwoocwwgmknkbebaekrc-eastus}
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: 
+          C:\generic-worker\generic-worker-ed25519-signing-key.key
+        idleTimeoutSecs: 15
+        livelogExecutable: C:\generic-worker\livelog.exe
+        shutdownMachineOnIdle: true
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: pmoore@mozilla.com
+            script: 
+              https://raw.githubusercontent.com/taskcluster/community-tc-config/f7068f3930ba9638fc167b4bcbad0a0c8085c28d/imagesets/generic-worker-win2025-staging/bootstrap.ps1
+generic-worker-win2022-gpu-wi:
+  azure:
+    images:
+      westus2: 
+        /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-higbgbljtsofjmqroigo-westus2
+  workerImplementation: generic-worker
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: 
+          C:\generic-worker\generic-worker-ed25519-signing-key.key
+        idleTimeoutSecs: 15
+        livelogExecutable: C:\generic-worker\livelog.exe
+        shutdownMachineOnIdle: true
+        shutdownMachineOnInternalError: true
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: pmoore@mozilla.com
+            script: 
+              https://raw.githubusercontent.com/taskcluster/community-tc-config/7fb58422dbca67046478bf105fded21656bda695/imagesets/generic-worker-win2022-gpu/bootstrap.ps1
+generic-worker-win2022-gpu-staging-wi:
+  azure:
+    images:
+      westus2: 
+        /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-kuvumetpjjmhdsifpwnu-westus2
+  workerImplementation: generic-worker
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: 
+          C:\generic-worker\generic-worker-ed25519-signing-key.key
+        idleTimeoutSecs: 15
+        livelogExecutable: C:\generic-worker\livelog.exe
+        shutdownMachineOnIdle: true
+        shutdownMachineOnInternalError: true
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: pmoore@mozilla.com
+            script: 
+              https://raw.githubusercontent.com/taskcluster/community-tc-config/afececaa541a781c5f539cb285c412585796aaf1/imagesets/generic-worker-win2022-gpu/bootstrap.ps1
+generic-worker-win11-24h2-staging-wi:
+  workerImplementation: generic-worker
+  azure:
+    images:
+      eastus: 
+        /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-y1ufoyvji0o9hjn26e6d-eastus
+  workerConfig:
+    genericWorker:
+      config:
+        ed25519SigningKeyLocation: 
+          C:\generic-worker\generic-worker-ed25519-signing-key.key
+        idleTimeoutSecs: 15
+        livelogExecutable: C:\generic-worker\livelog.exe
+        shutdownMachineOnIdle: true
+        taskclusterProxyExecutable: C:\generic-worker\taskcluster-proxy.exe
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: pmoore@mozilla.com
+            script: 
+              https://raw.githubusercontent.com/taskcluster/community-tc-config/b68c2d5b07909a749a958a665c3c9db92fe819b0/imagesets/generic-worker-win11-24h2-staging/bootstrap.ps1

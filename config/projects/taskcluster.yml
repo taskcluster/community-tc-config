@@ -81,7 +81,7 @@ taskcluster:
     gw-windows-2022-gui:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win2022
+      imageset: generic-worker-win2022-wi
       cloud: azure
       minCapacity: 0
       maxCapacity: 10
@@ -192,7 +192,7 @@ taskcluster:
     gw-windows-2022:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win2022
+      imageset: generic-worker-win2022-wi
       cloud: azure
       minCapacity: 0
       maxCapacity: 10
@@ -205,7 +205,7 @@ taskcluster:
     gw-windows-2022-staging:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win2022-staging
+      imageset: generic-worker-win2022-staging-wi
       cloud: azure
       minCapacity: 0
       maxCapacity: 1
@@ -223,7 +223,7 @@ taskcluster:
     gw-windows-2025-staging:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win2025-staging
+      imageset: generic-worker-win2025-staging-wi
       cloud: aws
       minCapacity: 0
       maxCapacity: 1
@@ -241,7 +241,7 @@ taskcluster:
     gw-windows-2022-gpu:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win2022-gpu
+      imageset: generic-worker-win2022-gpu-wi
       cloud: azure
       minCapacity: 0
       maxCapacity: 3
@@ -257,7 +257,7 @@ taskcluster:
     gw-windows-2022-gpu-staging:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win2022-gpu-staging
+      imageset: generic-worker-win2022-gpu-staging-wi
       cloud: azure
       minCapacity: 0
       maxCapacity: 1
@@ -283,7 +283,7 @@ taskcluster:
     gw-windows-11-24h2-staging:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win11-24h2-staging
+      imageset: generic-worker-win11-24h2-staging-wi
       cloud: azure
       minCapacity: 0
       maxCapacity: 1
