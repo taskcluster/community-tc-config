@@ -1,0 +1,32 @@
+provider:
+  providerType: static
+  rootURL: "https://community-tc.services.mozilla.com"
+  providerID: static
+  staticSecret: ""
+  workerPoolID: proj-taskcluster/gw-ci-macos
+  workerGroup: proj-taskcluster
+  workerID: macmini-m4-1
+  workerLocation:
+    host: macstadium
+worker:
+  implementation: generic-worker
+  path: /usr/local/bin/generic-worker
+  configPath: /etc/generic-worker/config
+workerConfig:
+  cachesDir: "/Library/Caches/generic-worker/caches"
+  cleanUpTaskDirs: true
+  disableReboots: false
+  downloadsDir: "/Library/Caches/generic-worker/downloads"
+  ed25519SigningKeyLocation: "/etc/generic-worker/ed25519_key"
+  headlessTasks: false
+  livelogExecutable: "/usr/local/bin/livelog"
+  publicIP: "207.254.33.162"
+  requiredDiskSpaceMegabytes: 20480
+  sentryProject: "generic-worker"
+  shutdownMachineOnIdle: false
+  shutdownMachineOnInternalError: false
+  taskclusterProxyExecutable: "/usr/local/bin/taskcluster-proxy"
+  taskclusterProxyPort: 8080
+  tasksDir: "/Users"
+  wstAudience: "communitytc"
+  wstServerURL: "https://community-websocktunnel.services.mozilla.com"
