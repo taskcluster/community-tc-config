@@ -891,8 +891,8 @@ function all-in-parallel {
     # TODO: inspect configs to determine full set of image sets to build, rather than maintain a static list
 
     ########## Azure Windows ##########
-    imagesets/imageset.sh azure update generic-worker-win2022 &
-    imagesets/imageset.sh azure update generic-worker-win2022-gpu &
+    # imagesets/imageset.sh azure update generic-worker-win2022 &
+    # imagesets/imageset.sh azure update generic-worker-win2022-gpu &
 
     ########## Non-Azure Windows ##########
     # Commenting out for now due to https://github.com/taskcluster/community-tc-config/issues/872
@@ -905,10 +905,10 @@ function all-in-parallel {
     imagesets/imageset.sh google update generic-worker-ubuntu-24-04-arm64 &
 
     if "${BUILD_STAGING_IMAGES}"; then
-      imagesets/imageset.sh azure update generic-worker-win2022-staging &
-      imagesets/imageset.sh azure update generic-worker-win2025-staging &
-      imagesets/imageset.sh azure update generic-worker-win2022-gpu-staging &
-      imagesets/imageset.sh azure update generic-worker-win11-24h2-staging &
+      # imagesets/imageset.sh azure update generic-worker-win2022-staging &
+      # imagesets/imageset.sh azure update generic-worker-win2025-staging &
+      # imagesets/imageset.sh azure update generic-worker-win2022-gpu-staging &
+      # imagesets/imageset.sh azure update generic-worker-win11-24h2-staging &
       imagesets/imageset.sh google update generic-worker-ubuntu-24-04-staging &
       imagesets/imageset.sh aws update generic-worker-ubuntu-24-04-staging &
     fi
@@ -921,6 +921,12 @@ function all-in-parallel {
         az group delete --name $rg --yes --no-wait
       done
     fi
+    export GITHUB_TOKEN=$(gh auth token)
+    python3 imagesets/rel-sre-imagesets.py
+    git add config/imagesets.yml
+    git commit -m "Built new Azure machine images"
+    retry git -c pull.rebase=true pull "${OFFICIAL_GIT_REPO}" main
+    retry git push "${OFFICIAL_GIT_REPO}" "+HEAD:refs/heads/main"
   fi
 
   if "${DEPLOY_IMAGES}"; then
