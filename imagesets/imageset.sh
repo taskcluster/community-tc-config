@@ -76,13 +76,13 @@ function deploy {
   log "Checking inputs..."
 
   if [ "${#}" -ne 3 ]; then
-    log "Please specify a cloud (aws/azure/google), action (delete|update), and image set (e.g. generic-worker-win2022) e.g. ${0} aws update generic-worker-win2022" >&2
+    log "Please specify a cloud (aws/google), action (delete|update), and image set (e.g. generic-worker-win2022) e.g. ${0} aws update generic-worker-win2022" >&2
     return 66
   fi
 
   export CLOUD="${1}"
-  if [ "${CLOUD}" != "aws" ] && [ "${CLOUD}" != "azure" ] && [ "${CLOUD}" != "google" ]; then
-    log "Provider must be 'aws', 'azure', or 'google' but '${CLOUD}' was specified" >&2
+  if [ "${CLOUD}" != "aws" ] && [ "${CLOUD}" != "google" ]; then
+    log "Provider must be 'aws' or 'google' but '${CLOUD}' was specified" >&2
     return 67
   fi
 
@@ -122,12 +122,6 @@ function deploy {
   if [ "${CLOUD}" == "google" ] && [ -z "${GCP_PROJECT-}" ]; then
     log "Environment variable GCP_PROJECT must be exported before calling this script" >&2
     return 71
-  fi
-
-  if [ "${CLOUD}" == "azure" ] && [ -z "${AZURE_IMAGE_RESOURCE_GROUP-}" ]; then
-    log "Environment variable AZURE_IMAGE_RESOURCE_GROUP must be exported before calling this script" >&2
-    log "This resource group will be used for storing your created image(s)." >&2
-    return 74
   fi
 
   if ! [ -d "${IMAGE_SET}" ]; then
@@ -201,33 +195,6 @@ function deploy {
       log "Pushing new secrets..."
       retry pass git push
       ;;
-    azure)
-      if ! retry az account show > /dev/null 2>&1; then
-        log "Need azure credentials..."
-        log-iff-fails retry az login
-      fi
-      if [[ "$IMAGE_SET" == *-staging ]]; then
-        echo eastus 15 250 | xargs -P1 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
-      else
-        echo centralus 26 215 eastus 15 250 eastus2 33 200 northcentralus 100 175 southcentralus 99 150 westus 75 225 westus2 60 160 | xargs -P7 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
-      fi
-      log "Fetching secrets..."
-      retry pass git pull
-      for REGION in centralus eastus eastus2 northcentralus southcentralus westus westus2; do
-        # Delete any preexisting value, in case we don't have a new one, e.g.
-        # because we have switched instance type and the new one is not available
-        # in a given region.
-        yq d -i ../config/imagesets.yml "${IMAGE_SET}.azure.images.${REGION}" # returns with exit code 0 even if entry doesn't exist
-        # some regions may not have secrets if they do not support the required instance type
-        if [ -f "${IMAGE_SET}/azure.${REGION}.secrets" ]; then
-          IMAGE_ID="$(cat "${IMAGE_SET}/azure.${REGION}.secrets" | sed -n 's/^Image: *//p')"
-          yq w -i ../config/imagesets.yml "${IMAGE_SET}.azure.images.${REGION}" "${IMAGE_ID}"
-          pass insert -m -f "community-tc/imagesets/${IMAGE_SET}/${REGION}" < "${IMAGE_SET}/azure.${REGION}.secrets"
-        fi
-      done
-      log "Pushing new secrets..."
-      retry pass git push
-      ;;
     google)
       echo us-central1-a 21 230 | xargs -P1 -n3 "./$(basename "${0}")" process-region "${CLOUD}_${ACTION}"
       log "Updating config/imagesets.yml..."
@@ -249,9 +216,6 @@ function deploy {
   case "${CLOUD}" in
     aws)
       git commit -m "Built new AWS AMIs for imageset ${IMAGE_SET}"
-      ;;
-    azure)
-      git commit -m "Built new Azure machine images for imageset ${IMAGE_SET}"
       ;;
     google)
       git commit -m "Built new google machine image for imageset ${IMAGE_SET}"
@@ -544,213 +508,6 @@ function google_update {
   echo "projects/${GCP_PROJECT}/global/images/${UNIQUE_NAME}" > gcp.secrets
 }
 
-################## AZURE ##################
-
-function azure_delete {
-  azure_find_old_objects
-  azure_delete_found
-  azure_delete_resource_groups
-}
-
-function azure_find_old_objects {
-  log "Querying previous images..."
-  OLD_IMAGES="$(retry az image list --query="[?tags.image_set == '${IMAGE_SET}' && location == '${REGION}'].id" --output tsv)"
-  if [ -n "${OLD_IMAGES}" ]; then
-    log "Found old image(s):" $OLD_IMAGES
-  else
-    log "WARNING: No old images found"
-  fi
-}
-
-function azure_delete_found {
-  if [ -n "${OLD_IMAGES}" ]; then
-    log "Deleting the old image(s) ("${OLD_IMAGES}")..."
-    log-iff-fails retry az image delete --ids ${OLD_IMAGES} --no-wait true
-  else
-    log "No old images to delete."
-  fi
-}
-
-function azure_delete_resource_groups {
-  log "Querying old resource groups..."
-  OLD_RESOURCE_GROUPS="$(retry az group list --query="[?tags.image_set == '${IMAGE_SET}' && location == '${REGION}'].id" --output tsv)"
-  if [ -n "${OLD_RESOURCE_GROUPS}" ]; then
-    log "Found old resource group(s):" $OLD_RESOURCE_GROUPS
-  else
-    log "WARNING: No old resource groups found"
-  fi
-  if [ -n "${OLD_RESOURCE_GROUPS}" ]; then
-    for group in ${OLD_RESOURCE_GROUPS}; do
-      log "Now deleting previous resource group ${group}..."
-      log-iff-fails retry az group delete --name="${group}" --yes --no-wait
-    done
-  else
-    log "No previous resource groups to delete."
-  fi
-}
-
-function azure_update {
-
-  # Note, we could haved alternatively checked availability of the given
-  # machine type in the given location by querying the file database in
-  # /config/azure-vm-size-offerings directory, but that may be out-of-date
-  # and this az cli call is pretty quick to make anyway.
-  if [ -z "$(retry az vm list-skus --location "${REGION}" --resource-type virtualMachines --query="[].name" --output tsv | sed -n "/^$(cat azure_base_instance_type)\$/p")" ]; then
-    log "Cannot deploy in ${REGION} since machine type $(cat azure_base_instance_type) is not supported; skipping."
-    return 0
-  fi
-
-  # Avoid using UNIQUE_NAME which may be too long, see e.g.
-  # https://bugs.launchpad.net/ubuntu-kernel-tests/+bug/1779107/comments/2
-  NAME_WITH_REGION="imageset-${UUID}-${REGION}"
-  TEMP_SETUP_SCRIPT="$(mktemp -t ${NAME_WITH_REGION}.XXXXXXXXXX)"
-
-  cat bootstrap.ps1 | sed 's/%MY_CLOUD%/azure/g' >> "${TEMP_SETUP_SCRIPT}"
-
-  AZURE_VM_RESOURCE_GROUP="${NAME_WITH_REGION}-rg"
-
-  log "Creating temporary resource group ${AZURE_VM_RESOURCE_GROUP} for image building resources..."
-  log-iff-fails retry az group create \
-    --name="${AZURE_VM_RESOURCE_GROUP}" \
-    --tags "image_set=${IMAGE_SET}" \
-    --location="${REGION}"
-
-  # The admin password needs to contain 3 of the 4 character ranges specified
-  # in the loop below. To ensure characters from all ranges are present, choose 5
-  # characters randomly from each range.
-  ADMIN_PASSWORD=''
-  for range in 'A-Z' 'a-z' '0-9' '!@#$%^&*'; do
-    ADMIN_PASSWORD="${ADMIN_PASSWORD}$(head -c 256 /dev/urandom | LC_ALL=C tr -dc "${range}" | head -c 5)"
-  done
-
-  log "Creating instance ${NAME_WITH_REGION}..."
-  log-iff-fails retry az vm create \
-    --name="${NAME_WITH_REGION}" \
-    --image=$(cat azure_image) \
-    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
-    --computer-name="ImageBuilder" \
-    --os-disk-delete-option=Delete \
-    --data-disk-delete-option=Delete \
-    --nic-delete-option=Delete \
-    --nsg-rule=NONE \
-    --license-type="Windows_Server" \
-    --accept-term \
-    --location="${REGION}" \
-    --security-type="Standard" \
-    --size=$(cat azure_base_instance_type) \
-    --tags "image_set=${IMAGE_SET}" \
-    --admin-username="azureuser" \
-    --admin-password="${ADMIN_PASSWORD}"
-
-  PUBLIC_IP="$(retry az vm show -d --name="${NAME_WITH_REGION}" --resource-group="${AZURE_VM_RESOURCE_GROUP}" --query publicIps --output tsv)"
-
-  log "Created instance ${NAME_WITH_REGION}."
-
-  log "To connect to the template instance (please don't do so until image creation process is completed"'!'"):"
-  log ''
-  log "                         Public IP:   ${PUBLIC_IP}"
-  log "                         Username:    azureuser"
-  log "                         Password:    ${ADMIN_PASSWORD}"
-  log ''
-
-  log "Running bootstrap script - it can take a \x1B[4mVery Long Time™\x1B[24m..."
-  retry az vm run-command invoke \
-    --command-id="RunPowerShellScript" \
-    --name="${NAME_WITH_REGION}" \
-    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
-    --scripts="@${TEMP_SETUP_SCRIPT}" \
-    --no-wait
-  rm "${TEMP_SETUP_SCRIPT}"
-
-  log "Waiting for instance ${NAME_WITH_REGION} to shut down..."
-  retry az vm wait \
-    --custom="instanceView.statuses[?code=='PowerState/stopped']" \
-    --name="${NAME_WITH_REGION}" \
-    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
-    --interval=15
-
-  log "Starting instance ${NAME_WITH_REGION} to run sysprep..."
-  retry az vm start \
-    --name="${NAME_WITH_REGION}" \
-    --resource-group="${AZURE_VM_RESOURCE_GROUP}"
-
-  log "Running Sysprep on instance ${NAME_WITH_REGION}..."
-  retry az vm run-command invoke \
-    --command-id="RunPowerShellScript" \
-    --name="${NAME_WITH_REGION}" \
-    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
-    --scripts @sysprep.ps1 \
-    --no-wait
-
-  log "Waiting for instance ${NAME_WITH_REGION} to shut down..."
-  retry az vm wait \
-    --custom="instanceView.statuses[?code=='PowerState/stopped']" \
-    --name="${NAME_WITH_REGION}" \
-    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
-    --interval=15
-
-  log "Generalizing VM to allow it to be imaged..."
-  retry az vm generalize \
-    --name="${NAME_WITH_REGION}" \
-    --resource-group="${AZURE_VM_RESOURCE_GROUP}"
-
-  log "Deallocating VM..."
-  retry az vm deallocate \
-    --name="${NAME_WITH_REGION}" \
-    --resource-group="${AZURE_VM_RESOURCE_GROUP}"
-
-  log "Creating an image from the terminated instance..."
-  log-iff-fails retry az image create \
-    --name="${NAME_WITH_REGION}" \
-    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
-    --hyper-v-generation="V2" \
-    --location="${REGION}" \
-    --tags "image_set=${IMAGE_SET}" \
-    --source="${NAME_WITH_REGION}"
-
-  IMAGE_ID="$(retry az image show --name="${NAME_WITH_REGION}" --resource-group="${AZURE_VM_RESOURCE_GROUP}" --query id --output tsv)"
-
-  log ''
-  log "The image is being created here:"
-  log ''
-  log "                         https://portal.azure.com/#@mozilla.com/resource${IMAGE_ID}"
-  log ''
-
-  log "Waiting for image ${NAME_WITH_REGION} to be created..."
-  retry az image wait \
-    --created \
-    --image-name="${NAME_WITH_REGION}" \
-    --resource-group="${AZURE_VM_RESOURCE_GROUP}" \
-    --interval=15
-
-  # Try to acquire an exclusive lock as only one `az resource move` can happen
-  # at a time. Place lock in parent folder so the lock is shared across all
-  # image sets, otherwise it appears image sets cannot be built in parallel.
-  exec 200> ../azure_move_image.lock
-  flock -x 200
-
-  log "Moving image ${NAME_WITH_REGION} to ${AZURE_IMAGE_RESOURCE_GROUP} resource group..."
-  retry az resource move \
-    --destination-group="${AZURE_IMAGE_RESOURCE_GROUP}" \
-    --ids="${IMAGE_ID}"
-
-  # Release the lock
-  flock -u 200
-
-  log "Deleting temporary resource group ${AZURE_VM_RESOURCE_GROUP}..."
-  log-iff-fails retry az group delete --name="${AZURE_VM_RESOURCE_GROUP}" --yes --no-wait
-
-  IMAGE_ID="$(retry az image show --name="${NAME_WITH_REGION}" --resource-group="${AZURE_IMAGE_RESOURCE_GROUP}" --query id --output tsv)"
-
-  {
-    echo "Instance:  ${NAME_WITH_REGION}"
-    echo "Public IP: ${PUBLIC_IP}"
-    echo "Username:  azureuser"
-    echo "Password:  ${ADMIN_PASSWORD}"
-    echo "Image:     ${IMAGE_ID}"
-  } > "azure.${REGION}.secrets"
-}
-
 ############### Deploy all image sets ###############
 
 function all-in-parallel {
@@ -890,25 +647,12 @@ function all-in-parallel {
   if "${BUILD_IMAGES}"; then
     # TODO: inspect configs to determine full set of image sets to build, rather than maintain a static list
 
-    ########## Azure Windows ##########
-    # imagesets/imageset.sh azure update generic-worker-win2022 &
-    # imagesets/imageset.sh azure update generic-worker-win2022-gpu &
-
-    ########## Non-Azure Windows ##########
-    # Commenting out for now due to https://github.com/taskcluster/community-tc-config/issues/872
-    # and the fact that we no longer run windows workloads on AWS
-    # imagesets/imageset.sh aws update generic-worker-win2022 &
-
     ########## Ubuntu ##########
     imagesets/imageset.sh google update generic-worker-ubuntu-24-04 &
     imagesets/imageset.sh aws update generic-worker-ubuntu-24-04 &
     imagesets/imageset.sh google update generic-worker-ubuntu-24-04-arm64 &
 
     if "${BUILD_STAGING_IMAGES}"; then
-      # imagesets/imageset.sh azure update generic-worker-win2022-staging &
-      # imagesets/imageset.sh azure update generic-worker-win2025-staging &
-      # imagesets/imageset.sh azure update generic-worker-win2022-gpu-staging &
-      # imagesets/imageset.sh azure update generic-worker-win11-24h2-staging &
       imagesets/imageset.sh google update generic-worker-ubuntu-24-04-staging &
       imagesets/imageset.sh aws update generic-worker-ubuntu-24-04-staging &
     fi
