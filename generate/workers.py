@@ -648,7 +648,9 @@ def azure(
       armDeployment: Optional ARM template deployment configuration. When provided,
                      uses a template spec to deploy instead of image-based VMSS.
                      Supported keys:
-                       templateSpecId (required): ID of the template spec version to deploy.
+                       templateSpecId (optional): ID of the template spec version to deploy.
+                                                  if not provided, azure.yml#armDeployment
+                                                  would be used.
                        parameters (optional): Values merged with auto-injected parameters
                                               (vmSize, imageId, subnetId, location, priority).
       armDeploymentResourceGroup: Optional resource group for the template deployment.
@@ -672,6 +674,7 @@ def azure(
     if "locations" not in cfg:
         locations = list(image_set.azure["images"])
     assert locations, "must give locations"
+    locations = sorted(locations)
 
     imageIds = image_set.azure["images"]
     assert imageIds, "must give imageIds"
@@ -685,9 +688,15 @@ def azure(
             if vmSize not in azure_machine_types_in_location(location):
                 continue
 
+            # this will use arm deployment if it is defined in azure.yml or pool config
+            arm_deployment_cfg = {
+                **azure_config.get("armDeployment", {}),
+                **(armDeployment if armDeployment else {}),
+            }
+
             arm_launch_config = _build_arm_template_launch_config(
                 image_set=image_set,
-                pool_arm_deployment=armDeployment,
+                pool_arm_deployment=arm_deployment_cfg,
                 pool_arm_deployment_resource_group=armDeploymentResourceGroup,
                 location=location,
                 vmSize=vmSize,

@@ -97,26 +97,6 @@ taskcluster:
             headlessTasks: false
             idleTimeoutSecs: 300
 
-    gw-windows-2022-armtpl:
-      owner: taskcluster-notifications+workers@mozilla.com
-      emailOnError: true
-      imageset: generic-worker-win2022
-      cloud: azure
-      minCapacity: 0
-      maxCapacity: 1
-      armDeployment:
-        templateSpecId: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/templates-rg/providers/Microsoft.Resources/templateSpecs/arm-tpl-test-1/versions/2.0
-        parameters:
-          priority: Spot
-      workerManager:
-        keepDeployment: true
-        publicIp: true
-      workerConfig:
-        genericWorker:
-          config:
-            headlessTasks: true
-            idleTimeoutSecs: 300
-
     gw-ubuntu-24-04-metal:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true

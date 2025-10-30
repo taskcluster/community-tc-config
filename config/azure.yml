@@ -1,15 +1,21 @@
 ---
-# This file describes Azure constants used to build worker pools
-# It supports one top level dictionary:
+# This file describes Azure constants used for building worker pools.
+# It contains a top-level dictionary with the following keys:
 #
-# # List all the available subnets in supported locations
 # subnets:
-#   <azure-location-name>: <azure-subnet-id>
+#   A dictionary mapping Azure location names to their subnet IDs.
+#   Example:
+#     <azure-location-name>: <azure-subnet-id>
 #
-# Please do not move or edit the structure of that file as
-# it's being actively used by the fuzzing team decision task
-# to manage worker pools
-# If you remove a region, please reach out to fuzzing+taskcluster@mozilla.com
+# armDeployment:
+#   Configuration for ARM deployments, containing the following keys:
+#   - templateSpecId: The resource ID of the template spec version.
+#
+# IMPORTANT:
+# Please do not change the structure of this file. It is actively
+# used by the fuzzing team's decision task to manage worker pools.
+# If you need to remove a region, please contact fuzzing+taskcluster@mozilla.com.
+
 
 subnets:
   centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-vnets/providers/Microsoft.Network/virtualNetworks/tc-vnet-centralus/subnets/default
@@ -19,3 +25,5 @@ subnets:
   southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-vnets/providers/Microsoft.Network/virtualNetworks/tc-vnet-southcentralus/subnets/default
   westus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-vnets/providers/Microsoft.Network/virtualNetworks/tc-vnet-westus/subnets/default
   westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-vnets/providers/Microsoft.Network/virtualNetworks/tc-vnet-westus2/subnets/default
+armDeployment:
+  templateSpecId: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/templates-rg/providers/Microsoft.Resources/templateSpecs/arm-tpl-test-1/versions/3.0
