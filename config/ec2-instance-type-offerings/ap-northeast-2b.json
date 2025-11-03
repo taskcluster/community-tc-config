@@ -285,6 +285,7 @@
     "m8g.metal-24xl",
     "m8g.metal-48xl",
     "m8g.xlarge",
+    "p4d.24xlarge",
     "r5.12xlarge",
     "r5.16xlarge",
     "r5.24xlarge",
