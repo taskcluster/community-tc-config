@@ -521,6 +521,107 @@ def azure_machine_types_in_location(location):
     return set(data)
 
 
+def _build_arm_template_launch_config(
+    *,
+    image_set,
+    pool_arm_deployment,
+    pool_arm_deployment_resource_group,
+    location,
+    vmSize,
+    capacityPerInstance,
+    imageId,
+    subnetId,
+    cfg,
+):
+    """
+    Create a launch config for ARM template deployment.
+
+    Auto-injects the common parameters (vmSize, imageId, location, subnetId) and merges
+    them with user-provided parameters. Templates are specified via template specs; only
+    the template spec ID and parameters are supported in configuration.
+    """
+    attrs = {"location": location, "vmSize": vmSize}
+
+    def evaluate(value, item_name):
+        if value is None:
+            return None
+        return evaluate_keyed_by(value, item_name, attrs)
+
+    def normalize(parameters):
+        normalized = {}
+        for key, value in (parameters or {}).items():
+            if isinstance(value, dict) and "value" in value:
+                normalized[key] = value
+            else:
+                normalized[key] = {"value": value}
+        return normalized
+
+    base_arm_deployment = (
+        evaluate(image_set.azure.get("armDeployment"), "armDeployment") or {}
+    )
+    override_arm_deployment = evaluate(pool_arm_deployment, "armDeployment") or {}
+
+    if not base_arm_deployment and not override_arm_deployment:
+        return None
+
+    template_spec_id = override_arm_deployment.get(
+        "templateSpecId"
+    ) or base_arm_deployment.get("templateSpecId")
+    if not template_spec_id:
+        raise ValueError(
+            "armDeployment.templateSpecId must be provided via imageset or pool override"
+        )
+
+    parameters = normalize(base_arm_deployment.get("parameters"))
+    parameters.update(normalize(override_arm_deployment.get("parameters")))
+
+    auto_defaults = {
+        "vmSize": {"value": vmSize},
+        "imageId": {"value": imageId},
+        "location": {"value": location},
+        "subnetId": {"value": subnetId},
+    }
+    if "priority" in parameters or cfg.get("priority") is not None:
+        auto_defaults["priority"] = {"value": cfg.get("priority", "Spot")}
+
+    for key, value in auto_defaults.items():
+        parameters.setdefault(key, value)
+
+    deployment = {
+        "mode": "Incremental",
+        "templateLink": {"id": template_spec_id},
+        "parameters": parameters,
+    }
+
+    launchConfig = {
+        "armDeployment": deployment,
+        "workerManager": merge(
+            {
+                "capacityPerInstance": capacityPerInstance,
+            },
+            get_worker_manager_overrides(
+                cfg,
+                {"location": location, "vmSize": vmSize},
+            ),
+        ),
+    }
+
+    # Add armDeploymentResourceGroup if specified
+    base_arm_rg = evaluate(
+        image_set.azure.get("armDeploymentResourceGroup"),
+        "armDeploymentResourceGroup",
+    )
+    override_arm_rg = evaluate(
+        pool_arm_deployment_resource_group,
+        "armDeploymentResourceGroup",
+    )
+    armDeploymentResourceGroup = override_arm_rg or base_arm_rg
+    if armDeploymentResourceGroup:
+        launchConfig["armDeploymentResourceGroup"] = armDeploymentResourceGroup
+
+    return launchConfig
+
+
 @cloud
 def azure(
     *,
@@ -531,6 +632,8 @@ def azure(
     vmSizes={
         "Standard_F16s_v2": 1,
     },
+    armDeployment=None,
+    armDeploymentResourceGroup=None,
     **cfg,
 ):
     """
@@ -542,6 +645,15 @@ def azure(
       maxCapacity: maximum capacity to run at any time (required)
       vmSizes: dict of VM sizes to provision, values are
                      capacityPerInstance (required) (default {Standard_F16s_v2: 1})
+      armDeployment: Optional ARM template deployment configuration. When provided,
+                     uses a template spec to deploy instead of image-based VMSS.
+                     Supported keys:
+                       templateSpecId (optional): ID of the template spec version to deploy.
+                                                  if not provided, azure.yml#armDeployment
+                                                  would be used.
+                       parameters (optional): Values merged with auto-injected parameters
+                                              (vmSize, imageId, subnetId, location, priority).
+      armDeploymentResourceGroup: Optional resource group for the template deployment.
     """
 
     assert maxCapacity, "must give a maxCapacity"
@@ -562,6 +674,7 @@ def azure(
     if "locations" not in cfg:
         locations = list(image_set.azure["images"])
     assert locations, "must give locations"
+    locations = sorted(locations)
 
     imageIds = image_set.azure["images"]
     assert imageIds, "must give imageIds"
@@ -574,43 +687,65 @@ def azure(
             # is not available.
             if vmSize not in azure_machine_types_in_location(location):
                 continue
-            launchConfig = {
-                "location": location,
-                "storageProfile": {
-                    "osDisk": {
-                        "osType": "Windows",
-                        "caching": "ReadOnly",
-                        "createOption": "FromImage",
-                        "diffDiskSettings": {
-                            "option": "Local",
+
+            # this will use arm deployment if it is defined in azure.yml or pool config
+            arm_deployment_cfg = {
+                **azure_config.get("armDeployment", {}),
+                **(armDeployment if armDeployment else {}),
+            }
+
+            arm_launch_config = _build_arm_template_launch_config(
+                image_set=image_set,
+                pool_arm_deployment=arm_deployment_cfg,
+                pool_arm_deployment_resource_group=armDeploymentResourceGroup,
+                location=location,
+                vmSize=vmSize,
+                capacityPerInstance=capacityPerInstance,
+                imageId=imageIds[location],
+                subnetId=subnetId,
+                cfg=cfg,
+            )
+            if arm_launch_config:
+                launchConfig = arm_launch_config
+            else:
+                # Original image-based deployment
+                launchConfig = {
+                    "location": location,
+                    "storageProfile": {
+                        "osDisk": {
+                            "osType": "Windows",
+                            "caching": "ReadOnly",
+                            "createOption": "FromImage",
+                            "diffDiskSettings": {
+                                "option": "Local",
+                            },
+                        },
+                        "imageReference": {
+                            "id": imageIds[location],
                         },
                     },
-                    "imageReference": {
-                        "id": imageIds[location],
+                    "osProfile": {
+                        "windowsConfiguration": {
+                            "timeZone": "UTC",
+                            "enableAutomaticUpdates": False,
+                        },
                     },
-                },
-                "osProfile": {
-                    "windowsConfiguration": {
-                        "timeZone": "UTC",
-                        "enableAutomaticUpdates": False,
+                    "subnetId": subnetId,
+                    "priority": "spot",
+                    "evictionPolicy": "Delete",
+                    "hardwareProfile": {
+                        "vmSize": vmSize,
                     },
-                },
-                "subnetId": subnetId,
-                "priority": "spot",
-                "evictionPolicy": "Delete",
-                "hardwareProfile": {
-                    "vmSize": vmSize,
-                },
-                "workerManager": merge(
-                    {
-                        "capacityPerInstance": capacityPerInstance,
-                    },
-                    get_worker_manager_overrides(
-                        cfg,
-                        {"location": location, "vmSize": vmSize},
+                    "workerManager": merge(
+                        {
+                            "capacityPerInstance": capacityPerInstance,
+                        },
+                        get_worker_manager_overrides(
+                            cfg,
+                            {"location": location, "vmSize": vmSize},
+                        ),
                     ),
-                ),
-            }
+                }
             launchConfigs.append(launchConfig)
     assert launchConfigs, (
         f"The locations {locations} do not support VM sizes" f" {list(vmSizes.keys())}"

@@ -40,6 +40,15 @@ Each file is defined as follows:
       cloud: cloud to deploy in ('aws', 'azure', or 'gcp')
       ..: ..  # arguments to that function
 
+      # For Azure worker pools, ARM template deployment via template specs is supported:
+      armDeployment:  # Optional: Use ARM template-based deployment instead of image-based
+        templateSpecId: /subscriptions/<sub-id>/resourceGroups/<rg>/providers/Microsoft.Resources/templateSpecs/<name>/versions/<version>
+        parameters:  # Optional: Custom parameters merged with auto-injected defaults
+          customParam: customValue
+          # Auto-injected parameters: vmSize, imageId, location, subnetId, priority
+          # User-provided parameters override auto-injected ones
+      armDeploymentResourceGroup: templates-rg  # Optional: Resource group for ARM deployment
+
   secrets:
     # Secrets associated with this project, suffixed to `project/<project-name>/`.
     # These secrets can be managed externally by setting the value to `true`:
