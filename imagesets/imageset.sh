@@ -638,7 +638,7 @@ function all-in-parallel {
 
   # TODO: fetch these IPs automatically, and report if they need to be logged into first with vnc
   if "${DEPLOY_MACS}"; then
-    for HOST in macmini-m4-126; do
+    for HOST in macmini-m4-126 macmini-m4-127; do
       pass "mdc1/generic-worker-ci/${HOST}" | tail -1 | ssh "administrator@${HOST}.test.releng.mdc1.mozilla.com" sudo -S "bash" -c /var/root/update.sh
     done
   fi
