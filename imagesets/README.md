@@ -48,7 +48,7 @@ to be present:
          `AWS_SESSION_TOKEN` are not set, the [`signin-aws.sh`](signin-aws.sh)
          script will be automatically run. However, the yubikey interface isn't
          supported when running under docker, so if you use a yubikey, it is recommended
-         to run `eval $(signin-aws.sh)` before calling the `imageset-under-docker.sh` script.
+         to run `eval $(signin-aws.sh)` before calling the `imageset.sh` script.
 
        * Other MFA Device:
  
@@ -87,52 +87,6 @@ to be able to build image sets.
 Run:
 
   * `./imageset.sh all`
-
-### Build single image set under Docker
-
-To update/delete the image set `IMAGE_SET` whose definition is in the
-subdirectory `<IMAGE_SET>`:
-
-  * `./imageset-under-docker.sh (aws|azure|google) (delete|update) IMAGE_SET`
-
-This will launch a docker container to build the image set.
-
-### Build single image set natively on host
-
-If you instead prefer to build an image set natively on your host (not using docker):
-
-  * `./imageset.sh (aws|azure|google) (delete|update) IMAGE_SET`
-
-All of the following tools must be available in the `PATH`:
-
-  * `aws`
-  * `az`
-  * `basename`
-  * `bash`
-  * `cat`
-  * `chmod`
-  * `cut`
-  * `date`
-  * `dirname`
-  * `env`
-  * `find`
-  * `flock`
-  * `gcloud`
-  * `git`
-  * `grep`
-  * `head`
-  * `mktemp`
-  * `pass`
-  * `rm`
-  * `sed`
-  * `sleep`
-  * `sort`
-  * `tail`
-  * `touch`
-  * `tr`
-  * `which`
-  * `xargs`
-  * `yq` **version 3** (version 4 is [backwardly incompatible](https://mikefarah.gitbook.io/yq/upgrading-from-v3))
 
 ## Post image set building steps when building a single image set
 
