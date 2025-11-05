@@ -92,43 +92,12 @@ def list_dispatch_runs_for_workflow(workflow_file, per_page=100):
     r = gh(url, params={"branch": REF, "event": "workflow_dispatch", "per_page": per_page})
     return r.json()["workflow_runs"]
 
-def cancel_run(run_id):
-    url = f"{API_ROOT}/repos/{REPO}/actions/runs/{run_id}/cancel"
-    try:
-        gh(url, "POST")  # 202 Accepted
-        print(f"   🛑 Sent cancel for run_id={run_id}")
-    except requests.HTTPError as e:
-        # If it already finished between list and cancel, just log and continue
-        status = getattr(e.response, "status_code", None)
-        print(f"   ⚠️ Cancel failed for run_id={run_id} (status={status}); continuing")
-
 def get_run_status(run_id):
     url = f"{API_ROOT}/repos/{REPO}/actions/runs/{run_id}"
     return gh(url).json()
 
 
 # ---- Selection / matching ----
-def cancel_active_runs_for_config(workflow_file, config):
-    """
-    Cancel all older active (queued/in_progress) runs whose parsed title config matches exactly.
-    """
-    runs = list_dispatch_runs_for_workflow(workflow_file, per_page=100)
-    active_statuses = {"queued", "in_progress"}
-    runs_sorted = sorted(runs, key=lambda r: r["created_at"])  # oldest first for readable logs
-    cancelled = 0
-    for run in runs_sorted:
-        title = run.get("display_title") or run.get("name", "")
-        parsed = title_to_config(title)
-        status = run.get("status")
-        if parsed == config and status in active_statuses:
-            print(f"   🔁 Found active older run for {config}: #{run['run_number']} ({status}) created_at={run['created_at']}")
-            cancel_run(run["id"])
-            cancelled += 1
-    if cancelled:
-        print(f"   ✅ Cancelled {cancelled} active run(s) for {config}")
-    else:
-        print(f"   ✅ No active older runs to cancel for {config}")
-
 def find_new_run_by_config(workflow_file, config, seen_ids):
     """
     Return the most recent workflow_dispatch run whose parsed title config matches exactly,
@@ -156,15 +125,14 @@ def trigger_all_workflows(workflows_dict):
     run_map = {}  # (workflow_file, config) -> (run_id, run_number, workflow_file)
     seen_ids = set()
 
-    # Phase 1: Cancel old runs and trigger new ones for all workflows
-    print("🚀 Phase 1: Canceling old runs and triggering new builds...")
+    # Phase 1: Trigger new runs for all workflows
+    print("🚀 Phase 1: Triggering new builds...")
     for workflow_file, configs in workflows_dict.items():
         print(f"\n{'='*80}")
         print(f"📋 Workflow: {workflow_file}")
         print(f"{'='*80}")
         for cfg in configs:
             print(f"🔧 Preparing {cfg} for {workflow_file} ...")
-            cancel_active_runs_for_config(workflow_file, cfg)
             trigger_workflow(workflow_file, cfg)
 
     # Phase 2: Poll for all triggered runs to appear

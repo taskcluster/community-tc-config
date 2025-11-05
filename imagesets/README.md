@@ -88,6 +88,26 @@ Run:
 
   * `./imageset.sh all`
 
+All of the following tools must be available in the `PATH`:
+
+  * `aws`
+  * `az`
+  * `bash`
+  * `cut`
+  * `dirname`
+  * `env`
+  * `gcloud`
+  * `git`
+  * `head`
+  * `mktemp`
+  * `pass`
+  * `rm`
+  * `sleep`
+  * `sort`
+  * `tail`
+  * `which`
+  * `xargs`
+
 ## Post image set building steps when building a single image set
 
 Note, this is not required when running `./imageset.sh all`.
