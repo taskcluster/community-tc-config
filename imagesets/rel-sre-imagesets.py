@@ -5,6 +5,7 @@ import requests
 import re
 from datetime import datetime, timezone
 from ruamel.yaml import YAML
+from requests import Response
 
 # ---- Config ----
 REPO = "mozilla-platform-ops/worker-images"
@@ -48,10 +49,29 @@ SCRIPT_START_TIME = datetime.now(timezone.utc)
 
 
 # ---- Utility ----
-def gh(url, method="GET", **kwargs):
-    r = requests.request(method, url, headers=HEADERS, **kwargs)
-    r.raise_for_status()
-    return r
+def gh(url, method="GET", max_retries=5, **kwargs) -> Response:
+    """Make a GitHub API request with retry logic for network failures."""
+    for attempt in range(max_retries):
+        try:
+            # Add timeout to prevent hanging indefinitely
+            if 'timeout' not in kwargs:
+                kwargs['timeout'] = 30
+            r = requests.request(method, url, headers=HEADERS, **kwargs)
+            r.raise_for_status()
+            return r
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout,
+                requests.exceptions.ConnectTimeout) as e:
+            if attempt < max_retries - 1:
+                wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s, 8s, 16s
+                print(f"⚠️  Network error (attempt {attempt + 1}/{max_retries}): {e}")
+                print(f"   Retrying in {wait_time}s...")
+                time.sleep(wait_time)
+            else:
+                print(f"❌ Failed after {max_retries} attempts")
+                raise
+    # This should never be reached due to raise, but satisfies type checker
+    raise RuntimeError("Unexpected: max_retries loop completed without return or raise")
 
 def get_cloud_provider(workflow_file: str) -> str:
     """
