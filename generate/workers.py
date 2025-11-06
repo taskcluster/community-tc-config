@@ -294,7 +294,7 @@ def gcp(
     minCapacity=0,
     maxCapacity=None,
     machineType="zones/{zone}/machineTypes/n2-standard-4",
-    diskSizeGb=50,
+    diskSizeGb=60,
     **cfg,
 ):
     """
@@ -305,7 +305,7 @@ def gcp(
       maxCapacity: maximum capacity to run at any time (required)
       machineType: fully qualified gcp machine type name (default
                    `zones/{zone}/machineTypes/n2-standard-4`)
-      diskSizeGb: boot disk size, in GB (defaults to 50)
+      diskSizeGb: boot disk size, in GB (defaults to 60)
     """
 
     image = image_set.gcp["image"]
