@@ -107,12 +107,12 @@ generic-worker-ubuntu-24-04:
             maintainer: taskcluster-notifications+workers@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/community-tc-config/b5b7c2ad856c144a6759e6e72280c4a958f8a930/imagesets/generic-worker-ubuntu-24-04/bootstrap.sh
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-kyxthvgmnpkqitfjmupv
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-xexlhdndfrowdsdpnwir
   aws:
     amis:
-      eu-west-1: ami-0f4ddeecdd8f459ae
-      us-east-1: ami-08731ed40c3437ab3
-      us-west-2: ami-04fb58ad98f6f902b
+      eu-west-1: ami-0369cce3d8f8d60f9
+      us-east-1: ami-034033d158353d0aa
+      us-west-2: ami-066210cabecb58f96
 generic-worker-ubuntu-24-04-arm64:
   workerImplementation: generic-worker
   workerConfig:
@@ -130,7 +130,7 @@ generic-worker-ubuntu-24-04-arm64:
             maintainer: taskcluster-notifications+workers@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/community-tc-config/bd07a18b393cb12303779969b8f461b726031638/imagesets/generic-worker-ubuntu-24-04-arm64/bootstrap.sh
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-arm64-ufphsiytlysumfjixqoj
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-arm64-adukotasmftqyamjgsbs
 generic-worker-ubuntu-24-04-staging:
   workerImplementation: generic-worker
   workerConfig:
@@ -150,13 +150,13 @@ generic-worker-ubuntu-24-04-staging:
     amis:
       us-east-1: ami-0afcb836d0b81a957
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-oivijwbdxrcdxqrcbukq
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-sgsaonwquidpednruthn
 generic-worker-win2022:
   workerImplementation: generic-worker
   azure:
     images:
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-ihtbrsgrxhtaqosvpgdv-centralus
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nuqmhbnxgigokjjcroyj-eastus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-guujeekiwksexrpoksgm-eastus
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-uyrhmuxbmbebpkojraeh-centralus
   workerConfig:
     genericWorker:
       config:
@@ -174,8 +174,8 @@ generic-worker-win2022-staging:
   workerImplementation: generic-worker
   azure:
     images:
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-ekytahbgbgwqhxkospfx-eastus
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-tohrnrpxlavmnymwbqph-centralus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-rejqfxtsvmyuvjrepasf-eastus
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-ospsgnqneejcvvyxvtow-centralus
   workerConfig:
     genericWorker:
       config:
@@ -195,8 +195,8 @@ generic-worker-win2025-staging:
       us-east-1: ami-05fc5e0c31b199d96
   azure:
     images:
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-uidovtaracbjsbukewrh-eastus
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-iwtilrgbmcddcaenyctw-centralus
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-pdgumwjaintwxaqpoboc-centralus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-ngoyxcjrkvitespkhexp-eastus
   workerConfig:
     genericWorker:
       config:
@@ -212,7 +212,7 @@ generic-worker-win2025-staging:
 generic-worker-win2022-gpu:
   azure:
     images:
-      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-oplbrepxklofurvakwfx-westus2
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-vntoxesendqncmqftvtl-westus2
   workerImplementation: generic-worker
   workerConfig:
     genericWorker:
@@ -230,7 +230,7 @@ generic-worker-win2022-gpu:
 generic-worker-win2022-gpu-staging:
   azure:
     images:
-      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-nbgsdordcfcnvbwlsdpj-westus2
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-vubcxdqtpfhtumouulsi-westus2
   workerImplementation: generic-worker
   workerConfig:
     genericWorker:
@@ -249,8 +249,7 @@ generic-worker-win11-24h2-staging:
   workerImplementation: generic-worker
   azure:
     images:
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-khnijeusyamovnxoxypw-eastus
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-fuqonbxnpcciaxrlbbsb-centralus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-pwoqbxalupsesttnbfrq-eastus
   workerConfig:
     genericWorker:
       config:
