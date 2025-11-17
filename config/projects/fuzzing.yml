@@ -203,51 +203,6 @@ fuzzing:
             type: string
             default: main
         additionalProperties: true
-    domino-web-tests:
-      description: Domino Web Tests trigger
-      owner: jkratzer@mozilla.com
-      emailOnError: true
-      bindings:
-        - exchange: exchange/taskcluster-github/v1/push
-          routingKeyPattern: primary.MozillaSecurity.domino
-        - exchange: exchange/taskcluster-github/v1/push
-          routingKeyPattern: primary.MozillaSecurity.GrIDL
-      task:
-        provisionerId: proj-fuzzing
-        schedulerId: fuzzing
-        workerType: ci
-        payload:
-          image:
-            type: indexed-image
-            path: public/domino-web-tests.tar.zst
-            namespace: project.fuzzing.orion.domino-web-tests.master
-          features:
-            taskclusterProxy: true
-          maxRunTime: 3600
-          env:
-            ACTION: trigger
-        metadata:
-          name: Domino Web Tests
-          description: Domino Web Tests
-          owner: jkratzer@mozilla.com
-          source: 'https://github.com/MozillaSecurity/domino-web-tests'
-        expires:
-          $fromNow: 3 months
-        deadline:
-          $fromNow: 6 hours
-        scopes:
-          - queue:create-task:highest:proj-fuzzing/ci
-          - secrets:get:project/fuzzing/deploy-domino-web-tests
-          - secrets:get:project/fuzzing/deploy-domino
-          - secrets:get:project/fuzzing/deploy-gridl
-          - secrets:get:project/fuzzing/deploy-octo-private
-      triggerSchema:
-        type: object
-        properties:
-          branch:
-            type: string
-            default: master
-        additionalProperties: true
     grizzly-reduce-monitor:
       description: Hook for triggering Grizzly reduce monitor tasks
       owner: truber@mozilla.com
@@ -745,15 +700,6 @@ fuzzing:
         - secrets:get:project/fuzzing/decision
       to:
         - repo:github.com/MozillaSecurity/fuzzing-tc-config:*
-    - grant:
-        - queue:create-task:highest:proj-fuzzing/ci
-        - queue:scheduler-id:fuzzing
-        - secrets:get:project/fuzzing/deploy-domino
-        - secrets:get:project/fuzzing/deploy-domino-web-tests
-        - secrets:get:project/fuzzing/deploy-gridl
-        - secrets:get:project/fuzzing/deploy-octo-private
-      to:
-        - hook-id:project-fuzzing/domino-web-tests
     # fuzzing-tc-config code on master can run tc-admin apply to manage worker pools
     - grant:
         - assume:hook-id:project-fuzzing/linux-pool*
