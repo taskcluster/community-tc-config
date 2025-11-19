@@ -771,6 +771,7 @@ fuzzing:
     - grant:
         - queue:create-task:highest:proj-fuzzing/decision
         - queue:route:notify.email.truber@mozilla.com.on-failed
+        - queue:route:notify.email.twsmith@mozilla.com.on-failed
         - secrets:get:project/fuzzing/fuzzmanagerconf
       to:
         - hook-id:project-fuzzing/grizzly-reduce-reset-error
