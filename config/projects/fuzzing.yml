@@ -244,6 +244,7 @@ fuzzing:
           - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows-ngpu
           - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker*
           - queue:route:notify.email.truber@mozilla.com.on-failed
+          - queue:route:notify.email.twsmith@mozilla.com.on-failed
           - queue:scheduler-id:fuzzing
           - secrets:get:project/fuzzing/deploy-bearspray
           - secrets:get:project/fuzzing/deploy-grizzly-private
