@@ -770,5 +770,9 @@
   "Standard_M96ds_1_v3",
   "Standard_M96ds_2_v3",
   "Standard_M96s_1_v3",
-  "Standard_M96s_2_v3"
+  "Standard_M96s_2_v3",
+  "Standard_NC16as_T4_v3",
+  "Standard_NC4as_T4_v3",
+  "Standard_NC64as_T4_v3",
+  "Standard_NC8as_T4_v3"
 ]
