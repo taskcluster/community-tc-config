@@ -31,7 +31,7 @@ class Grants(ConfigList):
             for roleId in self.to:
                 id = f"Role={roleId}"
                 if not resources.is_managed(id):
-                    resources.manage(re.escape(id))
+                    resources.manage(re.escape(id) + "$")
                 resources.add(Role(roleId=roleId, description="", scopes=scopes))
 
     @classmethod
