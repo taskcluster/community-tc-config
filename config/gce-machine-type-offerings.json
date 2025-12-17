@@ -71888,6 +71888,10 @@
     "zone": "me-central2-c"
   },
   {
+    "name": "m4-ultramem-224",
+    "zone": "me-central2-c"
+  },
+  {
     "name": "m4-ultramem-56",
     "zone": "me-central2-c"
   },
@@ -104469,6 +104473,42 @@
   },
   {
     "name": "c4-standard-96-lssd",
+    "zone": "us-south1-a"
+  },
+  {
+    "name": "c4a-highmem-1",
+    "zone": "us-south1-a"
+  },
+  {
+    "name": "c4a-highmem-16",
+    "zone": "us-south1-a"
+  },
+  {
+    "name": "c4a-highmem-2",
+    "zone": "us-south1-a"
+  },
+  {
+    "name": "c4a-highmem-32",
+    "zone": "us-south1-a"
+  },
+  {
+    "name": "c4a-highmem-4",
+    "zone": "us-south1-a"
+  },
+  {
+    "name": "c4a-highmem-48",
+    "zone": "us-south1-a"
+  },
+  {
+    "name": "c4a-highmem-64",
+    "zone": "us-south1-a"
+  },
+  {
+    "name": "c4a-highmem-72",
+    "zone": "us-south1-a"
+  },
+  {
+    "name": "c4a-highmem-8",
     "zone": "us-south1-a"
   },
   {
