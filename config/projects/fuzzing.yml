@@ -253,6 +253,7 @@ fuzzing:
           - secrets:get:project/fuzzing/grizzly-reduce-tool-list
         routes:
           - notify.email.truber@mozilla.com.on-failed
+          - notify.email.twsmith@mozilla.com.on-failed
       schedule:
         - "0 */2 * * *"
     grizzly-reduce-reset-error:
