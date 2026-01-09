@@ -12,16 +12,11 @@ REPO = "mozilla-platform-ops/worker-images"
 REF = "main"
 WORKFLOWS = {
     "nonsig-tceng-azure.yml": [
-        "generic-worker-win2022-staging",
         "generic-worker-win2022",
-        "generic-worker-win2022-gpu-staging",
         "generic-worker-win2022-gpu",
-        "generic-worker-win11-24h2-staging",
-        "generic-worker-win2025-staging",
     ],
     "gcp-tceng.yml": [
         "generic-worker-ubuntu-24-04-arm64",
-        "generic-worker-ubuntu-24-04-staging",
         "generic-worker-ubuntu-24-04",
     ],
     "aws-tceng.yml": [
