@@ -785,31 +785,15 @@ def generic_worker(wp, **cfg):
             },
         )
 
-        # Generate unique deployment ID based on hash of launch config. Note, this
-        # isn't perfect, since it may not always be necessary to respawn workers in
-        # all regions for any launch config change, but it is a safe approach that
-        # favours over-rotating workers over under-rotating workers in cases of
-        # uncertainty. Note, deploymentId needs to be the same for all regions,
-        # since workers check the deploymentId of the first launchConfig,
-        # regardless of the region they are in.
-        hashedConfig = hashlib.sha256(
-            json.dumps(wp.config["launchConfigs"], sort_keys=True).encode("utf8")
-        ).hexdigest()
-
-        for launchConfig in wp.config["launchConfigs"]:
-            launchConfig["workerConfig"]["genericWorker"]["config"]["deploymentId"] = (
-                hashedConfig[:16]
-            )
-
         # The sentry project may be specified in the image set definition
         # (/config/imagesets.yml), or in the worker pool definition
         # (/config/projects.yml) so isn't necessarily "generic-worker". Note, we
         # don't include "sentryProject": "generic-worker" in fallback settings
         # above, since generic-worker has this default already, and this keeps the
         # config sections smaller/simpler.
-        sentryProject = launchConfig["workerConfig"]["genericWorker"]["config"].get(
-            "sentryProject", "generic-worker"
-        )
+        sentryProject = wp.config["launchConfigs"][0]["workerConfig"]["genericWorker"][
+            "config"
+        ].get("sentryProject", "generic-worker")
 
     if wp.supports_worker_manager_config():
         for launchConfig in wp.config["launchConfigs"]:
