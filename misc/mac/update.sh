@@ -32,16 +32,16 @@ if [ -z "${VERSION}" ]; then
 fi
 
 current_user=$(scutil <<< "show State:/Users/ConsoleUser" | sed -n 's/.*Name : //p')
-uid=$(id -u "${current_user}")
+uid=''
+[ -n "${current_user}" ] && uid=$(id -u "${current_user}")
 
 if [ -z "${current_user}" ] || [ -z "${uid}" ]; then
-  echo "Cannot detect current user (${current_user}) or uid (${uid})" >&2
-  exit 64
+  echo "WARNING: Cannot detect current user (${current_user}) or uid (${uid})" >&2
 fi
 
 cd /var/root
 launchctl unload -w /Library/LaunchDaemons/com.mozilla.genericworker.plist
-launchctl bootout "gui/${uid}" "/Users/${current_user}/Library/LaunchAgents/com.mozilla.genericworker.launchagent.plist"
+[ -n "${uid}" ] && launchctl bootout "gui/${uid}" "/Users/${current_user}/Library/LaunchAgents/com.mozilla.genericworker.launchagent.plist"
 rm -f current-task-user.json next-task-user.json tasks-resolved-count.txt directory-caches.json file-caches.json
 cd /usr/local/bin
 curl -L https://github.com/taskcluster/taskcluster/releases/download/v${VERSION}/generic-worker-multiuser-darwin-arm64 > generic-worker
@@ -50,5 +50,5 @@ curl -L https://github.com/taskcluster/taskcluster/releases/download/v${VERSION}
 curl -L https://github.com/taskcluster/taskcluster/releases/download/v${VERSION}/taskcluster-proxy-darwin-arm64 > taskcluster-proxy
 # in case the file wasn't already present, for any reason (such as they were manually deleted)
 chmod a+x generic-worker livelog start-worker taskcluster-proxy
-launchctl bootstrap "gui/${uid}" "/Users/${current_user}/Library/LaunchAgents/com.mozilla.genericworker.launchagent.plist"
+[ -n "${uid}" ] && launchctl bootstrap "gui/${uid}" "/Users/${current_user}/Library/LaunchAgents/com.mozilla.genericworker.launchagent.plist"
 launchctl load -w /Library/LaunchDaemons/com.mozilla.genericworker.plist
