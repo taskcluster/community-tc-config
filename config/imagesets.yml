@@ -150,7 +150,7 @@ generic-worker-ubuntu-24-04-staging:
     amis:
       us-east-1: ami-0afcb836d0b81a957
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-ebvxqcafoefwfuoohbsl
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-atyjijwoikhfkmkfsgoj
 generic-worker-win2022:
   workerImplementation: generic-worker
   azure:
