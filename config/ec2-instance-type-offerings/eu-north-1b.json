@@ -196,6 +196,7 @@
     "hpc7a.24xlarge",
     "hpc7a.48xlarge",
     "hpc7a.96xlarge",
+    "hpc8a.96xlarge",
     "i3.16xlarge",
     "i3.2xlarge",
     "i3.4xlarge",
@@ -570,5 +571,19 @@
     "x8g.medium",
     "x8g.metal-24xl",
     "x8g.metal-48xl",
-    "x8g.xlarge"
+    "x8g.xlarge",
+    "x8i.12xlarge",
+    "x8i.16xlarge",
+    "x8i.24xlarge",
+    "x8i.2xlarge",
+    "x8i.32xlarge",
+    "x8i.48xlarge",
+    "x8i.4xlarge",
+    "x8i.64xlarge",
+    "x8i.8xlarge",
+    "x8i.96xlarge",
+    "x8i.large",
+    "x8i.metal-48xl",
+    "x8i.metal-96xl",
+    "x8i.xlarge"
 ]

@@ -533,5 +533,19 @@
     "x2iedn.4xlarge",
     "x2iedn.8xlarge",
     "x2iedn.metal",
-    "x2iedn.xlarge"
+    "x2iedn.xlarge",
+    "x8i.12xlarge",
+    "x8i.16xlarge",
+    "x8i.24xlarge",
+    "x8i.2xlarge",
+    "x8i.32xlarge",
+    "x8i.48xlarge",
+    "x8i.4xlarge",
+    "x8i.64xlarge",
+    "x8i.8xlarge",
+    "x8i.96xlarge",
+    "x8i.large",
+    "x8i.metal-48xl",
+    "x8i.metal-96xl",
+    "x8i.xlarge"
 ]
