@@ -37164,6 +37164,90 @@
     "zone": "europe-central2-a"
   },
   {
+    "name": "c2d-highcpu-112",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-highcpu-16",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-highcpu-2",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-highcpu-32",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-highcpu-4",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-highcpu-56",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-highcpu-8",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-highmem-112",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-highmem-16",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-highmem-2",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-highmem-32",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-highmem-4",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-highmem-56",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-highmem-8",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-standard-112",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-standard-16",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-standard-2",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-standard-32",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-standard-4",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-standard-56",
+    "zone": "europe-central2-b"
+  },
+  {
+    "name": "c2d-standard-8",
+    "zone": "europe-central2-b"
+  },
+  {
     "name": "e2-highcpu-16",
     "zone": "europe-central2-b"
   },
@@ -81808,7 +81892,43 @@
     "zone": "northamerica-northeast2-c"
   },
   {
+    "name": "m4-hypermem-16",
+    "zone": "northamerica-northeast2-c"
+  },
+  {
+    "name": "m4-hypermem-32",
+    "zone": "northamerica-northeast2-c"
+  },
+  {
+    "name": "m4-hypermem-64",
+    "zone": "northamerica-northeast2-c"
+  },
+  {
+    "name": "m4-megamem-112",
+    "zone": "northamerica-northeast2-c"
+  },
+  {
+    "name": "m4-megamem-224",
+    "zone": "northamerica-northeast2-c"
+  },
+  {
+    "name": "m4-megamem-28",
+    "zone": "northamerica-northeast2-c"
+  },
+  {
+    "name": "m4-megamem-56",
+    "zone": "northamerica-northeast2-c"
+  },
+  {
+    "name": "m4-ultramem-112",
+    "zone": "northamerica-northeast2-c"
+  },
+  {
     "name": "m4-ultramem-224",
+    "zone": "northamerica-northeast2-c"
+  },
+  {
+    "name": "m4-ultramem-56",
     "zone": "northamerica-northeast2-c"
   },
   {
@@ -107344,7 +107464,31 @@
     "zone": "us-east5-a"
   },
   {
+    "name": "c3-standard-176",
+    "zone": "us-east5-a"
+  },
+  {
     "name": "c3-standard-192-metal",
+    "zone": "us-east5-a"
+  },
+  {
+    "name": "c3-standard-22",
+    "zone": "us-east5-a"
+  },
+  {
+    "name": "c3-standard-4",
+    "zone": "us-east5-a"
+  },
+  {
+    "name": "c3-standard-44",
+    "zone": "us-east5-a"
+  },
+  {
+    "name": "c3-standard-8",
+    "zone": "us-east5-a"
+  },
+  {
+    "name": "c3-standard-88",
     "zone": "us-east5-a"
   },
   {
@@ -109437,6 +109581,114 @@
   },
   {
     "name": "n4-standard-80",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highcpu-16",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highcpu-2",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highcpu-32",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highcpu-4",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highcpu-48",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highcpu-64",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highcpu-8",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highcpu-80",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highcpu-96",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highmem-16",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highmem-2",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highmem-32",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highmem-4",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highmem-48",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highmem-64",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highmem-8",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highmem-80",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-highmem-96",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-standard-16",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-standard-2",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-standard-32",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-standard-4",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-standard-48",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-standard-64",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-standard-8",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-standard-80",
+    "zone": "us-east5-b"
+  },
+  {
+    "name": "n4d-standard-96",
     "zone": "us-east5-b"
   },
   {
