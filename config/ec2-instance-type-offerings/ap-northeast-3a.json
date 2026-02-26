@@ -153,6 +153,7 @@
     "i8g.8xlarge",
     "i8g.large",
     "i8g.metal-24xl",
+    "i8g.metal-48xl",
     "i8g.xlarge",
     "m4.16xlarge",
     "m4.2xlarge",
@@ -360,5 +361,13 @@
     "x2idn.16xlarge",
     "x2idn.24xlarge",
     "x2idn.32xlarge",
-    "x2idn.metal"
+    "x2idn.metal",
+    "x2iedn.16xlarge",
+    "x2iedn.24xlarge",
+    "x2iedn.2xlarge",
+    "x2iedn.32xlarge",
+    "x2iedn.4xlarge",
+    "x2iedn.8xlarge",
+    "x2iedn.metal",
+    "x2iedn.xlarge"
 ]

@@ -237,6 +237,7 @@
     "i8g.8xlarge",
     "i8g.large",
     "i8g.metal-24xl",
+    "i8g.metal-48xl",
     "i8g.xlarge",
     "inf1.24xlarge",
     "inf1.2xlarge",
