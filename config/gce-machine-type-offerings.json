@@ -36384,6 +36384,90 @@
     "zone": "australia-southeast2-c"
   },
   {
+    "name": "c2d-highcpu-112",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-highcpu-16",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-highcpu-2",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-highcpu-32",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-highcpu-4",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-highcpu-56",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-highcpu-8",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-highmem-112",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-highmem-16",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-highmem-2",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-highmem-32",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-highmem-4",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-highmem-56",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-highmem-8",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-standard-112",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-standard-16",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-standard-2",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-standard-32",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-standard-4",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-standard-56",
+    "zone": "europe-central2-a"
+  },
+  {
+    "name": "c2d-standard-8",
+    "zone": "europe-central2-a"
+  },
+  {
     "name": "c4-highcpu-144",
     "zone": "europe-central2-a"
   },
@@ -49317,6 +49401,18 @@
   },
   {
     "name": "e2-standard-8",
+    "zone": "europe-west10-b"
+  },
+  {
+    "name": "g4-standard-192",
+    "zone": "europe-west10-b"
+  },
+  {
+    "name": "g4-standard-48",
+    "zone": "europe-west10-b"
+  },
+  {
+    "name": "g4-standard-96",
     "zone": "europe-west10-b"
   },
   {
@@ -103408,6 +103504,114 @@
     "zone": "us-east4-a"
   },
   {
+    "name": "n4d-highcpu-16",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highcpu-2",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highcpu-32",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highcpu-4",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highcpu-48",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highcpu-64",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highcpu-8",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highcpu-80",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highcpu-96",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highmem-16",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highmem-2",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highmem-32",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highmem-4",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highmem-48",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highmem-64",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highmem-8",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highmem-80",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-highmem-96",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-standard-16",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-standard-2",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-standard-32",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-standard-4",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-standard-48",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-standard-64",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-standard-8",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-standard-80",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "n4d-standard-96",
+    "zone": "us-east4-a"
+  },
+  {
     "name": "t2d-standard-1",
     "zone": "us-east4-a"
   },
@@ -126693,6 +126897,10 @@
   },
   {
     "name": "g4-standard-192",
+    "zone": "us-west4-c"
+  },
+  {
+    "name": "g4-standard-384",
     "zone": "us-west4-c"
   },
   {
