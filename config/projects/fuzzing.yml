@@ -70,7 +70,8 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
-      machineType: "zones/{zone}/machineTypes/c3d-standard-4"
+      machineTypes:
+        "zones/{zone}/machineTypes/c3d-standard-4": 1
     ci-arm64:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
@@ -78,7 +79,8 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
-      machineType: "zones/{zone}/machineTypes/t2a-standard-4"
+      machineTypes:
+        "zones/{zone}/machineTypes/t2a-standard-4": 1
     ci-windows:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
@@ -107,7 +109,8 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
-      machineType: "zones/{zone}/machineTypes/c4-standard-4"
+      machineTypes:
+        "zones/{zone}/machineTypes/c4-standard-4": 1
       launchConfig:
         advancedMachineFeatures:
           enableNestedVirtualization: true

@@ -143,7 +143,8 @@ taskcluster:
         genericWorker:
           config:
             headlessTasks: true
-      machineType: "zones/{zone}/machineTypes/t2a-standard-4"
+      machineTypes:
+        "zones/{zone}/machineTypes/t2a-standard-4": 1
 
     gw-ubuntu-staging-aws:
       owner: taskcluster-notifications+workers@mozilla.com

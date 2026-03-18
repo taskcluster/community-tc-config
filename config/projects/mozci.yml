@@ -18,9 +18,8 @@ mozci:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 25
-      machineType: "zones/{zone}/machineTypes/n2-standard-2"
-      instanceTypes:
-        m5.large: 1
+      machineTypes:
+        "zones/{zone}/machineTypes/n2-standard-2": 1
     compute-small:
       owner: mcastelluccio@mozilla.com
       emailOnError: false
@@ -28,9 +27,8 @@ mozci:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 25
-      machineType: "zones/{zone}/machineTypes/n2-standard-4"
-      instanceTypes:
-        m5.xlarge: 1
+      machineTypes:
+        "zones/{zone}/machineTypes/n2-standard-4": 1
     generic-worker-ubuntu-24-04:
       owner: mcastelluccio@mozilla.com
       emailOnError: false

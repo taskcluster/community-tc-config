@@ -293,7 +293,9 @@ def gcp(
     image_set=None,
     minCapacity=0,
     maxCapacity=None,
-    machineType="zones/{zone}/machineTypes/n2-standard-4",
+    machineTypes={
+        "zones/{zone}/machineTypes/n2-standard-4": 1,
+    },
     diskSizeGb=60,
     **cfg,
 ):
@@ -303,8 +305,9 @@ def gcp(
       image_set: ImageSets.Item class instance with worker config, image names etc
       minCapacity: minimum capacity to run at any time (default 0)
       maxCapacity: maximum capacity to run at any time (required)
-      machineType: fully qualified gcp machine type name (default
-                   `zones/{zone}/machineTypes/n2-standard-4`)
+      machineTypes: dict of fully qualified gcp machine type names to
+                    capacityPerInstance (default
+                    {"zones/{zone}/machineTypes/n2-standard-4": 1})
       diskSizeGb: boot disk size, in GB (defaults to 60)
     """
 
@@ -335,12 +338,16 @@ def gcp(
         return mtype in gcp_machine_types_by_zone()[zone]
 
     assert maxCapacity, "must give a maxCapacity"
+    assert machineTypes, "must give machineTypes"
     wp = DynamicWorkerPoolSettings(GOOGLE_PROVIDER)
     wp.config = {
         "maxCapacity": maxCapacity,
         "minCapacity": minCapacity,
         "launchConfigs": [
-            gcp_launch_config(zone, region, machineType, image, diskSizeGb, **cfg)
+            gcp_launch_config(
+                zone, region, machineType, capacityPerInstance, image, diskSizeGb, **cfg
+            )
+            for machineType, capacityPerInstance in machineTypes.items()
             for zone, region in GOOGLE_ZONES_REGIONS
             if machine_in_zone(machineType, zone)
         ],
@@ -348,13 +355,15 @@ def gcp(
 
     assert len(wp.config["launchConfigs"]) != 0, (
         f"No configured GCP zones ({', '.join(zone for zone, r in GOOGLE_ZONES_REGIONS)})"
-        f" support machine type {machineType.split('/')[-1]}"
+        f" support machine types {', '.join(mt.split('/')[-1] for mt in machineTypes)}"
     )
 
     return wp
 
 
-def gcp_launch_config(zone, region, machineType, image, diskSizeGb, **cfg):
+def gcp_launch_config(
+    zone, region, machineType, capacityPerInstance, image, diskSizeGb, **cfg
+):
     default_launch_config = {
         "machineType": machineType.format(zone=zone),
         "region": region,
@@ -378,7 +387,7 @@ def gcp_launch_config(zone, region, machineType, image, diskSizeGb, **cfg):
         "networkInterfaces": [{"accessConfigs": [{"type": "ONE_TO_ONE_NAT"}]}],
         "workerManager": merge(
             {
-                "capacityPerInstance": 1,
+                "capacityPerInstance": capacityPerInstance,
             },
             get_worker_manager_overrides(
                 cfg,
