@@ -11,9 +11,8 @@ git-cinnabar:
       imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       maxCapacity: 5
-      machineType: "zones/{zone}/machineTypes/n2-highmem-4"
-      instanceTypes:
-        r5.xlarge: 1
+      machineTypes:
+        "zones/{zone}/machineTypes/n2-highmem-4": 1
     windows:
       imageset: generic-worker-win2022
       cloud: azure
