@@ -788,7 +788,7 @@ def generic_worker(wp, **cfg):
                 "genericWorker": {
                     "config": {
                         "wstAudience": "communitytc",
-                        "wstServerURL": "https://community-websocktunnel.services.mozilla.com",
+                        "wstServerURL": "https://wstunnel.communitytc.taskcluster.prod.webservices.mozgcp.net",
                     },
                 },
             },
