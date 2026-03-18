@@ -29,4 +29,4 @@ workerConfig:
   taskclusterProxyPort: 8080
   tasksDir: "/Users"
   wstAudience: "communitytc"
-  wstServerURL: "https://community-websocktunnel.services.mozilla.com"
+  wstServerURL: "https://wstunnel.communitytc.taskcluster.prod.webservices.mozgcp.net"
