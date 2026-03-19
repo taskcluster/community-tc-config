@@ -155,7 +155,7 @@ generic-worker-ubuntu-24-04-staging:
     amis:
       us-east-1: ami-0afcb836d0b81a957
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-lrnlokjhcjknitwljwin
+    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-ptrehgbfweabnawqsnyu
 generic-worker-win2022:
   workerImplementation: generic-worker
   azure:
@@ -179,7 +179,7 @@ generic-worker-win2022-staging:
   workerImplementation: generic-worker
   azure:
     images:
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-ioarbsmaqowqdorgydat-centralus
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-abttjjrhchrumuiuqhsn-centralus
   workerConfig:
     genericWorker:
       config:
