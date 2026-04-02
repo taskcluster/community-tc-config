@@ -355,7 +355,7 @@ fuzzing:
         expires:
           $fromNow: 3 months
         deadline:
-          $fromNow: 6 hours
+          $fromNow: 8 hours
         scopes:
           - docker-worker:capability:device:hostSharedMemory
           - docker-worker:capability:device:loopbackAudio
@@ -391,7 +391,7 @@ fuzzing:
             namespace: project.fuzzing.orion.bugmon.master
           features:
             taskclusterProxy: true
-          maxRunTime: 10800
+          maxRunTime: 14400
           env:
             BUG_ACTION: monitor
             FORCE_CONFIRM: "true"
@@ -410,7 +410,7 @@ fuzzing:
         expires:
           $fromNow: 3 months
         deadline:
-          $fromNow: 6 hours
+          $fromNow: 8 hours
         scopes:
           - docker-worker:capability:device:hostSharedMemory
           - docker-worker:capability:device:loopbackAudio
