@@ -18,7 +18,7 @@ fuzzing:
       imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 20
       workerConfig:
         genericWorker:
           config:
@@ -29,7 +29,7 @@ fuzzing:
       imageset: generic-worker-win2022-gpu
       cloud: azure
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 20
       vmSizes:
         Standard_NV12s_v3: 1
       workerConfig:
