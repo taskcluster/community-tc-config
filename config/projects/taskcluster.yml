@@ -15,7 +15,7 @@ taskcluster:
     ci:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: false
-      imageset: generic-worker-ubuntu-24-04-staging # temporary while testing https://github.com/taskcluster/taskcluster/pull/8278
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
@@ -28,7 +28,7 @@ taskcluster:
       owner: taskcluster-notifications+workers@mozilla.com
       description: "Trusted worker to build Taskcluster releases (only!)"
       emailOnError: true
-      imageset: generic-worker-ubuntu-24-04-staging # temporary while testing https://github.com/taskcluster/taskcluster/pull/8278
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 1
@@ -62,7 +62,7 @@ taskcluster:
     gw-ubuntu-24-04-gui:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-24-04-staging # temporary while testing https://github.com/taskcluster/taskcluster/pull/8278
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
@@ -81,7 +81,7 @@ taskcluster:
     gw-windows-2022-gui:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win2022-staging # temporary while testing https://github.com/taskcluster/taskcluster/pull/8278
+      imageset: generic-worker-win2022
       cloud: azure
       minCapacity: 0
       maxCapacity: 10
@@ -122,7 +122,7 @@ taskcluster:
     gw-ubuntu-24-04:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-ubuntu-24-04-staging # temporary while testing https://github.com/taskcluster/taskcluster/pull/8278
+      imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50
@@ -193,7 +193,7 @@ taskcluster:
     gw-windows-2022:
       owner: taskcluster-notifications+workers@mozilla.com
       emailOnError: true
-      imageset: generic-worker-win2022-staging # temporary while testing https://github.com/taskcluster/taskcluster/pull/8278
+      imageset: generic-worker-win2022
       cloud: azure
       minCapacity: 0
       maxCapacity: 10
