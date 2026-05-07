@@ -216,10 +216,10 @@ generic-worker-win2025-staging:
 generic-worker-win2022-gpu:
   azure:
     images:
-      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-iprbwkpmqjsdlykgliis-westus2
-      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-wcbpqufmisniospuurij-southcentralus
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-bokbqsitfsorvfsulvqx-eastus
-      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-vhslreydipvsxhalgdda-eastus2
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-blqdxfqktcnlejfljrlu-westus2
+      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-gjxahqopqymjqlnwlcxy-southcentralus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-pytqpjhvfwnqlskngjsf-eastus
+      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-ittdjfdckpqnvqswdkno-eastus2
   workerImplementation: generic-worker
   workerConfig:
     genericWorker:
