@@ -548,6 +548,7 @@
     "m8i.metal-48xl",
     "m8i.metal-96xl",
     "m8i.xlarge",
+    "mac-m4.metal",
     "mac1.metal",
     "mac2-m2.metal",
     "mac2-m2pro.metal",
