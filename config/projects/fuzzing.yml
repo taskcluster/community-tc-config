@@ -31,7 +31,7 @@ fuzzing:
       minCapacity: 0
       maxCapacity: 20
       vmSizes:
-        Standard_NV12s_v3: 1
+        Standard_NV12ads_A10_v5: 1
       workerConfig:
         genericWorker:
           config:
@@ -122,7 +122,7 @@ fuzzing:
       minCapacity: 0
       maxCapacity: 10
       vmSizes:
-        Standard_NV12s_v3: 1
+        Standard_NV12ads_A10_v5: 1
     grizzly-reduce-worker-windows-ngpu:
       owner: truber@mozilla.com
       emailOnError: true
