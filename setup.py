@@ -9,7 +9,7 @@ setup(
     url="https://github.com/taskcluster/community-tc-config",
     packages=find_packages("."),
     install_requires=[
-        "tc-admin>=5.1.1",
+        "tc-admin>=5.2.1",
         "json-e>=4.7.1",
         "ruamel.yaml",
     ],
