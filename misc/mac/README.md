@@ -14,6 +14,9 @@ LaunchDaemon configuration file that automatically starts the generic worker ser
 ### [run-generic-worker.sh](run-generic-worker.sh)
 Startup script executed by the LaunchDaemon that:
 - Cleans up files from purged users in `/private/var/folders/`
+- Clears the Apple Neural Engine model cache (`/Library/Caches/com.apple.aned`)
+- Clears the Spotlight index, which otherwise grow unbounded from transient task users
+- Resets the Background Task Management database if it exceeds 2.5MiB (see [#983](https://github.com/taskcluster/community-tc-config/issues/983))
 - Changes to home directory
 - Launches the worker using `/usr/local/bin/start-worker` with config `/etc/generic-worker/runner.yml`
 
