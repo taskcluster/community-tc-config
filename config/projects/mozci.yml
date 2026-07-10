@@ -56,8 +56,11 @@ mozci:
     # Routes for mozci docker images
     - grant:
         - queue:route:index.project.mozci.docker-pr.*
-        - queue:route:index.project.mozci.docker.*
       to: repo:github.com/mozilla/mozci:*
+
+    - grant:
+        - queue:route:index.project.mozci.docker.*
+      to: repo:github.com/mozilla/mozci:branch:*
 
     - grant:
         # Allow decision task to create children tasks
