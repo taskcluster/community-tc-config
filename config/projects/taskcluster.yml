@@ -498,10 +498,15 @@ taskcluster:
         - queue:scheduler-id:taskcluster-level-1
         - queue:route:checks
         - queue:route:index.taskcluster.cache.pr.docker-images.v2.*
-        - queue:route:index.taskcluster.cache.level-1.docker-images.v2.*
       to:
         - repo:github.com/taskcluster/taskcluster:*
         - repo:github.com/taskcluster/staging-releases:*
+
+    - grant:
+        - queue:route:index.taskcluster.cache.level-1.docker-images.v2.*
+      to:
+        - repo:github.com/taskcluster/taskcluster:branch:*
+        - repo:github.com/taskcluster/staging-releases:branch:*
 
     - grant:
         - queue:create-task:medium:proj-taskcluster/gw-ubuntu-24-04-gui
