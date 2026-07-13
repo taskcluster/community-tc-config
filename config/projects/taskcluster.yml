@@ -6,6 +6,7 @@ taskcluster:
     - github.com/json-e/json-e:*
     - github.com/taskcluster/community-tc-config:*
     - github.com/mozilla/hawk:*
+    - github.com/petemoore/taskcluster:*
   externallyManaged:
     # smoketests create these resources, and also cleans them up, so leave
     # them alone here...
@@ -337,7 +338,9 @@ taskcluster:
         - secrets:get:project/taskcluster/testing/azure
         # This is the taskcluster channel
         - queue:route:notify.matrix-room.!whDRjjSmICCgrhFHsQ:mozilla.org.*
-      to: repo:github.com/taskcluster/*
+      to:
+        - repo:github.com/taskcluster/*
+        - repo:github.com/petemoore/taskcluster:*
 
     - grant:
         - queue:create-task:highest:proj-taskcluster/ci
@@ -347,7 +350,9 @@ taskcluster:
         - secrets:get:project/taskcluster/testing/client-libraries
         - secrets:get:project/taskcluster/testing/taskcluster-*
         - docker-worker:cache:taskcluster-*
-      to: repo:github.com/taskcluster/taskcluster:*
+      to:
+        - repo:github.com/taskcluster/taskcluster:*
+        - repo:github.com/petemoore/taskcluster:*
 
     - grant:
         - queue:create-task:highest:proj-taskcluster/release
@@ -423,6 +428,7 @@ taskcluster:
         - secrets:get:project/taskcluster/testing/docker-worker/pulse-creds
       to:
         - repo:github.com/taskcluster/taskcluster:*
+        - repo:github.com/petemoore/taskcluster:*
         - project:taskcluster:docker-worker-tester
 
     - grant: assume:project:taskcluster:docker-worker-tester
@@ -501,6 +507,7 @@ taskcluster:
       to:
         - repo:github.com/taskcluster/taskcluster:*
         - repo:github.com/taskcluster/staging-releases:*
+        - repo:github.com/petemoore/taskcluster:*
 
     - grant:
         - queue:route:index.taskcluster.cache.level-1.docker-images.v2.*
