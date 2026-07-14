@@ -1,1 +1,0 @@
-../generic-worker-ubuntu-24-04/bootstrap.sh

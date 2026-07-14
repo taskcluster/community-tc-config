@@ -13,6 +13,7 @@ import yaml
 
 from .imagesets import ImageSets
 from .loader import loader
+from .utils import evaluate_keyed_by
 
 CLOUD_FUNCS = {}
 WORKER_IMPLEMENTATION_FUNCS = {}
@@ -292,8 +293,10 @@ def gcp(
     image_set=None,
     minCapacity=0,
     maxCapacity=None,
-    machineType="zones/{zone}/machineTypes/n2-standard-4",
-    diskSizeGb=50,
+    machineTypes={
+        "zones/{zone}/machineTypes/n2-standard-4": 1,
+    },
+    diskSizeGb=60,
     **cfg,
 ):
     """
@@ -302,9 +305,10 @@ def gcp(
       image_set: ImageSets.Item class instance with worker config, image names etc
       minCapacity: minimum capacity to run at any time (default 0)
       maxCapacity: maximum capacity to run at any time (required)
-      machineType: fully qualified gcp machine type name (default
-                   `zones/{zone}/machineTypes/n2-standard-4`)
-      diskSizeGb: boot disk size, in GB (defaults to 50)
+      machineTypes: dict of fully qualified gcp machine type names to
+                    capacityPerInstance (default
+                    {"zones/{zone}/machineTypes/n2-standard-4": 1})
+      diskSizeGb: boot disk size, in GB (defaults to 60)
     """
 
     image = image_set.gcp["image"]
@@ -334,12 +338,16 @@ def gcp(
         return mtype in gcp_machine_types_by_zone()[zone]
 
     assert maxCapacity, "must give a maxCapacity"
+    assert machineTypes, "must give machineTypes"
     wp = DynamicWorkerPoolSettings(GOOGLE_PROVIDER)
     wp.config = {
         "maxCapacity": maxCapacity,
         "minCapacity": minCapacity,
         "launchConfigs": [
-            gcp_launch_config(zone, region, machineType, image, diskSizeGb, **cfg)
+            gcp_launch_config(
+                zone, region, machineType, capacityPerInstance, image, diskSizeGb, **cfg
+            )
+            for machineType, capacityPerInstance in machineTypes.items()
             for zone, region in GOOGLE_ZONES_REGIONS
             if machine_in_zone(machineType, zone)
         ],
@@ -347,13 +355,15 @@ def gcp(
 
     assert len(wp.config["launchConfigs"]) != 0, (
         f"No configured GCP zones ({', '.join(zone for zone, r in GOOGLE_ZONES_REGIONS)})"
-        f" support machine type {machineType.split('/')[-1]}"
+        f" support machine types {', '.join(mt.split('/')[-1] for mt in machineTypes)}"
     )
 
     return wp
 
 
-def gcp_launch_config(zone, region, machineType, image, diskSizeGb, **cfg):
+def gcp_launch_config(
+    zone, region, machineType, capacityPerInstance, image, diskSizeGb, **cfg
+):
     default_launch_config = {
         "machineType": machineType.format(zone=zone),
         "region": region,
@@ -375,9 +385,15 @@ def gcp_launch_config(zone, region, machineType, image, diskSizeGb, **cfg):
             },
         ],
         "networkInterfaces": [{"accessConfigs": [{"type": "ONE_TO_ONE_NAT"}]}],
-        "workerManager": {
-            "capacityPerInstance": 1,
-        },
+        "workerManager": merge(
+            {
+                "capacityPerInstance": capacityPerInstance,
+            },
+            get_worker_manager_overrides(
+                cfg,
+                {"region": region, "zone": zone, "machineType": machineType},
+            ),
+        ),
     }
     return merge(cfg.get("launchConfig", {}), default_launch_config)
 
@@ -469,10 +485,17 @@ def aws(
                         "InstanceType": instanceType,
                         "InstanceMarketOptions": {"MarketType": "spot"},
                     },
-                    "workerManager": {
-                        "capacityPerInstance": capacityPerInstance,
-                    },
+                    "workerManager": merge(
+                        {
+                            "capacityPerInstance": capacityPerInstance,
+                        },
+                        get_worker_manager_overrides(
+                            cfg,
+                            {"region": region, "az": az, "instanceType": instanceType},
+                        ),
+                    ),
                 }
+
                 launchConfigs.append(launchConfig)
     assert launchConfigs, (
         f"The regions {regions} do not support instance types"
@@ -507,6 +530,107 @@ def azure_machine_types_in_location(location):
     return set(data)
 
 
+def _build_arm_template_launch_config(
+    *,
+    image_set,
+    pool_arm_deployment,
+    pool_arm_deployment_resource_group,
+    location,
+    vmSize,
+    capacityPerInstance,
+    imageId,
+    subnetId,
+    cfg,
+):
+    """
+    Create a launch config for ARM template deployment.
+
+    Auto-injects the common parameters (vmSize, imageId, location, subnetId) and merges
+    them with user-provided parameters. Templates are specified via template specs; only
+    the template spec ID and parameters are supported in configuration.
+    """
+    attrs = {"location": location, "vmSize": vmSize}
+
+    def evaluate(value, item_name):
+        if value is None:
+            return None
+        return evaluate_keyed_by(value, item_name, attrs)
+
+    def normalize(parameters):
+        normalized = {}
+        for key, value in (parameters or {}).items():
+            if isinstance(value, dict) and "value" in value:
+                normalized[key] = value
+            else:
+                normalized[key] = {"value": value}
+        return normalized
+
+    base_arm_deployment = (
+        evaluate(image_set.azure.get("armDeployment"), "armDeployment") or {}
+    )
+    override_arm_deployment = evaluate(pool_arm_deployment, "armDeployment") or {}
+
+    if not base_arm_deployment and not override_arm_deployment:
+        return None
+
+    template_spec_id = override_arm_deployment.get(
+        "templateSpecId"
+    ) or base_arm_deployment.get("templateSpecId")
+    if not template_spec_id:
+        raise ValueError(
+            "armDeployment.templateSpecId must be provided via imageset or pool override"
+        )
+
+    parameters = normalize(base_arm_deployment.get("parameters"))
+    parameters.update(normalize(override_arm_deployment.get("parameters")))
+
+    auto_defaults = {
+        "vmSize": {"value": vmSize},
+        "imageId": {"value": imageId},
+        "location": {"value": location},
+        "subnetId": {"value": subnetId},
+    }
+    if "priority" in parameters or cfg.get("priority") is not None:
+        auto_defaults["priority"] = {"value": cfg.get("priority", "Spot")}
+
+    for key, value in auto_defaults.items():
+        parameters.setdefault(key, value)
+
+    deployment = {
+        "mode": "Incremental",
+        "templateLink": {"id": template_spec_id},
+        "parameters": parameters,
+    }
+
+    launchConfig = {
+        "armDeployment": deployment,
+        "workerManager": merge(
+            {
+                "capacityPerInstance": capacityPerInstance,
+            },
+            get_worker_manager_overrides(
+                cfg,
+                {"location": location, "vmSize": vmSize},
+            ),
+        ),
+    }
+
+    # Add armDeploymentResourceGroup if specified
+    base_arm_rg = evaluate(
+        image_set.azure.get("armDeploymentResourceGroup"),
+        "armDeploymentResourceGroup",
+    )
+    override_arm_rg = evaluate(
+        pool_arm_deployment_resource_group,
+        "armDeploymentResourceGroup",
+    )
+    armDeploymentResourceGroup = override_arm_rg or base_arm_rg
+    if armDeploymentResourceGroup:
+        launchConfig["armDeploymentResourceGroup"] = armDeploymentResourceGroup
+
+    return launchConfig
+
+
 @cloud
 def azure(
     *,
@@ -517,6 +641,8 @@ def azure(
     vmSizes={
         "Standard_F16s_v2": 1,
     },
+    armDeployment=None,
+    armDeploymentResourceGroup=None,
     **cfg,
 ):
     """
@@ -528,6 +654,15 @@ def azure(
       maxCapacity: maximum capacity to run at any time (required)
       vmSizes: dict of VM sizes to provision, values are
                      capacityPerInstance (required) (default {Standard_F16s_v2: 1})
+      armDeployment: Optional ARM template deployment configuration. When provided,
+                     uses a template spec to deploy instead of image-based VMSS.
+                     Supported keys:
+                       templateSpecId (optional): ID of the template spec version to deploy.
+                                                  if not provided, azure.yml#armDeployment
+                                                  would be used.
+                       parameters (optional): Values merged with auto-injected parameters
+                                              (vmSize, imageId, subnetId, location, priority).
+      armDeploymentResourceGroup: Optional resource group for the template deployment.
     """
 
     assert maxCapacity, "must give a maxCapacity"
@@ -548,6 +683,7 @@ def azure(
     if "locations" not in cfg:
         locations = list(image_set.azure["images"])
     assert locations, "must give locations"
+    locations = sorted(locations)
 
     imageIds = image_set.azure["images"]
     assert imageIds, "must give imageIds"
@@ -560,37 +696,65 @@ def azure(
             # is not available.
             if vmSize not in azure_machine_types_in_location(location):
                 continue
-            launchConfig = {
-                "location": location,
-                "storageProfile": {
-                    "osDisk": {
-                        "osType": "Windows",
-                        "caching": "ReadOnly",
-                        "createOption": "FromImage",
-                        "diffDiskSettings": {
-                            "option": "Local",
+
+            # this will use arm deployment if it is defined in azure.yml or pool config
+            arm_deployment_cfg = {
+                **azure_config.get("armDeployment", {}),
+                **(armDeployment if armDeployment else {}),
+            }
+
+            arm_launch_config = _build_arm_template_launch_config(
+                image_set=image_set,
+                pool_arm_deployment=arm_deployment_cfg,
+                pool_arm_deployment_resource_group=armDeploymentResourceGroup,
+                location=location,
+                vmSize=vmSize,
+                capacityPerInstance=capacityPerInstance,
+                imageId=imageIds[location],
+                subnetId=subnetId,
+                cfg=cfg,
+            )
+            if arm_launch_config:
+                launchConfig = arm_launch_config
+            else:
+                # Original image-based deployment
+                launchConfig = {
+                    "location": location,
+                    "storageProfile": {
+                        "osDisk": {
+                            "osType": "Windows",
+                            "caching": "ReadOnly",
+                            "createOption": "FromImage",
+                            "diffDiskSettings": {
+                                "option": "Local",
+                            },
+                        },
+                        "imageReference": {
+                            "id": imageIds[location],
                         },
                     },
-                    "imageReference": {
-                        "id": imageIds[location],
+                    "osProfile": {
+                        "windowsConfiguration": {
+                            "timeZone": "UTC",
+                            "enableAutomaticUpdates": False,
+                        },
                     },
-                },
-                "osProfile": {
-                    "windowsConfiguration": {
-                        "timeZone": "UTC",
-                        "enableAutomaticUpdates": False,
+                    "subnetId": subnetId,
+                    "priority": "spot",
+                    "evictionPolicy": "Delete",
+                    "hardwareProfile": {
+                        "vmSize": vmSize,
                     },
-                },
-                "subnetId": subnetId,
-                "priority": "spot",
-                "evictionPolicy": "Delete",
-                "hardwareProfile": {
-                    "vmSize": vmSize,
-                },
-                "workerManager": {
-                    "capacityPerInstance": capacityPerInstance,
-                },
-            }
+                    "workerManager": merge(
+                        {
+                            "capacityPerInstance": capacityPerInstance,
+                        },
+                        get_worker_manager_overrides(
+                            cfg,
+                            {"location": location, "vmSize": vmSize},
+                        ),
+                    ),
+                }
             launchConfigs.append(launchConfig)
     assert launchConfigs, (
         f"The locations {locations} do not support VM sizes" f" {list(vmSizes.keys())}"
@@ -624,27 +788,11 @@ def generic_worker(wp, **cfg):
                 "genericWorker": {
                     "config": {
                         "wstAudience": "communitytc",
-                        "wstServerURL": "https://community-websocktunnel.services.mozilla.com",
+                        "wstServerURL": "https://wstunnel.communitytc.taskcluster.prod.webservices.mozgcp.net",
                     },
                 },
             },
         )
-
-        # Generate unique deployment ID based on hash of launch config. Note, this
-        # isn't perfect, since it may not always be necessary to respawn workers in
-        # all regions for any launch config change, but it is a safe approach that
-        # favours over-rotating workers over under-rotating workers in cases of
-        # uncertainty. Note, deploymentId needs to be the same for all regions,
-        # since workers check the deploymentId of the first launchConfig,
-        # regardless of the region they are in.
-        hashedConfig = hashlib.sha256(
-            json.dumps(wp.config["launchConfigs"], sort_keys=True).encode("utf8")
-        ).hexdigest()
-
-        for launchConfig in wp.config["launchConfigs"]:
-            launchConfig["workerConfig"]["genericWorker"]["config"]["deploymentId"] = (
-                hashedConfig[:16]
-            )
 
         # The sentry project may be specified in the image set definition
         # (/config/imagesets.yml), or in the worker pool definition
@@ -652,9 +800,9 @@ def generic_worker(wp, **cfg):
         # don't include "sentryProject": "generic-worker" in fallback settings
         # above, since generic-worker has this default already, and this keeps the
         # config sections smaller/simpler.
-        sentryProject = launchConfig["workerConfig"]["genericWorker"]["config"].get(
-            "sentryProject", "generic-worker"
-        )
+        sentryProject = wp.config["launchConfigs"][0]["workerConfig"]["genericWorker"][
+            "config"
+        ].get("sentryProject", "generic-worker")
 
     if wp.supports_worker_manager_config():
         for launchConfig in wp.config["launchConfigs"]:
@@ -715,3 +863,22 @@ def get_launch_config_id(config, worker_pool_id):
         (worker_pool_id + json.dumps(cfg_without_wm, sort_keys=True)).encode("utf8")
     ).hexdigest()
     return "lc-" + hashedLaunchConfig[:20]
+
+
+def get_worker_manager_overrides(config, attrs):
+    initial_weight = evaluate_keyed_by(
+        config.get("workerManagerConfig", {}).get("initialWeight", None),
+        "initialWeight",
+        attrs,
+    )
+    max_capacity = evaluate_keyed_by(
+        config.get("workerManagerConfig", {}).get("maxCapacity", None),
+        "maxCapacity",
+        attrs,
+    )
+
+    return merge(
+        {},
+        {"initialWeight": initial_weight} if initial_weight is not None else {},
+        {"maxCapacity": max_capacity} if max_capacity is not None else {},
+    )

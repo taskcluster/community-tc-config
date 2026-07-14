@@ -1,1 +1,0 @@
-../generic-worker-win2022-staging/bootstrap.ps1

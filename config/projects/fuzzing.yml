@@ -18,16 +18,24 @@ fuzzing:
       imageset: generic-worker-ubuntu-24-04
       cloud: gcp
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 20
+      workerConfig:
+        genericWorker:
+          config:
+            numberOfTasksToRun: 1
     bugmon-processor-windows:
       owner: jkratzer@mozilla.com
       emailOnError: true
       imageset: generic-worker-win2022-gpu
       cloud: azure
       minCapacity: 0
-      maxCapacity: 10
+      maxCapacity: 20
       vmSizes:
-        Standard_NV12s_v3: 1
+        Standard_NV12ads_A10_v5: 1
+      workerConfig:
+        genericWorker:
+          config:
+            numberOfTasksToRun: 1
     bugmon-pernosco:
       owner: jkratzer@mozilla.com
       emailOnError: false
@@ -62,7 +70,8 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 20
-      machineType: "zones/{zone}/machineTypes/c3d-standard-4"
+      machineTypes:
+        "zones/{zone}/machineTypes/c3d-standard-4": 1
     ci-arm64:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
@@ -70,7 +79,8 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
-      machineType: "zones/{zone}/machineTypes/t2a-standard-4"
+      machineTypes:
+        "zones/{zone}/machineTypes/t2a-standard-4": 1
     ci-windows:
       owner: fuzzing+taskcluster@mozilla.com
       emailOnError: false
@@ -99,6 +109,11 @@ fuzzing:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+      machineTypes:
+        "zones/{zone}/machineTypes/c4-standard-4": 1
+      launchConfig:
+        advancedMachineFeatures:
+          enableNestedVirtualization: true
     grizzly-reduce-worker-windows:
       owner: truber@mozilla.com
       emailOnError: true
@@ -107,7 +122,7 @@ fuzzing:
       minCapacity: 0
       maxCapacity: 10
       vmSizes:
-        Standard_NV12s_v3: 1
+        Standard_NV12ads_A10_v5: 1
     grizzly-reduce-worker-windows-ngpu:
       owner: truber@mozilla.com
       emailOnError: true
@@ -191,51 +206,6 @@ fuzzing:
             type: string
             default: main
         additionalProperties: true
-    domino-web-tests:
-      description: Domino Web Tests trigger
-      owner: jkratzer@mozilla.com
-      emailOnError: true
-      bindings:
-        - exchange: exchange/taskcluster-github/v1/push
-          routingKeyPattern: primary.MozillaSecurity.domino
-        - exchange: exchange/taskcluster-github/v1/push
-          routingKeyPattern: primary.MozillaSecurity.GrIDL
-      task:
-        provisionerId: proj-fuzzing
-        schedulerId: fuzzing
-        workerType: ci
-        payload:
-          image:
-            type: indexed-image
-            path: public/domino-web-tests.tar.zst
-            namespace: project.fuzzing.orion.domino-web-tests.master
-          features:
-            taskclusterProxy: true
-          maxRunTime: 3600
-          env:
-            ACTION: trigger
-        metadata:
-          name: Domino Web Tests
-          description: Domino Web Tests
-          owner: jkratzer@mozilla.com
-          source: 'https://github.com/MozillaSecurity/domino-web-tests'
-        expires:
-          $fromNow: 3 months
-        deadline:
-          $fromNow: 6 hours
-        scopes:
-          - queue:create-task:highest:proj-fuzzing/ci
-          - secrets:get:project/fuzzing/deploy-domino-web-tests
-          - secrets:get:project/fuzzing/deploy-domino
-          - secrets:get:project/fuzzing/deploy-gridl
-          - secrets:get:project/fuzzing/deploy-octo-private
-      triggerSchema:
-        type: object
-        properties:
-          branch:
-            type: string
-            default: master
-        additionalProperties: true
     grizzly-reduce-monitor:
       description: Hook for triggering Grizzly reduce monitor tasks
       owner: truber@mozilla.com
@@ -277,6 +247,7 @@ fuzzing:
           - generic-worker:run-as-administrator:proj-fuzzing/grizzly-reduce-worker-windows-ngpu
           - queue:create-task:highest:proj-fuzzing/grizzly-reduce-worker*
           - queue:route:notify.email.truber@mozilla.com.on-failed
+          - queue:route:notify.email.twsmith@mozilla.com.on-failed
           - queue:scheduler-id:fuzzing
           - secrets:get:project/fuzzing/deploy-bearspray
           - secrets:get:project/fuzzing/deploy-grizzly-private
@@ -285,6 +256,7 @@ fuzzing:
           - secrets:get:project/fuzzing/grizzly-reduce-tool-list
         routes:
           - notify.email.truber@mozilla.com.on-failed
+          - notify.email.twsmith@mozilla.com.on-failed
       schedule:
         - "0 */2 * * *"
     grizzly-reduce-reset-error:
@@ -350,60 +322,6 @@ fuzzing:
           - secrets:get:project/fuzzing/fuzzmanagerconf
         routes:
           - notify.email.truber@mozilla.com.on-failed
-    failed-log-ingestor:
-      description: Hook for ingesting livelogs from failed fuzzing tasks for bucketing
-      owner: truber@mozilla.com
-      emailOnError: true
-      bindings:
-        - exchange: exchange/taskcluster-queue/v1/task-failed
-          routingKeyPattern: primary.#.proj-fuzzing.#
-      task:
-        provisionerId: proj-fuzzing
-        schedulerId: fuzzing
-        workerType: decision
-        payload:
-          image:
-            type: indexed-image
-            path: public/failed-log-ingestor.tar.zst
-            namespace: project.fuzzing.orion.failed-log-ingestor.master
-          features:
-            taskclusterProxy: true
-          maxRunTime: 600
-          command:
-            - 'ingest'
-            - '--task-id'
-            - '${payload.status.taskId}'
-            - '--run-id'
-            - '${payload.runId}'
-        metadata:
-          name: failed-log-ingestor
-          description: Ingest logs from failed fuzzing tasks
-          owner: truber@mozilla.com
-          source: 'https://github.com/MozillaSecurity/orion'
-        expires:
-          $fromNow: 2 weeks
-        deadline:
-          $fromNow: 1 hour
-        scopes:
-          - queue:route:notify.email.truber@mozilla.com.on-failed
-          - queue:scheduler-id:fuzzing
-          - secrets:get:project/fuzzing/fuzzmanagerconf
-          - queue:get-artifact:project/fuzzing/private/logs/*
-        routes:
-          - notify.email.truber@mozilla.com.on-failed
-      triggerSchema:
-        type: object
-        properties:
-          status:
-            type: object
-            properties:
-              workerType:
-                type: string
-                not:
-                  anyOf:
-                    - pattern: '^ci.*'
-                    - const: decision
-                    - pattern: '^grizzly-reduce.*'
     bugmon:
       description: Hook for triggering bugmon monitor tasks
       owner: jkratzer@mozilla.com
@@ -437,7 +355,7 @@ fuzzing:
         expires:
           $fromNow: 3 months
         deadline:
-          $fromNow: 6 hours
+          $fromNow: 8 hours
         scopes:
           - docker-worker:capability:device:hostSharedMemory
           - docker-worker:capability:device:loopbackAudio
@@ -473,7 +391,7 @@ fuzzing:
             namespace: project.fuzzing.orion.bugmon.master
           features:
             taskclusterProxy: true
-          maxRunTime: 10800
+          maxRunTime: 14400
           env:
             BUG_ACTION: monitor
             FORCE_CONFIRM: "true"
@@ -492,7 +410,7 @@ fuzzing:
         expires:
           $fromNow: 3 months
         deadline:
-          $fromNow: 6 hours
+          $fromNow: 8 hours
         scopes:
           - docker-worker:capability:device:hostSharedMemory
           - docker-worker:capability:device:loopbackAudio
@@ -597,93 +515,6 @@ fuzzing:
           - notify.email.fuzzing@mozilla.com.on-failed
       schedule:
         - "0 0 * * 1"
-    gr-css:
-      description: Hook for updating gr.css grammar
-      owner: jkratzer@mozilla.com
-      emailOnError: true
-      task:
-        provisionerId: proj-fuzzing
-        schedulerId: fuzzing
-        workerType: ci
-        payload:
-          image:
-            type: indexed-image
-            path: public/gr-css-reports.tar.zst
-            namespace: project.fuzzing.orion.gr-css-reports.master
-          features:
-            taskclusterProxy: true
-          maxRunTime: 10800
-          artifacts:
-            project/fuzzing/gr-css:
-              path: /live.log
-              type: file
-        metadata:
-          name: gr-css
-          description: Hook for updating gr.css grammar
-          owner: jkratzer@mozilla.com
-          source: 'https://github.com/MozillaSecurity/gr.css.reports'
-        expires:
-          $fromNow: 1 months
-        deadline:
-          $fromNow: 6 hours
-        scopes:
-          - docker-worker:capability:device:hostSharedMemory
-          - docker-worker:capability:device:loopbackAudio
-          - docker-worker:capability:privileged
-          - queue:get-artifact:project/fuzzing/gr-css/*
-          - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-          - queue:scheduler-id:fuzzing
-          - secrets:get:project/fuzzing/deploy-gr-css
-          - secrets:get:project/fuzzing/deploy-gr-css-generator
-          - secrets:get:project/fuzzing/deploy-gr-css-reports
-          - secrets:get:project/fuzzing/deploy-octo-private
-          - secrets:get:project/fuzzing/deploy-npm
-          - secrets:get:project/fuzzing/ci-git-token
-        routes:
-          - notify.email.jkratzer@mozilla.com.on-failed
-      schedule:
-        - "0 8 * * 6"
-    gr-idl-update:
-      description: Hook for updating gr.idl grammar
-      owner: jkratzer@mozilla.com
-      emailOnError: true
-      task:
-        routes:
-          - notify.email.jkratzer@mozilla.com.on-failed
-        scopes:
-          - docker-worker:capability:privileged
-          - queue:get-artifact:project/fuzzing/gr-idl-update/*
-          - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-          - queue:scheduler-id:fuzzing
-          - secrets:get:project/fuzzing/ci-git-token
-          - secrets:get:project/fuzzing/deploy-gridl
-          - secrets:get:project/fuzzing/deploy-npm
-        expires:
-          $fromNow: 1 months
-        payload:
-          image:
-            path: public/gr-idl-update.tar.zst
-            type: indexed-image
-            namespace: project.fuzzing.orion.gr-idl-update.master
-          features:
-            taskclusterProxy: true
-          artifacts:
-            project/fuzzing/gr-idl-update:
-              path: /live.log
-              type: file
-          maxRunTime: 10800
-        deadline:
-          $fromNow: 6 hours
-        metadata:
-          name: gr-idl-update
-          owner: jkratzer@mozilla.com
-          source: https://github.com/MozillaSecurity/gridl
-          description: Hook for updating gr.idl grammar
-        workerType: ci
-        provisionerId: proj-fuzzing
-        schedulerId: fuzzing
-      schedule:
-        - "0 8 * * 1"
     orion-cron:
       description: Periodically check if any Orion services need to be rebuilt
       owner: truber@mozilla.com
@@ -787,15 +618,6 @@ fuzzing:
         - secrets:get:project/fuzzing/decision
       to:
         - repo:github.com/MozillaSecurity/fuzzing-tc-config:*
-    - grant:
-        - queue:create-task:highest:proj-fuzzing/ci
-        - queue:scheduler-id:fuzzing
-        - secrets:get:project/fuzzing/deploy-domino
-        - secrets:get:project/fuzzing/deploy-domino-web-tests
-        - secrets:get:project/fuzzing/deploy-gridl
-        - secrets:get:project/fuzzing/deploy-octo-private
-      to:
-        - hook-id:project-fuzzing/domino-web-tests
     # fuzzing-tc-config code on master can run tc-admin apply to manage worker pools
     - grant:
         - assume:hook-id:project-fuzzing/linux-pool*
@@ -867,6 +689,7 @@ fuzzing:
     - grant:
         - queue:create-task:highest:proj-fuzzing/decision
         - queue:route:notify.email.truber@mozilla.com.on-failed
+        - queue:route:notify.email.twsmith@mozilla.com.on-failed
         - secrets:get:project/fuzzing/fuzzmanagerconf
       to:
         - hook-id:project-fuzzing/grizzly-reduce-reset-error
@@ -876,6 +699,7 @@ fuzzing:
         - queue:get-artifact:project/fuzzing/private/logs/*
       to:
         - hook-id:project-fuzzing/failed-log-ingestor
+        - login-identity:github/173702880|moz-mdauer
     - grant:
         - docker-worker:capability:privileged
         - index:insert-task:project.fuzzing.orion.*
@@ -912,33 +736,6 @@ fuzzing:
         - queue:route:index.project.fuzzing.coverage-revision.*
       to:
         - hook-id:project-fuzzing/coverage-revision
-    - grant:
-        - docker-worker:capability:device:hostSharedMemory
-        - docker-worker:capability:device:loopbackAudio
-        - docker-worker:capability:privileged
-        - queue:create-task:highest:proj-fuzzing/ci
-        - queue:get-artifact:project/fuzzing/gr-css/*
-        - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-        - queue:scheduler-id:fuzzing
-        - secrets:get:project/fuzzing/ci-git-token
-        - secrets:get:project/fuzzing/deploy-gr-css
-        - secrets:get:project/fuzzing/deploy-gr-css-generator
-        - secrets:get:project/fuzzing/deploy-gr-css-reports
-        - secrets:get:project/fuzzing/deploy-octo-private
-        - secrets:get:project/fuzzing/deploy-npm
-      to:
-        - hook-id:project-fuzzing/gr-css
-    - grant:
-        - docker-worker:capability:privileged
-        - queue:create-task:highest:proj-fuzzing/ci
-        - queue:get-artifact:project/fuzzing/gr-idl-update/*
-        - queue:route:notify.email.jkratzer@mozilla.com.on-failed
-        - queue:scheduler-id:fuzzing
-        - secrets:get:project/fuzzing/ci-git-token
-        - secrets:get:project/fuzzing/deploy-gridl
-        - secrets:get:project/fuzzing/deploy-npm
-      to:
-        - hook-id:project-fuzzing/gr-idl-update
     - grant:
         - docker-worker:capability:privileged
         - queue:create-task:highest:proj-fuzzing/nss-corpus-update-worker

@@ -1,6 +1,6 @@
 relman:
   adminRoles:
-    - github-team:mozilla/ci-and-quality-tools
+    - github-team:mozilla/ci-engineering-workflow-and-quality-tools
   externallyManaged: true # some hooks are deployed into this space
   repos:
     - github.com/mozilla/microannotate:*
@@ -73,6 +73,8 @@ relman:
     code-review/deploy-dev: true
     code-review/deploy-production: true
     code-review/deploy-testing: true
+    code-review/integration-testing: true
+    code-review/integration-production: true
     code-review/release: true
     dump_syms/deploy: true
     microannotate/deploy: true
@@ -198,7 +200,9 @@ relman:
         - generic-worker:cache:rust-code-analysis-*
       to: repo:github.com/mozilla/rust-code-analysis:*
     - grant: secrets:get:project/relman/rust-code-analysis/deploy
-      to: repo:github.com/mozilla/rust-code-analysis:tag:*
+      to:
+        - repo:github.com/mozilla/rust-code-analysis:tag:*
+        - repo:github.com/mozilla/rust-code-analysis:branch:master
 
     # rust-parsepatch
     - grant: secrets:get:project/relman/rust-parsepatch/deploy
