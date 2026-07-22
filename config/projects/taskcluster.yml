@@ -497,6 +497,7 @@ taskcluster:
     - grant:
         - assume:project:taskcluster:generic-worker-tester
         - queue:create-task:highest:proj-taskcluster/*
+        - queue:create-task:highest:built-in/succeed
         - generic-worker:cache:taskcluster-*
         - generic-worker:run-task-as-current-user:proj-taskcluster/*
         - generic-worker:os-group:proj-taskcluster/gw-ubuntu-24-04-gui/docker
