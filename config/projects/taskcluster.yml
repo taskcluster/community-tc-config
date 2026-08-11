@@ -522,6 +522,13 @@ taskcluster:
         - repo:github.com/taskcluster/docker-exec-websocket-server:*
         - repo:github.com/taskcluster/docker-exec-websocket-client:*
 
+    - grant:
+        - queue:create-task:lowest:proj-taskcluster/gw-windows-2022-gui
+        - queue:route:index.project.taskcluster.azure.attested-document.*
+        # hooks create tasks with schedulerId `-`
+        - queue:scheduler-id:-
+      to: hook-id:project-taskcluster/azure-attested-document
+
   clients:
     smoketest:
       scopes:
@@ -607,4 +614,65 @@ taskcluster:
     staging-release:
       GH_TOKEN: $taskcluster-staging-release-gh-token
 
-  hooks: []
+  hooks:
+    # Publishes an Azure IMDS attested document as an indexed artifact, so that
+    # worker-manager's azure_signature_good.json test fixture can be refreshed
+    # without anyone having to run a Windows VM by hand. The leaf certificate in
+    # that fixture expires roughly every 6 months (and the CA/Browser Forum caps
+    # TLS lifetimes at 100 days from March 2027, so more often after that).
+    # See https://github.com/taskcluster/taskcluster/issues/8533
+    azure-attested-document:
+      description: >-
+        Fetch an Azure IMDS attested document and instance metadata, and publish
+        them as indexed artifacts for refreshing worker-manager's
+        `services/worker-manager/test/fixtures/azure_signature_good.json`.
+        Fetch the latest with:
+        `curl https://community-tc.services.mozilla.com/api/index/v1/task/project.taskcluster.azure.attested-document.latest/artifacts/public/attested.json`
+        See https://github.com/taskcluster/taskcluster/issues/8533
+      owner: taskcluster-notifications@mozilla.com
+      emailOnError: true
+      schedule:
+        - "0 3 * * 1" # 03:00 UTC every Monday
+      task:
+        provisionerId: proj-taskcluster
+        workerType: gw-windows-2022-gui
+        priority: lowest
+        deadline: {$fromNow: "3 hours"}
+        # The artifacts and the index entry die with the task; ~6 months keeps a
+        # document fetchable for about one certificate lifetime
+        expires: {$fromNow: "180 days"}
+        routes:
+          - index.project.taskcluster.azure.attested-document.latest
+        payload:
+          maxRunTime: 300
+          command:
+            # Set-Content, not Out-File: Out-File applies console-width
+            # formatting, which would wrap (and thus corrupt) the ~4KB signature.
+            - >-
+              powershell -Command "(Invoke-WebRequest -UseBasicParsing -Headers
+              @{Metadata='true'} -Uri
+              'http://169.254.169.254/metadata/attested/document?api-version=2021-05-01').Content
+              | Set-Content -Encoding ascii -NoNewline -Path attested.json"
+            - >-
+              powershell -Command "(Invoke-WebRequest -UseBasicParsing -Headers
+              @{Metadata='true'} -Uri
+              'http://169.254.169.254/metadata/instance?api-version=2021-05-01').Content
+              | Set-Content -Encoding ascii -NoNewline -Path instance.json"
+            # Re-print the files rather than re-querying IMDS, so that the log
+            # and the artifacts are guaranteed to be the same document (a second
+            # request returns a different nonce and timestamp).
+            - powershell -Command "Get-Content -Raw attested.json; Get-Content -Raw instance.json"
+          artifacts:
+            - name: public/attested.json
+              path: attested.json
+              type: file
+            - name: public/instance.json
+              path: instance.json
+              type: file
+        metadata:
+          name: azure-attested-document
+          description: >-
+            Fetch and index an Azure IMDS attested document, for refreshing
+            worker-manager's azure_signature_good.json test fixture.
+          owner: taskcluster-notifications@mozilla.com
+          source: https://github.com/taskcluster/community-tc-config/blob/main/config/projects/taskcluster.yml
