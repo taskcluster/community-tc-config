@@ -106,7 +106,6 @@ bugbug:
         - docker-worker:cache:bugbug-*
         - generic-worker:cache:bugbug-*
         - docker-worker:capability:privileged
-        - secrets:get:project/bugbug/integration
       to: project:bugbug/build
     - grant:
         - secrets:get:project/bugbug/deploy
@@ -118,6 +117,7 @@ bugbug:
         - assume:project:bugbug/deploy
         - assume:hook-id:project-bugbug/bugbug
         - hooks:modify-hook:project-bugbug/bugbug
+        - secrets:get:project/bugbug/integration
       to: repo:github.com/mozilla/bugbug:tag:*
     - grant:
         - assume:project:bugbug/build
