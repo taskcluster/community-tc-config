@@ -135,4 +135,5 @@ bugbug:
     - grant:
         - assume:hook-id:project-bugbug/bugbug-*
         - hooks:modify-hook:project-bugbug/bugbug-*
+        - secrets:get:project/bugbug/integration
       to: hook-id:project-bugbug/bugbug
