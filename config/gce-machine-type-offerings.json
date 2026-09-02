@@ -139768,114 +139768,6 @@
     "zone": "us-west3-b"
   },
   {
-    "name": "n4d-highcpu-16",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highcpu-2",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highcpu-32",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highcpu-4",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highcpu-48",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highcpu-64",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highcpu-8",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highcpu-80",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highcpu-96",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highmem-16",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highmem-2",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highmem-32",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highmem-4",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highmem-48",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highmem-64",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highmem-8",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highmem-80",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-highmem-96",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-standard-16",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-standard-2",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-standard-32",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-standard-4",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-standard-48",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-standard-64",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-standard-8",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-standard-80",
-    "zone": "us-west3-b"
-  },
-  {
-    "name": "n4d-standard-96",
-    "zone": "us-west3-b"
-  },
-  {
     "name": "t2d-standard-1",
     "zone": "us-west3-b"
   },
@@ -143396,31 +143288,7 @@
     "zone": "us-west4-b"
   },
   {
-    "name": "g4-standard-12",
-    "zone": "us-west4-b"
-  },
-  {
-    "name": "g4-standard-192",
-    "zone": "us-west4-b"
-  },
-  {
-    "name": "g4-standard-24",
-    "zone": "us-west4-b"
-  },
-  {
     "name": "g4-standard-384",
-    "zone": "us-west4-b"
-  },
-  {
-    "name": "g4-standard-48",
-    "zone": "us-west4-b"
-  },
-  {
-    "name": "g4-standard-6",
-    "zone": "us-west4-b"
-  },
-  {
-    "name": "g4-standard-96",
     "zone": "us-west4-b"
   },
   {
