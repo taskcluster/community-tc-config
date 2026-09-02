@@ -281,20 +281,16 @@
   "Standard_D96s_v6",
   "Standard_DC16ads_v6",
   "Standard_DC16as_v6",
-  "Standard_DC1s_v2",
   "Standard_DC2ads_v6",
   "Standard_DC2as_v6",
-  "Standard_DC2s_v2",
   "Standard_DC32ads_v6",
   "Standard_DC32as_v6",
   "Standard_DC48ads_v6",
   "Standard_DC48as_v6",
   "Standard_DC4ads_v6",
   "Standard_DC4as_v6",
-  "Standard_DC4s_v2",
   "Standard_DC64ads_v6",
   "Standard_DC64as_v6",
-  "Standard_DC8_v2",
   "Standard_DC8ads_v6",
   "Standard_DC8as_v6",
   "Standard_DC96ads_v6",
@@ -825,5 +821,6 @@
   "Standard_M64s_v2",
   "Standard_M8-2ms",
   "Standard_M8-4ms",
-  "Standard_M8ms"
+  "Standard_M8ms",
+  "Standard_ND96amsr_A100_v4"
 ]
