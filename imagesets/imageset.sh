@@ -41,7 +41,7 @@ function all-in-parallel {
   : ${UPDATE_OFFERINGS:=true}
   : ${AZURE_VM_SIZES_PARALLEL_PROCESSES:=10}
 
-  export GCP_PROJECT=community-tc-workers
+  export GCP_PROJECT=taskcluster-imaging
   export AZURE_IMAGE_RESOURCE_GROUP=rg-tc-eng-images
 
   export TASKCLUSTER_CLIENT_ID='static/taskcluster/root'

@@ -11,7 +11,7 @@ Modifications to service configuration are handled via bugs filed in `Operations
 
 ## GCP
 
-`community-tc-workers-google` is a google provider corresponding to GCP project `community-tc-workers`
+`community-tc-workers-google` is a google provider corresponding to GCP project `taskcluster-imaging`
 
 ## AWS
 

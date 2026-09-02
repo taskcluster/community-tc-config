@@ -50,7 +50,7 @@ generic-worker:
 docker-worker:
   workerImplementation: docker-worker
   gcp:
-    image: projects/community-tc-workers/global/images/docker-worker-sfwv7ea5qm9wuoig3274
+    image: projects/taskcluster-imaging/global/images/docker-worker-sfwv7ea5qm9wuoig3274
   aws:
     # originally built with the `docker_community_aws` builder in monopacker
     amis:
@@ -107,7 +107,7 @@ generic-worker-ubuntu-24-04:
             maintainer: taskcluster-notifications+workers@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/community-tc-config/b5b7c2ad856c144a6759e6e72280c4a958f8a930/imagesets/generic-worker-ubuntu-24-04/bootstrap.sh
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-10c009c7a14346ef8938
+    image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-10c009c7a14346ef8938
   aws:
     amis:
       eu-west-1: ami-05dc5a1652dff5020
@@ -130,7 +130,7 @@ generic-worker-ubuntu-24-04-arm64:
             maintainer: taskcluster-notifications+workers@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/community-tc-config/bd07a18b393cb12303779969b8f461b726031638/imagesets/generic-worker-ubuntu-24-04-arm64/bootstrap.sh
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-arm64-9b0cf502dc074faabd33
+    image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-arm64-9b0cf502dc074faabd33
   aws:
     amis:
       eu-west-1: ami-0ee6adca447181453
@@ -155,7 +155,7 @@ generic-worker-ubuntu-24-04-staging:
     amis:
       us-east-1: ami-0afcb836d0b81a957
   gcp:
-    image: projects/community-tc-workers/global/images/generic-worker-ubuntu-24-04-staging-iuujjhskyujdtccoemka
+    image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-staging-iuujjhskyujdtccoemka
 generic-worker-win2022:
   workerImplementation: generic-worker
   azure:
