@@ -356,11 +356,13 @@ taskcluster:
 
     - grant:
         - queue:create-task:highest:proj-taskcluster/release
+        - generic-worker:run-task-as-current-user:proj-taskcluster/release
         - secrets:get:project/taskcluster/release
       to: repo:github.com/taskcluster/taskcluster:tag:v*
 
     - grant:
         - queue:create-task:highest:proj-taskcluster/release
+        - generic-worker:run-task-as-current-user:proj-taskcluster/release
         - secrets:get:project/taskcluster/staging-release
       to:
         # both pre- and post-bug-1635455
