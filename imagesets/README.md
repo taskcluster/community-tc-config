@@ -57,9 +57,9 @@ to be present:
      * Azure only:
 
        First, run `export AZURE_IMAGE_RESOURCE_GROUP=<your Azure resource group of choice to deploy image into>`
-       (typically `rg-tc-eng-images`). Worker Manager spawns instances in resource group
+       (typically `rg-packer-worker-images`). Worker Manager spawns instances in resource group
        `rg-tc-eng-worker-manager-VMs` but typically the machine images are stored in resource group
-       `rg-tc-eng-images`.
+       `rg-packer-worker-images`.
 
      * GCP only:
 

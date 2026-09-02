@@ -42,7 +42,7 @@ function all-in-parallel {
   : ${AZURE_VM_SIZES_PARALLEL_PROCESSES:=10}
 
   export GCP_PROJECT=taskcluster-imaging
-  export AZURE_IMAGE_RESOURCE_GROUP=rg-tc-eng-images
+  export AZURE_IMAGE_RESOURCE_GROUP=rg-packer-worker-images
 
   export TASKCLUSTER_CLIENT_ID='static/taskcluster/root'
   export TASKCLUSTER_ROOT_URL='https://community-tc.services.mozilla.com'
