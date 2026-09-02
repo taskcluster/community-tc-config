@@ -160,8 +160,8 @@ generic-worker-win2022:
   workerImplementation: generic-worker
   azure:
     images:
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-1ed77ebf32ad46ce95e9-centralus-fuzzing
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-37f118e5d00544fb993f-eastus-fuzzing
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-packer-worker-images/providers/Microsoft.Compute/images/imageset-1ed77ebf32ad46ce95e9-centralus-fuzzing
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-packer-worker-images/providers/Microsoft.Compute/images/imageset-37f118e5d00544fb993f-eastus-fuzzing
   workerConfig:
     genericWorker:
       config:
@@ -179,7 +179,7 @@ generic-worker-win2022-staging:
   workerImplementation: generic-worker
   azure:
     images:
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-btxgedftadsilqkbomor-centralus
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-packer-worker-images/providers/Microsoft.Compute/images/imageset-btxgedftadsilqkbomor-centralus
   workerConfig:
     genericWorker:
       config:
@@ -199,8 +199,8 @@ generic-worker-win2025-staging:
       us-east-1: ami-05fc5e0c31b199d96
   azure:
     images:
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-blfrhdhdcujxakvkeion-centralus
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-eakglbysgaxiavottjng-eastus
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-packer-worker-images/providers/Microsoft.Compute/images/imageset-blfrhdhdcujxakvkeion-centralus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-packer-worker-images/providers/Microsoft.Compute/images/imageset-eakglbysgaxiavottjng-eastus
   workerConfig:
     genericWorker:
       config:
@@ -216,10 +216,10 @@ generic-worker-win2025-staging:
 generic-worker-win2022-gpu:
   azure:
     images:
-      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-1b7019c209fd4f5a9b64-southcentralus-fuzzing
-      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-d9fb2fd962b649859597-westus2-fuzzing
-      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-b1581c346bfc4eb69fa0-eastus2-fuzzing
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-799185bb01244ed4b63d-eastus-fuzzing
+      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-packer-worker-images/providers/Microsoft.Compute/images/imageset-1b7019c209fd4f5a9b64-southcentralus-fuzzing
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-packer-worker-images/providers/Microsoft.Compute/images/imageset-d9fb2fd962b649859597-westus2-fuzzing
+      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-packer-worker-images/providers/Microsoft.Compute/images/imageset-b1581c346bfc4eb69fa0-eastus2-fuzzing
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-packer-worker-images/providers/Microsoft.Compute/images/imageset-799185bb01244ed4b63d-eastus-fuzzing
   workerImplementation: generic-worker
   workerConfig:
     genericWorker:
@@ -237,7 +237,7 @@ generic-worker-win2022-gpu:
 generic-worker-win2022-gpu-staging:
   azure:
     images:
-      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-ikwtewhhpnmyaojsljoa-westus2
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-packer-worker-images/providers/Microsoft.Compute/images/imageset-ikwtewhhpnmyaojsljoa-westus2
   workerImplementation: generic-worker
   workerConfig:
     genericWorker:
@@ -256,8 +256,8 @@ generic-worker-win11-24h2-staging:
   workerImplementation: generic-worker
   azure:
     images:
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-stlqenyshaheamotncyg-centralus
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-ccdkidxlucatcocbslqs-eastus
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-packer-worker-images/providers/Microsoft.Compute/images/imageset-stlqenyshaheamotncyg-centralus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-packer-worker-images/providers/Microsoft.Compute/images/imageset-ccdkidxlucatcocbslqs-eastus
   workerConfig:
     genericWorker:
       config:
