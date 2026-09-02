@@ -449,6 +449,7 @@
     "m8i.metal-96xl",
     "m8i.xlarge",
     "p5e.48xlarge",
+    "p6-b300.48xlarge",
     "r5.12xlarge",
     "r5.16xlarge",
     "r5.24xlarge",
