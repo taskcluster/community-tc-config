@@ -23,6 +23,7 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            enableRunTaskAsCurrentUser: false
             headlessTasks: true
 
     release:
@@ -108,6 +109,7 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             # this pool isn't in regular use, and when we use it, it is
             # typically for testing bare metal stuff, so nice to have
@@ -130,6 +132,7 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             idleTimeoutSecs: 300
 
@@ -143,6 +146,7 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            enableRunTaskAsCurrentUser: false
             headlessTasks: true
       machineTypes:
         "zones/{zone}/machineTypes/t2a-standard-4": 1
@@ -157,6 +161,7 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
@@ -183,6 +188,7 @@ taskcluster:
 #             path: /proc/sys/kernel/core_pattern
 #             content: 'Y29yZQo='
           config:
+            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
@@ -201,6 +207,7 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             idleTimeoutSecs: 300
 
@@ -214,6 +221,7 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
@@ -232,6 +240,7 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
@@ -252,6 +261,7 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            enableRunTaskAsCurrentUser: false
             # Headless on GPU instances might make sense if using e.g. CUDA
             # but generally GPU useful when GUI is enabled.
             headlessTasks: false
@@ -268,6 +278,7 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            enableRunTaskAsCurrentUser: false
             # Currently staging is using GPU pool, so enable GUI. This also
             # matches what Release SRE have, for the purposes of testing
             # https://github.com/taskcluster/taskcluster/issues/7303.
@@ -295,6 +306,7 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            enableRunTaskAsCurrentUser: false
             # Same as Release SRE
             headlessTasks: false
             # While iterating on the image building process for this worker
@@ -337,7 +349,8 @@ taskcluster:
         - queue:route:notify.matrix-room.!whDRjjSmICCgrhFHsQ:mozilla.org.*
       to:
         - repo:github.com/taskcluster/*
-        - repo:github.com/petemoore/taskcluster:*
+        - repo:github.com/petemoore/taskcluster:branch:*
+        - repo:github.com/petemoore/taskcluster:tag:*
 
     - grant:
         - queue:create-task:highest:proj-taskcluster/ci
@@ -351,7 +364,8 @@ taskcluster:
         - repo:github.com/taskcluster/taskcluster:pull-request
         - repo:github.com/taskcluster/taskcluster:branch:*
         - repo:github.com/taskcluster/taskcluster:tag:*
-        - repo:github.com/petemoore/taskcluster:*
+        - repo:github.com/petemoore/taskcluster:branch:*
+        - repo:github.com/petemoore/taskcluster:tag:*
 
     # Credentials used by integration tests are restricted to trusted code.
     - grant:
@@ -362,7 +376,8 @@ taskcluster:
         - repo:github.com/taskcluster/taskcluster:pull-request
         - repo:github.com/taskcluster/taskcluster:branch:*
         - repo:github.com/taskcluster/taskcluster:tag:*
-        - repo:github.com/petemoore/taskcluster:*
+        - repo:github.com/petemoore/taskcluster:branch:*
+        - repo:github.com/petemoore/taskcluster:tag:*
 
     - grant:
         - queue:create-task:highest:proj-taskcluster/release
@@ -377,7 +392,8 @@ taskcluster:
       to:
         # both pre- and post-bug-1635455
         - repo:github.com/taskcluster/taskcluster:branch:staging-release/*
-        - repo:github.com/taskcluster/staging-releases:*
+        - repo:github.com/taskcluster/staging-releases:branch:*
+        - repo:github.com/taskcluster/staging-releases:tag:*
 
     - grant:
         # pushes to main and releases can notify on failure
@@ -439,10 +455,10 @@ taskcluster:
         - secrets:get:project/taskcluster/testing/docker-worker/ci-creds
         - secrets:get:project/taskcluster/testing/docker-worker/pulse-creds
       to:
-        - repo:github.com/taskcluster/taskcluster:pull-request
         - repo:github.com/taskcluster/taskcluster:branch:*
         - repo:github.com/taskcluster/taskcluster:tag:*
-        - repo:github.com/petemoore/taskcluster:*
+        - repo:github.com/petemoore/taskcluster:branch:*
+        - repo:github.com/petemoore/taskcluster:tag:*
         - project:taskcluster:docker-worker-tester
 
     - grant: assume:project:taskcluster:docker-worker-tester
@@ -536,8 +552,10 @@ taskcluster:
         - repo:github.com/taskcluster/taskcluster:pull-request
         - repo:github.com/taskcluster/taskcluster:branch:*
         - repo:github.com/taskcluster/taskcluster:tag:*
-        - repo:github.com/taskcluster/staging-releases:*
-        - repo:github.com/petemoore/taskcluster:*
+        - repo:github.com/taskcluster/staging-releases:branch:*
+        - repo:github.com/taskcluster/staging-releases:tag:*
+        - repo:github.com/petemoore/taskcluster:branch:*
+        - repo:github.com/petemoore/taskcluster:tag:*
 
     # External worker integration tests can mutate Taskcluster resources and
     # require credentials, so only trusted code may run them.
@@ -552,8 +570,10 @@ taskcluster:
         - repo:github.com/taskcluster/taskcluster:pull-request
         - repo:github.com/taskcluster/taskcluster:branch:*
         - repo:github.com/taskcluster/taskcluster:tag:*
-        - repo:github.com/taskcluster/staging-releases:*
-        - repo:github.com/petemoore/taskcluster:*
+        - repo:github.com/taskcluster/staging-releases:branch:*
+        - repo:github.com/taskcluster/staging-releases:tag:*
+        - repo:github.com/petemoore/taskcluster:branch:*
+        - repo:github.com/petemoore/taskcluster:tag:*
 
     - grant:
         - queue:route:index.taskcluster.cache.level-3.docker-images.v2.*
