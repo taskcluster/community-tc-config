@@ -109,7 +109,6 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
-            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             # this pool isn't in regular use, and when we use it, it is
             # typically for testing bare metal stuff, so nice to have
@@ -132,7 +131,6 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
-            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             idleTimeoutSecs: 300
 
@@ -146,7 +144,6 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
-            enableRunTaskAsCurrentUser: false
             headlessTasks: true
       machineTypes:
         "zones/{zone}/machineTypes/t2a-standard-4": 1
@@ -161,7 +158,6 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
-            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
@@ -188,7 +184,6 @@ taskcluster:
 #             path: /proc/sys/kernel/core_pattern
 #             content: 'Y29yZQo='
           config:
-            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
@@ -207,7 +202,6 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
-            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             idleTimeoutSecs: 300
 
@@ -221,7 +215,6 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
-            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
@@ -240,7 +233,6 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
-            enableRunTaskAsCurrentUser: false
             headlessTasks: true
             # While iterating on the image building process for this worker
             # pool, useful for workers not to die immediately...
@@ -261,7 +253,6 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
-            enableRunTaskAsCurrentUser: false
             # Headless on GPU instances might make sense if using e.g. CUDA
             # but generally GPU useful when GUI is enabled.
             headlessTasks: false
@@ -278,7 +269,6 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
-            enableRunTaskAsCurrentUser: false
             # Currently staging is using GPU pool, so enable GUI. This also
             # matches what Release SRE have, for the purposes of testing
             # https://github.com/taskcluster/taskcluster/issues/7303.
@@ -306,7 +296,6 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
-            enableRunTaskAsCurrentUser: false
             # Same as Release SRE
             headlessTasks: false
             # While iterating on the image building process for this worker
@@ -561,9 +550,7 @@ taskcluster:
     # require credentials, so only trusted code may run them.
     - grant:
         - assume:project:taskcluster:generic-worker-tester
-        - generic-worker:run-task-as-current-user:proj-taskcluster/gw-ubuntu-24-04-gui
-        - generic-worker:run-task-as-current-user:proj-taskcluster/gw-ci-macos
-        - generic-worker:run-task-as-current-user:proj-taskcluster/gw-windows-2022-gui
+        - generic-worker:run-task-as-current-user:proj-taskcluster/gw-*
         - generic-worker:os-group:proj-taskcluster/gw-ubuntu-24-04-gui/docker
         - secrets:get:project/taskcluster/testing/generic-worker/ci-creds
       to:
