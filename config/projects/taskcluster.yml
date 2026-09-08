@@ -566,7 +566,9 @@ taskcluster:
         - queue:route:index.taskcluster.cache.level-3.docker-images.v2.*
       to:
         - repo:github.com/taskcluster/taskcluster:branch:*
+        - repo:github.com/taskcluster/taskcluster:tag:*
         - repo:github.com/taskcluster/staging-releases:branch:*
+        - repo:github.com/petemoore/taskcluster:branch:*
 
     - grant:
         - queue:create-task:medium:proj-taskcluster/gw-ubuntu-24-04-gui
