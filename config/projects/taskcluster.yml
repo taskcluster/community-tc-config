@@ -23,6 +23,7 @@ taskcluster:
       workerConfig:
         genericWorker:
           config:
+            enableRunTaskAsCurrentUser: false
             headlessTasks: true
 
     release:
@@ -333,26 +334,39 @@ taskcluster:
         # For replacing the docker-worker pool (proj-taskcluster/ci) for d2g work
         - queue:create-task:highest:proj-taskcluster/gw-ubuntu-24-04
         - queue:create-task:highest:proj-taskcluster/windows2012r2-amd64-ci
-        # The account and secret for the Azure testing storage account.
-        # This is secret but ok for use by PRs.
-        - secrets:get:project/taskcluster/testing/azure
         # This is the taskcluster channel
         - queue:route:notify.matrix-room.!whDRjjSmICCgrhFHsQ:mozilla.org.*
       to:
         - repo:github.com/taskcluster/*
-        - repo:github.com/petemoore/taskcluster:*
+        - repo:github.com/petemoore/taskcluster:branch:*
+        - repo:github.com/petemoore/taskcluster:tag:*
 
     - grant:
         - queue:create-task:highest:proj-taskcluster/ci
       to: repo:github.com/mozilla/hawk:*
 
+    # Trusted pull requests, branches, and tags use level 3. Untrusted pull
+    # requests use a separate level-1 namespace below.
     - grant:
-        - secrets:get:project/taskcluster/testing/client-libraries
-        - secrets:get:project/taskcluster/testing/taskcluster-*
         - docker-worker:cache:taskcluster-*
       to:
-        - repo:github.com/taskcluster/taskcluster:*
-        - repo:github.com/petemoore/taskcluster:*
+        - repo:github.com/taskcluster/taskcluster:pull-request
+        - repo:github.com/taskcluster/taskcluster:branch:*
+        - repo:github.com/taskcluster/taskcluster:tag:*
+        - repo:github.com/petemoore/taskcluster:branch:*
+        - repo:github.com/petemoore/taskcluster:tag:*
+
+    # Credentials used by integration tests are restricted to trusted code.
+    - grant:
+        - secrets:get:project/taskcluster/testing/azure
+        - secrets:get:project/taskcluster/testing/client-libraries
+        - secrets:get:project/taskcluster/testing/taskcluster-*
+      to:
+        - repo:github.com/taskcluster/taskcluster:pull-request
+        - repo:github.com/taskcluster/taskcluster:branch:*
+        - repo:github.com/taskcluster/taskcluster:tag:*
+        - repo:github.com/petemoore/taskcluster:branch:*
+        - repo:github.com/petemoore/taskcluster:tag:*
 
     - grant:
         - queue:create-task:highest:proj-taskcluster/release
@@ -367,7 +381,8 @@ taskcluster:
       to:
         # both pre- and post-bug-1635455
         - repo:github.com/taskcluster/taskcluster:branch:staging-release/*
-        - repo:github.com/taskcluster/staging-releases:*
+        - repo:github.com/taskcluster/staging-releases:branch:*
+        - repo:github.com/taskcluster/staging-releases:tag:*
 
     - grant:
         # pushes to main and releases can notify on failure
@@ -429,8 +444,10 @@ taskcluster:
         - secrets:get:project/taskcluster/testing/docker-worker/ci-creds
         - secrets:get:project/taskcluster/testing/docker-worker/pulse-creds
       to:
-        - repo:github.com/taskcluster/taskcluster:*
-        - repo:github.com/petemoore/taskcluster:*
+        - repo:github.com/taskcluster/taskcluster:branch:*
+        - repo:github.com/taskcluster/taskcluster:tag:*
+        - repo:github.com/petemoore/taskcluster:branch:*
+        - repo:github.com/petemoore/taskcluster:tag:*
         - project:taskcluster:docker-worker-tester
 
     - grant: assume:project:taskcluster:docker-worker-tester
@@ -496,24 +513,57 @@ taskcluster:
         - queue:scheduler-id:test-scheduler
       to: project:taskcluster:generic-worker-tester
 
+    # Untrusted pull requests can run only the isolated, non-GUI CI graph.
     - grant:
-        - assume:project:taskcluster:generic-worker-tester
-        - queue:create-task:highest:proj-taskcluster/gw-*
+        - docker-worker:cache:taskcluster-level-1-*
+        - generic-worker:cache:taskcluster-level-1-*
+        - queue:create-task:highest:built-in/succeed
+        - queue:create-task:highest:proj-taskcluster/gw-ubuntu-24-04
+        - queue:scheduler-id:taskcluster-level-1
+        - queue:route:checks
+      to: repo:github.com/taskcluster/taskcluster:pull-request-untrusted
+
+    # Trusted code may use CI pools, but the release pool is deliberately
+    # absent. Release access is granted only to release tags and staging above.
+    - grant:
+        - queue:create-task:highest:proj-taskcluster/ci
+        - queue:create-task:highest:proj-taskcluster/gw-ubuntu-24-04
+        - queue:create-task:highest:proj-taskcluster/gw-ubuntu-24-04-gui
+        - queue:create-task:highest:proj-taskcluster/gw-ci-macos
+        - queue:create-task:highest:proj-taskcluster/gw-windows-2022
+        - queue:create-task:highest:proj-taskcluster/gw-windows-2022-gui
         - queue:create-task:highest:built-in/succeed
         - generic-worker:cache:taskcluster-*
-        - generic-worker:run-task-as-current-user:proj-taskcluster/gw-*
-        - generic-worker:os-group:proj-taskcluster/gw-ubuntu-24-04-gui/docker
-        - secrets:get:project/taskcluster/testing/generic-worker/ci-creds
-        - queue:scheduler-id:taskcluster-level-1
+        - queue:scheduler-id:taskcluster-level-3
         - queue:route:checks
         - queue:route:index.taskcluster.cache.pr.docker-images.v2.*
       to:
-        - repo:github.com/taskcluster/taskcluster:*
-        - repo:github.com/taskcluster/staging-releases:*
-        - repo:github.com/petemoore/taskcluster:*
+        - repo:github.com/taskcluster/taskcluster:pull-request
+        - repo:github.com/taskcluster/taskcluster:branch:*
+        - repo:github.com/taskcluster/taskcluster:tag:*
+        - repo:github.com/taskcluster/staging-releases:branch:*
+        - repo:github.com/taskcluster/staging-releases:tag:*
+        - repo:github.com/petemoore/taskcluster:branch:*
+        - repo:github.com/petemoore/taskcluster:tag:*
+
+    # External worker integration tests can mutate Taskcluster resources and
+    # require credentials, so only trusted code may run them.
+    - grant:
+        - assume:project:taskcluster:generic-worker-tester
+        - generic-worker:run-task-as-current-user:proj-taskcluster/gw-*
+        - generic-worker:os-group:proj-taskcluster/gw-ubuntu-24-04-gui/docker
+        - secrets:get:project/taskcluster/testing/generic-worker/ci-creds
+      to:
+        - repo:github.com/taskcluster/taskcluster:pull-request
+        - repo:github.com/taskcluster/taskcluster:branch:*
+        - repo:github.com/taskcluster/taskcluster:tag:*
+        - repo:github.com/taskcluster/staging-releases:branch:*
+        - repo:github.com/taskcluster/staging-releases:tag:*
+        - repo:github.com/petemoore/taskcluster:branch:*
+        - repo:github.com/petemoore/taskcluster:tag:*
 
     - grant:
-        - queue:route:index.taskcluster.cache.level-1.docker-images.v2.*
+        - queue:route:index.taskcluster.cache.level-3.docker-images.v2.*
       to:
         - repo:github.com/taskcluster/taskcluster:branch:*
         - repo:github.com/taskcluster/staging-releases:branch:*
