@@ -520,6 +520,7 @@ taskcluster:
         - queue:cancel-task-group:taskcluster-level-1/*
         - queue:create-task:highest:built-in/succeed
         - queue:create-task:highest:proj-taskcluster/gw-ubuntu-24-04
+        - queue:rerun-task:taskcluster-level-1/*
         - queue:scheduler-id:taskcluster-level-1
         - queue:seal-task-group:taskcluster-level-1/*
         - queue:route:checks
@@ -537,6 +538,7 @@ taskcluster:
         - queue:create-task:highest:built-in/succeed
         - generic-worker:cache:taskcluster-*
         - queue:cancel-task-group:taskcluster-level-3/*
+        - queue:rerun-task:taskcluster-level-3/*
         - queue:scheduler-id:taskcluster-level-3
         - queue:seal-task-group:taskcluster-level-3/*
         - queue:route:checks
