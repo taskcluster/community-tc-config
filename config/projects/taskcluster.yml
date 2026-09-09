@@ -431,7 +431,6 @@ taskcluster:
         - queue:create-task:lowest:null-provisioner/*
         - queue:create-task:lowest:proj-taskcluster/ci
         - queue:get-artifact:private/docker-worker-tests/*
-        - queue:rerun-task:taskcluster-level-1/*
         - queue:resolve-task
         - queue:route:statuses
         - queue:scheduler-id:docker-worker-tests
@@ -512,6 +511,11 @@ taskcluster:
         - queue:resolve-task
         - queue:scheduler-id:test-scheduler
       to: project:taskcluster:generic-worker-tester
+
+    - grant:
+        - queue:rerun-task:taskcluster-level-1/*
+        - queue:rerun-task:taskcluster-level-3/*
+      to: repo:github.com/taskcluster/taskcluster:rerun
 
     # Untrusted pull requests can run only the isolated, non-GUI CI graph.
     - grant:
