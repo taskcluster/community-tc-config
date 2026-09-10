@@ -490,11 +490,7 @@ taskcluster:
         - docker-worker:capability:device:loopbackVideo
         - docker-worker:capability:device:loopbackVideo:test-provisioner/test-*
         - docker-worker:feature:allowPtrace
-        - generic-worker:cache:apple-cache
-        - generic-worker:cache:banana-cache
-        - generic-worker:cache:devtools-app
-        - generic-worker:cache:test-modifications
-        - generic-worker:cache:unknown-issuer-app-cache
+        - generic-worker:cache:tc-test-*
         - generic-worker:os-group:test-provisioner/*
         - generic-worker:run-as-administrator:test-provisioner/*
         - generic-worker:run-task-as-current-user:test-provisioner/*
