@@ -2,17 +2,6 @@ wpt:
   adminRoles:
     - github-team:web-platform-tests/admins
   workerPools:
-    ci:
-      imageset: docker-worker
-      cloud: gcp
-      minCapacity: 0
-      maxCapacity: 80
-      workerConfig:
-        dockerConfig:
-          allowPrivileged: true
-      launchConfig:
-        advancedMachineFeatures:
-          enableNestedVirtualization: true
     ci-gw:
       owner: pmoore@mozilla.com
       emailOnError: true
