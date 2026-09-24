@@ -4,7 +4,6 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file, You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 
-import re
 import os
 import sys
 
@@ -25,7 +24,7 @@ async def update_resources(resources):
     externally_managed_patterns.append("Client=(static|github)/.*")
 
     em_bar = "|".join(externally_managed_patterns)
-    resources.manage(re.compile(r"(?!{}).*".format(em_bar)))
+    resources.manage(r"(?!{}).*".format(em_bar))
 
     secret_values = None
     if AppConfig.current().options.get("with_secrets"):
