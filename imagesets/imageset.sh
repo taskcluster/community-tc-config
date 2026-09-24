@@ -26,6 +26,44 @@ function retry {
   set -e
 }
 
+# Run a command on a macOS worker as administrator. The administrator password
+# (from pass) is used for ssh authentication if key authentication fails.
+function mac-ssh {
+  local host="${1}"
+  shift
+  local pass_entry="mdc1/generic-worker-ci/${host%%.*}"
+  local askpass
+  local status=0
+  askpass="$(mktemp -t mac-askpass.XXXXXXXXXX)"
+  printf '#!/bin/sh\npass "%s" | tail -1\n' "${pass_entry}" > "${askpass}"
+  chmod 700 "${askpass}"
+  SSH_ASKPASS="${askpass}" SSH_ASKPASS_REQUIRE=force ssh -n -o ConnectTimeout=10 -o NumberOfPasswordPrompts=1 "administrator@${host}" "$@" || status=$?
+  rm -f "${askpass}"
+  return "${status}"
+}
+
+# Fail early if any macOS worker can't be reached over ssh, or administrator
+# doesn't have passwordless sudo, rather than discovering it after all the
+# other (lengthy) steps have run.
+function check-mac-connectivity {
+  local host
+  local output
+  local failed=false
+  for host in "$@"; do
+    if ! output="$(mac-ssh "${host}" sudo -n echo hello 2>&1)" || [ "${output}" != "hello" ]; then
+      echo "Cannot ssh to administrator@${host} and run sudo: ${output}" >&2
+      if [[ "${output}" == *"Could not resolve hostname"* ]]; then
+        echo "Updating macOS workers (DEPLOY_MACS=true) requires connecting to the Mozilla corporate VPN." >&2
+      fi
+      failed=true
+    fi
+  done
+  if "${failed}"; then
+    echo "Fix the above, or rerun with DEPLOY_MACS=false to skip the macOS workers." >&2
+    return 1
+  fi
+}
+
 ############### Deploy all image sets ###############
 
 function all-in-parallel {
@@ -40,6 +78,16 @@ function all-in-parallel {
   : ${UPDATE_GCLOUD:=true}
   : ${UPDATE_OFFERINGS:=true}
   : ${AZURE_VM_SIZES_PARALLEL_PROCESSES:=10}
+
+  # TODO: fetch these hosts automatically
+  local MAC_HOSTS=(
+    macmini-m4-126.test.releng.mdc1.mozilla.com
+    macmini-m4-127.test.releng.mdc1.mozilla.com
+  )
+
+  if "${DEPLOY_MACS}"; then
+    check-mac-connectivity "${MAC_HOSTS[@]}"
+  fi
 
   export GCP_PROJECT=taskcluster-imaging
   export AZURE_IMAGE_RESOURCE_GROUP=rg-tc-eng-images
@@ -113,13 +161,13 @@ function all-in-parallel {
   ###### Update macOS workers ######
   ##################################
   #
-  # Remember to connect to the mozilla VPN before running this script in order to access the mac minis!
+  # ssh connectivity is checked at the start of the script.
   # Remeber to vnc as administrator onto macs before running this script, to avoid ssh connection problems!
 
-  # TODO: fetch these IPs automatically, and report if they need to be logged into first with vnc
+  # TODO: report if macs need to be logged into first with vnc
   if "${DEPLOY_MACS}"; then
-    for HOST in macmini-m4-126 macmini-m4-127; do
-      pass "mdc1/generic-worker-ci/${HOST}" | tail -1 | ssh "administrator@${HOST}.test.releng.mdc1.mozilla.com" sudo -S "bash" -c /var/root/update.sh
+    for HOST in "${MAC_HOSTS[@]}"; do
+      mac-ssh "${HOST}" sudo -n bash -c /var/root/update.sh
     done
   fi
 
