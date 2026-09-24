@@ -43,13 +43,15 @@ function all-in-parallel {
 
   export GCP_PROJECT=taskcluster-imaging
   export AZURE_IMAGE_RESOURCE_GROUP=rg-tc-eng-images
+  # Taskcluster Engineering DevTest Subscription
+  export AZURE_SUBSCRIPTION_ID=8a205152-b25a-417f-a676-80465535a6c9
 
   export TASKCLUSTER_CLIENT_ID='static/taskcluster/root'
   export TASKCLUSTER_ROOT_URL='https://community-tc.services.mozilla.com'
   unset TASKCLUSTER_CERTIFICATE
 
   if "${LOGIN_AZURE}"; then
-    retry az login
+    retry az login --tenant mozilla.com --subscription "${AZURE_SUBSCRIPTION_ID}"
   fi
 
   if "${UPDATE_GCLOUD}"; then
@@ -79,7 +81,7 @@ function all-in-parallel {
   export TASKCLUSTER_ACCESS_TOKEN="$(pass ls community-tc/root | head -1)"
 
   if "${LOGIN_AWS}"; then
-    eval $(imagesets/signin-aws.sh)
+    eval $(SIGNIN_AWS_ACCOUNT_NAME=moz-fx-tc-community-workers imagesets/signin-aws.sh)
   fi
 
   if "${UPDATE_OFFERINGS}"; then
