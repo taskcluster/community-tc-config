@@ -88,6 +88,12 @@ Run:
 
   * `./imageset.sh all`
 
+Before building, any `taskcluster_version` in worker-images' `config/tceng/` that
+isn't the latest Taskcluster release is bumped in a PR, and the script waits for
+someone to merge it (`UPDATE_TASKCLUSTER_VERSION=false` skips this). Azure images
+that worker-images built in another subscription are copied into ours by
+`copy-azure-images.py` before `tc-admin apply` switches worker pools to them.
+
 All of the following tools must be available in the `PATH`:
 
   * `aws`

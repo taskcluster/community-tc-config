@@ -70,6 +70,10 @@ function all-in-parallel {
   : ${BUILD_IMAGES:=true}
 
   : ${DEPLOY_IMAGES:=true}
+  # Bump worker-images' TCEng configs to the latest Taskcluster release (via a PR
+  # that must be merged) before building
+  : ${UPDATE_TASKCLUSTER_VERSION:=true}
+  export UPDATE_TASKCLUSTER_VERSION
   : ${DEPLOY_MACS:=true}
 
   : ${LOGIN_AWS:=true}
@@ -182,6 +186,8 @@ function all-in-parallel {
   fi
 
   if "${DEPLOY_IMAGES}"; then
+    # Images must exist before tc-admin points worker pools at them
+    python3 imagesets/copy-azure-images.py
     retry tc-admin apply
   fi
 
