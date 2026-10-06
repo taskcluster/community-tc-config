@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import base64
 import os
+import sys
 import time
 import requests
 import re
@@ -152,6 +153,23 @@ def find_pr(branch):
              params={"head": f"{owner}:{branch}", "state": "all", "per_page": 1}).json()
     return prs[0] if prs else None
 
+def enable_auto_merge(pr):
+    """Have GitHub merge `pr` as soon as it is approved, so that nobody needs to
+    come back and merge it after reviewing it."""
+    if pr["merged_at"] or pr.get("auto_merge"):
+        return
+    query = """mutation($id: ID!) {
+      enablePullRequestAutoMerge(input: {pullRequestId: $id, mergeMethod: MERGE}) { clientMutationId }
+    }"""
+    try:
+        errors = gh(f"{API_ROOT}/graphql", "POST", json={"query": query, "variables": {"id": pr["node_id"]}}).json().get("errors")
+    except requests.exceptions.RequestException as e:
+        errors = e
+    if errors:
+        print(f"⚠️  Couldn't enable auto-merge on {pr['html_url']}, it will need merging by hand: {errors}")
+    else:
+        print(f"🤖 Enabled auto-merge on {pr['html_url']}")
+
 def open_bump_pr(version, changes, base_sha):
     branch = f"tceng-tc-v{version}"
     pr = find_pr(branch)
@@ -159,6 +177,7 @@ def open_bump_pr(version, changes, base_sha):
         raise SystemExit(f"❌ {pr['html_url']} was closed without merging; reopen it or delete branch {branch}.")
     if pr:
         print(f"♻️  Reusing {pr['html_url']}")
+        enable_auto_merge(pr)
         return pr
 
     title = f"chore(tceng): bump to TC v{version}"
@@ -182,6 +201,7 @@ def open_bump_pr(version, changes, base_sha):
         "body": f"https://github.com/taskcluster/taskcluster/releases/tag/v{version}",
     }).json()
     print(f"📝 Opened {pr['html_url']}")
+    enable_auto_merge(pr)
     return pr
 
 def wait_for_merge(pr):
@@ -202,9 +222,10 @@ def wait_for_merge(pr):
         if pr["state"] == "closed":
             raise SystemExit(f"❌ {pr['html_url']} was closed without merging.")
 
-def bump_taskcluster_version():
+def bump_taskcluster_version(wait=True):
     """Make every TCEng config on worker-images' main pin the latest Taskcluster
-    release, via a PR that must be merged before continuing."""
+    release, via a PR that must be merged before continuing. With wait=False,
+    just open (or reuse) the PR and return without waiting for it to be merged."""
     version = latest_taskcluster_version()
     base_sha = gh(f"{API_ROOT}/repos/{REPO}/git/ref/heads/{REF}").json()["object"]["sha"]
     changes = outdated_tceng_configs(base_sha, version)
@@ -212,7 +233,11 @@ def bump_taskcluster_version():
         print(f"✅ {REPO} {TCENG_CONFIG_DIR} already pins Taskcluster v{version}")
         return
     print(f"⬆️  Bumping to Taskcluster v{version}: {', '.join(sorted(changes))}")
-    wait_for_merge(open_bump_pr(version, changes, base_sha))
+    pr = open_bump_pr(version, changes, base_sha)
+    if not wait:
+        print(f"⏸️  {pr['html_url']} needs to be merged before images can be built.")
+        return
+    wait_for_merge(pr)
     base_sha = gh(f"{API_ROOT}/repos/{REPO}/git/ref/heads/{REF}").json()["object"]["sha"]
     still = outdated_tceng_configs(base_sha, version)
     if still:
@@ -482,6 +507,12 @@ def write_patch_file(staged_updates, filename="patch.yml"):
 
 # ---- Main ----
 def main():
+    # Opening the PR early gives someone time to review and merge it while the
+    # rest of the deployment runs; a later run without this flag waits for it.
+    if sys.argv[1:] == ["--open-bump-pr"]:
+        bump_taskcluster_version(wait=False)
+        return
+
     # 0) Builds use worker-images' main, so it must pin the latest Taskcluster first
     if os.environ.get("UPDATE_TASKCLUSTER_VERSION", "true") == "true":
         bump_taskcluster_version()

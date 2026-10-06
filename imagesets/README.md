@@ -89,9 +89,13 @@ Run:
   * `./imageset.sh all`
 
 Before building, any `taskcluster_version` in worker-images' `config/tceng/` that
-isn't the latest Taskcluster release is bumped in a PR, and the script waits for
-someone to merge it (`UPDATE_TASKCLUSTER_VERSION=false` skips this). Azure images
-that worker-images built in another subscription are copied into ours by
+isn't the latest Taskcluster release is bumped in a PR (with auto-merge enabled,
+so it lands as soon as it is approved), and the script waits for it to merge
+(`UPDATE_TASKCLUSTER_VERSION=false` skips this). The PR is opened as soon as the
+logins and other setup steps have completed, so it can be reviewed while
+instance types/VM sizes/machine types are updated and macOS workers are
+deployed; only building the images waits for it to be merged. Azure images that
+worker-images built in another subscription are copied into ours by
 `copy-azure-images.py` before `tc-admin apply` switches worker pools to them.
 
 All of the following tools must be available in the `PATH`:
