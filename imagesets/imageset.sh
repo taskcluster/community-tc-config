@@ -136,6 +136,17 @@ function all-in-parallel {
     eval $(SIGNIN_AWS_ACCOUNT_NAME=moz-fx-tc-community-workers imagesets/signin-aws.sh)
   fi
 
+  if "${BUILD_IMAGES}"; then
+    GITHUB_TOKEN="$(gh auth token)"
+    export GITHUB_TOKEN
+    # The worker-images PR needs someone to review and merge it, so open it
+    # before anything else. Only building the images waits for it to be merged
+    # (in rel-sre-imagesets.py below); the steps in between don't depend on it.
+    if "${UPDATE_TASKCLUSTER_VERSION}"; then
+      python3 imagesets/rel-sre-imagesets.py --open-bump-pr
+    fi
+  fi
+
   if "${UPDATE_OFFERINGS}"; then
     echo "Updating EC2 instance types..."
     misc/update-ec2-instance-types.sh
@@ -177,7 +188,6 @@ function all-in-parallel {
 
 
   if "${BUILD_IMAGES}"; then
-    export GITHUB_TOKEN=$(gh auth token)
     python3 imagesets/rel-sre-imagesets.py
     git add config/imagesets.yml
     git commit -m "Built new machine images"
