@@ -83,7 +83,6 @@ function all-in-parallel {
 
   : ${UPDATE_GCLOUD:=true}
   : ${UPDATE_OFFERINGS:=true}
-  : ${AZURE_VM_SIZES_PARALLEL_PROCESSES:=10}
 
   # TODO: fetch these hosts automatically
   local MAC_HOSTS=(
@@ -156,7 +155,7 @@ function all-in-parallel {
     git commit -m "Ran script misc/update-ec2-instance-types.sh" || true
 
     echo "Updating Azure VM sizes..."
-    misc/update-azure-vm-sizes.sh "${AZURE_VM_SIZES_PARALLEL_PROCESSES}"
+    misc/update-azure-vm-sizes.sh
     git add 'config/azure-vm-size-offerings'
     git commit -m "Ran script misc/update-azure-vm-sizes.sh" || true
 

@@ -107,20 +107,23 @@ All of the following tools must be available in the `PATH`:
   * `aws`
   * `az`
   * `bash`
+  * `curl`
   * `cut`
   * `dirname`
   * `env`
   * `gcloud`
+  * `gh` (logged in with `gh auth login`)
   * `git`
   * `head`
   * `mktemp`
   * `pass`
+  * `python3`
   * `rm`
   * `sleep`
   * `sort`
+  * `ssh`
   * `tail`
   * `which`
-  * `xargs`
 
 ## Post image set building steps when building a single image set
 
