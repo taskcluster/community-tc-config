@@ -33,6 +33,10 @@ IMAGESETS_FILE = "config/imagesets.yml"
 TCENG_CONFIG_DIR = "config/tceng"
 TASKCLUSTER_VERSION_RE = re.compile(r"^(\s*taskcluster_version:\s*)([\"']?)([^\"'\s#]+)([\"']?)", re.M)
 PR_POLL_SECONDS = 60
+# Builds occasionally fail transiently (e.g. an Azure VM create that hangs),
+# so failed jobs are rerun until a run has had this many attempts.
+MAX_RUN_ATTEMPTS = int(os.environ.get("MAX_RUN_ATTEMPTS", "3"))
+RERUN_CONCLUSIONS = {"failure", "timed_out"}
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 if not GITHUB_TOKEN:
@@ -315,19 +319,36 @@ def wait_for_all_runs(run_map):
     """
     unfinished = dict(run_map)  # (workflow_file, config) -> (run_id, run_number, workflow_file)
     results = {}  # (workflow_file, config) -> (run_id, run_number, conclusion, workflow_file)
+    min_attempt = {}  # run_id -> attempt that must complete before the run counts as finished
 
     print("\n\n⏳ Phase 3: Waiting for all workflow runs to complete...")
     print(f"Monitoring {len(unfinished)} run(s)...\n")
 
     while unfinished:
-        time.sleep(20)
-        for (workflow_file, cfg), (run_id, run_number, _) in list(unfinished.items()):
-            run = get_run_status(run_id)
-            if run["status"] == "completed":
+        while unfinished:
+            time.sleep(20)
+            for (workflow_file, cfg), (run_id, run_number, _) in list(unfinished.items()):
+                run = get_run_status(run_id)
+                # After requesting a rerun, the previous attempt still shows as completed for a while
+                if run["status"] != "completed" or run["run_attempt"] < min_attempt.get(run_id, 1):
+                    continue
                 conclusion = run["conclusion"]
+                if conclusion in RERUN_CONCLUSIONS and run["run_attempt"] < MAX_RUN_ATTEMPTS:
+                    print(f"   🔁 {cfg} ({workflow_file}): run #{run_number} attempt {run['run_attempt']} "
+                          f"finished with conclusion={conclusion}; rerunning failed jobs")
+                    gh(f"{API_ROOT}/repos/{REPO}/actions/runs/{run_id}/rerun-failed-jobs", method="POST")
+                    min_attempt[run_id] = run["run_attempt"] + 1
+                    continue
                 results[(workflow_file, cfg)] = (run_id, run_number, conclusion, workflow_file)
                 print(f"   ✅ {cfg} ({workflow_file}): run #{run_number} finished with conclusion={conclusion}")
                 unfinished.pop((workflow_file, cfg))
+
+        # A finished run may since have been rerun by hand; wait for that too
+        for (workflow_file, cfg), (run_id, run_number, _, _) in list(results.items()):
+            run = get_run_status(run_id)
+            if run["status"] != "completed":
+                print(f"   🔁 {cfg} ({workflow_file}): run #{run_number} was rerun (attempt {run['run_attempt']}); waiting for it")
+                unfinished[(workflow_file, cfg)] = results.pop((workflow_file, cfg))[:2] + (workflow_file,)
 
     print("\n✅ All runs completed!")
     return results
@@ -519,6 +540,7 @@ def main():
 
     staged_updates = {}  # (image_set, cloud_provider) -> {region: image_name}
     updated = False
+    failed_jobs = []
 
     # all_results: (workflow_file, config) -> (run_id, run_number, conclusion, workflow_file)
     for (workflow_file, cfg), (run_id, run_number, _conclusion, _) in all_results.items():
@@ -556,6 +578,11 @@ def main():
                     print(f"        ❌ Could not parse job name, skipping.")
                     continue
 
+            if job["conclusion"] != "success":
+                print(f"        ❌ Job finished with conclusion={job['conclusion']}, skipping.")
+                failed_jobs.append(f"{job_name} ({job['html_url']})")
+                continue
+
             log = download_job_log(job["id"])
             image_name = extract_image_name(log, cloud_provider)
             if not image_name:
@@ -578,6 +605,12 @@ def main():
                 # Azure uses per-region images
                 print(f"        → image_set = '{image_set}', region = '{region}', image_name = '{image_name}'")
                 staged_updates.setdefault(key, {})[region] = image_name
+
+    if failed_jobs:
+        print(f"\n⚠️  {len(failed_jobs)} job(s) didn't succeed (failed jobs are rerun up to {MAX_RUN_ATTEMPTS} attempts); "
+              "their regions are dropped from the updated image sets:")
+        for failed in failed_jobs:
+            print(f"   - {failed}")
 
     for (image_set, cloud_provider), region_to_image in staged_updates.items():
         if update_yaml_file_bulk(data, image_set, cloud_provider, region_to_image):
