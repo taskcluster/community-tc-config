@@ -25,5 +25,21 @@ else
     parallel_processes=$1
 fi
 
+# `az vm list-skus --location` fetches the SKUs of every location and filters
+# client side, so each call is slow and CPU heavy. Instead query the Resource
+# SKUs API directly with a server-side location filter, so that each location
+# is a small request, and fetch the locations in parallel. The query matches
+# the default (no --all) filtering of `az vm list-skus`, which excludes SKUs
+# that are not available to the subscription in the location.
+function list_vm_sizes {
+    local output_dir="${1}"
+    local location="${2}"
+    az rest --method get \
+        --url "https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.Compute/skus?api-version=2021-07-01&\$filter=location eq '${location}'" \
+        --query "sort(value[?resourceType=='virtualMachines' && !(restrictions[?reasonCode=='NotAvailableForSubscription' && type=='Location'])].name)" \
+        --output json > "${output_dir}/${location}.json"
+}
+export -f list_vm_sizes
+
 az account list-locations --query="[].name" --output tsv | sort -u | \
-xargs -I {} -P "$parallel_processes" bash -c 'az vm list-skus --location "$1" --resource-type virtualMachines --query="sort([].name)" --output json 2> /dev/null > "$0/$1.json"' "$output_dir" {}
+xargs -I {} -P "$parallel_processes" bash -c 'list_vm_sizes "$0" "$1"' "$output_dir" {}
