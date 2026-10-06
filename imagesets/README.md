@@ -1,106 +1,94 @@
-# Building Image Sets
+# Deploying Image Sets
 
-## Prerequisite Steps
+Machine images are not built in this repository: they are built by the TCEng
+GitHub Actions workflows of relops'
+[worker-images](https://github.com/mozilla-platform-ops/worker-images)
+repository. To have worker-images build new images of all image sets, and
+deploy them to community-tc's worker pools, run, from this directory:
 
-The AWS/Azure/GCP image set building machinery requires the following configuration
-to be present:
+  * `./imageset.sh all`
 
-1) Depending on which cloud you will be deploying to:
+This is the only way to run the script; no other arguments are accepted. It
+always deploys to AWS, Azure and GCP, and updates the macOS workers. The environment variables [below](#environment-variables) can
+skip some of the steps.
 
-     * AWS only:
+## Prerequisites
 
-       You will need an AWS access key configured under `~/.aws` on your host,
-       and 2FA should be enabled on your AWS account.
+1) AWS: credentials set up with `aws configure` (or `SIGNIN_AWS_ACCESS_KEY_ID`
+   and `SIGNIN_AWS_SECRET_ACCESS_KEY`), with MFA enabled on your AWS account. The
+   script signs in with [`signin-aws.sh`](signin-aws.sh), which prompts for an
+   MFA code, or reads it from your Yubikey if `SIGNIN_AWS_YUBIKEY_OATH_NAME` is
+   set.
 
-     * Azure only:
+2) Azure: `az` installed. The script runs `az login`.
 
-       You will need an az installed on your host, and you will need to logon on
-       your host (`az login`) in order that `~/.azure` folder holds your logon
-       information.
+3) GCP: `gcloud` installed. The script runs `gcloud auth login`.
 
-2) You will need a valid git configuration under `~/.gitconfig` on your host with
-   a valid user/email, for committing changes to community-tc-config repo and the
-   taskcluster team password store.
+4) GitHub: `gh` installed and logged in (`gh auth login`). It is used to trigger
+   the image builds in
+   [worker-images](https://github.com/mozilla-platform-ops/worker-images), and
+   to open PRs there and in
+   [fxci-config](https://github.com/mozilla-releng/fxci-config) (from your fork,
+   which is created if you don't have one).
 
-3) In order to read/write to taskcluster team password store, you will need
-   `gcloud` installed on your host, and you will need to logon (`gcloud auth login
-   <user>@mozilla.com`) in order that `~/.config/gcloud` folder holds your logon
-   information.
+5) A valid git configuration under `~/.gitconfig` with a valid user/email, and
+   an ssh key that can push to `git@github.com:taskcluster/community-tc-config`
+   and the taskcluster team password store. If the key is not in a standard
+   location (e.g. `~/.ssh/id_rsa`, `~/.ssh/id_ed25519`, ...), specify it with an
+   `IdentityFile` directive in `~/.ssh/config`.
 
-4) The ssh key for pushing to the taskcluster password store should be in a file
-   somewhere underneath `~/.ssh` on your host. This directory is mounted in to the
-   docker container. If it is not in a standard location (e.g. `~/.ssh/id_rsa`,
-   `~/.ssh/id_ed25519`, ...) then the location should be explicitly specified with
-   an `IdentityFile` directive in the `~/.ssh/config` file (see point 3 above).
-
-5) You will need your gpg account to be configured under `~/.gnupg` on your host,
-   with a valid key that is authorised in the taskcluster team password store.
-
-6) Depending on which cloud you are deploying to, there may be other steps
-   required:
-
-     * AWS only:
-
-       * If you use a Yubikey:
-
-         The image set building process requires that you are authenticated against
-         AWS. If the env vars `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`,
-         `AWS_SESSION_TOKEN` are not set, the [`signin-aws.sh`](signin-aws.sh)
-         script will be automatically run. However, the yubikey interface isn't
-         supported when running under docker, so if you use a yubikey, it is recommended
-         to run `eval $(signin-aws.sh)` before calling the `imageset.sh` script.
-
-       * Other MFA Device:
- 
-         No additional steps needed, you will be prompted for MFA codes as necessary.
-
-     * Azure only:
-
-       First, run `export AZURE_IMAGE_RESOURCE_GROUP=<your Azure resource group of choice to deploy image into>`
-       (typically `rg-tc-eng-images`). Worker Manager spawns instances in resource group
-       `rg-tc-eng-worker-manager-VMs` but typically the machine images are stored in resource group
-       `rg-tc-eng-images`.
-
-     * GCP only:
-
-       First run `export GCP_PROJECT=<your google cloud project of choice to deploy image into>`
-       (typically `taskcluster-imaging`). Worker Manager spawns instances in project
-       `community-tc-workers` but typically the machine images are stored in project
-       `taskcluster-imaging`.
-
-7) You should set the gpg agent appropriately to enable building images without
-   being prompted for your signing key passphrase. For example, by writing the
-   following content to file `~/.gnupg/gpg-agent.conf`:
+6) Your gpg account configured under `~/.gnupg`, with a valid key that is
+   authorised in the taskcluster team password store. Set the gpg agent's cache
+   so that you aren't prompted for your passphrase during the run, e.g. by
+   writing the following to `~/.gnupg/gpg-agent.conf`:
 
    ```
    default-cache-ttl 86400
    max-cache-ttl 86400
    ```
 
-Once all of the above prerequisite steps have been made, you are in a position
-to be able to build image sets.
+7) macOS workers: a connection to the Mozilla corporate VPN, and a VNC session
+   as administrator on each Mac, to avoid ssh connection problems. The script
+   checks it can ssh to each Mac and run `sudo` before doing anything else.
 
-## Building
+## What it does
 
-### Building and deploying all image sets in one go in parallel
-
-Run:
-
-  * `./imageset.sh all`
-
-Before building, any `taskcluster_version` in worker-images' `config/tceng/` that
+Before triggering the builds, any `taskcluster_version` in worker-images' `config/tceng/` that
 isn't the latest Taskcluster release is bumped in a PR (with auto-merge enabled,
 so it lands as soon as it is approved), and the script waits for it to merge
 (`UPDATE_TASKCLUSTER_VERSION=false` skips this). The PR is opened as soon as the
 logins and other setup steps have completed, so it can be reviewed while
 instance types/VM sizes/machine types are updated and macOS workers are
-deployed; only building the images waits for it to be merged. Azure images that
-worker-images built in another subscription are copied into ours by
+deployed; only triggering the builds waits for it to be merged. Failed
+worker-images jobs are rerun, up to `MAX_RUN_ATTEMPTS` attempts. Azure images
+that worker-images built in another subscription are copied into ours by
 `copy-azure-images.py` before `tc-admin apply` switches worker pools to them.
-Finally, the new images are logged, and a PR is opened (from your fork) to have
+Finally, the new images are logged with links to the worker-images jobs that
+built them, and a PR is opened (from your fork) to have
 fxci's worker pools that use the same images use the new ones too
 (`UPDATE_FXCI_IMAGES=false` skips this). It isn't opened if any location that
 fxci uses has no new image, e.g. because its build failed.
+
+## Environment variables
+
+All default to `true`, apart from `MAX_RUN_ATTEMPTS`.
+
+| Variable | Controls |
+|---|---|
+| `UPDATE_OFFERINGS` | Update EC2 instance types, Azure VM sizes and GCE machine types, and `tc-admin apply` |
+| `DEPLOY_MACS` | Update the macOS workers |
+| `BUILD_IMAGES` | Have worker-images build new images, and commit them to `config/imagesets.yml` |
+| `UPDATE_TASKCLUSTER_VERSION` | Bump worker-images' TCEng configs to the latest Taskcluster release before building |
+| `MAX_RUN_ATTEMPTS` | Attempts per worker-images workflow run, including reruns of failed jobs (default `3`) |
+| `DEPLOY_IMAGES` | Copy Azure images into place and `tc-admin apply` |
+| `UPDATE_FXCI_IMAGES` | Open the fxci-config PR to use the new images |
+| `LOGIN_AWS` / `LOGIN_AZURE` | Sign in to AWS / Azure (`false` to use an existing session) |
+| `UPDATE_GCLOUD` | Run `gcloud components update` |
+
+After a run, test the new images, e.g. by rerunning some tasks that previously
+ran successfully.
+
+## Required tools
 
 All of the following tools must be available in the `PATH`:
 
@@ -124,62 +112,3 @@ All of the following tools must be available in the `PATH`:
   * `ssh`
   * `tail`
   * `which`
-
-## Post image set building steps when building a single image set
-
-Note, this is not required when running `./imageset.sh all`.
-
-There are some important, currently manual, post-image-set-building steps to
-complete:
-
-1) A new commit will have been made to your `community-tc-config` repository,
-   updating image references in `/config/imagesets.yml`. Make sure to push this
-   commit upstream (i.e. to `git@github.com:taskcluster/community-tc-config.git`).
-
-2) Apply the config changes by running `tc-admin`. Note, here is a script that
-   does this, if you have not already set something up:
-
-   ```bash
-   #!/bin/bash
-
-   set -eu
-   set -o pipefail
-
-   cd "$(dirname "${0}")"
-
-   export TASKCLUSTER_CLIENT_ID='static/taskcluster/root'
-   export TASKCLUSTER_ACCESS_TOKEN="$(pass ls community-tc/root | head -1)"
-   export TASKCLUSTER_ROOT_URL='https://community-tc.services.mozilla.com'
-   unset TASKCLUSTER_CERTIFICATE
-
-   pass git pull
-
-   rm -rf tc-admin
-   mkdir tc-admin
-
-   cd tc-admin
-   python3 -m venv tc-admin-venv
-   source tc-admin-venv/bin/activate
-   pip3 install pytest
-   pip3 install --upgrade pip
-
-   git clone https://github.com/taskcluster/community-tc-config
-   cd community-tc-config
-
-   pip3 install -e .
-   which tc-admin
-
-   tc-admin diff || true
-   echo
-   echo 'Applying in 60 seconds (Ctrl-C to abort)....'
-   echo
-   sleep 60
-   echo 'Applying!'
-   echo
-   tc-admin apply
-
-   echo "All done!"
-   ```
-
-3) Don't forget to test your image set changes! Try rerunning some tasks that
-   previously ran successfully.

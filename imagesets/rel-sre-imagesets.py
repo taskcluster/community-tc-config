@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import base64
 import hashlib
-import io
 import os
 import subprocess
 import sys
+import tempfile
 import time
 import requests
 import re
@@ -60,7 +60,8 @@ SCRIPT_START_TIME = datetime.now(timezone.utc)
 
 # ---- Utility ----
 def gh(url, method="GET", max_retries=5, **kwargs) -> Response:
-    """Make a GitHub API request with retry logic for network failures."""
+    """Make a GitHub API request with retry logic for network failures and
+    server errors."""
     for attempt in range(max_retries):
         try:
             # Add timeout to prevent hanging indefinitely
@@ -71,10 +72,13 @@ def gh(url, method="GET", max_retries=5, **kwargs) -> Response:
             return r
         except (requests.exceptions.ConnectionError,
                 requests.exceptions.Timeout,
-                requests.exceptions.ConnectTimeout) as e:
+                requests.exceptions.ConnectTimeout,
+                requests.exceptions.HTTPError) as e:
+            if isinstance(e, requests.exceptions.HTTPError) and e.response.status_code < 500:
+                raise
             if attempt < max_retries - 1:
                 wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s, 8s, 16s
-                print(f"⚠️  Network error (attempt {attempt + 1}/{max_retries}): {e}")
+                print(f"⚠️  Request failed (attempt {attempt + 1}/{max_retries}): {e}")
                 print(f"   Retrying in {wait_time}s...")
                 time.sleep(wait_time)
             else:
@@ -511,8 +515,7 @@ def write_patch_file(staged_updates, filename="patch.yml"):
 # ---- Logging / fxci ----
 FXCI_REPO = "mozilla-releng/fxci-config"
 FXCI_IMAGES_FILE = "worker-images.yml"
-FXCI_POOLS_FILE = "worker-pools.yml"
-# fxci's worker pools use some of the image sets built here, under other names:
+# fxci's worker pools use some of the same image sets, under other names:
 # fxci image -> (image set, fxci provider id)
 FXCI_IMAGES = {
     "gw-ubuntu-24-04": ("generic-worker-ubuntu-24-04", "fxci-level1-gcp"),
@@ -524,19 +527,22 @@ FXCI_IMAGES = {
 FXCI_AZURE_SETTINGS = {"version", "resource_group", "deployment_id", "sbom", "name"}
 
 def log_images():
-    """Print the images of the image sets built by this script."""
+    """Print the images of the image sets that worker-images builds for us."""
     with open(IMAGESETS_FILE) as f:
         data = yaml.load(f)
-    print("\n🖼️  Images in config/imagesets.yml of the image sets built by this script:")
+    print(f"\n🖼️  Images in config/imagesets.yml of the image sets built by {REPO}, "
+          "with the GitHub Actions jobs that built them:")
     for image_set in sorted({cfg for cfgs in WORKFLOWS.values() for cfg in cfgs}):
         print(f"   {image_set}:")
         for cloud, key in (("gcp", "image"), ("aws", "amis"), ("azure", "images")):
             images = data.get(image_set, {}).get(cloud, {}).get(key)
-            if isinstance(images, str):
-                print(f"      {cloud}: {images}")
-            else:
-                for region, image in (images or {}).items():
-                    print(f"      {cloud} {region}: {image.rsplit('/', 1)[-1]}")
+            if not images:
+                continue
+            regions = {cloud: images} if isinstance(images, str) else {f"{cloud} {r}": i for r, i in images.items()}
+            names = {region: image.rsplit("/", 1)[-1] for region, image in regions.items()}
+            jobs, _ = worker_images_jobs(image_set, cloud, list(names.values()))
+            for region, name in names.items():
+                print(f"      {region}: {name} ({jobs.get(name, 'job not found')})")
 
 def update_fxci_images(imagesets, worker_images):
     """Point the images in `worker_images` (fxci's worker-images.yml) at those in
@@ -575,99 +581,124 @@ def update_fxci_images(imagesets, worker_images):
                          "so not opening an fxci PR:\n" + "\n".join(f"   - {m}" for m in missing))
     return changes
 
-def fxci_pools_using(worker_pools, images):
-    """{image: [pool ids]} of the pools in fxci's worker-pools.yml that use `images`."""
-    pools = {}
-    pool = None
-    for line in worker_pools.splitlines():
-        match = re.match(r"\s*- pool_id:\s*['\"]?([^'\"\s]+)", line)
-        if match:
-            pool = match.group(1)
-        match = re.match(r"\s*image:\s*['\"]?([^'\"\s#]+)", line)
-        if match and match.group(1) in images and pool:
-            pools.setdefault(match.group(1), []).append(pool)
-    return pools
+def worker_images_jobs(image_set, cloud, image_names):
+    """({image name: URL of the worker-images GitHub Actions job that built it},
+    run) for the latest successful run that built `image_set` for `cloud` and
+    all of `image_names` (as shown by its job logs), or ({}, None) if there
+    isn't one."""
+    workflow_file = next(wf for wf, cfgs in WORKFLOWS.items() if get_cloud_provider(wf) == cloud and image_set in cfgs)
+    checked = set()
+    # GitHub's list of runs occasionally misses recent ones, so list them again
+    # if none of the listed runs built the images
+    for attempt in range(3):
+        if attempt:
+            time.sleep(10)
+        runs = [run for run in list_dispatch_runs_for_workflow(workflow_file)
+                if title_to_config(run.get("display_title") or run.get("name", "")) == image_set
+                and run["conclusion"] == "success"]
+        for run in sorted(runs, key=lambda r: r["created_at"], reverse=True)[:5]:
+            if run["id"] in checked:
+                continue
+            checked.add(run["id"])
+            logs = {}
+            for job in get_workflow_jobs(run["id"]):
+                if job["conclusion"] != "success":
+                    continue
+                try:
+                    logs[job["html_url"]] = download_job_log(job["id"])
+                except requests.exceptions.HTTPError:
+                    pass  # e.g. logs expired
+            jobs = {}
+            for name in image_names:
+                url = next((url for url, log in logs.items() if name in log), None)
+                if url:
+                    jobs[name] = url
+            if len(jobs) == len(set(image_names)):
+                return jobs, run
+    print(f"⚠️  Couldn't find the {REPO} jobs that built {image_set} ({cloud}) images {', '.join(image_names)}")
+    return {}, None
+
+def fxci_pr_text(changes):
+    """Title and body of the fxci PR for `changes` (from update_fxci_images)."""
+    images = sorted({image for image, *_ in changes})
+    jobs = {}
+    versions = set()
+    for image in images:
+        image_set, _ = FXCI_IMAGES[image]
+        # GCP images are for all locations (None)
+        cloud = "gcp" if any(location is None for i, location, *_ in changes if i == image) else "azure"
+        image_jobs, run = worker_images_jobs(image_set, cloud,
+                                             [new.rsplit("/", 1)[-1] for i, _, _, new in changes if i == image])
+        jobs.update(image_jobs)
+        if run:
+            # The Taskcluster version that the run's TCEng config pinned
+            url = f"{API_ROOT}/repos/{REPO}/contents/{TCENG_CONFIG_DIR}/{image_set}.yaml"
+            config = base64.b64decode(gh(url, params={"ref": run["head_sha"]}).json()["content"]).decode("utf-8")
+            match = TASKCLUSTER_VERSION_RE.search(config)
+            if match:
+                versions.add(match.group(3))
+    title = "Update TCEng worker images" + (f" to Taskcluster {', '.join(sorted(versions))}" if versions else "")
+
+    def linked(name):
+        return f"[`{name}`]({jobs[name]})" if name in jobs else f"`{name}`"
+
+    rows = "\n".join(f"| `{image}` | {location or 'all'} | `{old.rsplit('/', 1)[-1]}` | {linked(new.rsplit('/', 1)[-1])} |"
+                     for image, location, old, new in changes)
+    body = f"""Use the latest images built by the TCEng workflows in [{REPO}](https://github.com/{REPO}). Each new image links to the GitHub Actions job that built it.
+
+| Image | Location | Old | New |
+|---|---|---|---|
+{rows}"""
+    return title, body
 
 def open_fxci_pr():
     """Open a PR (from the GitHub user's fork) to have fxci use the image sets'
     latest images too, since fxci's config can only be changed with a PR."""
-    def contents(path, ref):
-        url = f"{API_ROOT}/repos/{FXCI_REPO}/contents/{path}"
-        return base64.b64decode(gh(url, params={"ref": ref}).json()["content"]).decode("utf-8")
-
     with open(IMAGESETS_FILE) as f:
         imagesets = yaml.load(f)
-    base_sha = gh(f"{API_ROOT}/repos/{FXCI_REPO}/git/ref/heads/main").json()["object"]["sha"]
-    content = contents(FXCI_IMAGES_FILE, base_sha)
-    fxci_yaml = YAML()
-    fxci_yaml.preserve_quotes = True
-    fxci_yaml.width = 4096
-    fxci_yaml.explicit_start = content.startswith("---")
-    worker_images = fxci_yaml.load(content)
-    changes = update_fxci_images(imagesets, worker_images)
-    if not changes:
-        print(f"✅ {FXCI_REPO} already uses the latest images")
-        return
-    out = io.StringIO()
-    fxci_yaml.dump(worker_images, out)
-    new_content = out.getvalue()
+    with tempfile.TemporaryDirectory() as tmp:
+        def git(*args):
+            return subprocess.run(["git", *args], cwd=f"{tmp}/fxci-config", check=True,
+                                  capture_output=True, text=True).stdout.strip()
 
-    # The same images give the same branch, so a rerun reuses the PR
-    branch = f"community-tc-images-{hashlib.sha256(new_content.encode()).hexdigest()[:12]}"
-    # Returns the existing fork, if there is one
-    fork = gh(f"{API_ROOT}/repos/{FXCI_REPO}/forks", "POST").json()["full_name"]
-    owner = fork.split("/")[0]
-    prs = gh(f"{API_ROOT}/repos/{FXCI_REPO}/pulls",
-             params={"head": f"{owner}:{branch}", "state": "open", "per_page": 1}).json()
-    if prs:
-        print(f"♻️  Reusing {prs[0]['html_url']}")
-        return
+        # Clones your fork (creating it if needed) as `origin`, with fxci-config as `upstream`
+        fork = subprocess.run(["gh", "repo", "fork", FXCI_REPO, "--clone", "--default-branch-only"], cwd=tmp,
+                              capture_output=True, text=True)
+        if fork.returncode != 0:
+            raise SystemExit(f"❌ Couldn't fork and clone {FXCI_REPO}:\n{fork.stdout}{fork.stderr}")
+        git("fetch", "upstream", "main")
+        git("checkout", "--detach", "upstream/main")
 
-    images = sorted({image for image, *_ in changes})
-    title = f"Update {', '.join(images)} to the latest TCEng builds"
-    # A new fork takes a moment to be usable
-    for attempt in range(10):
-        try:
-            base_tree = gh(f"{API_ROOT}/repos/{fork}/git/commits/{base_sha}").json()["tree"]["sha"]
-            break
-        except requests.exceptions.HTTPError:
-            if attempt == 9:
-                raise
-            time.sleep(10)
-    tree = gh(f"{API_ROOT}/repos/{fork}/git/trees", "POST", json={
-        "base_tree": base_tree,
-        "tree": [{"path": FXCI_IMAGES_FILE, "mode": "100644", "type": "blob", "content": new_content}],
-    }).json()["sha"]
-    commit = gh(f"{API_ROOT}/repos/{fork}/git/commits", "POST", json={
-        "message": title, "tree": tree, "parents": [base_sha],
-    }).json()["sha"]
-    try:
-        gh(f"{API_ROOT}/repos/{fork}/git/refs", "POST", json={"ref": f"refs/heads/{branch}", "sha": commit})
-    except requests.exceptions.HTTPError as e:
-        if e.response.status_code != 422:
-            raise
-        # Branch left over from an interrupted run, with no PR: point it at the new commit.
-        gh(f"{API_ROOT}/repos/{fork}/git/refs/heads/{branch}", "PATCH", json={"sha": commit, "force": True})
+        fxci_yaml = YAML()
+        fxci_yaml.preserve_quotes = True
+        fxci_yaml.width = 4096
+        images_file = f"{tmp}/fxci-config/{FXCI_IMAGES_FILE}"
+        with open(images_file) as f:
+            fxci_yaml.explicit_start = f.read().startswith("---")
+        with open(images_file) as f:
+            worker_images = fxci_yaml.load(f)
+        changes = update_fxci_images(imagesets, worker_images)
+        if not changes:
+            print(f"✅ {FXCI_REPO} already uses the latest images")
+            return
+        with open(images_file, "w") as f:
+            fxci_yaml.dump(worker_images, f)
 
-    community_sha = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()
-    rows = "\n".join(f"| `{image}` | {location or 'all'} | `{old.rsplit('/', 1)[-1]}` | `{new.rsplit('/', 1)[-1]}` |"
-                     for image, location, old, new in changes)
-    pools = fxci_pools_using(contents(FXCI_POOLS_FILE, base_sha), images)
-    pool_list = "\n".join(f"- `{image}`: {', '.join(f'`{p}`' for p in pools.get(image, []))}" for image in images)
-    body = f"""Use the images that community-tc built and deployed in taskcluster/community-tc-config@{community_sha}.
+        # The same images give the same branch, so a rerun reuses the PR
+        with open(images_file, "rb") as f:
+            branch = f"tceng-images-{hashlib.sha256(f.read()).hexdigest()[:12]}"
+        existing = subprocess.run(["gh", "pr", "list", "--repo", FXCI_REPO, "--head", branch, "--state", "open",
+                                   "--json", "url", "--jq", ".[].url"], capture_output=True, text=True, check=True).stdout.strip()
+        if existing:
+            print(f"♻️  Reusing {existing}")
+            return
 
-| Image | Location | Old | New |
-|---|---|---|---|
-{rows}
-
-Pools using these images:
-{pool_list}
-
-Opened by community-tc-config's `imagesets/imageset.sh all`."""
-    pr = gh(f"{API_ROOT}/repos/{FXCI_REPO}/pulls", "POST", json={
-        "title": title, "head": f"{owner}:{branch}", "base": "main", "body": body,
-    }).json()
-    print(f"📝 Opened {pr['html_url']}")
+        title, body = fxci_pr_text(changes)
+        git("commit", "--all", "--message", title)
+        git("push", "--force", "origin", f"HEAD:refs/heads/{branch}")
+        fork_owner = subprocess.run(["gh", "api", "user", "--jq", ".login"], capture_output=True, text=True, check=True).stdout.strip()
+        subprocess.run(["gh", "pr", "create", "--repo", FXCI_REPO, "--base", "main", "--head", f"{fork_owner}:{branch}",
+                        "--title", title, "--body", body], check=True)
 
 
 # ---- Main ----
