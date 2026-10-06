@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# This file is managed in https://github.com/taskcluster/community-tc-config
+# (misc/mac/update.sh), and installed on the macOS workers by imagesets/imageset.sh
+# on every deployment. Don't change it on a worker, as the next deployment will
+# overwrite it: change it in community-tc-config instead.
+
 function retry {
   set +e
   local n=0

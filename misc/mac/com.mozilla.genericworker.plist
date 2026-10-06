@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  This file is managed in https://github.com/taskcluster/community-tc-config
+  (misc/mac/com.mozilla.genericworker.plist), and installed on the macOS workers by imagesets/imageset.sh
+  on every deployment. Don't change it on a worker, as the next deployment will
+  overwrite it: change it in community-tc-config instead.
+-->
 <plist version="1.0">
     <dict>
         <key>Label</key>

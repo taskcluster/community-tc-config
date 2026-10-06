@@ -1,13 +1,23 @@
+# This file is managed in https://github.com/taskcluster/community-tc-config
+# (misc/mac/runner.yml), and installed on the macOS workers as
+# /etc/generic-worker/runner.yml by imagesets/imageset.sh on every deployment.
+# Don't change it on a worker, as the next deployment will overwrite it: change
+# it in community-tc-config instead.
+#
+# When it is installed, @WORKER_ID@ is replaced with the worker's hostname (e.g.
+# macmini-m4-126), @PUBLIC_IP@ with its public IP address (as seen from the
+# internet), and @STATIC_SECRET@ with the staticSecret value in the worker's
+# existing runner.yml, so that the secret isn't stored here.
 provider:
   providerType: static
-  rootURL: "https://community-tc.services.mozilla.com"
+  rootURL: "https://firefox-ci-tc.services.mozilla.com"
   providerID: static
-  staticSecret: ""
+  staticSecret: @STATIC_SECRET@
   workerPoolID: proj-taskcluster/gw-ci-macos
   workerGroup: proj-taskcluster
-  workerID: macmini-m4-1
+  workerID: @WORKER_ID@
   workerLocation:
-    host: macstadium
+    host: mdc1
 worker:
   implementation: generic-worker
   path: /usr/local/bin/generic-worker
@@ -20,7 +30,7 @@ workerConfig:
   ed25519SigningKeyLocation: "/etc/generic-worker/ed25519_key"
   headlessTasks: false
   livelogExecutable: "/usr/local/bin/livelog"
-  publicIP: "207.254.33.162"
+  publicIP: "@PUBLIC_IP@"
   requiredDiskSpaceMegabytes: 20480
   sentryProject: "generic-worker"
   shutdownMachineOnIdle: false
@@ -28,5 +38,5 @@ workerConfig:
   taskclusterProxyExecutable: "/usr/local/bin/taskcluster-proxy"
   taskclusterProxyPort: 8080
   tasksDir: "/Users"
-  wstAudience: "communitytc"
-  wstServerURL: "https://wstunnel.communitytc.taskcluster.prod.webservices.mozgcp.net"
+  wstAudience: "firefoxcitc"
+  wstServerURL: "https://firefoxci-websocktunnel.services.mozilla.com/"
