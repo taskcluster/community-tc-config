@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# This file is managed in https://github.com/taskcluster/community-tc-config
+# (misc/mac/run-generic-worker.sh), and installed on the macOS workers by imagesets/imageset.sh
+# on every deployment. Don't change it on a worker, as the next deployment will
+# overwrite it: change it in community-tc-config instead.
+
 log() {
   echo "$(date '+%Y/%m/%d %H:%M:%S') $*"
 }

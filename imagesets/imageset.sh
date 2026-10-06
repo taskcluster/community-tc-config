@@ -28,18 +28,86 @@ function retry {
 
 # Run a command on a macOS worker as administrator. The administrator password
 # (from pass) is used for ssh authentication if key authentication fails.
+# stdin isn't passed to the command, unless MAC_SSH_STDIN=true.
 function mac-ssh {
   local host="${1}"
   shift
   local pass_entry="mdc1/generic-worker-ci/${host%%.*}"
   local askpass
   local status=0
+  local ssh_options=(-o ConnectTimeout=10 -o NumberOfPasswordPrompts=1)
+  "${MAC_SSH_STDIN:-false}" || ssh_options+=(-n)
   askpass="$(mktemp -t mac-askpass.XXXXXXXXXX)"
   printf '#!/bin/sh\npass "%s" | tail -1\n' "${pass_entry}" > "${askpass}"
   chmod 700 "${askpass}"
-  SSH_ASKPASS="${askpass}" SSH_ASKPASS_REQUIRE=force ssh -n -o ConnectTimeout=10 -o NumberOfPasswordPrompts=1 "administrator@${host}" "$@" || status=$?
+  SSH_ASKPASS="${askpass}" SSH_ASKPASS_REQUIRE=force ssh "${ssh_options[@]}" "administrator@${host}" "$@" || status=$?
   rm -f "${askpass}"
   return "${status}"
+}
+
+# Files in misc/mac that are installed on the macOS workers, before updating
+# them, as <file>:<path on the worker>:<mode>. They are only maintained in this
+# repository, so that the workers don't drift from it.
+MAC_FILES=(
+  update.sh:/var/root/update.sh:755
+  run-generic-worker.sh:/usr/local/bin/run-generic-worker.sh:755
+  com.mozilla.genericworker.plist:/Library/LaunchDaemons/com.mozilla.genericworker.plist:644
+  runner.yml:/etc/generic-worker/runner.yml:600
+)
+
+# Install MAC_FILES on a macOS worker, with a script that runs on the worker as
+# root. In runner.yml, @WORKER_ID@ is replaced with the worker's hostname,
+# @PUBLIC_IP@ with its public IP address, and @STATIC_SECRET@ with the
+# staticSecret in its existing runner.yml (so the secret never leaves the
+# worker). Each file is written to a new file that is renamed
+# into place, so that a running script isn't modified.
+function install-mac-files {
+  local host="${1}"
+  local entry file dest mode
+  {
+    cat << 'EOF'
+set -eu
+# Not readable by others while being written, as runner.yml has a secret
+umask 077
+# Replace the placeholders, other than in comments (which mention them), with
+# string operations, as the secret may contain any character
+function replace_placeholders {
+  awk '
+    function replace(placeholder, value) {
+      while ((i = index($0, placeholder)) > 0) {
+        $0 = substr($0, 1, i - 1) value substr($0, i + length(placeholder))
+      }
+    }
+    !/^ *#/ {
+      replace("@WORKER_ID@", ENVIRON["WORKER_ID"])
+      replace("@PUBLIC_IP@", ENVIRON["PUBLIC_IP"])
+      replace("@STATIC_SECRET@", ENVIRON["STATIC_SECRET"])
+    }
+    { print }
+  '
+}
+STATIC_SECRET="$(sed -n 's/^  staticSecret: //p' /etc/generic-worker/runner.yml)"
+[ -n "${STATIC_SECRET}" ] || { echo "No staticSecret in /etc/generic-worker/runner.yml" >&2; exit 1; }
+export STATIC_SECRET
+# If the public IP address can't be determined, keep the existing one
+PUBLIC_IP="$(curl -fsS --max-time 10 https://checkip.amazonaws.com || true)"
+if ! [[ "${PUBLIC_IP}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  PUBLIC_IP="$(sed -n 's/^  publicIP: "\(.*\)"$/\1/p' /etc/generic-worker/runner.yml)"
+  echo "WARNING: Couldn't determine the public IP address; keeping ${PUBLIC_IP}" >&2
+fi
+export PUBLIC_IP
+EOF
+    echo "export WORKER_ID='${host%%.*}'"
+    for entry in "${MAC_FILES[@]}"; do
+      IFS=: read -r file dest mode <<< "${entry}"
+      echo "base64 -d << 'END_OF_BASE64' | replace_placeholders > '${dest}.new'"
+      base64 < "${IMAGESETS_DIR}/../misc/mac/${file}"
+      echo 'END_OF_BASE64'
+      echo "chown root:wheel '${dest}.new'"
+      echo "chmod ${mode} '${dest}.new'"
+      echo "if cmp -s '${dest}.new' '${dest}'; then rm '${dest}.new'; echo '${host%%.*}: ${dest} is up to date'; else mv -f '${dest}.new' '${dest}'; echo '${host%%.*}: updated ${dest}'; fi"
+    done
+  } | MAC_SSH_STDIN=true mac-ssh "${host}" sudo -n bash -s
 }
 
 # Fail early if any macOS worker can't be reached over ssh, or administrator
@@ -183,6 +251,7 @@ function all-in-parallel {
   # TODO: report if macs need to be logged into first with vnc
   if "${DEPLOY_MACS}"; then
     for HOST in "${MAC_HOSTS[@]}"; do
+      install-mac-files "${HOST}"
       mac-ssh "${HOST}" sudo -n bash -c /var/root/update.sh
     done
   fi

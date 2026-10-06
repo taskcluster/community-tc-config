@@ -1,6 +1,11 @@
 # macOS Worker Files
 
-This directory contains configuration files and scripts extracted from static Taskcluster macOS workers. These files are preserved to avoid having to recreate them from scratch.
+This directory contains the configuration files and scripts of the static
+Taskcluster macOS workers (`proj-taskcluster/gw-ci-macos` in firefox-ci). This
+repository is their only source: `imagesets/imageset.sh all` installs them on
+each worker (see `MAC_FILES` in [imageset.sh](../../imagesets/imageset.sh))
+before updating it, so any changes made directly on a worker are overwritten.
+Change them here instead.
 
 ## Files
 
@@ -21,7 +26,11 @@ Startup script executed by the LaunchDaemon that:
 - Launches the worker using `/usr/local/bin/start-worker` with config `/etc/generic-worker/runner.yml`
 
 ### [runner.yml](runner.yml)
-Taskcluster worker configuration file used by `start-worker`.
+Taskcluster worker configuration file used by `start-worker`, installed as
+`/etc/generic-worker/runner.yml`. `@WORKER_ID@` is replaced with the worker's
+hostname, `@PUBLIC_IP@` with its public IP address (as seen from the internet),
+and `@STATIC_SECRET@` with the `staticSecret` in the worker's existing
+`runner.yml`, so that the secret isn't stored in this repository.
 
 ### [update.sh](update.sh)
 Maintenance script for updating Taskcluster worker components:
