@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+import base64
 import os
 import time
 import requests
 import re
+import urllib.parse
 from datetime import datetime, timezone
 from ruamel.yaml import YAML
 from requests import Response
@@ -25,6 +27,11 @@ WORKFLOWS = {
     ],
 }
 IMAGESETS_FILE = "config/imagesets.yml"
+# Every file in this worker-images directory that pins `taskcluster_version`
+# is bumped to the latest Taskcluster release before building.
+TCENG_CONFIG_DIR = "config/tceng"
+TASKCLUSTER_VERSION_RE = re.compile(r"^(\s*taskcluster_version:\s*)([\"']?)([^\"'\s#]+)([\"']?)", re.M)
+PR_POLL_SECONDS = 60
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 if not GITHUB_TOKEN:
@@ -110,6 +117,102 @@ def list_dispatch_runs_for_workflow(workflow_file, per_page=100):
 def get_run_status(run_id):
     url = f"{API_ROOT}/repos/{REPO}/actions/runs/{run_id}"
     return gh(url).json()
+
+
+# ---- Taskcluster version bump ----
+def latest_taskcluster_version():
+    tag = gh(f"{API_ROOT}/repos/taskcluster/taskcluster/releases/latest").json()["tag_name"]
+    match = re.fullmatch(r"v(\d+\.\d+\.\d+)", tag)
+    if not match:
+        raise SystemExit(f"❌ Unexpected latest Taskcluster release tag: {tag}")
+    return match.group(1)
+
+def outdated_tceng_configs(ref, version):
+    """{path: new_content} for every file under TCENG_CONFIG_DIR at `ref` whose
+    taskcluster_version isn't `version`."""
+    listing = gh(f"{API_ROOT}/repos/{REPO}/contents/{TCENG_CONFIG_DIR}", params={"ref": ref}).json()
+    changes = {}
+    for entry in listing:
+        if entry["type"] != "file":
+            continue
+        url = f"{API_ROOT}/repos/{REPO}/contents/{urllib.parse.quote(entry['path'])}"
+        content = base64.b64decode(gh(url, params={"ref": ref}).json()["content"]).decode("utf-8")
+        new = TASKCLUSTER_VERSION_RE.sub(lambda m: f"{m.group(1)}{m.group(2)}{version}{m.group(4)}", content)
+        if new != content:
+            changes[entry["path"]] = new
+    return changes
+
+def find_pr(branch):
+    owner = REPO.split("/")[0]
+    prs = gh(f"{API_ROOT}/repos/{REPO}/pulls",
+             params={"head": f"{owner}:{branch}", "state": "all", "per_page": 1}).json()
+    return prs[0] if prs else None
+
+def open_bump_pr(version, changes, base_sha):
+    branch = f"tceng-tc-v{version}"
+    pr = find_pr(branch)
+    if pr and pr["state"] == "closed" and not pr["merged_at"]:
+        raise SystemExit(f"❌ {pr['html_url']} was closed without merging; reopen it or delete branch {branch}.")
+    if pr:
+        print(f"♻️  Reusing {pr['html_url']}")
+        return pr
+
+    title = f"chore(tceng): bump to TC v{version}"
+    base_tree = gh(f"{API_ROOT}/repos/{REPO}/git/commits/{base_sha}").json()["tree"]["sha"]
+    tree = gh(f"{API_ROOT}/repos/{REPO}/git/trees", "POST", json={
+        "base_tree": base_tree,
+        "tree": [{"path": p, "mode": "100644", "type": "blob", "content": c} for p, c in changes.items()],
+    }).json()["sha"]
+    commit = gh(f"{API_ROOT}/repos/{REPO}/git/commits", "POST", json={
+        "message": title, "tree": tree, "parents": [base_sha],
+    }).json()["sha"]
+    try:
+        gh(f"{API_ROOT}/repos/{REPO}/git/refs", "POST", json={"ref": f"refs/heads/{branch}", "sha": commit})
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code != 422:
+            raise
+        # Branch left over from an interrupted run, with no PR: point it at the new commit.
+        gh(f"{API_ROOT}/repos/{REPO}/git/refs/heads/{branch}", "PATCH", json={"sha": commit, "force": True})
+    pr = gh(f"{API_ROOT}/repos/{REPO}/pulls", "POST", json={
+        "title": title, "head": branch, "base": REF,
+        "body": f"https://github.com/taskcluster/taskcluster/releases/tag/v{version}",
+    }).json()
+    print(f"📝 Opened {pr['html_url']}")
+    return pr
+
+def wait_for_merge(pr):
+    if pr["merged_at"]:
+        return
+    print(f"⏸️  {pr['html_url']} needs to be merged before images can be built.")
+    print(f"   Waiting for it to be merged (checking every {PR_POLL_SECONDS}s)...")
+    while True:
+        time.sleep(PR_POLL_SECONDS)
+        try:
+            pr = gh(pr["url"]).json()
+        except requests.exceptions.RequestException as e:
+            print(f"⚠️  Couldn't check PR, will retry: {e}")
+            continue
+        if pr["merged_at"]:
+            print(f"✅ {pr['html_url']} merged.")
+            return
+        if pr["state"] == "closed":
+            raise SystemExit(f"❌ {pr['html_url']} was closed without merging.")
+
+def bump_taskcluster_version():
+    """Make every TCEng config on worker-images' main pin the latest Taskcluster
+    release, via a PR that must be merged before continuing."""
+    version = latest_taskcluster_version()
+    base_sha = gh(f"{API_ROOT}/repos/{REPO}/git/ref/heads/{REF}").json()["object"]["sha"]
+    changes = outdated_tceng_configs(base_sha, version)
+    if not changes:
+        print(f"✅ {REPO} {TCENG_CONFIG_DIR} already pins Taskcluster v{version}")
+        return
+    print(f"⬆️  Bumping to Taskcluster v{version}: {', '.join(sorted(changes))}")
+    wait_for_merge(open_bump_pr(version, changes, base_sha))
+    base_sha = gh(f"{API_ROOT}/repos/{REPO}/git/ref/heads/{REF}").json()["object"]["sha"]
+    still = outdated_tceng_configs(base_sha, version)
+    if still:
+        raise SystemExit(f"❌ {REF} still doesn't pin v{version} after merge: {', '.join(sorted(still))}")
 
 
 # ---- Selection / matching ----
@@ -358,6 +461,14 @@ def write_patch_file(staged_updates, filename="patch.yml"):
 
 # ---- Main ----
 def main():
+    # 0) Builds use worker-images' main, so it must pin the latest Taskcluster first
+    if os.environ.get("UPDATE_TASKCLUSTER_VERSION", "true") == "true":
+        bump_taskcluster_version()
+
+    # Only match runs triggered from here on, not any started while waiting for the PR.
+    global SCRIPT_START_TIME
+    SCRIPT_START_TIME = datetime.now(timezone.utc)
+
     # 1) Trigger all workflows in parallel and wait for all to complete
     run_map = trigger_all_workflows(WORKFLOWS)
 
