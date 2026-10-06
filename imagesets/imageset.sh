@@ -74,6 +74,8 @@ function all-in-parallel {
   # that must be merged) before building
   : ${UPDATE_TASKCLUSTER_VERSION:=true}
   export UPDATE_TASKCLUSTER_VERSION
+  # Open a PR to have fxci's worker pools use the new images too
+  : ${UPDATE_FXCI_IMAGES:=true}
   : ${DEPLOY_MACS:=true}
 
   : ${LOGIN_AWS:=true}
@@ -199,6 +201,14 @@ function all-in-parallel {
     # Images must exist before tc-admin points worker pools at them
     python3 imagesets/copy-azure-images.py
     retry tc-admin apply
+  fi
+
+  if "${BUILD_IMAGES}"; then
+    python3 imagesets/rel-sre-imagesets.py --log-images
+    # fxci's config can only be changed with a reviewed PR
+    if "${UPDATE_FXCI_IMAGES}"; then
+      python3 imagesets/rel-sre-imagesets.py --open-fxci-pr
+    fi
   fi
 
   echo

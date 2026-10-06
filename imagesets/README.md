@@ -97,6 +97,10 @@ instance types/VM sizes/machine types are updated and macOS workers are
 deployed; only building the images waits for it to be merged. Azure images that
 worker-images built in another subscription are copied into ours by
 `copy-azure-images.py` before `tc-admin apply` switches worker pools to them.
+Finally, the new images are logged, and a PR is opened (from your fork) to have
+fxci's worker pools that use the same images use the new ones too
+(`UPDATE_FXCI_IMAGES=false` skips this). It isn't opened if any location that
+fxci uses has no new image, e.g. because its build failed.
 
 All of the following tools must be available in the `PATH`:
 
