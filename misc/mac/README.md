@@ -26,7 +26,10 @@ Taskcluster worker configuration file used by `start-worker`.
 ### [update.sh](update.sh)
 Maintenance script for updating Taskcluster worker components:
 - Fetches the latest Taskcluster version from GitHub API
-- Stops existing worker services (LaunchDaemon and LaunchAgent)
 - Downloads updated binaries: `generic-worker`, `livelog`, `start-worker`, `taskcluster-proxy`
+- Stops existing worker services (LaunchDaemon and LaunchAgent)
+- Renames the new binaries into place, rather than overwriting the existing
+  files, as macOS kills a binary that was overwritten while it was running, the
+  next time it is run
 - Restarts the worker services
 - Includes retry logic with exponential backoff for network operations
