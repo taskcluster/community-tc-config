@@ -258,6 +258,7 @@
     "g5g.metal",
     "g5g.xlarge",
     "hpc6a.48xlarge",
+    "hpc8a.96xlarge",
     "i2.2xlarge",
     "i2.4xlarge",
     "i2.8xlarge",
