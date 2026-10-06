@@ -139,7 +139,7 @@ function all-in-parallel {
 
   : ${DEPLOY_IMAGES:=true}
   # Bump worker-images' TCEng configs to the latest Taskcluster release (via a PR
-  # that must be merged) before building
+  # that must be merged) before triggering worker-images builds
   : ${UPDATE_TASKCLUSTER_VERSION:=true}
   export UPDATE_TASKCLUSTER_VERSION
   # Open a PR to have fxci's worker pools use the new images too
@@ -209,7 +209,7 @@ function all-in-parallel {
     GITHUB_TOKEN="$(gh auth token)"
     export GITHUB_TOKEN
     # The worker-images PR needs someone to review and merge it, so open it
-    # before anything else. Only building the images waits for it to be merged
+    # before anything else. Only triggering the image builds waits for it to be merged
     # (in rel-sre-imagesets.py below); the steps in between don't depend on it.
     if "${UPDATE_TASKCLUSTER_VERSION}"; then
       python3 imagesets/rel-sre-imagesets.py --open-bump-pr
@@ -260,7 +260,7 @@ function all-in-parallel {
   if "${BUILD_IMAGES}"; then
     python3 imagesets/rel-sre-imagesets.py
     git add config/imagesets.yml
-    git commit -m "Built new machine images"
+    git commit -m "Use new machine images built by mozilla-platform-ops/worker-images"
     retry git -c pull.rebase=true pull "${OFFICIAL_GIT_REPO}" main
     retry git push "${OFFICIAL_GIT_REPO}" "+HEAD:refs/heads/main"
   fi
@@ -295,7 +295,12 @@ IMAGESETS_DIR="$(pwd)"
 
 export OFFICIAL_GIT_REPO='git@github.com:taskcluster/community-tc-config'
 
-if [ "${1-}" == "all" ]; then
-  all-in-parallel
-  exit 0
+# `./imageset.sh all` is the only way to run this script; see README.md for the
+# environment variables that control which steps run.
+if [ "${#}" -ne 1 ] || [ "${1}" != "all" ]; then
+  echo "Usage: ${0} all" >&2
+  echo "Has mozilla-platform-ops/worker-images build all image sets, and deploys them. No other arguments are accepted; see README.md." >&2
+  exit 64
 fi
+
+all-in-parallel
