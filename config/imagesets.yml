@@ -107,12 +107,12 @@ generic-worker-ubuntu-24-04:
             maintainer: taskcluster-notifications+workers@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/community-tc-config/b5b7c2ad856c144a6759e6e72280c4a958f8a930/imagesets/generic-worker-ubuntu-24-04/bootstrap.sh
   gcp:
-    image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-3113c926ad2b4470926a
+    image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-dc8b8fa453dc44228536
   aws:
     amis:
-      eu-west-1: ami-0f4f44e9c06aa18c3
-      us-east-1: ami-0ed952d39c8861ea7
-      us-west-2: ami-0dbfdcded334fc620
+      eu-west-1: ami-0a25ee8285563fb04
+      us-east-1: ami-0f91f63bdb2e29662
+      us-west-2: ami-01d367b3221c1c427
 generic-worker-ubuntu-24-04-arm64:
   workerImplementation: generic-worker
   workerConfig:
@@ -130,12 +130,12 @@ generic-worker-ubuntu-24-04-arm64:
             maintainer: taskcluster-notifications+workers@mozilla.com
             script: https://raw.githubusercontent.com/taskcluster/community-tc-config/bd07a18b393cb12303779969b8f461b726031638/imagesets/generic-worker-ubuntu-24-04-arm64/bootstrap.sh
   gcp:
-    image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-arm64-a09ac7ef8ab247baad28
+    image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-arm64-0f74b8027af7419c91af
   aws:
     amis:
-      eu-west-1: ami-0a47e50f765bb3120
-      us-east-1: ami-05c90f4abbef9dd86
-      us-west-2: ami-05e230a71dc7464a3
+      eu-west-1: ami-0cf31d31ac417ba24
+      us-east-1: ami-0e8db2a168f0ac43d
+      us-west-2: ami-0cbb66d597e9e1acf
 generic-worker-ubuntu-24-04-staging:
   workerImplementation: generic-worker
   workerConfig:
@@ -160,8 +160,8 @@ generic-worker-win2022:
   workerImplementation: generic-worker
   azure:
     images:
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-1ffeb4aa61fa4361a1e8-centralus-fuzzing
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-3f450fa747af4e6fb417-eastus-fuzzing
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-f4e676838caa4c5fbd62-eastus-fuzzing
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-16804d13b8024e46ab0c-centralus-fuzzing
   workerConfig:
     genericWorker:
       config:
@@ -216,10 +216,10 @@ generic-worker-win2025-staging:
 generic-worker-win2022-gpu:
   azure:
     images:
-      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-b0d4a10fae6244faafc6-southcentralus-fuzzing
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-15324b02de2f45dbb542-eastus-fuzzing
-      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-63fd57eb5b554031a8c7-eastus2-fuzzing
-      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-a6794c729e134be3a1c3-westus2-fuzzing
+      eastus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-34ff7b723db94f55bd40-eastus2-fuzzing
+      westus2: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-abf07d543c6144a78848-westus2-fuzzing
+      southcentralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-789b596b99df43eda282-southcentralus-fuzzing
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-994bb150daa347dfb43f-eastus-fuzzing
   workerImplementation: generic-worker
   workerConfig:
     genericWorker:
