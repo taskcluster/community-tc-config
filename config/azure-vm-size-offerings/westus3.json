@@ -564,6 +564,8 @@
   "Standard_E20s_v5",
   "Standard_E20s_v6",
   "Standard_E20s_v7",
+  "Standard_E248ds_v7",
+  "Standard_E248s_v7",
   "Standard_E2_v3",
   "Standard_E2_v4",
   "Standard_E2_v5",
@@ -644,6 +646,8 @@
   "Standard_E32s_v5",
   "Standard_E32s_v6",
   "Standard_E32s_v7",
+  "Standard_E372ids_v7",
+  "Standard_E372is_v7",
   "Standard_E4-2ads_v5",
   "Standard_E4-2ads_v7",
   "Standard_E4-2as_v4",
@@ -1239,13 +1243,9 @@
   "Standard_NG32ads_V620_v1",
   "Standard_NG8ads_V620_v1",
   "Standard_NV12ads_A10_v5",
-  "Standard_NV16as_v4",
   "Standard_NV18ads_A10_v5",
-  "Standard_NV32as_v4",
   "Standard_NV36adms_A10_v5",
   "Standard_NV36ads_A10_v5",
-  "Standard_NV4as_v4",
   "Standard_NV6ads_A10_v5",
-  "Standard_NV72ads_A10_v5",
-  "Standard_NV8as_v4"
+  "Standard_NV72ads_A10_v5"
 ]
