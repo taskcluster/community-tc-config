@@ -109944,6 +109944,14 @@
     "zone": "us-central1-c"
   },
   {
+    "name": "tpu7-standard-1t",
+    "zone": "us-central1-c"
+  },
+  {
+    "name": "tpu7-standard-4t",
+    "zone": "us-central1-c"
+  },
+  {
     "name": "tpu7x-standard-1t",
     "zone": "us-central1-c"
   },
@@ -110069,6 +110077,10 @@
   },
   {
     "name": "z4d-highmem-384-standardlssd",
+    "zone": "us-central1-c"
+  },
+  {
+    "name": "z4d-highmem-384-standardlssd-metal",
     "zone": "us-central1-c"
   },
   {
