@@ -81,6 +81,20 @@ bugbug:
         genericWorker:
           config:
             maxTaskRunTime: 87500
+    firefox-build:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      diskSizeGb: 140
+      minCapacity: 0
+      maxCapacity: 25
+      machineTypes:
+        "zones/{zone}/machineTypes/c3d-highcpu-30": 1
+      workerConfig:
+        genericWorker:
+          config:
+            maxTaskRunTime: 87500
   secrets:
     bugbug/deploy: true
     bugbug/integration: true
