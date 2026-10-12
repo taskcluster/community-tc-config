@@ -12,6 +12,8 @@ bugbug:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50
+      machineTypes:
+        "zones/{zone}/machineTypes/c3d-standard-4": 1
       workerConfig:
         genericWorker:
           config:
@@ -24,7 +26,7 @@ bugbug:
       minCapacity: 0
       maxCapacity: 25
       machineTypes:
-        "zones/{zone}/machineTypes/n2-standard-2": 1
+        "zones/{zone}/machineTypes/c3d-highcpu-4": 1
       workerConfig:
         genericWorker:
           config:
@@ -37,7 +39,7 @@ bugbug:
       minCapacity: 0
       maxCapacity: 25
       machineTypes:
-        "zones/{zone}/machineTypes/n2-standard-2": 1
+        "zones/{zone}/machineTypes/c3d-highcpu-4": 1
       workerConfig:
         genericWorker:
           config:
@@ -50,7 +52,7 @@ bugbug:
       minCapacity: 0
       maxCapacity: 25
       machineTypes:
-        "zones/{zone}/machineTypes/n2-standard-4": 1
+        "zones/{zone}/machineTypes/c3d-standard-4": 1
       workerConfig:
         genericWorker:
           config:
@@ -63,7 +65,7 @@ bugbug:
       minCapacity: 0
       maxCapacity: 25
       machineTypes:
-        "zones/{zone}/machineTypes/n2-standard-8": 1
+        "zones/{zone}/machineTypes/c3d-standard-8": 1
       workerConfig:
         genericWorker:
           config:
@@ -76,7 +78,7 @@ bugbug:
       minCapacity: 0
       maxCapacity: 25
       machineTypes:
-        "zones/{zone}/machineTypes/n2-standard-16": 1
+        "zones/{zone}/machineTypes/c3d-standard-16": 1
       workerConfig:
         genericWorker:
           config:
