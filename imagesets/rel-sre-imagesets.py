@@ -483,6 +483,32 @@ def update_yaml_file_bulk(data, image_set, cloud_provider, region_to_image):
 
     return True
 
+def bootstrap_script_url(image_set, cloud_provider, sha):
+    """URL of the bootstrap script that worker-images (at commit `sha`) ran to
+    build `image_set` for `cloud_provider`, or None if it can't be determined."""
+    url = f"{API_ROOT}/repos/{REPO}/contents/{TCENG_CONFIG_DIR}/{image_set}.yaml"
+    try:
+        config = YAML(typ="safe").load(base64.b64decode(gh(url, params={"ref": sha}).json()["content"]))
+        # See packer/tceng-{azure,gcp,aws}.pkr.hcl in worker-images
+        if cloud_provider == "azure":
+            path = f"scripts/windows/tceng/{config['vm']['bootstrapscript']}.ps1"
+        else:
+            path = f"scripts/linux/tceng/{config['vm']['script_name']}"
+    except (requests.exceptions.HTTPError, KeyError, TypeError) as e:
+        print(f"      ⚠️ Couldn't determine bootstrap script of {image_set} ({cloud_provider}) at {sha}: {e!r}")
+        return None
+    return f"https://raw.githubusercontent.com/{REPO}/{sha}/{path}"
+
+def update_bootstrap_script(data, image_set, script_url):
+    """Link to the bootstrap script in the worker type metadata of
+    `image_set`, so that users can see how its images were built."""
+    if data[image_set].get("workerImplementation") != "generic-worker":
+        return
+    config = data[image_set].setdefault("workerConfig", {}).setdefault("genericWorker", {}).setdefault("config", {})
+    machine_setup = config.setdefault("workerTypeMetadata", {}).setdefault("machine-setup", {})
+    machine_setup["script"] = script_url
+    print(f"      ✅ Set {image_set} workerTypeMetadata.machine-setup.script = {script_url}")
+
 def write_patch_file(staged_updates, filename="patch.yml"):
     """Write only the updates as a patch for yq merging."""
     with open(filename, "w") as f:
@@ -741,6 +767,7 @@ def main():
         data = yaml.load(f)
 
     staged_updates = {}  # (image_set, cloud_provider) -> {region: image_name}
+    staged_shas = {}  # (image_set, cloud_provider) -> worker-images commit the images were built from
     updated = False
     failed_jobs = []
 
@@ -748,6 +775,8 @@ def main():
     for (workflow_file, cfg), (run_id, run_number, _conclusion, _) in all_results.items():
         cloud_provider = get_cloud_provider(workflow_file)
         print(f"\n🔍 Processing workflow run #{run_number} for {cfg} (run_id={run_id}, cloud={cloud_provider})")
+        # Reruns of failed jobs build from the same commit as the original run
+        head_sha = get_run_status(run_id)["head_sha"]
         jobs = get_workflow_jobs(run_id)
         print(f"    → Workflow run #{run_number} has {len(jobs)} jobs:")
 
@@ -792,6 +821,7 @@ def main():
                 continue
 
             key = (image_set, cloud_provider)
+            staged_shas[key] = head_sha
 
             # Handle different cloud provider formats
             if cloud_provider == "aws" and isinstance(image_name, dict):
@@ -814,9 +844,21 @@ def main():
         for failed in failed_jobs:
             print(f"   - {failed}")
 
+    script_urls = {}  # image_set -> {bootstrap script URL: [cloud_provider]}
     for (image_set, cloud_provider), region_to_image in staged_updates.items():
         if update_yaml_file_bulk(data, image_set, cloud_provider, region_to_image):
             updated = True
+            script_url = bootstrap_script_url(image_set, cloud_provider, staged_shas[(image_set, cloud_provider)])
+            if script_url:
+                script_urls.setdefault(image_set, {}).setdefault(script_url, []).append(cloud_provider)
+
+    for image_set, urls in script_urls.items():
+        # An image set's builds for different clouds (e.g. AWS and GCP) could
+        # run from different commits, if worker-images changed in between
+        if len(urls) > 1:
+            print(f"      ⚠️ {image_set} images were built with different bootstrap scripts: "
+                  + ", ".join(f"{url} ({'/'.join(clouds)})" for url, clouds in urls.items()))
+        update_bootstrap_script(data, image_set, list(urls)[-1])
 
     if updated:
         try:

@@ -63,6 +63,9 @@ deployed; only triggering the builds waits for it to be merged. Failed
 worker-images jobs are rerun, up to `MAX_RUN_ATTEMPTS` attempts. Azure images
 that worker-images built in another subscription are copied into ours by
 `copy-azure-images.py` before `tc-admin apply` switches worker pools to them.
+The `workerTypeMetadata.machine-setup.script` of each image set with new images
+is set to the URL of the bootstrap script in worker-images, at the commit the
+images were built from, so that users can see how their worker was set up.
 Finally, the new images are logged with links to the worker-images jobs that
 built them, and a PR is opened (from your fork) to have
 fxci's worker pools that use the same images use the new ones too
