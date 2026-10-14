@@ -864,6 +864,26 @@
     "zone": "africa-south1-a"
   },
   {
+    "name": "x5-1376-24t-metal",
+    "zone": "africa-south1-a"
+  },
+  {
+    "name": "x5-1376-32t-metal",
+    "zone": "africa-south1-a"
+  },
+  {
+    "name": "x5-2064-48t-metal",
+    "zone": "africa-south1-a"
+  },
+  {
+    "name": "x5-688-12t-metal",
+    "zone": "africa-south1-a"
+  },
+  {
+    "name": "x5-688-16t-metal",
+    "zone": "africa-south1-a"
+  },
+  {
     "name": "c2d-highcpu-112",
     "zone": "africa-south1-b"
   },
@@ -2516,7 +2536,31 @@
     "zone": "asia-east1-a"
   },
   {
+    "name": "c3-highmem-176",
+    "zone": "asia-east1-a"
+  },
+  {
     "name": "c3-highmem-192-metal",
+    "zone": "asia-east1-a"
+  },
+  {
+    "name": "c3-highmem-22",
+    "zone": "asia-east1-a"
+  },
+  {
+    "name": "c3-highmem-4",
+    "zone": "asia-east1-a"
+  },
+  {
+    "name": "c3-highmem-44",
+    "zone": "asia-east1-a"
+  },
+  {
+    "name": "c3-highmem-8",
+    "zone": "asia-east1-a"
+  },
+  {
+    "name": "c3-highmem-88",
     "zone": "asia-east1-a"
   },
   {
@@ -22421,6 +22465,30 @@
   },
   {
     "name": "c2d-standard-8",
+    "zone": "asia-south2-a"
+  },
+  {
+    "name": "c3-highcpu-176",
+    "zone": "asia-south2-a"
+  },
+  {
+    "name": "c3-highcpu-22",
+    "zone": "asia-south2-a"
+  },
+  {
+    "name": "c3-highcpu-4",
+    "zone": "asia-south2-a"
+  },
+  {
+    "name": "c3-highcpu-44",
+    "zone": "asia-south2-a"
+  },
+  {
+    "name": "c3-highcpu-8",
+    "zone": "asia-south2-a"
+  },
+  {
+    "name": "c3-highcpu-88",
     "zone": "asia-south2-a"
   },
   {
@@ -40988,6 +41056,10 @@
     "zone": "australia-southeast2-c"
   },
   {
+    "name": "g4-standard-384",
+    "zone": "australia-southeast2-c"
+  },
+  {
     "name": "m3-megamem-128",
     "zone": "australia-southeast2-c"
   },
@@ -61661,6 +61733,14 @@
   },
   {
     "name": "t2d-standard-8",
+    "zone": "europe-west2-a"
+  },
+  {
+    "name": "tpu7-standard-1t",
+    "zone": "europe-west2-a"
+  },
+  {
+    "name": "tpu7-standard-4t",
     "zone": "europe-west2-a"
   },
   {
@@ -105504,6 +105584,26 @@
     "zone": "us-central1-a"
   },
   {
+    "name": "x5-1376-24t-metal",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "x5-1376-32t-metal",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "x5-2064-48t-metal",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "x5-688-12t-metal",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "x5-688-16t-metal",
+    "zone": "us-central1-a"
+  },
+  {
     "name": "z3-highmem-14-standardlssd",
     "zone": "us-central1-a"
   },
@@ -105585,6 +105685,10 @@
   },
   {
     "name": "z4d-highmem-384-standardlssd",
+    "zone": "us-central1-a"
+  },
+  {
+    "name": "z4d-highmem-384-standardlssd-metal",
     "zone": "us-central1-a"
   },
   {
@@ -119792,6 +119896,10 @@
     "zone": "us-east4-a"
   },
   {
+    "name": "x5-2064-48t-metal",
+    "zone": "us-east4-a"
+  },
+  {
     "name": "z3-highmem-14-standardlssd",
     "zone": "us-east4-a"
   },
@@ -119873,6 +119981,10 @@
   },
   {
     "name": "z4d-highmem-384-standardlssd",
+    "zone": "us-east4-a"
+  },
+  {
+    "name": "z4d-highmem-384-standardlssd-metal",
     "zone": "us-east4-a"
   },
   {
@@ -123844,6 +123956,10 @@
     "zone": "us-east4-c"
   },
   {
+    "name": "x5-2064-48t-metal",
+    "zone": "us-east4-c"
+  },
+  {
     "name": "z3-highmem-14-standardlssd",
     "zone": "us-east4-c"
   },
@@ -123925,6 +124041,10 @@
   },
   {
     "name": "z4d-highmem-384-standardlssd",
+    "zone": "us-east4-c"
+  },
+  {
+    "name": "z4d-highmem-384-standardlssd-metal",
     "zone": "us-east4-c"
   },
   {
@@ -128684,6 +128804,10 @@
     "zone": "us-east5-c"
   },
   {
+    "name": "z4d-highmem-384-standardlssd-metal",
+    "zone": "us-east5-c"
+  },
+  {
     "name": "z4d-highmem-48-highlssd",
     "zone": "us-east5-c"
   },
@@ -130661,6 +130785,14 @@
   },
   {
     "name": "t2d-standard-8",
+    "zone": "us-south1-b"
+  },
+  {
+    "name": "tpu7-standard-1t",
+    "zone": "us-south1-b"
+  },
+  {
+    "name": "tpu7-standard-4t",
     "zone": "us-south1-b"
   },
   {
