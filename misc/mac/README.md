@@ -2,7 +2,7 @@
 
 This directory contains the configuration files and scripts of the static
 Taskcluster macOS workers (`proj-taskcluster/gw-ci-macos` in firefox-ci). This
-repository is their only source: `imagesets/imageset.sh all` installs them on
+repository is their only source: `imagesets/imageset.sh prod` (or `all`) installs them on
 each worker (see `MAC_FILES` in [imageset.sh](../../imagesets/imageset.sh))
 before updating it, so any changes made directly on a worker are overwritten.
 Change them here instead.

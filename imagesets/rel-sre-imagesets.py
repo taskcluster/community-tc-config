@@ -16,20 +16,47 @@ from requests import Response
 # ---- Config ----
 REPO = "mozilla-platform-ops/worker-images"
 REF = "main"
-WORKFLOWS = {
-    "nonsig-tceng-azure.yml": [
-        "generic-worker-win2022",
-        "generic-worker-win2022-gpu",
-    ],
-    "gcp-tceng.yml": [
-        "generic-worker-ubuntu-24-04-arm64",
-        "generic-worker-ubuntu-24-04",
-    ],
-    "aws-tceng.yml": [
-        "generic-worker-ubuntu-24-04-arm64",
-        "generic-worker-ubuntu-24-04",
-    ],
+# Image sets that worker-images builds for us, per workflow, for each target of
+# imageset.sh. Staging builds use the workflows' default TASKCLUSTER_REF (main).
+TARGET_WORKFLOWS = {
+    "prod": {
+        "nonsig-tceng-azure.yml": [
+            "generic-worker-win2022",
+            "generic-worker-win2022-gpu",
+        ],
+        "gcp-tceng.yml": [
+            "generic-worker-ubuntu-24-04-arm64",
+            "generic-worker-ubuntu-24-04",
+        ],
+        "aws-tceng.yml": [
+            "generic-worker-ubuntu-24-04-arm64",
+            "generic-worker-ubuntu-24-04",
+        ],
+    },
+    "staging": {
+        "nonsig-tceng-azure.yml": [
+            "generic-worker-win2022-staging",
+            "generic-worker-win2022-gpu-staging",
+        ],
+        "gcp-tceng.yml": [
+            "generic-worker-ubuntu-24-04-arm64-staging",
+            "generic-worker-ubuntu-24-04-staging",
+        ],
+        "aws-tceng.yml": [
+            "generic-worker-ubuntu-24-04-arm64-staging",
+            "generic-worker-ubuntu-24-04-staging",
+        ],
+    },
 }
+TARGET_WORKFLOWS["all"] = {}
+for _workflows in (TARGET_WORKFLOWS["prod"], TARGET_WORKFLOWS["staging"]):
+    for _workflow_file, _configs in _workflows.items():
+        TARGET_WORKFLOWS["all"].setdefault(_workflow_file, []).extend(_configs)
+TARGET = os.environ.get("IMAGESET_TARGET", "prod")
+if TARGET not in TARGET_WORKFLOWS:
+    raise SystemExit(f"IMAGESET_TARGET must be one of {', '.join(TARGET_WORKFLOWS)}, not {TARGET!r}")
+# The image sets to build and log
+WORKFLOWS = TARGET_WORKFLOWS[TARGET]
 IMAGESETS_FILE = "config/imagesets.yml"
 # Every file in this worker-images directory that pins `taskcluster_version`
 # is bumped to the latest Taskcluster release before building.
@@ -542,12 +569,17 @@ def write_patch_file(staged_updates, filename="patch.yml"):
 FXCI_REPO = "mozilla-releng/fxci-config"
 FXCI_IMAGES_FILE = "worker-images.yml"
 # fxci's worker pools use some of the same image sets, under other names:
-# fxci image -> (image set, fxci provider id)
+# fxci image -> (image set, fxci provider id). Those that fxci doesn't have
+# (yet) are skipped.
 FXCI_IMAGES = {
     "gw-ubuntu-24-04": ("generic-worker-ubuntu-24-04", "fxci-level1-gcp"),
     "gw-ubuntu-24-04-arm64": ("generic-worker-ubuntu-24-04-arm64", "fxci-level1-gcp"),
     "gw-win2022": ("generic-worker-win2022", "azure2"),
     "gw-win2022-gpu": ("generic-worker-win2022-gpu", "azure2"),
+    "gw-ubuntu-24-04-staging": ("generic-worker-ubuntu-24-04-staging", "fxci-level1-gcp"),
+    "gw-ubuntu-24-04-arm64-staging": ("generic-worker-ubuntu-24-04-arm64-staging", "fxci-level1-gcp"),
+    "gw-win2022-staging": ("generic-worker-win2022-staging", "azure2"),
+    "gw-win2022-gpu-staging": ("generic-worker-win2022-gpu-staging", "azure2"),
 }
 # Keys of an fxci Azure image that aren't locations
 FXCI_AZURE_SETTINGS = {"version", "resource_group", "sbom", "name"}
@@ -576,6 +608,9 @@ def update_fxci_images(imagesets, worker_images):
     changes = []
     missing = []
     for fxci_image, (image_set, provider_id) in FXCI_IMAGES.items():
+        if provider_id not in worker_images.get(fxci_image, {}):
+            print(f"ℹ️  fxci has no {fxci_image} image for {provider_id}, so not updating it")
+            continue
         current = worker_images[fxci_image][provider_id]
         if isinstance(current, str):
             # GCP: one image for all regions
@@ -611,7 +646,8 @@ def worker_images_jobs(image_set, cloud, image_names):
     run) for the latest successful run that built `image_set` for `cloud` and
     all of `image_names` (as shown by its job logs), or ({}, None) if there
     isn't one."""
-    workflow_file = next(wf for wf, cfgs in WORKFLOWS.items() if get_cloud_provider(wf) == cloud and image_set in cfgs)
+    workflow_file = next(wf for wf, cfgs in TARGET_WORKFLOWS["all"].items()
+                         if get_cloud_provider(wf) == cloud and image_set in cfgs)
     checked = set()
     # GitHub's list of runs occasionally misses recent ones, so list them again
     # if none of the listed runs built the images

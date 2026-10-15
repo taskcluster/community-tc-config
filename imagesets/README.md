@@ -3,14 +3,21 @@
 Machine images are not built in this repository: they are built by the TCEng
 GitHub Actions workflows of relops'
 [worker-images](https://github.com/mozilla-platform-ops/worker-images)
-repository. To have worker-images build new images of all image sets, and
-deploy them to community-tc's worker pools, run, from this directory:
+repository. To have worker-images build new images, and deploy them to
+community-tc's worker pools, run, from this directory, one of:
 
-  * `./imageset.sh all`
+  * `./imageset.sh prod`: the production image sets (e.g.
+    `generic-worker-ubuntu-24-04`), which pin a Taskcluster release
+  * `./imageset.sh staging`: the staging image sets (e.g.
+    `generic-worker-ubuntu-24-04-staging`), which are built from Taskcluster's
+    `main` branch
+  * `./imageset.sh all`: both
 
-This is the only way to run the script; no other arguments are accepted. It
-always deploys to AWS, Azure and GCP, and updates the macOS workers. The environment variables [below](#environment-variables) can
-skip some of the steps.
+The image sets of each target are listed in `TARGET_WORKFLOWS` in
+[`rel-sre-imagesets.py`](rel-sre-imagesets.py). The script always deploys to
+AWS, Azure and GCP. `prod` and `all` also update the macOS workers. The
+environment variables [below](#environment-variables) can skip some of the
+steps.
 
 ## Prerequisites
 
@@ -74,19 +81,17 @@ fxci uses has no new image, e.g. because its build failed.
 
 ## Environment variables
 
-All default to `true`, apart from `MAX_RUN_ATTEMPTS`.
-
-| Variable | Controls |
-|---|---|
-| `UPDATE_OFFERINGS` | Update EC2 instance types, Azure VM sizes and GCE machine types, and `tc-admin apply` |
-| `DEPLOY_MACS` | Update the macOS workers |
-| `BUILD_IMAGES` | Have worker-images build new images, and commit them to `config/imagesets.yml` |
-| `UPDATE_TASKCLUSTER_VERSION` | Bump worker-images' TCEng configs to the latest Taskcluster release before building |
-| `MAX_RUN_ATTEMPTS` | Attempts per worker-images workflow run, including reruns of failed jobs (default `3`) |
-| `DEPLOY_IMAGES` | Copy Azure images into place and `tc-admin apply` |
-| `UPDATE_FXCI_IMAGES` | Open the fxci-config PR to use the new images |
-| `LOGIN_AWS` / `LOGIN_AZURE` | Sign in to AWS / Azure (`false` to use an existing session) |
-| `UPDATE_GCLOUD` | Run `gcloud components update` |
+| Variable | Controls | Default |
+|---|---|---|
+| `UPDATE_OFFERINGS` | Update EC2 instance types, Azure VM sizes and GCE machine types, and `tc-admin apply` | `true` (`false` for `staging`) |
+| `DEPLOY_MACS` | Update the macOS workers | `true` (`false` for `staging`) |
+| `BUILD_IMAGES` | Have worker-images build new images, and commit them to `config/imagesets.yml` | `true` |
+| `UPDATE_TASKCLUSTER_VERSION` | Bump worker-images' TCEng configs to the latest Taskcluster release before building | `true` (`false` for `staging`) |
+| `MAX_RUN_ATTEMPTS` | Attempts per worker-images workflow run, including reruns of failed jobs | `3` |
+| `DEPLOY_IMAGES` | Copy Azure images into place and `tc-admin apply` | `true` |
+| `UPDATE_FXCI_IMAGES` | Open the fxci-config PR to use the new images | `true` |
+| `LOGIN_AWS` / `LOGIN_AZURE` | Sign in to AWS / Azure (`false` to use an existing session) | `true` |
+| `UPDATE_GCLOUD` | Run `gcloud components update` | `true` |
 
 After a run, test the new images, e.g. by rerunning some tasks that previously
 ran successfully.
