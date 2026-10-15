@@ -132,25 +132,34 @@ function check-mac-connectivity {
   fi
 }
 
-############### Deploy all image sets ###############
+############### Deploy image sets ###############
 
-function all-in-parallel {
+# Deploys the image sets of IMAGESET_TARGET: prod, staging or all.
+function deploy-image-sets {
+  # Steps that only concern production (the Taskcluster version that prod
+  # images pin, fxci's worker pools, macOS workers, and instance offerings) are
+  # skipped by default when only staging image sets are deployed.
+  local prod_default=true
+  if [ "${IMAGESET_TARGET}" == "staging" ]; then
+    prod_default=false
+  fi
+
   : ${BUILD_IMAGES:=true}
 
   : ${DEPLOY_IMAGES:=true}
   # Bump worker-images' TCEng configs to the latest Taskcluster release (via a PR
   # that must be merged) before triggering worker-images builds
-  : ${UPDATE_TASKCLUSTER_VERSION:=true}
+  : ${UPDATE_TASKCLUSTER_VERSION:=${prod_default}}
   export UPDATE_TASKCLUSTER_VERSION
   # Open a PR to have fxci's worker pools use the new images too
-  : ${UPDATE_FXCI_IMAGES:=true}
-  : ${DEPLOY_MACS:=true}
+  : ${UPDATE_FXCI_IMAGES:=${prod_default}}
+  : ${DEPLOY_MACS:=${prod_default}}
 
   : ${LOGIN_AWS:=true}
   : ${LOGIN_AZURE:=true}
 
   : ${UPDATE_GCLOUD:=true}
-  : ${UPDATE_OFFERINGS:=true}
+  : ${UPDATE_OFFERINGS:=${prod_default}}
 
   # TODO: fetch these hosts automatically
   local MAC_HOSTS=(
@@ -295,12 +304,12 @@ IMAGESETS_DIR="$(pwd)"
 
 export OFFICIAL_GIT_REPO='git@github.com:taskcluster/community-tc-config'
 
-# `./imageset.sh all` is the only way to run this script; see README.md for the
-# environment variables that control which steps run.
-if [ "${#}" -ne 1 ] || [ "${1}" != "all" ]; then
-  echo "Usage: ${0} all" >&2
-  echo "Has mozilla-platform-ops/worker-images build all image sets, and deploys them. No other arguments are accepted; see README.md." >&2
+# See README.md for the environment variables that control which steps run.
+if [ "${#}" -ne 1 ] || ! [[ "${1}" =~ ^(prod|staging|all)$ ]]; then
+  echo "Usage: ${0} prod|staging|all" >&2
+  echo "Has mozilla-platform-ops/worker-images build the production image sets (prod), the staging image sets (staging), or both (all), and deploys them; see README.md." >&2
   exit 64
 fi
 
-all-in-parallel
+export IMAGESET_TARGET="${1}"
+deploy-image-sets
