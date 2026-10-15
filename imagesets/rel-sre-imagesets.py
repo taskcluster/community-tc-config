@@ -524,7 +524,7 @@ FXCI_IMAGES = {
     "gw-win2022-gpu": ("generic-worker-win2022-gpu", "azure2"),
 }
 # Keys of an fxci Azure image that aren't locations
-FXCI_AZURE_SETTINGS = {"version", "resource_group", "deployment_id", "sbom", "name"}
+FXCI_AZURE_SETTINGS = {"version", "resource_group", "sbom", "name"}
 
 def log_images():
     """Print the images of the image sets that worker-images builds for us."""
@@ -559,20 +559,19 @@ def update_fxci_images(imagesets, worker_images):
                 changes.append((fxci_image, None, current, new))
             continue
         # Azure: a managed image per location, built in fxci's subscription by
-        # worker-images, which fxci references as <location value>-<deployment_id>
+        # worker-images, which fxci references by name
         if current.get("version") != "NA":
             raise SystemExit(f"❌ fxci's {fxci_image} doesn't reference managed images, so can't be updated")
+        if "deployment_id" in current:
+            raise SystemExit(f"❌ fxci's {fxci_image} has a deployment_id, which fxci appends to managed image "
+                             "names, so can't be updated with full image names")
         built = imagesets[image_set]["azure"]["images"]
-        suffix = f"-{current['deployment_id']}"
         for location in [k for k in current if k not in FXCI_AZURE_SETTINGS]:
             path = built.get(location.replace("-", ""))
             if not path:
                 missing.append(f"{fxci_image} ({image_set}) {location}")
                 continue
-            name = path.rsplit("/", 1)[-1]
-            if not name.endswith(suffix):
-                raise SystemExit(f"❌ {image_set} image {name} doesn't end with fxci's {fxci_image} deployment_id {suffix}")
-            new = name.removesuffix(suffix)
+            new = path.rsplit("/", 1)[-1]
             if current[location] != new:
                 changes.append((fxci_image, location, current[location], new))
                 current[location] = new
