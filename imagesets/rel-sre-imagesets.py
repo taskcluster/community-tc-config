@@ -510,6 +510,32 @@ def update_yaml_file_bulk(data, image_set, cloud_provider, region_to_image):
 
     return True
 
+def bootstrap_script_url(image_set, cloud_provider, sha):
+    """URL of the bootstrap script that worker-images (at commit `sha`) ran to
+    build `image_set` for `cloud_provider`, or None if it can't be determined."""
+    url = f"{API_ROOT}/repos/{REPO}/contents/{TCENG_CONFIG_DIR}/{image_set}.yaml"
+    try:
+        config = YAML(typ="safe").load(base64.b64decode(gh(url, params={"ref": sha}).json()["content"]))
+        # See packer/tceng-{azure,gcp,aws}.pkr.hcl in worker-images
+        if cloud_provider == "azure":
+            path = f"scripts/windows/tceng/{config['vm']['bootstrapscript']}.ps1"
+        else:
+            path = f"scripts/linux/tceng/{config['vm']['script_name']}"
+    except (requests.exceptions.HTTPError, KeyError, TypeError) as e:
+        print(f"      ⚠️ Couldn't determine bootstrap script of {image_set} ({cloud_provider}) at {sha}: {e!r}")
+        return None
+    return f"https://raw.githubusercontent.com/{REPO}/{sha}/{path}"
+
+def update_bootstrap_script(data, image_set, script_url):
+    """Link to the bootstrap script in the worker type metadata of
+    `image_set`, so that users can see how its images were built."""
+    if data[image_set].get("workerImplementation") != "generic-worker":
+        return
+    config = data[image_set].setdefault("workerConfig", {}).setdefault("genericWorker", {}).setdefault("config", {})
+    machine_setup = config.setdefault("workerTypeMetadata", {}).setdefault("machine-setup", {})
+    machine_setup["script"] = script_url
+    print(f"      ✅ Set {image_set} workerTypeMetadata.machine-setup.script = {script_url}")
+
 def write_patch_file(staged_updates, filename="patch.yml"):
     """Write only the updates as a patch for yq merging."""
     with open(filename, "w") as f:
@@ -556,7 +582,7 @@ FXCI_IMAGES = {
     "gw-win2022-gpu-staging": ("generic-worker-win2022-gpu-staging", "azure2"),
 }
 # Keys of an fxci Azure image that aren't locations
-FXCI_AZURE_SETTINGS = {"version", "resource_group", "deployment_id", "sbom", "name"}
+FXCI_AZURE_SETTINGS = {"version", "resource_group", "sbom", "name"}
 
 def log_images():
     """Print the images of the image sets that worker-images builds for us."""
@@ -594,20 +620,19 @@ def update_fxci_images(imagesets, worker_images):
                 changes.append((fxci_image, None, current, new))
             continue
         # Azure: a managed image per location, built in fxci's subscription by
-        # worker-images, which fxci references as <location value>-<deployment_id>
+        # worker-images, which fxci references by name
         if current.get("version") != "NA":
             raise SystemExit(f"❌ fxci's {fxci_image} doesn't reference managed images, so can't be updated")
+        if "deployment_id" in current:
+            raise SystemExit(f"❌ fxci's {fxci_image} has a deployment_id, which fxci appends to managed image "
+                             "names, so can't be updated with full image names")
         built = imagesets[image_set]["azure"]["images"]
-        suffix = f"-{current['deployment_id']}"
         for location in [k for k in current if k not in FXCI_AZURE_SETTINGS]:
             path = built.get(location.replace("-", ""))
             if not path:
                 missing.append(f"{fxci_image} ({image_set}) {location}")
                 continue
-            name = path.rsplit("/", 1)[-1]
-            if not name.endswith(suffix):
-                raise SystemExit(f"❌ {image_set} image {name} doesn't end with fxci's {fxci_image} deployment_id {suffix}")
-            new = name.removesuffix(suffix)
+            new = path.rsplit("/", 1)[-1]
             if current[location] != new:
                 changes.append((fxci_image, location, current[location], new))
                 current[location] = new
@@ -777,6 +802,7 @@ def main():
         data = yaml.load(f)
 
     staged_updates = {}  # (image_set, cloud_provider) -> {region: image_name}
+    staged_shas = {}  # (image_set, cloud_provider) -> worker-images commit the images were built from
     updated = False
     failed_jobs = []
 
@@ -784,6 +810,8 @@ def main():
     for (workflow_file, cfg), (run_id, run_number, _conclusion, _) in all_results.items():
         cloud_provider = get_cloud_provider(workflow_file)
         print(f"\n🔍 Processing workflow run #{run_number} for {cfg} (run_id={run_id}, cloud={cloud_provider})")
+        # Reruns of failed jobs build from the same commit as the original run
+        head_sha = get_run_status(run_id)["head_sha"]
         jobs = get_workflow_jobs(run_id)
         print(f"    → Workflow run #{run_number} has {len(jobs)} jobs:")
 
@@ -828,6 +856,7 @@ def main():
                 continue
 
             key = (image_set, cloud_provider)
+            staged_shas[key] = head_sha
 
             # Handle different cloud provider formats
             if cloud_provider == "aws" and isinstance(image_name, dict):
@@ -850,9 +879,21 @@ def main():
         for failed in failed_jobs:
             print(f"   - {failed}")
 
+    script_urls = {}  # image_set -> {bootstrap script URL: [cloud_provider]}
     for (image_set, cloud_provider), region_to_image in staged_updates.items():
         if update_yaml_file_bulk(data, image_set, cloud_provider, region_to_image):
             updated = True
+            script_url = bootstrap_script_url(image_set, cloud_provider, staged_shas[(image_set, cloud_provider)])
+            if script_url:
+                script_urls.setdefault(image_set, {}).setdefault(script_url, []).append(cloud_provider)
+
+    for image_set, urls in script_urls.items():
+        # An image set's builds for different clouds (e.g. AWS and GCP) could
+        # run from different commits, if worker-images changed in between
+        if len(urls) > 1:
+            print(f"      ⚠️ {image_set} images were built with different bootstrap scripts: "
+                  + ", ".join(f"{url} ({'/'.join(clouds)})" for url, clouds in urls.items()))
+        update_bootstrap_script(data, image_set, list(urls)[-1])
 
     if updated:
         try:
