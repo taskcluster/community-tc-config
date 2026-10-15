@@ -156,6 +156,28 @@ generic-worker-ubuntu-24-04-staging:
       us-east-1: ami-0afcb836d0b81a957
   gcp:
     image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-staging-iuujjhskyujdtccoemka
+generic-worker-ubuntu-24-04-arm64-staging:
+  workerImplementation: generic-worker
+  workerConfig:
+    genericWorker:
+      config:
+        d2gConfig:
+          enableD2G: true
+        ed25519SigningKeyLocation: /etc/generic-worker/ed25519_key
+        enableInteractive: true
+        idleTimeoutSecs: 15
+        shutdownMachineOnIdle: true
+        workerTypeMetadata:
+          machine-setup:
+            maintainer: taskcluster-notifications+workers@mozilla.com
+            script: https://github.com/mozilla-platform-ops/worker-images/blob/main/scripts/linux/tceng/generic-worker-ubuntu-24-04-staging.sh
+  gcp:
+    image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-arm64-ed626229ee5844439d7c
+  aws:
+    amis:
+      eu-west-1: ami-0c92274f505e4731b
+      us-east-1: ami-011bfbc5ce73af29b
+      us-west-2: ami-028ed7d602c7db5db
 generic-worker-win2022:
   workerImplementation: generic-worker
   azure:

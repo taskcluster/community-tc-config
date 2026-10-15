@@ -137,8 +137,8 @@ function check-mac-connectivity {
 # Deploys the image sets of IMAGESET_TARGET: prod, staging or all.
 function deploy-image-sets {
   # Steps that only concern production (the Taskcluster version that prod
-  # images pin, fxci's worker pools, macOS workers, and instance offerings) are
-  # skipped by default when only staging image sets are deployed.
+  # images pin, macOS workers, and instance offerings) are skipped by default
+  # when only staging image sets are deployed.
   local prod_default=true
   if [ "${IMAGESET_TARGET}" == "staging" ]; then
     prod_default=false
@@ -152,7 +152,7 @@ function deploy-image-sets {
   : ${UPDATE_TASKCLUSTER_VERSION:=${prod_default}}
   export UPDATE_TASKCLUSTER_VERSION
   # Open a PR to have fxci's worker pools use the new images too
-  : ${UPDATE_FXCI_IMAGES:=${prod_default}}
+  : ${UPDATE_FXCI_IMAGES:=true}
   : ${DEPLOY_MACS:=${prod_default}}
 
   : ${LOGIN_AWS:=true}

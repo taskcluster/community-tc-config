@@ -86,7 +86,7 @@ fxci uses has no new image, e.g. because its build failed.
 | `UPDATE_TASKCLUSTER_VERSION` | Bump worker-images' TCEng configs to the latest Taskcluster release before building | `true` (`false` for `staging`) |
 | `MAX_RUN_ATTEMPTS` | Attempts per worker-images workflow run, including reruns of failed jobs | `3` |
 | `DEPLOY_IMAGES` | Copy Azure images into place and `tc-admin apply` | `true` |
-| `UPDATE_FXCI_IMAGES` | Open the fxci-config PR to use the new images | `true` (`false` for `staging`) |
+| `UPDATE_FXCI_IMAGES` | Open the fxci-config PR to use the new images | `true` |
 | `LOGIN_AWS` / `LOGIN_AZURE` | Sign in to AWS / Azure (`false` to use an existing session) | `true` |
 | `UPDATE_GCLOUD` | Run `gcloud components update` | `true` |
 

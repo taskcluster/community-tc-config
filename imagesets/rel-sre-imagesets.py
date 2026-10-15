@@ -39,9 +39,11 @@ TARGET_WORKFLOWS = {
             "generic-worker-win2022-gpu-staging",
         ],
         "gcp-tceng.yml": [
+            "generic-worker-ubuntu-24-04-arm64-staging",
             "generic-worker-ubuntu-24-04-staging",
         ],
         "aws-tceng.yml": [
+            "generic-worker-ubuntu-24-04-arm64-staging",
             "generic-worker-ubuntu-24-04-staging",
         ],
     },
@@ -541,12 +543,17 @@ def write_patch_file(staged_updates, filename="patch.yml"):
 FXCI_REPO = "mozilla-releng/fxci-config"
 FXCI_IMAGES_FILE = "worker-images.yml"
 # fxci's worker pools use some of the same image sets, under other names:
-# fxci image -> (image set, fxci provider id)
+# fxci image -> (image set, fxci provider id). Those that fxci doesn't have
+# (yet) are skipped.
 FXCI_IMAGES = {
     "gw-ubuntu-24-04": ("generic-worker-ubuntu-24-04", "fxci-level1-gcp"),
     "gw-ubuntu-24-04-arm64": ("generic-worker-ubuntu-24-04-arm64", "fxci-level1-gcp"),
     "gw-win2022": ("generic-worker-win2022", "azure2"),
     "gw-win2022-gpu": ("generic-worker-win2022-gpu", "azure2"),
+    "gw-ubuntu-24-04-staging": ("generic-worker-ubuntu-24-04-staging", "fxci-level1-gcp"),
+    "gw-ubuntu-24-04-arm64-staging": ("generic-worker-ubuntu-24-04-arm64-staging", "fxci-level1-gcp"),
+    "gw-win2022-staging": ("generic-worker-win2022-staging", "azure2"),
+    "gw-win2022-gpu-staging": ("generic-worker-win2022-gpu-staging", "azure2"),
 }
 # Keys of an fxci Azure image that aren't locations
 FXCI_AZURE_SETTINGS = {"version", "resource_group", "deployment_id", "sbom", "name"}
@@ -575,6 +582,9 @@ def update_fxci_images(imagesets, worker_images):
     changes = []
     missing = []
     for fxci_image, (image_set, provider_id) in FXCI_IMAGES.items():
+        if provider_id not in worker_images.get(fxci_image, {}):
+            print(f"ℹ️  fxci has no {fxci_image} image for {provider_id}, so not updating it")
+            continue
         current = worker_images[fxci_image][provider_id]
         if isinstance(current, str):
             # GCP: one image for all regions
