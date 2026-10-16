@@ -374,7 +374,8 @@ def wait_for_all_runs(run_map):
                     min_attempt[run_id] = run["run_attempt"] + 1
                     continue
                 results[(workflow_file, cfg)] = (run_id, run_number, conclusion, workflow_file)
-                print(f"   ✅ {cfg} ({workflow_file}): run #{run_number} finished with conclusion={conclusion}")
+                icon = "✅" if conclusion == "success" else "❌"
+                print(f"   {icon} {cfg} ({workflow_file}): run #{run_number} finished with conclusion={conclusion}")
                 unfinished.pop((workflow_file, cfg))
 
         # A finished run may since have been rerun by hand; wait for that too
