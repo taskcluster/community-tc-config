@@ -203,6 +203,7 @@ generic-worker-win2022-staging:
   workerImplementation: generic-worker
   azure:
     images:
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-950d7db4ed40425296dc-centralus
       eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-aca0421a53f346e1800f-eastus
   workerConfig:
     genericWorker:
