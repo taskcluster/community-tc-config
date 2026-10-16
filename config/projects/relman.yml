@@ -62,6 +62,27 @@ relman:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 50
+    decision:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 4
+    linux-docker:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 10
+    linux-gcp:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 10
 
   secrets:
     bugzilla-dashboard-backend/deploy-production: true
@@ -175,6 +196,74 @@ relman:
         - docker-worker:cache:code-review-integration-production
         - generic-worker:cache:code-review-integration-production
       to: hook-id:project-relman/code-review-integration-production
+
+    - grant:
+        - queue:scheduler-id:code-analysis-level-1
+        - docker-worker:cache:code-analysis-level-1-*
+        - generic-worker:cache:code-analysis-level-1-*
+      to:
+        - repo:github.com/mozilla/code-review:pull-request
+        - repo:github.com/mozilla/code-review:branch:testing
+
+    - grant:
+        - queue:route:index.code-analysis.v2.code-review-pr.*
+        - index:insert-task:code-analysis.v2.code-review-pr.*
+        - queue:route:index.code-analysis.cache.pr.*
+        - index:insert-task:code-analysis.cache.pr.*
+      to: repo:github.com/mozilla/code-review:pull-request
+
+    - grant:
+        - queue:route:index.code-analysis.v2.code-review.backend.branch.<..>
+        - index:insert-task:code-analysis.v2.code-review.backend.branch.<..>
+        - queue:route:index.code-analysis.v2.code-review.bot.branch.<..>
+        - index:insert-task:code-analysis.v2.code-review.bot.branch.<..>
+        - queue:route:index.code-analysis.v2.code-review.integration.branch.<..>
+        - index:insert-task:code-analysis.v2.code-review.integration.branch.<..>
+        - queue:route:index.code-analysis.v2.code-review.revision.*
+        - index:insert-task:code-analysis.v2.code-review.revision.*
+      to: repo:github.com/mozilla/code-review:branch:*
+
+    - grant:
+        - queue:route:index.code-analysis.v2.code-review.backend.revision.*
+        - index:insert-task:code-analysis.v2.code-review.backend.revision.*
+        - queue:route:index.code-analysis.v2.code-review.bot.revision.*
+        - index:insert-task:code-analysis.v2.code-review.bot.revision.*
+        - queue:route:index.code-analysis.v2.code-review.integration.revision.*
+        - index:insert-task:code-analysis.v2.code-review.integration.revision.*
+      to:
+        - repo:github.com/mozilla/code-review:branch:*
+        - repo:github.com/mozilla/code-review:release:published
+
+    - grant:
+        - queue:route:index.code-analysis.cache.level-1.*
+        - index:insert-task:code-analysis.cache.level-1.*
+      to: repo:github.com/mozilla/code-review:branch:testing
+
+    - grant:
+        - queue:scheduler-id:code-analysis-level-3
+        - docker-worker:cache:code-analysis-level-3-*
+        - generic-worker:cache:code-analysis-level-3-*
+        - queue:route:index.code-analysis.cache.level-3.*
+        - index:insert-task:code-analysis.cache.level-3.*
+      to:
+        - repo:github.com/mozilla/code-review:branch:master
+        - repo:github.com/mozilla/code-review:branch:production
+        - repo:github.com/mozilla/code-review:release:published
+
+    - grant:
+        - queue:route:index.code-analysis.v2.code-review.latest.*
+        - index:insert-task:code-analysis.v2.code-review.latest.*
+      to: repo:github.com/mozilla/code-review:branch:master
+
+    - grant:
+        - queue:route:index.code-analysis.v2.code-review.backend.branch.v*
+        - index:insert-task:code-analysis.v2.code-review.backend.branch.v*
+        - queue:route:index.code-analysis.v2.code-review.bot.branch.v*
+        - index:insert-task:code-analysis.v2.code-review.bot.branch.v*
+        - queue:route:index.code-analysis.v2.code-review.integration.branch.v*
+        - index:insert-task:code-analysis.v2.code-review.integration.branch.v*
+        - secrets:get:project/relman/code-review/release
+      to: repo:github.com/mozilla/code-review:release:published
 
     # dump_syms
     - grant: secrets:get:project/relman/dump_syms/deploy
