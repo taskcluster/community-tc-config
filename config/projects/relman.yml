@@ -176,6 +176,21 @@ relman:
         - generic-worker:cache:code-review-integration-production
       to: hook-id:project-relman/code-review-integration-production
 
+    # code-review taskgraph CI (mozilla/code-review PR #3264)
+    - grant:
+        - queue:scheduler-id:code-analysis-level-1
+        - docker-worker:cache:code-analysis-*
+        - generic-worker:cache:code-analysis-*
+      to: repo:github.com/mozilla/code-review:*
+    - grant:
+        - queue:route:index.code-analysis.v2.code-review.*
+        - queue:route:index.code-analysis.v2.code-review-pr.*
+        - queue:route:index.code-analysis.cache.*
+        - index:insert-task:code-analysis.v2.code-review.*
+        - index:insert-task:code-analysis.v2.code-review-pr.*
+        - index:insert-task:code-analysis.cache.*
+      to: repo:github.com/mozilla/code-review:*
+
     # dump_syms
     - grant: secrets:get:project/relman/dump_syms/deploy
       to: repo:github.com/mozilla/dump_syms:tag:*
