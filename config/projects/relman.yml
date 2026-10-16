@@ -212,13 +212,14 @@ relman:
         - index:insert-task:code-analysis.cache.pr.*
       to: repo:github.com/mozilla/code-review:pull-request
 
+    # <..> expands to the branch name that the role matches
     - grant:
-        - queue:route:index.code-analysis.v2.code-review.backend.branch.testing
-        - index:insert-task:code-analysis.v2.code-review.backend.branch.testing
-        - queue:route:index.code-analysis.v2.code-review.bot.branch.testing
-        - index:insert-task:code-analysis.v2.code-review.bot.branch.testing
-        - queue:route:index.code-analysis.v2.code-review.integration.branch.testing
-        - index:insert-task:code-analysis.v2.code-review.integration.branch.testing
+        - queue:route:index.code-analysis.v2.code-review.backend.branch.<..>
+        - index:insert-task:code-analysis.v2.code-review.backend.branch.<..>
+        - queue:route:index.code-analysis.v2.code-review.bot.branch.<..>
+        - index:insert-task:code-analysis.v2.code-review.bot.branch.<..>
+        - queue:route:index.code-analysis.v2.code-review.integration.branch.<..>
+        - index:insert-task:code-analysis.v2.code-review.integration.branch.<..>
         - queue:route:index.code-analysis.v2.code-review.backend.revision.*
         - index:insert-task:code-analysis.v2.code-review.backend.revision.*
         - queue:route:index.code-analysis.v2.code-review.bot.revision.*
@@ -227,6 +228,9 @@ relman:
         - index:insert-task:code-analysis.v2.code-review.integration.revision.*
         - queue:route:index.code-analysis.v2.code-review.revision.*
         - index:insert-task:code-analysis.v2.code-review.revision.*
+      to: repo:github.com/mozilla/code-review:branch:*
+
+    - grant:
         - queue:route:index.code-analysis.cache.level-1.*
         - index:insert-task:code-analysis.cache.level-1.*
       to: repo:github.com/mozilla/code-review:branch:testing
@@ -243,40 +247,9 @@ relman:
         - repo:github.com/mozilla/code-review:release:published
 
     - grant:
-        - queue:route:index.code-analysis.v2.code-review.backend.branch.master
-        - index:insert-task:code-analysis.v2.code-review.backend.branch.master
-        - queue:route:index.code-analysis.v2.code-review.bot.branch.master
-        - index:insert-task:code-analysis.v2.code-review.bot.branch.master
-        - queue:route:index.code-analysis.v2.code-review.integration.branch.master
-        - index:insert-task:code-analysis.v2.code-review.integration.branch.master
-        - queue:route:index.code-analysis.v2.code-review.backend.revision.*
-        - index:insert-task:code-analysis.v2.code-review.backend.revision.*
-        - queue:route:index.code-analysis.v2.code-review.bot.revision.*
-        - index:insert-task:code-analysis.v2.code-review.bot.revision.*
-        - queue:route:index.code-analysis.v2.code-review.integration.revision.*
-        - index:insert-task:code-analysis.v2.code-review.integration.revision.*
-        - queue:route:index.code-analysis.v2.code-review.revision.*
-        - index:insert-task:code-analysis.v2.code-review.revision.*
         - queue:route:index.code-analysis.v2.code-review.latest.*
         - index:insert-task:code-analysis.v2.code-review.latest.*
       to: repo:github.com/mozilla/code-review:branch:master
-
-    - grant:
-        - queue:route:index.code-analysis.v2.code-review.backend.branch.production
-        - index:insert-task:code-analysis.v2.code-review.backend.branch.production
-        - queue:route:index.code-analysis.v2.code-review.bot.branch.production
-        - index:insert-task:code-analysis.v2.code-review.bot.branch.production
-        - queue:route:index.code-analysis.v2.code-review.integration.branch.production
-        - index:insert-task:code-analysis.v2.code-review.integration.branch.production
-        - queue:route:index.code-analysis.v2.code-review.backend.revision.*
-        - index:insert-task:code-analysis.v2.code-review.backend.revision.*
-        - queue:route:index.code-analysis.v2.code-review.bot.revision.*
-        - index:insert-task:code-analysis.v2.code-review.bot.revision.*
-        - queue:route:index.code-analysis.v2.code-review.integration.revision.*
-        - index:insert-task:code-analysis.v2.code-review.integration.revision.*
-        - queue:route:index.code-analysis.v2.code-review.revision.*
-        - index:insert-task:code-analysis.v2.code-review.revision.*
-      to: repo:github.com/mozilla/code-review:branch:production
 
     - grant:
         - queue:route:index.code-analysis.v2.code-review.backend.branch.v*
