@@ -90,7 +90,7 @@ its worker pools.
 | `DEPLOY_MACS` | Update the macOS workers | `true` (`false` for `staging`) |
 | `BUILD_IMAGES` | Have worker-images build new images, and commit them to `config/imagesets.yml` | `true` |
 | `UPDATE_TASKCLUSTER_VERSION` | Bump worker-images' TCEng configs to the latest Taskcluster release before building | `true` (`false` for `staging`) |
-| `MAX_RUN_ATTEMPTS` | Attempts per worker-images workflow run, including reruns of failed jobs | `3` |
+| `MAX_RUN_ATTEMPTS` | Attempts per worker-images workflow run, including reruns of failed jobs (and of jobs cancelled for exceeding their time limit, but not of jobs cancelled by hand) | `5` |
 | `DEPLOY_IMAGES` | Copy Azure images into place and `tc-admin apply` | `true` |
 | `UPDATE_FXCI_IMAGES` | Open the fxci-config PR to use the new images | `true` |
 | `LOGIN_AWS` / `LOGIN_AZURE` | Sign in to AWS / Azure (`false` to use an existing session) | `true` |

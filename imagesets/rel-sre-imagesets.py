@@ -63,10 +63,14 @@ IMAGESETS_FILE = "config/imagesets.yml"
 TCENG_CONFIG_DIR = "config/tceng"
 TASKCLUSTER_VERSION_RE = re.compile(r"^(\s*taskcluster_version:\s*)([\"']?)([^\"'\s#]+)([\"']?)", re.M)
 PR_POLL_SECONDS = 60
-# Builds occasionally fail transiently (e.g. an Azure VM create that hangs),
-# so failed jobs are rerun until a run has had this many attempts.
-MAX_RUN_ATTEMPTS = int(os.environ.get("MAX_RUN_ATTEMPTS", "3"))
+# Builds occasionally fail transiently (e.g. an Azure VM create that hangs, or
+# a stuck download), so failed jobs are rerun until a run has had this many
+# attempts.
+MAX_RUN_ATTEMPTS = int(os.environ.get("MAX_RUN_ATTEMPTS", "5"))
 RERUN_CONCLUSIONS = {"failure", "timed_out"}
+# Jobs that hit their time limit are cancelled with this annotation, so they
+# are rerun too, unlike jobs that were cancelled by hand.
+TIME_LIMIT_ANNOTATION = "exceeded the maximum execution time"
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 if not GITHUB_TOKEN:
@@ -152,6 +156,17 @@ def list_dispatch_runs_for_workflow(workflow_file, per_page=100):
     url = f"{API_ROOT}/repos/{REPO}/actions/workflows/{workflow_file}/runs"
     r = gh(url, params={"branch": REF, "event": "workflow_dispatch", "per_page": per_page})
     return r.json()["workflow_runs"]
+
+def hit_time_limit(run_id):
+    """Whether a job of the latest attempt of run `run_id` was cancelled for
+    exceeding its time limit (rather than by hand)."""
+    for job in get_workflow_jobs(run_id):
+        if job["conclusion"] != "cancelled":
+            continue
+        annotations = gh(f"{API_ROOT}/repos/{REPO}/check-runs/{job['id']}/annotations").json()
+        if any(TIME_LIMIT_ANNOTATION in annotation.get("message", "") for annotation in annotations):
+            return True
+    return False
 
 def get_run_status(run_id):
     url = f"{API_ROOT}/repos/{REPO}/actions/runs/{run_id}"
@@ -367,9 +382,11 @@ def wait_for_all_runs(run_map):
                 if run["status"] != "completed" or run["run_attempt"] < min_attempt.get(run_id, 1):
                     continue
                 conclusion = run["conclusion"]
-                if conclusion in RERUN_CONCLUSIONS and run["run_attempt"] < MAX_RUN_ATTEMPTS:
+                timed_out = conclusion == "cancelled" and hit_time_limit(run_id)
+                if (conclusion in RERUN_CONCLUSIONS or timed_out) and run["run_attempt"] < MAX_RUN_ATTEMPTS:
+                    reason = " (time limit exceeded)" if timed_out else ""
                     print(f"   🔁 {cfg} ({workflow_file}): run #{run_number} attempt {run['run_attempt']} "
-                          f"finished with conclusion={conclusion}; rerunning failed jobs")
+                          f"finished with conclusion={conclusion}{reason}; rerunning failed jobs")
                     gh(f"{API_ROOT}/repos/{REPO}/actions/runs/{run_id}/rerun-failed-jobs", method="POST")
                     min_attempt[run_id] = run["run_attempt"] + 1
                     continue
