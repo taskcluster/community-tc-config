@@ -583,6 +583,9 @@ FXCI_IMAGES = {
 }
 # Keys of an fxci Azure image that aren't locations
 FXCI_AZURE_SETTINGS = {"version", "resource_group", "sbom", "name"}
+# Merged by fxci into the workerTypeMetadata of the worker pools using an image
+FXCI_METADATA_KEY = "worker-type-metadata"
+WORKER_IMAGES_RAW_URL = f"https://raw.githubusercontent.com/{REPO}/"
 
 def log_images():
     """Print the images of the image sets that worker-images builds for us."""
@@ -602,22 +605,46 @@ def log_images():
             for region, name in names.items():
                 print(f"      {region}: {name} ({jobs.get(name, 'job not found')})")
 
+def update_fxci_script(imagesets, image_set, worker_images, fxci_image):
+    """Link fxci's `fxci_image` to the worker-images bootstrap script that the
+    images of `image_set` were built with, in place (fxci merges it into the
+    worker type metadata of its worker pools, as community-tc does). Returns
+    the script's URL, or None if `image_set` doesn't link to a worker-images
+    script, e.g. because its images haven't been rebuilt since it last linked
+    to a script in this repository."""
+    gw_config = imagesets[image_set].get("workerConfig", {}).get("genericWorker", {}).get("config", {})
+    script = gw_config.get("workerTypeMetadata", {}).get("machine-setup", {}).get("script", "")
+    if not script.startswith(WORKER_IMAGES_RAW_URL):
+        print(f"ℹ️  {image_set} doesn't link to a {REPO} bootstrap script, so not linking fxci's {fxci_image} to one")
+        return None
+    image = worker_images[fxci_image]
+    if FXCI_METADATA_KEY not in image:
+        # First, since the blank line after an image belongs to its last key
+        image.insert(0, FXCI_METADATA_KEY, {})
+    image[FXCI_METADATA_KEY].setdefault("machine-setup", {})["script"] = script
+    return script
+
 def update_fxci_images(imagesets, worker_images):
     """Point the images in `worker_images` (fxci's worker-images.yml) at those in
-    `imagesets`, in place. Returns [(fxci image, location, old, new)]."""
+    `imagesets`, in place, and link the updated ones to the bootstrap scripts
+    they were built with. Returns ([(fxci image, location, old, new)],
+    {fxci image: bootstrap script URL})."""
     changes = []
+    scripts = {}
     missing = []
     for fxci_image, (image_set, provider_id) in FXCI_IMAGES.items():
         if provider_id not in worker_images.get(fxci_image, {}):
             print(f"ℹ️  fxci has no {fxci_image} image for {provider_id}, so not updating it")
             continue
         current = worker_images[fxci_image][provider_id]
+        changed = len(changes)
         if isinstance(current, str):
             # GCP: one image for all regions
             new = imagesets[image_set]["gcp"]["image"]
             if current != new:
                 worker_images[fxci_image][provider_id] = new
                 changes.append((fxci_image, None, current, new))
+                scripts[fxci_image] = update_fxci_script(imagesets, image_set, worker_images, fxci_image)
             continue
         # Azure: a managed image per location, built in fxci's subscription by
         # worker-images, which fxci references by name
@@ -636,10 +663,12 @@ def update_fxci_images(imagesets, worker_images):
             if current[location] != new:
                 changes.append((fxci_image, location, current[location], new))
                 current[location] = new
+        if len(changes) > changed:
+            scripts[fxci_image] = update_fxci_script(imagesets, image_set, worker_images, fxci_image)
     if missing:
         raise SystemExit("❌ fxci uses these locations, but there are no new images for them (did their builds fail?), "
                          "so not opening an fxci PR:\n" + "\n".join(f"   - {m}" for m in missing))
-    return changes
+    return changes, {image: script for image, script in scripts.items() if script}
 
 def worker_images_jobs(image_set, cloud, image_names):
     """({image name: URL of the worker-images GitHub Actions job that built it},
@@ -679,8 +708,9 @@ def worker_images_jobs(image_set, cloud, image_names):
     print(f"⚠️  Couldn't find the {REPO} jobs that built {image_set} ({cloud}) images {', '.join(image_names)}")
     return {}, None
 
-def fxci_pr_text(changes):
-    """Title and body of the fxci PR for `changes` (from update_fxci_images)."""
+def fxci_pr_text(changes, scripts):
+    """Title and body of the fxci PR for `changes` and `scripts` (from
+    update_fxci_images)."""
     images = sorted({image for image, *_ in changes})
     jobs = {}
     versions = set()
@@ -710,6 +740,12 @@ def fxci_pr_text(changes):
 | Image | Location | Old | New |
 |---|---|---|---|
 {rows}"""
+    if scripts:
+        body += f"""
+
+Each updated image's `{FXCI_METADATA_KEY}` links to the {REPO} bootstrap script it was built with:
+
+""" + "\n".join(f"* `{image}`: {script}" for image, script in sorted(scripts.items()))
     return title, body
 
 def open_fxci_pr():
@@ -738,7 +774,7 @@ def open_fxci_pr():
             fxci_yaml.explicit_start = f.read().startswith("---")
         with open(images_file) as f:
             worker_images = fxci_yaml.load(f)
-        changes = update_fxci_images(imagesets, worker_images)
+        changes, scripts = update_fxci_images(imagesets, worker_images)
         if not changes:
             print(f"✅ {FXCI_REPO} already uses the latest images")
             return
@@ -754,7 +790,7 @@ def open_fxci_pr():
             print(f"♻️  Reusing {existing}")
             return
 
-        title, body = fxci_pr_text(changes)
+        title, body = fxci_pr_text(changes, scripts)
         git("commit", "--all", "--message", title)
         git("push", "--force", "origin", f"HEAD:refs/heads/{branch}")
         fork_owner = subprocess.run(["gh", "api", "user", "--jq", ".login"], capture_output=True, text=True, check=True).stdout.strip()
