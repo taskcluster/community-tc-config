@@ -77,7 +77,10 @@ Finally, the new images are logged with links to the worker-images jobs that
 built them, and a PR is opened (from your fork) to have
 fxci's worker pools that use the same images use the new ones too
 (`UPDATE_FXCI_IMAGES=false` skips this). It isn't opened if any location that
-fxci uses has no new image, e.g. because its build failed.
+fxci uses has no new image, e.g. because its build failed. The PR also sets the
+`worker-type-metadata.machine-setup.script` of each updated fxci image to the
+same bootstrap script URL, which fxci merges into the `workerTypeMetadata` of
+its worker pools.
 
 ## Environment variables
 
