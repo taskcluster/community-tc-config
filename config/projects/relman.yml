@@ -212,7 +212,6 @@ relman:
         - index:insert-task:code-analysis.cache.pr.*
       to: repo:github.com/mozilla/code-review:pull-request
 
-    # <..> expands to the branch name that the role matches
     - grant:
         - queue:route:index.code-analysis.v2.code-review.backend.branch.<..>
         - index:insert-task:code-analysis.v2.code-review.backend.branch.<..>
@@ -263,9 +262,7 @@ relman:
         - index:insert-task:code-analysis.v2.code-review.bot.branch.v*
         - queue:route:index.code-analysis.v2.code-review.integration.branch.v*
         - index:insert-task:code-analysis.v2.code-review.integration.branch.v*
-      to: repo:github.com/mozilla/code-review:release:published
-
-    - grant: secrets:get:project/relman/code-review/release
+        - secrets:get:project/relman/code-review/release
       to: repo:github.com/mozilla/code-review:release:published
 
     # dump_syms
