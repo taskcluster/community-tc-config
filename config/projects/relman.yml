@@ -220,15 +220,20 @@ relman:
         - index:insert-task:code-analysis.v2.code-review.bot.branch.<..>
         - queue:route:index.code-analysis.v2.code-review.integration.branch.<..>
         - index:insert-task:code-analysis.v2.code-review.integration.branch.<..>
+        - queue:route:index.code-analysis.v2.code-review.revision.*
+        - index:insert-task:code-analysis.v2.code-review.revision.*
+      to: repo:github.com/mozilla/code-review:branch:*
+
+    - grant:
         - queue:route:index.code-analysis.v2.code-review.backend.revision.*
         - index:insert-task:code-analysis.v2.code-review.backend.revision.*
         - queue:route:index.code-analysis.v2.code-review.bot.revision.*
         - index:insert-task:code-analysis.v2.code-review.bot.revision.*
         - queue:route:index.code-analysis.v2.code-review.integration.revision.*
         - index:insert-task:code-analysis.v2.code-review.integration.revision.*
-        - queue:route:index.code-analysis.v2.code-review.revision.*
-        - index:insert-task:code-analysis.v2.code-review.revision.*
-      to: repo:github.com/mozilla/code-review:branch:*
+      to:
+        - repo:github.com/mozilla/code-review:branch:*
+        - repo:github.com/mozilla/code-review:release:published
 
     - grant:
         - queue:route:index.code-analysis.cache.level-1.*
@@ -258,12 +263,6 @@ relman:
         - index:insert-task:code-analysis.v2.code-review.bot.branch.v*
         - queue:route:index.code-analysis.v2.code-review.integration.branch.v*
         - index:insert-task:code-analysis.v2.code-review.integration.branch.v*
-        - queue:route:index.code-analysis.v2.code-review.backend.revision.*
-        - index:insert-task:code-analysis.v2.code-review.backend.revision.*
-        - queue:route:index.code-analysis.v2.code-review.bot.revision.*
-        - index:insert-task:code-analysis.v2.code-review.bot.revision.*
-        - queue:route:index.code-analysis.v2.code-review.integration.revision.*
-        - index:insert-task:code-analysis.v2.code-review.integration.revision.*
       to: repo:github.com/mozilla/code-review:release:published
 
     - grant: secrets:get:project/relman/code-review/release
