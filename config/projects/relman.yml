@@ -123,7 +123,6 @@ relman:
         - repo:github.com/mozilla/microannotate:*
         - repo:github.com/mozilla/task-boot:*
         - repo:github.com/mozilla/code-coverage:*
-        - repo:github.com/mozilla/code-review:*
         - repo:github.com/mozilla/rust-code-analysis:*
         - repo:github.com/mozilla/rust-parsepatch:*
         - repo:github.com/mozilla/pyo3-parsepatch:*
@@ -136,6 +135,22 @@ relman:
         - repo:github.com/mozilla/stab-crashes:*
         - repo:github.com/mozilla/grcov:*
         - repo:github.com/mozilla/adr:*
+
+    - grant:
+        - queue:route:statuses
+        - queue:route:checks
+      to: repo:github.com/mozilla/code-review:*
+
+    - grant:
+        - queue:create-task:highest:proj-relman/*
+      to:
+        - repo:github.com/mozilla/code-review:pull-request
+        - repo:github.com/mozilla/code-review:branch:*
+        - repo:github.com/mozilla/code-review:release:published
+        - repo:github.com/mozilla/code-review:tag:*
+
+    - grant: queue:create-task:lowest:proj-relman/generic-worker-ubuntu-24-04
+      to: repo:github.com/mozilla/code-review:pull-request-untrusted
 
     # all hooks
     - grant:
@@ -171,7 +186,11 @@ relman:
 
     # code-review
     - grant: docker-worker:capability:privileged
-      to: repo:github.com/mozilla/code-review:*
+      to:
+        - repo:github.com/mozilla/code-review:pull-request
+        - repo:github.com/mozilla/code-review:branch:*
+        - repo:github.com/mozilla/code-review:release:published
+        - repo:github.com/mozilla/code-review:tag:*
     - grant:
         - secrets:get:project/relman/code-review/deploy-production
         - assume:hook-id:project-relman/code-review-integration-production
@@ -211,6 +230,9 @@ relman:
         - queue:route:index.code-analysis.cache.pr.*
         - index:insert-task:code-analysis.cache.pr.*
       to: repo:github.com/mozilla/code-review:pull-request
+
+    - grant: queue:scheduler-id:code-analysis-level-1
+      to: repo:github.com/mozilla/code-review:pull-request-untrusted
 
     - grant:
         - queue:route:index.code-analysis.v2.code-review.backend.branch.<..>
