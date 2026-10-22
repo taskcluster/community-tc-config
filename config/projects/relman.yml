@@ -273,6 +273,30 @@ relman:
         - repo:github.com/mozilla/code-review:release:published
 
     - grant:
+        - queue:cancel-task:code-analysis-level-1/*
+        - queue:cancel-task-group:code-analysis-level-1/*
+        - queue:seal-task-group:code-analysis-level-1/*
+        - queue:rerun-task:code-analysis-level-1/*
+      to:
+        - repo:github.com/mozilla/code-review:pull-request
+        - repo:github.com/mozilla/code-review:branch:testing
+
+    - grant:
+        - queue:cancel-task:code-analysis-level-3/*
+        - queue:cancel-task-group:code-analysis-level-3/*
+        - queue:seal-task-group:code-analysis-level-3/*
+        - queue:rerun-task:code-analysis-level-3/*
+      to:
+        - repo:github.com/mozilla/code-review:branch:master
+        - repo:github.com/mozilla/code-review:branch:production
+        - repo:github.com/mozilla/code-review:release:published
+
+    - grant:
+        - queue:rerun-task:code-analysis-level-1/*
+        - queue:rerun-task:code-analysis-level-3/*
+      to: repo:github.com/mozilla/code-review:rerun
+
+    - grant:
         - queue:route:index.code-analysis.v2.code-review.latest.*
         - index:insert-task:code-analysis.v2.code-review.latest.*
       to: repo:github.com/mozilla/code-review:branch:master
