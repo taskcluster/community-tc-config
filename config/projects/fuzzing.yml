@@ -686,6 +686,10 @@ fuzzing:
       to:
         - repo:github.com/MozillaSecurity/FuzzManager:*
     - grant:
+        - queue:create-task:highest:proj-fuzzing/orion-gha-publish
+      to:
+        - repo:github.com/MozillaSecurity/orion:branch:master
+    - grant:
         - secrets:get:project/fuzzing/docker-hub
       to:
         - repo:github.com/MozillaSecurity/FuzzManager:branch:master
