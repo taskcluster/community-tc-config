@@ -81,7 +81,11 @@ its worker pools.
 | `DEPLOY_IMAGES` | Copy Azure images into place and `tc-admin apply` | `true` |
 | `UPDATE_FXCI_IMAGES` | Open the fxci-config PR to use the new images | `true` |
 | `IMAGESET_LOCAL_CHANGES` | Use the files of your checkout (other than `config/`), rather than upstream `main`'s, to test changes to the scripts | `false` |
+| `IMAGESET_RESUME` | Whether to resume an unfinished run of the same target (skipping the steps it completed, and waiting for its worker-images builds rather than triggering new ones), rather than start again | asks |
 | `UPDATE_GCLOUD` | Run `gcloud components update` | `true` |
+
+If a run fails, it says which step failed. Rerun the same command to continue
+from there: it asks whether to resume, or to start again.
 
 After a run, test the new images, e.g. by rerunning some tasks that previously
 ran successfully.

@@ -65,7 +65,7 @@ function install-hint {
 }
 
 function check-required-tools {
-  local tools=(az cat chmod dirname env gcloud gh git gpg mkdir mktemp pass python3 rm sed sleep tee tr uname)
+  local tools=(az cat chmod dirname env gcloud gh git gpg grep id mkdir mktemp pass paste python3 rm sed sleep tee tr uname)
   local tool
   local missing=false
   local version
@@ -446,6 +446,118 @@ function run-from-clone {
   IMAGESET_PREP_DIR="${PREP_DIR}" exec "${clone}/imagesets/imageset.sh" "${IMAGESET_TARGET}"
 }
 
+function step-done {
+  grep -qxF "${1}" "${STEPS_FILE}" 2> /dev/null
+}
+
+# Runs a step, unless resuming a previous run that completed it
+function run-step {
+  local step="${1}"
+  shift
+  if step-done "${step}"; then
+    echo "Skipping ${step}: completed by a previous run"
+    return
+  fi
+  CURRENT_STEP="${step}"
+  "$@"
+  echo "${step}" >> "${STEPS_FILE}"
+  CURRENT_STEP=''
+}
+
+function update-offerings {
+  echo "Updating EC2 instance types..."
+  misc/update-ec2-instance-types.sh
+  git add 'config/ec2-instance-type-offerings'
+  git diff --cached --quiet || git commit -m "Ran script misc/update-ec2-instance-types.sh"
+
+  echo "Updating Azure VM sizes..."
+  misc/update-azure-vm-sizes.sh
+  git add 'config/azure-vm-size-offerings'
+  git diff --cached --quiet || git commit -m "Ran script misc/update-azure-vm-sizes.sh"
+
+  echo "Updating GCE machine types..."
+  misc/update-gce-machine-types.sh
+  git add 'config/gce-machine-type-offerings.json'
+  git diff --cached --quiet || git commit -m "Ran script misc/update-gce-machine-types.sh"
+
+  retry push-to-main
+  retry tc-admin apply
+}
+
+function update-mac {
+  local host="${1}"
+  retry-mac install-mac-files "${host}"
+  # The lock stops a retry from running alongside an interrupted run
+  retry-mac mac-ssh "${host}" sudo -n lockf -t 900 /var/run/com.mozilla.genericworker.update.lock /var/root/update.sh
+}
+
+function build-images {
+  python3 imagesets/rel-sre-imagesets.py
+  git add config/imagesets.yml
+  git diff --cached --quiet || git commit -m "Use new machine images built by mozilla-platform-ops/worker-images"
+  retry push-to-main
+}
+
+function deploy-images {
+  python3 imagesets/copy-azure-images.py
+  retry tc-admin apply
+}
+
+# On failure, says how to resume; on success, forgets the completed steps
+function finish {
+  local status="${1}"
+  if [ "${status}" == 0 ]; then
+    if [ -n "${STEPS_FILE}" ]; then
+      rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}"
+    fi
+  elif [ -n "${STEPS_FILE}" ]; then
+    echo >&2
+    echo "imageset.sh failed${CURRENT_STEP:+ during step: ${CURRENT_STEP}}. To continue from there, rerun the same command: it will offer to resume." >&2
+  fi
+}
+
+# Progress, kept outside PREP_DIR for resuming. No secrets.
+function state-paths {
+  STATE_DIR="${TMPDIR:-/tmp}/community-tc-imagesets-$(id -u)"
+  STEPS_FILE="${STATE_DIR}/${IMAGESET_TARGET}.steps"
+  # The worker-images runs that rel-sre-imagesets.py waits for
+  IMAGESET_RUNS_FILE="${STATE_DIR}/${IMAGESET_TARGET}.runs.json"
+}
+
+# Asks whether to resume an unfinished run of the same target, unless
+# IMAGESET_RESUME says
+function choose-resume {
+  local answer
+  case "${IMAGESET_RESUME-}" in
+    true | false | '') ;;
+    *) echo "IMAGESET_RESUME must be true or false" >&2; return 1 ;;
+  esac
+  state-paths
+  if [ -n "${IMAGESET_RESUME-}" ] || ! { [ -f "${STEPS_FILE}" ] || [ -f "${IMAGESET_RUNS_FILE}" ]; }; then
+    export IMAGESET_RESUME="${IMAGESET_RESUME:-false}"
+    return
+  fi
+  echo "A previous ${IMAGESET_TARGET} run didn't finish."
+  if [ -f "${STEPS_FILE}" ]; then
+    echo "Steps it completed: $(paste -sd , - < "${STEPS_FILE}")"
+  fi
+  if [ -f "${IMAGESET_RUNS_FILE}" ]; then
+    echo "It triggered worker-images builds, which resuming waits for, rather than triggering new ones."
+  fi
+  if ! [ -t 0 ]; then
+    echo "Set IMAGESET_RESUME=true to resume it, or IMAGESET_RESUME=false to start again." >&2
+    return 1
+  fi
+  while true; do
+    read -r -p "Resume it (r), or delete its progress and start again (s)? " answer
+    case "${answer}" in
+      r | R) IMAGESET_RESUME=true; break ;;
+      s | S) IMAGESET_RESUME=false; break ;;
+    esac
+  done
+  export IMAGESET_RESUME
+}
+
 ############### Deploy image sets ###############
 
 function set-defaults {
@@ -514,9 +626,16 @@ function deploy-image-sets {
     exit 1
   fi
 
+  # Only the macOS workers that a resumed run hasn't updated yet
+  local pending_macs=()
   if "${DEPLOY_MACS}"; then
-    read-mac-passwords "${MAC_HOSTS[@]}"
-    check-mac-connectivity "${MAC_HOSTS[@]}"
+    for HOST in "${MAC_HOSTS[@]}"; do
+      step-done "mac ${HOST}" || pending_macs+=("${HOST}")
+    done
+  fi
+  if [ "${#pending_macs[@]}" -gt 0 ]; then
+    read-mac-passwords "${pending_macs[@]}"
+    check-mac-connectivity "${pending_macs[@]}"
   fi
 
   if can-open-browser; then
@@ -526,7 +645,7 @@ function deploy-image-sets {
   fi
   az account set --subscription "${AZURE_SUBSCRIPTION_ID}"
 
-  if "${UPDATE_OFFERINGS}"; then
+  if "${UPDATE_OFFERINGS}" && ! step-done offerings; then
     login-aws
   fi
 
@@ -549,33 +668,15 @@ function deploy-image-sets {
   GITHUB_TOKEN="$(gh auth token)"
   export GITHUB_TOKEN
 
-  if "${BUILD_IMAGES}"; then
+  if "${BUILD_IMAGES}" && "${UPDATE_TASKCLUSTER_VERSION}"; then
     # The worker-images PR needs someone to review and merge it, so open it
     # before anything else. Only triggering the image builds waits for it to be merged
     # (in rel-sre-imagesets.py below); the steps in between don't depend on it.
-    if "${UPDATE_TASKCLUSTER_VERSION}"; then
-      python3 imagesets/rel-sre-imagesets.py --open-bump-pr
-    fi
+    run-step bump-pr python3 imagesets/rel-sre-imagesets.py --open-bump-pr
   fi
 
   if "${UPDATE_OFFERINGS}"; then
-    echo "Updating EC2 instance types..."
-    misc/update-ec2-instance-types.sh
-    git add 'config/ec2-instance-type-offerings'
-    git diff --cached --quiet || git commit -m "Ran script misc/update-ec2-instance-types.sh"
-
-    echo "Updating Azure VM sizes..."
-    misc/update-azure-vm-sizes.sh
-    git add 'config/azure-vm-size-offerings'
-    git diff --cached --quiet || git commit -m "Ran script misc/update-azure-vm-sizes.sh"
-
-    echo "Updating GCE machine types..."
-    misc/update-gce-machine-types.sh
-    git add 'config/gce-machine-type-offerings.json'
-    git diff --cached --quiet || git commit -m "Ran script misc/update-gce-machine-types.sh"
-
-    retry push-to-main
-    retry tc-admin apply
+    run-step offerings update-offerings
   fi
 
   #######################################################################################
@@ -593,31 +694,24 @@ function deploy-image-sets {
   # TODO: report if macs need to be logged into first with vnc
   if "${DEPLOY_MACS}"; then
     for HOST in "${MAC_HOSTS[@]}"; do
-      retry-mac install-mac-files "${HOST}"
-      # The lock stops a retry from running alongside an interrupted run
-      retry-mac mac-ssh "${HOST}" sudo -n lockf -t 900 /var/run/com.mozilla.genericworker.update.lock /var/root/update.sh
+      run-step "mac ${HOST}" update-mac "${HOST}"
     done
   fi
 
-
   if "${BUILD_IMAGES}"; then
-    python3 imagesets/rel-sre-imagesets.py
-    git add config/imagesets.yml
-    git diff --cached --quiet || git commit -m "Use new machine images built by mozilla-platform-ops/worker-images"
-    retry push-to-main
+    run-step build-images build-images
   fi
 
   if "${DEPLOY_IMAGES}"; then
     # Images must exist before tc-admin points worker pools at them
-    python3 imagesets/copy-azure-images.py
-    retry tc-admin apply
+    run-step deploy-images deploy-images
   fi
 
   if "${BUILD_IMAGES}"; then
     python3 imagesets/rel-sre-imagesets.py --log-images
     # fxci's config can only be changed with a reviewed PR
     if "${UPDATE_FXCI_IMAGES}"; then
-      python3 imagesets/rel-sre-imagesets.py --open-fxci-pr
+      run-step fxci-pr python3 imagesets/rel-sre-imagesets.py --open-fxci-pr
     fi
   fi
 
@@ -646,6 +740,7 @@ set-defaults
 
 if [ -z "${IMAGESET_PREP_DIR-}" ]; then
   check-required-tools
+  choose-resume
   run-from-clone
 fi
 
@@ -655,7 +750,30 @@ if [ "$(pwd -P)" != "$(cd "${IMAGESET_PREP_DIR}" && pwd -P)/community-tc-config/
 fi
 PREP_DIR="${IMAGESET_PREP_DIR}"
 unset IMAGESET_PREP_DIR
-trap 'status=$?; cd; rm -rf "${PREP_DIR}"; exit "${status}"' EXIT
+
+STEPS_FILE=''
+IMAGESET_RUNS_FILE=''
+CURRENT_STEP=''
+trap 'status=$?; cd; rm -rf "${PREP_DIR}"; finish "${status}"; exit "${status}"' EXIT
+
+state-paths
+export IMAGESET_RUNS_FILE
+mkdir -p -m 700 "${STATE_DIR}"
+if [ -L "${STATE_DIR}" ] || ! [ -O "${STATE_DIR}" ]; then
+  echo "${STATE_DIR} isn't a directory of yours" >&2
+  STEPS_FILE=''
+  exit 1
+fi
+if ! "${IMAGESET_RESUME:-false}"; then
+  rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}"
+elif [ -f "${STEPS_FILE}" ] || [ -f "${IMAGESET_RUNS_FILE}" ]; then
+  echo "Resuming a previous run"
+  if [ -f "${STEPS_FILE}" ]; then
+    echo "Skipping the steps it completed: $(paste -sd , - < "${STEPS_FILE}")"
+  fi
+else
+  echo "Nothing to resume: running all the steps"
+fi
 echo
 echo "Preparing in directory ${PREP_DIR}..."
 echo
