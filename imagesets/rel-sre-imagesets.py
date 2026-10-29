@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import base64
 import hashlib
+import json
 import os
 import subprocess
 import sys
@@ -67,6 +68,9 @@ PR_POLL_SECONDS = 60
 # a stuck download), so failed jobs are rerun until a run has had this many
 # attempts.
 MAX_RUN_ATTEMPTS = int(os.environ.get("MAX_RUN_ATTEMPTS", "5"))
+# Where the triggered runs are saved, so that a resumed deployment waits for
+# them rather than triggering new ones
+RUNS_FILE = os.environ.get("IMAGESET_RUNS_FILE")
 RERUN_CONCLUSIONS = {"failure", "timed_out"}
 # Jobs that hit their time limit are cancelled with this annotation, so they
 # are rerun too, unlike jobs that were cancelled by hand.
@@ -830,16 +834,24 @@ def main():
         open_fxci_pr()
         return
 
-    # 0) Builds use worker-images' main, so it must pin the latest Taskcluster first
-    if os.environ.get("UPDATE_TASKCLUSTER_VERSION", "true") == "true":
-        bump_taskcluster_version()
+    if RUNS_FILE and os.path.exists(RUNS_FILE):
+        with open(RUNS_FILE) as f:
+            run_map = {(wf, cfg): (run_id, run_number, wf) for wf, cfg, run_id, run_number in json.load(f)}
+        print(f"♻️  Resuming the {len(run_map)} run(s) in {RUNS_FILE}")
+    else:
+        # 0) Builds use worker-images' main, so it must pin the latest Taskcluster first
+        if os.environ.get("UPDATE_TASKCLUSTER_VERSION", "true") == "true":
+            bump_taskcluster_version()
 
-    # Only match runs triggered from here on, not any started while waiting for the PR.
-    global SCRIPT_START_TIME
-    SCRIPT_START_TIME = datetime.now(timezone.utc)
+        # Only match runs triggered from here on, not any started while waiting for the PR.
+        global SCRIPT_START_TIME
+        SCRIPT_START_TIME = datetime.now(timezone.utc)
 
-    # 1) Trigger all workflows in parallel and wait for all to complete
-    run_map = trigger_all_workflows(WORKFLOWS)
+        # 1) Trigger all workflows in parallel and wait for all to complete
+        run_map = trigger_all_workflows(WORKFLOWS)
+        if RUNS_FILE and run_map:
+            with open(RUNS_FILE, "w") as f:
+                json.dump([[wf, cfg, run_id, run_number] for (wf, cfg), (run_id, run_number, _) in run_map.items()], f)
 
     if not run_map:
         print("❌ No runs were captured; nothing to wait on.")
