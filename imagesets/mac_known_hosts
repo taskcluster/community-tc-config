@@ -1,0 +1,3 @@
+# Host keys of MAC_HOSTS in imageset.sh. To update: ssh-keyscan -t ed25519 <host>
+macmini-m4-126.test.releng.mdc1.mozilla.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMHp9GCkN3xCmnlv75WEX0MOCq1wjeDeX8rdh3FbrYop
+macmini-m4-127.test.releng.mdc1.mozilla.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ1d4SozmZKKhLBLdPhMmHAfo23YY5JxB7kNonwfR5kn

@@ -12,6 +12,8 @@
 #
 # You will need the gcloud CLI in your PATH.
 
+set -o pipefail
+
 cd "$(dirname "${0}")"
 
 rm -f '../config/gce-machine-type-offerings.json'

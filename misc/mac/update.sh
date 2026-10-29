@@ -58,13 +58,49 @@ for binary in ${BINARIES}; do
   chmod a+x "${binary}.new"
 done
 
+# Runs a command that stops a launchd service (<domain>/<label>), which fails
+# if it isn't loaded, and fails only if the service is still loaded afterwards.
+function stop-service {
+  local service="${1}"
+  shift
+  local stop_failed=false
+  "$@" || stop_failed=true
+  local attempt
+  for attempt in $(seq 30); do
+    if ! launchctl print "${service}" > /dev/null 2>&1; then
+      if "${stop_failed}"; then
+        echo "WARNING: '$*' failed, probably because ${service} wasn't loaded. This can be a matter of timing, and doesn't mean that anything is wrong: ${service} isn't loaded now." >&2
+      fi
+      return 0
+    fi
+    sleep 1
+  done
+  echo "ERROR: ${service} is still loaded after running '$*'" >&2
+  return 1
+}
+
+DAEMON_PLIST=/Library/LaunchDaemons/com.mozilla.genericworker.plist
+AGENT_PLIST="/Users/${current_user}/Library/LaunchAgents/com.mozilla.genericworker.launchagent.plist"
+
 cd /var/root
-launchctl unload -w /Library/LaunchDaemons/com.mozilla.genericworker.plist
-[ -n "${uid}" ] && launchctl bootout "gui/${uid}" "/Users/${current_user}/Library/LaunchAgents/com.mozilla.genericworker.launchagent.plist"
+if ! stop-service system/com.mozilla.genericworker launchctl unload -w "${DAEMON_PLIST}"; then
+  launchctl load -w "${DAEMON_PLIST}" || true
+  exit 1
+fi
+if [ -n "${uid}" ] && ! stop-service "gui/${uid}/com.mozilla.genericworker.launchagent" launchctl bootout "gui/${uid}" "${AGENT_PLIST}"; then
+  echo "Restarting the worker without updating it" >&2
+  launchctl load -w "${DAEMON_PLIST}"
+  exit 1
+fi
 rm -f current-task-user.json next-task-user.json tasks-resolved-count.txt directory-caches.json file-caches.json
 cd /usr/local/bin
 for binary in ${BINARIES}; do
   mv -f "${binary}.new" "${binary}"
 done
-[ -n "${uid}" ] && launchctl bootstrap "gui/${uid}" "/Users/${current_user}/Library/LaunchAgents/com.mozilla.genericworker.launchagent.plist"
-launchctl load -w /Library/LaunchDaemons/com.mozilla.genericworker.plist
+status=0
+if [ -n "${uid}" ] && ! launchctl bootstrap "gui/${uid}" "${AGENT_PLIST}"; then
+  echo "ERROR: Couldn't bootstrap ${AGENT_PLIST} in gui/${uid}" >&2
+  status=1
+fi
+launchctl load -w "${DAEMON_PLIST}"
+exit "${status}"

@@ -21,42 +21,29 @@ steps.
 
 ## Prerequisites
 
-1) AWS: credentials set up with `aws configure` (or `SIGNIN_AWS_ACCESS_KEY_ID`
-   and `SIGNIN_AWS_SECRET_ACCESS_KEY`), with MFA enabled on your AWS account. The
-   script signs in with [`signin-aws.sh`](signin-aws.sh), which prompts for an
-   MFA code, or reads it from your Yubikey if `SIGNIN_AWS_YUBIKEY_OATH_NAME` is
-   set.
+1) AWS: the `AdministratorAccess` role on account `moz-fx-tc-community-workers`
+   (885316786408) in [Mozilla's AWS SSO](https://mozilla-cloudservices.awsapps.com/start).
 
-2) Azure: `az` installed. The script runs `az login`.
+2) Azure and GCP: `az` and `gcloud` installed.
 
-3) GCP: `gcloud` installed. The script runs `gcloud auth login`.
+3) GitHub: `gh` installed, and an account that can push to this repository.
 
-4) GitHub: `gh` installed and logged in (`gh auth login`). It is used to trigger
-   the image builds in
-   [worker-images](https://github.com/mozilla-platform-ops/worker-images), and
-   to open PRs there and in
-   [fxci-config](https://github.com/mozilla-releng/fxci-config) (from your fork,
-   which is created if you don't have one).
+4) git: `user.name` and `user.email` set.
 
-5) A valid git configuration under `~/.gitconfig` with a valid user/email, and
-   an ssh key that can push to `git@github.com:taskcluster/community-tc-config`
-   and the taskcluster team password store. If the key is not in a standard
-   location (e.g. `~/.ssh/id_rsa`, `~/.ssh/id_ed25519`, ...), specify it with an
-   `IdentityFile` directive in `~/.ssh/config`.
+5) gpg: a key that the taskcluster team password store is encrypted to.
 
-6) Your gpg account configured under `~/.gnupg`, with a valid key that is
-   authorised in the taskcluster team password store. Set the gpg agent's cache
-   so that you aren't prompted for your passphrase during the run, e.g. by
-   writing the following to `~/.gnupg/gpg-agent.conf`:
+6) macOS workers (`prod` and `all`): **you must be connected to the Mozilla
+   corporate VPN**, as the Macs are only reachable through it, and have a VNC
+   session as administrator on each Mac. If a Mac is reinstalled, update
+   [`mac_known_hosts`](mac_known_hosts).
 
-   ```
-   default-cache-ttl 86400
-   max-cache-ttl 86400
-   ```
-
-7) macOS workers: a connection to the Mozilla corporate VPN, and a VNC session
-   as administrator on each Mac, to avoid ssh connection problems. The script
-   checks it can ssh to each Mac and run `sudo` before doing anything else.
+The script doesn't use your own configuration of these tools (e.g.
+`~/.ssh/config`, `~/.gitconfig`, `~/.aws/config`, `~/.azure`,
+`~/.config/gcloud`, `~/.password-store`), apart from the AWS SSO token cache
+(`~/.aws/sso/cache`), nor your checkout of this repository: it signs in during
+the run, and clones upstream `main` and the password store into a temporary
+directory. To test local changes to the scripts, set
+`IMAGESET_LOCAL_CHANGES=true`.
 
 ## What it does
 
@@ -93,7 +80,7 @@ its worker pools.
 | `MAX_RUN_ATTEMPTS` | Attempts per worker-images workflow run, including reruns of failed jobs (and of jobs cancelled for exceeding their time limit, but not of jobs cancelled by hand) | `5` |
 | `DEPLOY_IMAGES` | Copy Azure images into place and `tc-admin apply` | `true` |
 | `UPDATE_FXCI_IMAGES` | Open the fxci-config PR to use the new images | `true` |
-| `LOGIN_AWS` / `LOGIN_AZURE` | Sign in to AWS / Azure (`false` to use an existing session) | `true` |
+| `IMAGESET_LOCAL_CHANGES` | Use the files of your checkout (other than `config/`), rather than upstream `main`'s, to test changes to the scripts | `false` |
 | `UPDATE_GCLOUD` | Run `gcloud components update` | `true` |
 
 After a run, test the new images, e.g. by rerunning some tasks that previously
@@ -101,25 +88,9 @@ ran successfully.
 
 ## Required tools
 
-All of the following tools must be available in the `PATH`:
-
-  * `aws`
-  * `az`
-  * `bash`
-  * `curl`
-  * `cut`
-  * `dirname`
-  * `env`
-  * `gcloud`
-  * `gh` (logged in with `gh auth login`)
-  * `git`
-  * `head`
-  * `mktemp`
-  * `pass`
-  * `python3`
-  * `rm`
-  * `sleep`
-  * `sort`
-  * `ssh`
-  * `tail`
-  * `which`
+The script runs on macOS and Linux. It checks for the tools it needs before
+doing anything else, and says how to install any that are missing:
+`aws` (version 2), `az`, `gcloud`, `gh`, `git`, `gpg`, `pass`,
+`python3` (3.10 or later, with `venv`), `ssh` (OpenSSH 8.4 or later), `curl`, `tar`, and
+standard utilities. Without a browser (e.g. over ssh), signing in uses a URL and
+code instead.

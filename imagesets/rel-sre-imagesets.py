@@ -74,7 +74,7 @@ TIME_LIMIT_ANNOTATION = "exceeded the maximum execution time"
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 if not GITHUB_TOKEN:
-    raise SystemExit("Set the GITHUB_TOKEN environment variable")
+    raise SystemExit('Set the GITHUB_TOKEN environment variable, e.g. export GITHUB_TOKEN="$(gh auth token)"')
 HEADERS = {"Authorization": f"Bearer {GITHUB_TOKEN}"}
 API_ROOT = "https://api.github.com"
 
