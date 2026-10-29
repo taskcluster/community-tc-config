@@ -13,6 +13,8 @@
 #
 # You will need the az CLI, curl and python3 in your PATH.
 
+set -o pipefail
+
 cd "$(dirname "${0}")"
 
 output_dir="../config/azure-vm-size-offerings"

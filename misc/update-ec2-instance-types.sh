@@ -15,6 +15,8 @@
 #
 # You will need the aws CLI in your PATH.
 
+set -o pipefail
+
 cd "$(dirname "${0}")"
 
 rm -f ../config/ec2-instance-type-offerings/*.json

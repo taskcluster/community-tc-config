@@ -36,7 +36,8 @@ and `@STATIC_SECRET@` with the `staticSecret` in the worker's existing
 Maintenance script for updating Taskcluster worker components:
 - Fetches the latest Taskcluster version from GitHub API
 - Downloads updated binaries: `generic-worker`, `livelog`, `start-worker`, `taskcluster-proxy`
-- Stops existing worker services (LaunchDaemon and LaunchAgent)
+- Stops existing worker services (LaunchDaemon and LaunchAgent), failing only
+  if they are still loaded afterwards
 - Renames the new binaries into place, rather than overwriting the existing
   files, as macOS kills a binary that was overwritten while it was running, the
   next time it is run

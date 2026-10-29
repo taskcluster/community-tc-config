@@ -4,45 +4,177 @@ set -eu
 set -o pipefail
 
 function retry {
-  set +e
   local n=0
   # 2^10 seconds is plenty
   local max=10
-  while true; do
-    "$@" && break || {
-      if [[ $n -lt $max ]]; then
-        ((n++))
-        echo "Command $@ failed" >&2
-        sleep_time=$((2 ** n))
-        echo "Sleeping $sleep_time seconds..." >&2
-        sleep $sleep_time
-        echo "Attempt $n/$max:" >&2
-      else
-        echo "Failed after $n attempts." >&2
-        return 67
-      fi
-    }
+  until "$@"; do
+    if [[ $n -ge $max ]]; then
+      echo "Failed after $n attempts." >&2
+      return 67
+    fi
+    n=$((n + 1))
+    echo "Command $@ failed" >&2
+    sleep_time=$((2 ** n))
+    echo "Sleeping $sleep_time seconds..." >&2
+    sleep $sleep_time
+    echo "Attempt $n/$max:" >&2
   done
-  set -e
 }
 
-# Run a command on a macOS worker as administrator. The administrator password
-# (from pass) is used for ssh authentication if key authentication fails.
-# stdin isn't passed to the command, unless MAC_SSH_STDIN=true.
+function install-hint {
+  local tool="${1}"
+  local package
+  if [ "$(uname)" == Darwin ]; then
+    case "${tool}" in
+      aws) echo "brew install awscli" ;;
+      az) echo "brew install --cask azure-cli" ;;
+      gcloud) echo "brew install --cask gcloud-cli" ;;
+      gh | git | pass) echo "brew install ${tool}" ;;
+      gpg) echo "brew install gnupg" ;;
+      python3) echo "brew install python" ;;
+      ssh) echo "brew install openssh" ;;
+      *) echo "it is part of macOS: check your PATH" ;;
+    esac
+    return
+  fi
+  case "${tool}" in
+    aws) echo "see https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html (version 2 is needed)"; return ;;
+    az) echo "see https://learn.microsoft.com/cli/azure/install-azure-cli-linux"; return ;;
+    gcloud) echo "see https://cloud.google.com/sdk/docs/install"; return ;;
+    gh) echo "see https://github.com/cli/cli/blob/trunk/docs/install_linux.md"; return ;;
+  esac
+  if command -v apt-get > /dev/null; then
+    case "${tool}" in
+      curl | git | pass | python3 | tar) package="${tool}" ;;
+      gpg) package=gnupg ;;
+      ssh) package=openssh-client ;;
+      *) package=coreutils ;;
+    esac
+    echo "sudo apt-get install ${package}"
+  elif command -v dnf > /dev/null; then
+    case "${tool}" in
+      curl | git | pass | python3 | tar) package="${tool}" ;;
+      gpg) package=gnupg2 ;;
+      ssh) package=openssh-clients ;;
+      *) package=coreutils ;;
+    esac
+    echo "sudo dnf install ${package}"
+  else
+    echo "install it with your package manager"
+  fi
+}
+
+function check-required-tools {
+  local tools=(az cat chmod dirname env gcloud gh git gpg mkdir mktemp pass python3 rm sed sleep tee tr uname)
+  local tool
+  local missing=false
+  local version
+  if "${DEPLOY_MACS}"; then
+    tools+=(base64 seq ssh)
+  fi
+  if "${UPDATE_OFFERINGS}"; then
+    tools+=(aws curl sort)
+  fi
+  if "${IMAGESET_LOCAL_CHANGES}"; then
+    tools+=(tar)
+  fi
+  for tool in "${tools[@]}"; do
+    if ! command -v "${tool}" > /dev/null; then
+      echo "Required tool ${tool} not found in PATH. To install it: $(install-hint "${tool}")" >&2
+      missing=true
+    fi
+  done
+  if "${missing}"; then
+    return 1
+  fi
+  if ! python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))'; then
+    echo "Python 3.10 or later is needed, rather than $(python3 --version 2>&1). To install it: $(install-hint python3)" >&2
+    return 1
+  fi
+  if ! python3 -c 'import ensurepip, venv' 2> /dev/null; then
+    echo "python3 can't create virtualenvs: install its venv module (e.g. sudo apt-get install python3-venv)." >&2
+    return 1
+  fi
+  if "${UPDATE_OFFERINGS}" && [[ "$(aws --version 2>&1)" != aws-cli/2.* ]]; then
+    echo "Version 2 of the AWS CLI is needed, rather than $(aws --version 2>&1). To install it: $(install-hint aws)" >&2
+    return 1
+  fi
+  # For SSH_ASKPASS_REQUIRE
+  if "${DEPLOY_MACS}"; then
+    version="$(ssh -V 2>&1 | sed -n 's/^OpenSSH_\([0-9]*\)\.\([0-9]*\).*/\1 \2/p')"
+    if [ -z "${version}" ] || [ "${version% *}" -lt 8 ] || { [ "${version% *}" -eq 8 ] && [ "${version#* }" -lt 4 ]; }; then
+      echo "OpenSSH 8.4 or later is needed, rather than $(ssh -V 2>&1). To install it: $(install-hint ssh)" >&2
+      return 1
+    fi
+  fi
+  # Read in the user's checkout, for any includeIf in their git configuration
+  IMAGESET_GIT_NAME="$(git -C "${IMAGESETS_DIR}" config user.name || true)"
+  IMAGESET_GIT_EMAIL="$(git -C "${IMAGESETS_DIR}" config user.email || true)"
+  export IMAGESET_GIT_NAME IMAGESET_GIT_EMAIL
+  if [ -z "${IMAGESET_GIT_NAME}" ] || [ -z "${IMAGESET_GIT_EMAIL}" ]; then
+    echo "Set your name and email for git commits, e.g. with: git config --global user.name 'Your Name'; git config --global user.email you@mozilla.com" >&2
+    return 1
+  fi
+  if [[ "$(gh auth login --help)" != *--insecure-storage* ]]; then
+    echo "A newer gh is needed, rather than $(gh --version | head -1). To install it: $(install-hint gh)" >&2
+    return 1
+  fi
+}
+
+function can-open-browser {
+  [ -z "${SSH_CONNECTION-}" ] && { [ "$(uname)" == Darwin ] || [ -n "${DISPLAY-}" ] || [ -n "${WAYLAND_DISPLAY-}" ]; }
+}
+
+function update-gcloud {
+  local log="${PREP_DIR}/gcloud-update.log"
+  if gcloud components update -q 2>&1 | tee "${log}"; then
+    return 0
+  fi
+  if [[ "$(tr -s ' \n' ' ' < "${log}")" == *"component manager is disabled"* ]]; then
+    echo "gcloud was installed with a package manager: update it with that instead." >&2
+    return 0
+  fi
+  return 1
+}
+
+# Run a command on a macOS worker as administrator. stdin isn't passed to the
+# command, unless MAC_SSH_STDIN=true.
 function mac-ssh {
   local host="${1}"
   shift
-  local pass_entry="mdc1/generic-worker-ci/${host%%.*}"
-  local askpass
-  local status=0
-  local ssh_options=(-o ConnectTimeout=10 -o NumberOfPasswordPrompts=1)
+  local password_var="MAC_PASSWORD_$(mac-name "${host}")"
+  # StrictHostKeyChecking, as SSH_ASKPASS would answer a host key prompt
+  local ssh_options=(
+    -F /dev/null
+    -o ConnectTimeout=10
+    -o NumberOfPasswordPrompts=1
+    -o PubkeyAuthentication=no
+    -o PreferredAuthentications=keyboard-interactive,password
+    -o StrictHostKeyChecking=yes
+    -o CheckHostIP=no
+    -o "UserKnownHostsFile=\"${IMAGESETS_DIR}/mac_known_hosts\""
+    -o GlobalKnownHostsFile=/dev/null
+    -o UpdateHostKeys=no
+  )
   "${MAC_SSH_STDIN:-false}" || ssh_options+=(-n)
-  askpass="$(mktemp -t mac-askpass.XXXXXXXXXX)"
-  printf '#!/bin/sh\npass "%s" | tail -1\n' "${pass_entry}" > "${askpass}"
-  chmod 700 "${askpass}"
-  SSH_ASKPASS="${askpass}" SSH_ASKPASS_REQUIRE=force ssh "${ssh_options[@]}" "administrator@${host}" "$@" || status=$?
-  rm -f "${askpass}"
-  return "${status}"
+  MAC_SSH_PASSWORD="${!password_var}" SSH_ASKPASS="${PREP_DIR}/mac-askpass" SSH_ASKPASS_REQUIRE=force \
+    ssh "${ssh_options[@]}" "administrator@${host}" "$@"
+}
+
+function mac-name {
+  local name="${1%%.*}"
+  echo "${name//-/_}"
+}
+
+function read-mac-passwords {
+  local host
+  local entry
+  for host in "$@"; do
+    entry="$(read-pass "mdc1/generic-worker-ci/${host%%.*}")"
+    printf -v "MAC_PASSWORD_$(mac-name "${host}")" '%s' "${entry##*$'\n'}"
+  done
+  printf '#!/bin/sh\nprintf "%%s\\n" "${MAC_SSH_PASSWORD}"\n' > "${PREP_DIR}/mac-askpass"
+  chmod 700 "${PREP_DIR}/mac-askpass"
 }
 
 # Files in misc/mac that are installed on the macOS workers, before updating
@@ -110,6 +242,37 @@ EOF
   } | MAC_SSH_STDIN=true mac-ssh "${host}" sudo -n bash -s
 }
 
+# Workers may be rebooting
+MAC_SSH_ATTEMPTS=10
+MAC_SSH_RETRY_INTERVAL=30
+
+# Succeeds if ssh output shows an error that retrying won't fix
+function mac-ssh-permanent-error {
+  [[ "${1}" =~ "Could not resolve hostname"|"Host key verification failed"|"Permission denied" ]]
+}
+
+# Retries a command (with the host as its first argument) while ssh can't connect
+function retry-mac {
+  local host="${2}"
+  local attempt
+  local status
+  local output
+  for attempt in $(seq "${MAC_SSH_ATTEMPTS}"); do
+    status=0
+    "$@" || status=$?
+    if [ "${status}" != 255 ] || [ "${attempt}" == "${MAC_SSH_ATTEMPTS}" ]; then
+      return "${status}"
+    fi
+    output="$(mac-ssh "${host}" true 2>&1)" || true
+    if mac-ssh-permanent-error "${output}"; then
+      echo "ssh to ${host} failed: ${output}" >&2
+      return "${status}"
+    fi
+    echo "Couldn't connect to ${host} (it may be rebooting), retrying in ${MAC_SSH_RETRY_INTERVAL} seconds (attempt ${attempt}/${MAC_SSH_ATTEMPTS} failed)..." >&2
+    sleep "${MAC_SSH_RETRY_INTERVAL}"
+  done
+}
+
 # Fail early if any macOS worker can't be reached over ssh, or administrator
 # doesn't have passwordless sudo, rather than discovering it after all the
 # other (lengthy) steps have run.
@@ -117,11 +280,28 @@ function check-mac-connectivity {
   local host
   local output
   local failed=false
+  local attempt
+  local status
   for host in "$@"; do
-    if ! output="$(mac-ssh "${host}" sudo -n echo hello 2>&1)" || [ "${output}" != "hello" ]; then
+    for attempt in $(seq "${MAC_SSH_ATTEMPTS}"); do
+      status=0
+      output="$(mac-ssh "${host}" sudo -n echo hello 2>&1)" || status=$?
+      if [ "${status}" != 255 ] || [ "${attempt}" == "${MAC_SSH_ATTEMPTS}" ] || mac-ssh-permanent-error "${output}"; then
+        break
+      fi
+      echo "Couldn't connect to ${host} (it may be rebooting), retrying in ${MAC_SSH_RETRY_INTERVAL} seconds (attempt ${attempt}/${MAC_SSH_ATTEMPTS} failed): ${output}" >&2
+      sleep "${MAC_SSH_RETRY_INTERVAL}"
+    done
+    if [ "${status}" != 0 ] || [ "${output}" != "hello" ]; then
       echo "Cannot ssh to administrator@${host} and run sudo: ${output}" >&2
-      if [[ "${output}" == *"Could not resolve hostname"* ]]; then
+      if [ "${status}" == 255 ] && ! [[ "${output}" =~ "Host key verification failed"|"Permission denied" ]]; then
         echo "Updating macOS workers (DEPLOY_MACS=true) requires connecting to the Mozilla corporate VPN." >&2
+      fi
+      if [[ "${output}" == *"Host key verification failed"* ]]; then
+        echo "The host key of ${host} isn't in ${IMAGESETS_DIR}/mac_known_hosts: if the worker was reinstalled, update it (ssh-keyscan -t ed25519 <host>)." >&2
+      fi
+      if [[ "${output}" == *"Permission denied"* ]]; then
+        echo "The administrator password of ${host} in the password store (mdc1/generic-worker-ci/${host%%.*}) was rejected: it may need updating." >&2
       fi
       failed=true
     fi
@@ -132,10 +312,143 @@ function check-mac-connectivity {
   fi
 }
 
+# Use our own configuration of the tools, rather than the user's
+function isolate-environment {
+  local git_name
+  local git_email
+  local var
+  git_name="${IMAGESET_GIT_NAME}"
+  git_email="${IMAGESET_GIT_EMAIL}"
+
+  for var in $(compgen -e); do
+    case "${var}" in
+      CLOUDSDK_PYTHON*) ;;
+      GIT_*|GH_*|GITHUB_*|AWS_*|AZURE_*|CLOUDSDK_*|PASSWORD_STORE_*|PIP_*|PYTHON*|VIRTUAL_ENV|TASKCLUSTER_*) unset "${var}" ;;
+    esac
+  done
+
+  export GIT_CONFIG_GLOBAL="${PREP_DIR}/gitconfig"
+  export GIT_CONFIG_NOSYSTEM=1
+  export GIT_TERMINAL_PROMPT=0
+  git config --global user.name "${git_name}"
+  git config --global user.email "${git_email}"
+  git config --global credential.https://github.com.helper '!gh auth git-credential'
+  git config --global credential.https://source.developers.google.com.helper '!gcloud auth git-helper --ignore-unknown "$@"'
+
+  export GH_CONFIG_DIR="${PREP_DIR}/gh"
+  mkdir "${GH_CONFIG_DIR}"
+  printf 'version: 1\ngit_protocol: https\nprompt: disabled\n' > "${GH_CONFIG_DIR}/config.yml"
+
+  export CLOUDSDK_CONFIG="${PREP_DIR}/gcloud"
+
+  export AZURE_CONFIG_DIR="${PREP_DIR}/azure"
+  export AZURE_CORE_LOGIN_EXPERIENCE_V2=off
+
+  export AWS_CONFIG_FILE="${PREP_DIR}/aws-config"
+  export AWS_SHARED_CREDENTIALS_FILE=/dev/null
+  export AWS_PAGER=''
+
+  export PIP_CONFIG_FILE=/dev/null
+
+  # A pager would wait for a key press
+  export PAGER=cat GIT_PAGER=cat GH_PAGER=cat
+}
+
+function read-pass {
+  local entry="${1}"
+  if ! pass show "${entry}"; then
+    echo "Couldn't decrypt ${entry} from the password store. Check that your gpg key is one that the password store is encrypted to (see ${PASSWORD_STORE_DIR}/.gpg-id), and that gpg can prompt for its passphrase." >&2
+    return 1
+  fi
+}
+
+function clone-password-store {
+  export PASSWORD_STORE_DIR="${PREP_DIR}/password-store"
+  echo "Cloning the password store from ${IMAGESET_PASSWORD_STORE_URL}..."
+  git clone --quiet --depth 1 "${IMAGESET_PASSWORD_STORE_URL}" "${PASSWORD_STORE_DIR}"
+}
+
+# The token is stored in GH_CONFIG_DIR, rather than the user's keychain
+function login-github {
+  gh auth login --hostname github.com --git-protocol https --scopes workflow --insecure-storage --web
+}
+
+function login-aws {
+  local account
+  export AWS_PROFILE=community-tc-workers
+  cat > "${AWS_CONFIG_FILE}" << EOF
+[sso-session community-tc-imagesets]
+sso_start_url = https://mozilla-cloudservices.awsapps.com/start
+sso_region = us-west-2
+sso_registration_scopes = sso:account:access
+
+[profile ${AWS_PROFILE}]
+sso_session = community-tc-imagesets
+sso_account_id = ${AWS_ACCOUNT_ID}
+sso_role_name = AdministratorAccess
+region = us-east-1
+EOF
+  if ! aws sts get-caller-identity > /dev/null 2>&1; then
+    echo "Signing in to AWS account moz-fx-tc-community-workers (${AWS_ACCOUNT_ID}) with Mozilla's AWS SSO..."
+    if can-open-browser; then
+      aws sso login --sso-session community-tc-imagesets
+    else
+      aws sso login --sso-session community-tc-imagesets --use-device-code
+    fi
+  fi
+  account="$(aws sts get-caller-identity --query Account --output text)"
+  if [ "${account}" != "${AWS_ACCOUNT_ID}" ]; then
+    echo "AWS credentials are for account ${account}, rather than moz-fx-tc-community-workers (${AWS_ACCOUNT_ID})." >&2
+    return 1
+  fi
+}
+
+function push-to-main {
+  if ! git pull --quiet --rebase --autostash "${OFFICIAL_GIT_REPO}" main; then
+    git rebase --abort 2> /dev/null || true
+    return 1
+  fi
+  git push "${OFFICIAL_GIT_REPO}" HEAD:refs/heads/main
+}
+
+# Runs this script from a clone of upstream main, rather than the user's checkout
+function run-from-clone {
+  local checkout="${IMAGESETS_DIR}/.."
+  local clone
+  local var
+  PREP_DIR="$(mktemp -t deploy-worker-pools.XXXXXXXXXX -d)"
+  trap 'status=$?; cd; rm -rf "${PREP_DIR}"; exit "${status}"' EXIT
+  clone="${PREP_DIR}/community-tc-config"
+  echo "Cloning ${OFFICIAL_GIT_REPO} (main) into ${clone}..."
+  (
+    for var in $(compgen -e); do
+      case "${var}" in GIT_*) unset "${var}" ;; esac
+    done
+    export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0
+    git clone --quiet --branch main "${OFFICIAL_GIT_REPO}" "${clone}"
+  )
+  git --no-pager -C "${clone}" log -1 --format='Using upstream main at %h: %s'
+  if "${IMAGESET_LOCAL_CHANGES}"; then
+    echo "WARNING: IMAGESET_LOCAL_CHANGES=true: using the files of ${checkout} (other than config/) rather than upstream main's" >&2
+    (
+      cd "${checkout}"
+      git ls-files -z --cached --others --exclude-standard -- . ':(exclude)config' |
+        while IFS= read -r -d '' file; do
+          [ -e "${file}" ] && printf '%s\0' "${file}"
+        done |
+        tar -cf - --null -T -
+    ) | tar -C "${clone}" -xf -
+  fi
+  if ! grep -q IMAGESET_PREP_DIR "${clone}/imagesets/imageset.sh"; then
+    echo "Upstream main's imageset.sh can't run from a clone yet: rerun with IMAGESET_LOCAL_CHANGES=true" >&2
+    exit 1
+  fi
+  IMAGESET_PREP_DIR="${PREP_DIR}" exec "${clone}/imagesets/imageset.sh" "${IMAGESET_TARGET}"
+}
+
 ############### Deploy image sets ###############
 
-# Deploys the image sets of IMAGESET_TARGET: prod, staging or all.
-function deploy-image-sets {
+function set-defaults {
   # Steps that only concern production (the Taskcluster version that prod
   # images pin, macOS workers, and instance offerings) are skipped by default
   # when only staging image sets are deployed.
@@ -155,47 +468,69 @@ function deploy-image-sets {
   : ${UPDATE_FXCI_IMAGES:=true}
   : ${DEPLOY_MACS:=${prod_default}}
 
-  : ${LOGIN_AWS:=true}
-  : ${LOGIN_AZURE:=true}
-
   : ${UPDATE_GCLOUD:=true}
   : ${UPDATE_OFFERINGS:=${prod_default}}
 
+  : ${IMAGESET_LOCAL_CHANGES:=false}
+}
+
+# Deploys the image sets of IMAGESET_TARGET: prod, staging or all.
+function deploy-image-sets {
   # TODO: fetch these hosts automatically
   local MAC_HOSTS=(
     macmini-m4-126.test.releng.mdc1.mozilla.com
     macmini-m4-127.test.releng.mdc1.mozilla.com
   )
 
-  if "${DEPLOY_MACS}"; then
-    check-mac-connectivity "${MAC_HOSTS[@]}"
-  fi
+  isolate-environment
 
   export GCP_PROJECT=taskcluster-imaging
   export AZURE_IMAGE_RESOURCE_GROUP=rg-tc-eng-images
   # Taskcluster Engineering DevTest Subscription
   export AZURE_SUBSCRIPTION_ID=8a205152-b25a-417f-a676-80465535a6c9
+  # moz-fx-tc-community-workers
+  export AWS_ACCOUNT_ID=885316786408
 
   export TASKCLUSTER_CLIENT_ID='static/taskcluster/root'
   export TASKCLUSTER_ROOT_URL='https://community-tc.services.mozilla.com'
-  unset TASKCLUSTER_CERTIFICATE
-
-  if "${LOGIN_AZURE}"; then
-    retry az login --tenant mozilla.com --subscription "${AZURE_SUBSCRIPTION_ID}"
-  fi
 
   if "${UPDATE_GCLOUD}"; then
-    retry gcloud components update -q
+    retry update-gcloud
   fi
-  retry gcloud auth login
+  if can-open-browser; then
+    retry gcloud auth login
+  else
+    retry gcloud auth login --no-launch-browser
+  fi
 
-  PREP_DIR="$(mktemp -t deploy-worker-pools.XXXXXXXXXX -d)"
+  login-github
+
+  clone-password-store
+  local root_credentials
+  root_credentials="$(read-pass community-tc/root)"
+  local taskcluster_access_token="${root_credentials%%$'\n'*}"
+  if [ -z "${taskcluster_access_token}" ]; then
+    echo "No access token in pass entry community-tc/root" >&2
+    exit 1
+  fi
+
+  if "${DEPLOY_MACS}"; then
+    read-mac-passwords "${MAC_HOSTS[@]}"
+    check-mac-connectivity "${MAC_HOSTS[@]}"
+  fi
+
+  if can-open-browser; then
+    retry az login --tenant mozilla.com --subscription "${AZURE_SUBSCRIPTION_ID}"
+  else
+    retry az login --tenant mozilla.com --subscription "${AZURE_SUBSCRIPTION_ID}" --use-device-code
+  fi
+  az account set --subscription "${AZURE_SUBSCRIPTION_ID}"
+
+  if "${UPDATE_OFFERINGS}"; then
+    login-aws
+  fi
+
   cd "${PREP_DIR}"
-
-  echo
-  echo "Preparing in directory ${PREP_DIR}..."
-  echo
-
   mkdir tc-admin
 
   cd tc-admin
@@ -207,16 +542,14 @@ function deploy-image-sets {
   cd "${IMAGESETS_DIR}/.."
 
   pip3 install -e .
-  which tc-admin
-  export TASKCLUSTER_ACCESS_TOKEN="$(pass ls community-tc/root | head -1)"
+  command -v tc-admin
 
-  if "${LOGIN_AWS}"; then
-    eval $(SIGNIN_AWS_ACCOUNT_NAME=moz-fx-tc-community-workers imagesets/signin-aws.sh)
-  fi
+  # Only after installing packages, which needn't see them
+  export TASKCLUSTER_ACCESS_TOKEN="${taskcluster_access_token}"
+  GITHUB_TOKEN="$(gh auth token)"
+  export GITHUB_TOKEN
 
   if "${BUILD_IMAGES}"; then
-    GITHUB_TOKEN="$(gh auth token)"
-    export GITHUB_TOKEN
     # The worker-images PR needs someone to review and merge it, so open it
     # before anything else. Only triggering the image builds waits for it to be merged
     # (in rel-sre-imagesets.py below); the steps in between don't depend on it.
@@ -229,19 +562,19 @@ function deploy-image-sets {
     echo "Updating EC2 instance types..."
     misc/update-ec2-instance-types.sh
     git add 'config/ec2-instance-type-offerings'
-    git commit -m "Ran script misc/update-ec2-instance-types.sh" || true
+    git diff --cached --quiet || git commit -m "Ran script misc/update-ec2-instance-types.sh"
 
     echo "Updating Azure VM sizes..."
     misc/update-azure-vm-sizes.sh
     git add 'config/azure-vm-size-offerings'
-    git commit -m "Ran script misc/update-azure-vm-sizes.sh" || true
+    git diff --cached --quiet || git commit -m "Ran script misc/update-azure-vm-sizes.sh"
 
     echo "Updating GCE machine types..."
     misc/update-gce-machine-types.sh
     git add 'config/gce-machine-type-offerings.json'
-    git commit -m "Ran script misc/update-gce-machine-types.sh" || true
+    git diff --cached --quiet || git commit -m "Ran script misc/update-gce-machine-types.sh"
 
-    retry git push "${OFFICIAL_GIT_REPO}"
+    retry push-to-main
     retry tc-admin apply
   fi
 
@@ -260,8 +593,9 @@ function deploy-image-sets {
   # TODO: report if macs need to be logged into first with vnc
   if "${DEPLOY_MACS}"; then
     for HOST in "${MAC_HOSTS[@]}"; do
-      install-mac-files "${HOST}"
-      mac-ssh "${HOST}" sudo -n bash -c /var/root/update.sh
+      retry-mac install-mac-files "${HOST}"
+      # The lock stops a retry from running alongside an interrupted run
+      retry-mac mac-ssh "${HOST}" sudo -n lockf -t 900 /var/run/com.mozilla.genericworker.update.lock /var/root/update.sh
     done
   fi
 
@@ -269,9 +603,8 @@ function deploy-image-sets {
   if "${BUILD_IMAGES}"; then
     python3 imagesets/rel-sre-imagesets.py
     git add config/imagesets.yml
-    git commit -m "Use new machine images built by mozilla-platform-ops/worker-images"
-    retry git -c pull.rebase=true pull "${OFFICIAL_GIT_REPO}" main
-    retry git push "${OFFICIAL_GIT_REPO}" "+HEAD:refs/heads/main"
+    git diff --cached --quiet || git commit -m "Use new machine images built by mozilla-platform-ops/worker-images"
+    retry push-to-main
   fi
 
   if "${DEPLOY_IMAGES}"; then
@@ -288,11 +621,6 @@ function deploy-image-sets {
     fi
   fi
 
-  echo
-  echo "Deleting preparation directory: ${PREP_DIR}..."
-  echo
-  cd
-  rm -rf "${PREP_DIR}"
   echo "All done!"
 }
 
@@ -302,7 +630,8 @@ cd "$(dirname "${0}")"
 
 IMAGESETS_DIR="$(pwd)"
 
-export OFFICIAL_GIT_REPO='git@github.com:taskcluster/community-tc-config'
+export OFFICIAL_GIT_REPO='https://github.com/taskcluster/community-tc-config'
+: ${IMAGESET_PASSWORD_STORE_URL:=https://source.developers.google.com/p/taskcluster-passwords/r/secrets}
 
 # See README.md for the environment variables that control which steps run.
 if [ "${#}" -ne 1 ] || ! [[ "${1}" =~ ^(prod|staging|all)$ ]]; then
@@ -312,4 +641,22 @@ if [ "${#}" -ne 1 ] || ! [[ "${1}" =~ ^(prod|staging|all)$ ]]; then
 fi
 
 export IMAGESET_TARGET="${1}"
+
+set-defaults
+
+if [ -z "${IMAGESET_PREP_DIR-}" ]; then
+  check-required-tools
+  run-from-clone
+fi
+
+if [ "$(pwd -P)" != "$(cd "${IMAGESET_PREP_DIR}" && pwd -P)/community-tc-config/imagesets" ]; then
+  echo "IMAGESET_PREP_DIR is only for imageset.sh's own use: unset it" >&2
+  exit 64
+fi
+PREP_DIR="${IMAGESET_PREP_DIR}"
+unset IMAGESET_PREP_DIR
+trap 'status=$?; cd; rm -rf "${PREP_DIR}"; exit "${status}"' EXIT
+echo
+echo "Preparing in directory ${PREP_DIR}..."
+echo
 deploy-image-sets
