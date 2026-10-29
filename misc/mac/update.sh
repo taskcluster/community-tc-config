@@ -58,13 +58,19 @@ for binary in ${BINARIES}; do
   chmod a+x "${binary}.new"
 done
 
+agent_plist="/Users/${current_user}/Library/LaunchAgents/com.mozilla.genericworker.launchagent.plist"
+
 cd /var/root
 launchctl unload -w /Library/LaunchDaemons/com.mozilla.genericworker.plist
-[ -n "${uid}" ] && launchctl bootout "gui/${uid}" "/Users/${current_user}/Library/LaunchAgents/com.mozilla.genericworker.launchagent.plist"
+# bootout fails ("Boot-out failed: 5: Input/output error") if the launch agent
+# isn't loaded, e.g. because it already exited, so only boot it out if it is.
+if [ -n "${uid}" ] && launchctl print "gui/${uid}/$(/usr/libexec/PlistBuddy -c 'Print :Label' "${agent_plist}")" > /dev/null 2>&1; then
+  launchctl bootout "gui/${uid}" "${agent_plist}"
+fi
 rm -f current-task-user.json next-task-user.json tasks-resolved-count.txt directory-caches.json file-caches.json
 cd /usr/local/bin
 for binary in ${BINARIES}; do
   mv -f "${binary}.new" "${binary}"
 done
-[ -n "${uid}" ] && launchctl bootstrap "gui/${uid}" "/Users/${current_user}/Library/LaunchAgents/com.mozilla.genericworker.launchagent.plist"
+[ -n "${uid}" ] && launchctl bootstrap "gui/${uid}" "${agent_plist}"
 launchctl load -w /Library/LaunchDaemons/com.mozilla.genericworker.plist
