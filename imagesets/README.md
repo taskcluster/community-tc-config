@@ -30,7 +30,8 @@ steps.
 
 4) git: `user.name` and `user.email` set.
 
-5) gpg: a key that the taskcluster team password store is encrypted to.
+5) gpg: a key that the taskcluster team password store is encrypted to. Its
+   passphrase is only asked for (if gpg-agent hasn't cached it) at the start.
 
 6) macOS workers (`prod` and `all`): **you must be connected to the Mozilla
    corporate VPN**, as the Macs are only reachable through it, and have a VNC
