@@ -65,7 +65,7 @@ function install-hint {
 }
 
 function check-required-tools {
-  local tools=(az cat chmod dirname env gcloud gh git gpg grep id mkdir mktemp pass paste python3 rm sed sleep tee tr uname)
+  local tools=(az cat chmod dirname env gcloud gh git gpg grep id mkdir mktemp pass paste python3 rm sed sleep tee tr tty uname)
   local tool
   local missing=false
   local version
@@ -362,6 +362,32 @@ function read-pass {
   fi
 }
 
+# Everything that needs a passphrase (gpg, for the password store) runs at the
+# start. Afterwards, gpg and ssh keys fail rather than prompt, as a late prompt
+# can time out while nobody is watching, and pass only serves the entries in
+# PASS_CACHE (read at the start), e.g. for tc-admin's secret values.
+function disable-passphrase-prompts {
+  local bin="${PREP_DIR}/no-passphrase-prompts"
+  local tool
+  mkdir "${bin}"
+  printf '#!/bin/sh\n[ "$1" = show ] && shift\nif [ $# = 1 ] && [ -f "%s/$1" ]; then exec cat "%s/$1"; fi\necho "imageset.sh: pass is disabled after the start, so that it cannot prompt for a passphrase, and $* was not read then" >&2\nexit 1\n' "${PASS_CACHE}" "${PASS_CACHE}" > "${bin}/pass"
+  chmod 755 "${bin}/pass"
+  for tool in gpg gpg2 ssh-for-git; do
+    printf '#!/bin/sh\necho "imageset.sh: %s is disabled after the start, so that it cannot prompt for a passphrase" >&2\nexit 1\n' "${tool}" > "${bin}/${tool}"
+    chmod 755 "${bin}/${tool}"
+  done
+  export PATH="${bin}:${PATH}"
+  export GIT_SSH_COMMAND="${bin}/ssh-for-git"
+  unset SSH_AUTH_SOCK
+}
+
+# Decrypts a password store entry into PASS_CACHE, for disable-passphrase-prompts
+function cache-pass-entry {
+  local entry="${1}"
+  mkdir -p -m 700 "${PASS_CACHE}/$(dirname "${entry}")"
+  (umask 077 && read-pass "${entry}" > "${PASS_CACHE}/${entry}")
+}
+
 function clone-password-store {
   export PASSWORD_STORE_DIR="${PREP_DIR}/password-store"
   echo "Cloning the password store from ${IMAGESET_PASSWORD_STORE_URL}..."
@@ -617,6 +643,11 @@ function deploy-image-sets {
 
   login-github
 
+  # For a terminal pinentry
+  if [ -t 0 ]; then
+    GPG_TTY="$(tty)"
+    export GPG_TTY
+  fi
   clone-password-store
   local root_credentials
   root_credentials="$(read-pass community-tc/root)"
@@ -635,6 +666,11 @@ function deploy-image-sets {
   fi
   if [ "${#pending_macs[@]}" -gt 0 ]; then
     read-mac-passwords "${pending_macs[@]}"
+  fi
+  # Read by tc-admin (generate/secret_values.py)
+  cache-pass-entry community-tc/secret-values.yml
+  disable-passphrase-prompts
+  if [ "${#pending_macs[@]}" -gt 0 ]; then
     check-mac-connectivity "${pending_macs[@]}"
   fi
 
@@ -750,6 +786,7 @@ if [ "$(pwd -P)" != "$(cd "${IMAGESET_PREP_DIR}" && pwd -P)/community-tc-config/
 fi
 PREP_DIR="${IMAGESET_PREP_DIR}"
 unset IMAGESET_PREP_DIR
+PASS_CACHE="${PREP_DIR}/pass-cache"
 
 STEPS_FILE=''
 IMAGESET_RUNS_FILE=''
