@@ -651,6 +651,74 @@ function stop-host-gnupg {
   fi
 }
 
+# Asks for your name and email for commits, offering the current ones
+function ask-identity {
+  local answer
+  while true; do
+    read -r -p "Your name, for commits${IMAGESET_GIT_NAME:+ [${IMAGESET_GIT_NAME}]}: " answer
+    IMAGESET_GIT_NAME="${answer:-${IMAGESET_GIT_NAME}}"
+    [ -n "${IMAGESET_GIT_NAME}" ] && break
+  done
+  while true; do
+    read -r -p "Your email, for commits${IMAGESET_GIT_EMAIL:+ [${IMAGESET_GIT_EMAIL}]}: " answer
+    IMAGESET_GIT_EMAIL="${answer:-${IMAGESET_GIT_EMAIL}}"
+    [[ "${IMAGESET_GIT_EMAIL}" == ?*@?* ]] && break
+  done
+  # Your git configuration's signing key may not be for the new email
+  IMAGESET_GIT_SIGNINGKEY=''
+}
+
+# The repositories that this run commits to, as "repository: how", one per line
+function repositories {
+  if "${UPDATE_OFFERINGS}" || "${BUILD_IMAGES}"; then
+    echo "taskcluster/community-tc-config: pushed to main"
+  fi
+  if "${BUILD_IMAGES}" && "${UPDATE_TASKCLUSTER_VERSION}"; then
+    echo "mozilla-platform-ops/worker-images: a pull request, from a branch there"
+  fi
+  if "${BUILD_IMAGES}" && "${UPDATE_FXCI_IMAGES}"; then
+    echo "mozilla-releng/fxci-config: a pull request, from your fork"
+  fi
+}
+
+# Your name and email for commits (from your git configuration, if you have
+# it), and the gpg key that signs them (IMAGESET_GPG_KEY), which you confirm,
+# or change
+function confirm-identity {
+  local answer
+  local uid
+  if [ -z "${IMAGESET_GIT_NAME}" ] || [ -z "${IMAGESET_GIT_EMAIL}" ]; then
+    ask-identity
+  fi
+  while true; do
+    if ! IMAGESET_GPG_KEY="$(find-gpg-key)"; then
+      ask-identity
+      continue
+    fi
+    uid="$(GNUPGHOME="${HOST_GNUPGHOME}" gpg --with-colons --list-keys "${IMAGESET_GPG_KEY}" |
+      awk -F: -v email="<${IMAGESET_GIT_EMAIL}>" '$1 == "uid" { if (!first) first = $10; if (index($10, email)) match_ = $10 } END { print (match_ ? match_ : first) }')"
+    echo
+    echo "Commits will be made as ${IMAGESET_GIT_NAME} <${IMAGESET_GIT_EMAIL}>, signed with your gpg key ${IMAGESET_GPG_KEY} (${uid}), with the GitHub account you sign in with, to:"
+    repositories | sed 's/^/  - /'
+    read -r -p "Use these (Y), or change the name and email (c)? " answer
+    case "${answer}" in
+      "" | y | Y | yes) break ;;
+      c | C) ask-identity ;;
+    esac
+  done
+  export IMAGESET_GIT_NAME IMAGESET_GIT_EMAIL IMAGESET_GPG_KEY
+}
+
+# Suggests your LDAP username, for the VPN: your git email, or else a
+# mozilla.com email of your GitHub account
+function suggest-ldap-username {
+  if [[ "${IMAGESET_GIT_EMAIL}" == *@mozilla.com ]]; then
+    echo "${IMAGESET_GIT_EMAIL}"
+  else
+    gh api user/emails --jq '[.[] | select(.verified and (.email | endswith("@mozilla.com"))) | .email][0] // empty' 2> /dev/null || true
+  fi
+}
+
 # gcloud waits for your browser (on the host) to be sent to
 # http://localhost:8085/, which imageset.sh publishes to this container. As
 # gcloud only listens on the container's localhost, socat forwards to it.
@@ -682,7 +750,8 @@ function login-gcloud {
 function login-github {
   local line
   local code=''
-  gh auth login --hostname github.com --git-protocol https --scopes workflow --insecure-storage --web 2>&1 |
+  # user:email and read:gpg_key, to check that your commits will show as verified
+  gh auth login --hostname github.com --git-protocol https --scopes workflow,read:org,user:email,read:gpg_key --insecure-storage --web 2>&1 |
     while IFS= read -r line; do
       case "${line}" in
         *"one-time code: "*) code="${line##* }" ;;
@@ -770,8 +839,7 @@ function deploy-image-sets {
   # bundle (if it isn't stored yet), the sign-ins, and connecting to the VPN
   # for the macOS workers. The rest runs unattended.
   copy-host-gnupg
-  IMAGESET_GPG_KEY="$(find-gpg-key)"
-  export IMAGESET_GPG_KEY
+  confirm-identity
   configure-tools
   setup-gpg
 
@@ -782,9 +850,6 @@ function deploy-image-sets {
       step-done "mac ${host}" || pending_macs+=("${host}")
     done
   fi
-  if [ "${#pending_macs[@]}" -gt 0 ]; then
-    vpn prepare
-  fi
 
   echo "Signing in to Google Cloud..."
   login-gcloud
@@ -794,6 +859,12 @@ function deploy-image-sets {
   login-azure
   if "${UPDATE_OFFERINGS}" && ! step-done offerings; then
     login-aws
+  fi
+
+  if [ "${#pending_macs[@]}" -gt 0 ]; then
+    IMAGESET_LDAP_SUGGESTION="$(suggest-ldap-username)"
+    export IMAGESET_LDAP_SUGGESTION
+    vpn prepare
   fi
 
   clone-password-store

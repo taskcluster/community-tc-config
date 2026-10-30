@@ -49,14 +49,12 @@ class VpnError(Exception):
 
 
 def username():
-    """Your LDAP username: IMAGESET_LDAP_USERNAME, or your git email, if it's
-    a mozilla.com one"""
+    """Your LDAP username: IMAGESET_LDAP_USERNAME, or else asked for,
+    suggesting IMAGESET_LDAP_SUGGESTION (from run.sh)"""
     name = os.environ.get("IMAGESET_LDAP_USERNAME", "")
-    email = os.environ.get("IMAGESET_GIT_EMAIL", "")
-    if not name and email.endswith("@mozilla.com"):
-        name = email
+    suggestion = os.environ.get("IMAGESET_LDAP_SUGGESTION", "")
     while not name:
-        name = input("Mozilla LDAP username (e.g. you@mozilla.com): ").strip()
+        name = input(f"Your Mozilla LDAP username{f' [{suggestion}]' if suggestion else ' (e.g. you@mozilla.com)'}: ").strip() or suggestion
     return name
 
 
