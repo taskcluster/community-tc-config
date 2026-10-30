@@ -3,8 +3,7 @@
 # (TOOLS_WEEK), to update the tools. The scripts aren't part of the image: they
 # are run from the clone of this repository that imageset.sh mounts.
 
-# Has headless Chromium, for login.mozilla.com's Duo prompt (see vpn.py)
-FROM mcr.microsoft.com/playwright/python:v1.64.1-noble
+FROM ubuntu:24.04
 
 LABEL org.mozilla.community-tc-imagesets=true
 
@@ -12,7 +11,7 @@ ENV DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 PIP_DISABLE_PIP_VERSION_CHECK=1
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      ca-certificates curl git gnupg iproute2 lsb-release openssh-client openvpn pass socat unzip \
+      ca-certificates curl git gnupg iproute2 lsb-release openssh-client openssl openvpn pass python3 python3-pip socat unzip \
  && rm -rf /var/lib/apt/lists/*
 
 # Changed by imageset.sh each week, so that the tools below are updated
@@ -37,7 +36,10 @@ RUN set -eux; \
     /tmp/aws/install; \
     rm -rf /tmp/aws /tmp/awscli.zip
 
-# The Playwright package of the image's browsers, and what this repository's
-# scripts need (setup.py), so that run.sh's install of it is quick
+# What this repository's scripts need (setup.py), so that run.sh's install of
+# it is quick, and Playwright, with headless Chromium, for login.mozilla.com's
+# Duo prompt (see vpn.py)
 RUN pip install --no-cache-dir --break-system-packages \
-      playwright==1.64.1 'tc-admin>=5.2.1' 'json-e>=4.7.1' ruamel.yaml requests pytest
+      playwright 'tc-admin>=5.2.1' 'json-e>=4.7.1' ruamel.yaml requests pytest \
+ && playwright install --with-deps --only-shell chromium \
+ && rm -rf /var/lib/apt/lists/*
