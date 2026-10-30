@@ -453,7 +453,10 @@ EOF
   else
     aws sso login --sso-session community-tc-imagesets --use-device-code --no-browser
   fi
-  account="$(aws sts get-caller-identity --query Account --output text)"
+  if ! account="$(aws sts get-caller-identity --query Account --output text)"; then
+    echo "You don't have the AdministratorAccess role on the AWS account moz-fx-tc-community-workers (${AWS_ACCOUNT_ID}): ask the Taskcluster team for it, in Mozilla's AWS SSO." >&2
+    return 1
+  fi
   if [ "${account}" != "${AWS_ACCOUNT_ID}" ]; then
     echo "AWS credentials are for account ${account}, rather than moz-fx-tc-community-workers (${AWS_ACCOUNT_ID})." >&2
     return 1
@@ -777,6 +780,10 @@ function login-azure {
   az account set --subscription "${AZURE_SUBSCRIPTION_ID}"
 }
 
+function preflight {
+  with-gpg python3 "${IMAGESETS_DIR}/container/preflight.py" "$@"
+}
+
 function vpn {
   with-gpg python3 "${IMAGESETS_DIR}/container/vpn.py" "$@"
 }
@@ -857,9 +864,19 @@ function deploy-image-sets {
   login-github
   echo "Signing in to Azure..."
   login-azure
+  local needs_aws=false
   if "${UPDATE_OFFERINGS}" && ! step-done offerings; then
+    needs_aws=true
     login-aws
   fi
+
+  # Stops now if you are missing any access that the run needs, saying how to
+  # get it
+  export BUILD_IMAGES DEPLOY_IMAGES UPDATE_OFFERINGS UPDATE_TASKCLUSTER_VERSION UPDATE_FXCI_IMAGES
+  export IMAGESET_PASSWORD_STORE_URL IMAGESET_PENDING_MACS="${pending_macs[*]}" IMAGESET_NEEDS_AWS="${needs_aws}"
+  GITHUB_TOKEN="$(gh auth token)" preflight accounts
+  clone-password-store
+  preflight secrets
 
   if [ "${#pending_macs[@]}" -gt 0 ]; then
     IMAGESET_LDAP_SUGGESTION="$(suggest-ldap-username)"
@@ -867,7 +884,6 @@ function deploy-image-sets {
     vpn prepare
   fi
 
-  clone-password-store
   local root_credentials
   root_credentials="$(read-pass community-tc/root)"
   local taskcluster_access_token="${root_credentials%%$'\n'*}"
