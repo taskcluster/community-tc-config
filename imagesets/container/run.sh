@@ -454,7 +454,7 @@ EOF
     aws sso login --sso-session community-tc-imagesets --use-device-code --no-browser
   fi
   if ! account="$(aws sts get-caller-identity --query Account --output text)"; then
-    echo "You don't have the AdministratorAccess role on the AWS account moz-fx-tc-community-workers (${AWS_ACCOUNT_ID}): ask the Taskcluster team for it, in Mozilla's AWS SSO." >&2
+    echo "You don't have the AdministratorAccess role on the AWS account moz-fx-tc-community-workers (${AWS_ACCOUNT_ID}): request membership of the cloudservices_aws_taskcluster_devs access group at https://people.mozilla.org" >&2
     return 1
   fi
   if [ "${account}" != "${AWS_ACCOUNT_ID}" ]; then
@@ -463,7 +463,8 @@ EOF
   fi
 }
 
-function push-to-main {
+# Rebases the commits onto upstream main, which they must be signed on
+function rebase-on-main {
   if ! with-gpg git pull --quiet --rebase --autostash "${OFFICIAL_GIT_REPO}" main; then
     git rebase --abort 2> /dev/null || true
     return 1
@@ -473,7 +474,82 @@ function push-to-main {
   if ! check-signed FETCH_HEAD..HEAD; then
     exit 1
   fi
+}
+
+function push-to-main {
+  rebase-on-main || return 1
   git push "${OFFICIAL_GIT_REPO}" HEAD:refs/heads/main
+}
+
+# Publishes the commits of a step to community-tc-config: pushes them to main,
+# or if you can't (see preflight.py), opens a pull request (from a branch, or
+# from your fork), and waits for it to be merged, so that what is then
+# deployed is on main
+function publish-changes {
+  local step="${1}"
+  git fetch --quiet "${OFFICIAL_GIT_REPO}" main
+  if [ -z "$(git rev-list FETCH_HEAD..HEAD)" ]; then
+    return
+  fi
+  case "${COMMUNITY_TC_CONFIG_PUBLISH:-main}" in
+    main) retry push-to-main ;;
+    *)
+      retry rebase-on-main
+      pull-request "${step}"
+      ;;
+  esac
+}
+
+function pull-request {
+  local step="${1}"
+  # The same for a rerun of the step, so that it updates the same pull request
+  local branch="imageset-${IMAGESET_TARGET}-${step// /-}"
+  local login
+  local owner
+  local remote
+  local url
+  local title
+  local state
+  login="$(gh api user --jq .login)"
+  if [ "${COMMUNITY_TC_CONFIG_PUBLISH}" == fork ]; then
+    owner="${login}"
+    # Nothing, if it exists already
+    gh repo fork taskcluster/community-tc-config --clone=false --default-branch-only > /dev/null 2>&1 || true
+  else
+    owner=taskcluster
+  fi
+  remote="https://github.com/${owner}/community-tc-config"
+  # A new fork may take a moment to appear
+  retry git push --quiet --force "${remote}" "HEAD:refs/heads/${branch}"
+  url="$(gh pr list --repo taskcluster/community-tc-config --head "${branch}" --state open --json url,headRepositoryOwner \
+    --jq "[.[] | select(.headRepositoryOwner.login == \"${owner}\") | .url][0] // empty")"
+  if [ -z "${url}" ]; then
+    if [ "$(git rev-list --count FETCH_HEAD..HEAD)" == 1 ]; then
+      title="$(git log -1 --format=%s)"
+    else
+      title="imageset.sh ${IMAGESET_TARGET}: ${step}"
+    fi
+    url="$(gh pr create --repo taskcluster/community-tc-config --base main --head "${owner}:${branch}" --title "${title}" \
+      --body "$(printf 'Opened by `imageset.sh %s` (step: %s), which waits for it to be merged.\n\n%s\n' \
+        "${IMAGESET_TARGET}" "${step}" "$(git log --format='* %s' FETCH_HEAD..HEAD)")")"
+  fi
+  # So that it is merged as soon as it is approved, where that is allowed
+  gh pr merge --auto --merge "${url}" > /dev/null 2>&1 || true
+  echo "Opened ${url} (you can't push to main): waiting for someone to approve it, and for it to be merged..."
+  while true; do
+    state="$(gh pr view "${url}" --json state --jq .state 2> /dev/null || echo UNKNOWN)"
+    case "${state}" in
+      MERGED) break ;;
+      CLOSED)
+        echo "${url} was closed without being merged." >&2
+        return 1
+        ;;
+    esac
+    sleep 60
+  done
+  echo "${url} was merged."
+  git fetch --quiet "${OFFICIAL_GIT_REPO}" main
+  git reset --quiet --hard FETCH_HEAD
 }
 
 function step-done {
@@ -510,7 +586,7 @@ function update-offerings {
   git add 'config/gce-machine-type-offerings.json'
   git diff --cached --quiet || with-gpg git commit -m "Ran script misc/update-gce-machine-types.sh"
 
-  retry push-to-main
+  publish-changes offerings
   retry with-gpg tc-admin apply
 }
 
@@ -525,7 +601,7 @@ function build-images {
   with-gpg python3 imagesets/rel-sre-imagesets.py
   git add config/imagesets.yml
   git diff --cached --quiet || with-gpg git commit -m "Use new machine images built by mozilla-platform-ops/worker-images"
-  retry push-to-main
+  publish-changes build-images
 }
 
 function deploy-images {
@@ -874,7 +950,11 @@ function deploy-image-sets {
   # get it
   export BUILD_IMAGES DEPLOY_IMAGES UPDATE_OFFERINGS UPDATE_TASKCLUSTER_VERSION UPDATE_FXCI_IMAGES
   export IMAGESET_PASSWORD_STORE_URL IMAGESET_PENDING_MACS="${pending_macs[*]}" IMAGESET_NEEDS_AWS="${needs_aws}"
+  export IMAGESET_ACCESS_FILE="${PREP_DIR}/access"
+  : > "${IMAGESET_ACCESS_FILE}"
   GITHUB_TOKEN="$(gh auth token)" preflight accounts
+  # How to publish commits to community-tc-config
+  source "${IMAGESET_ACCESS_FILE}"
   clone-password-store
   preflight secrets
 
@@ -923,7 +1003,11 @@ function deploy-image-sets {
   fi
 
   echo
-  echo "Everything that needs you is done: the rest runs unattended."
+  if [ "${COMMUNITY_TC_CONFIG_PUBLISH:-main}" == main ]; then
+    echo "Everything that needs you is done: the rest runs unattended."
+  else
+    echo "Everything that needs you is done: the rest runs unattended, other than waiting for its community-tc-config pull requests to be approved and merged."
+  fi
   echo
 
   if "${UPDATE_OFFERINGS}"; then
