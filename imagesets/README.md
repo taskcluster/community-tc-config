@@ -32,10 +32,12 @@ steps.
    (885316786408) in [Mozilla's AWS SSO](https://mozilla-cloudservices.awsapps.com/start).
 
 3) GitHub: an account that is a member of the `taskcluster` and
-   `mozilla-platform-ops` organizations, an admin of this repository (in the
-   `taskcluster/community-tc-admins` team: `main` is protected, and only its
-   admins can push to it directly, which the script does), with write access
-   to `mozilla-platform-ops/worker-images`.
+   `mozilla-platform-ops` organizations, with write access to
+   `mozilla-platform-ops/worker-images` (to trigger its workflows). `main` of
+   this repository is protected: only its admins (the
+   `taskcluster/community-tc-admins` team) can push to it directly. For anyone
+   else, the script opens pull requests instead (from a branch, or from your
+   fork), and waits for them to be approved and merged.
 
 4) Your name and email for commits: taken from your git configuration
    (`user.name` and `user.email`), if you have git, and otherwise asked for.

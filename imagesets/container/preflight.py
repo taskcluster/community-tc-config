@@ -30,8 +30,11 @@ HOW = {
     "community-tc-admin": "ask a member of the taskcluster/community-tc-admins GitHub team "
                           "(https://github.com/orgs/taskcluster/teams/community-tc-admins/members), e.g. in "
                           "#taskcluster:mozilla.org on Matrix (https://chat.mozilla.org), to add you to it",
-    "github-org": "ask for access to the {org} GitHub organization: see https://wiki.mozilla.org/GitHub "
-                  "(a people.mozilla.org group, ghe_{org}_users, and a GitHub Administration bug) (unverified)",
+    # Managed in mozilla/global-platform-admin (github/tf/mozilla-corporation/organization_teams.tf)
+    "github-org": "open a pull request that adds your Mozilla email to organization_members[\"{org}\"] in "
+                  "github/tf/mozilla-corporation/organization_teams.tf of https://github.com/mozilla/global-platform-admin "
+                  "(your people.mozilla.org profile needs your GitHub username, and you need to be in the "
+                  "gh_access_mozilla LDAP group, and a member of Mozilla's GitHub enterprise)",
     # The tceng team (Taskcluster Engineering) has the TCEng configs (CODEOWNERS); its maintainer is in relops
     "worker-images": "ask a maintainer of the mozilla-platform-ops/tceng GitHub team "
                      "(https://github.com/orgs/mozilla-platform-ops/teams/tceng/members) to add you to it, for "
@@ -40,8 +43,10 @@ HOW = {
     "azure": "ask the Taskcluster team for access to the Azure subscription {subscription} (unverified)",
     "azure-other": "ask Release Operations (relops) for read access to the images in the Azure subscription(s) {names} "
                    "(unverified)",
-    "aws": "ask the Taskcluster team for the AdministratorAccess role on the AWS account moz-fx-tc-community-workers "
-           "(885316786408), in Mozilla's AWS SSO (unverified)",
+    # From mozilla/global-platform-admin's aws/tf/sso/cloudservices/main.tf
+    "aws": "request membership of the cloudservices_aws_taskcluster_devs access group at "
+           "https://people.mozilla.org (which gives the AdministratorAccess role on the AWS account "
+           "moz-fx-tc-community-workers, 885316786408, in Mozilla's AWS SSO)",
     "password-store": "ask the Taskcluster team to add your gpg key ({key}) to the password store's .gpg-id, and "
                       "re-encrypt it (pass init) (unverified)",
     "taskcluster": "ask the Taskcluster team: community-tc/root in the password store may be out of date (unverified)",
@@ -144,19 +149,35 @@ def check_org(org):
 
 
 def check_push_to_main():
-    """push-to-main pushes to main directly, which its protection only allows
-    admins to"""
+    """How run.sh publishes commits to community-tc-config (in the access
+    file): pushing them to main, which its protection only allows admins to,
+    or else in a pull request, from a branch (with write access), or from your
+    fork"""
     owner, name = COMMUNITY_TC_CONFIG.split("/")
     data = graphql(f'{{ repository(owner: "{owner}", name: "{name}") {{ viewerPermission '
                    f'ref(qualifiedName: "refs/heads/main") {{ refUpdateRule {{ viewerCanPush }} }} }} }}')
     repo = (data.get("data") or {}).get("repository") or {}
     rule = (repo.get("ref") or {}).get("refUpdateRule")
-    can_push = rule["viewerCanPush"] if rule else repo.get("viewerPermission") in ("WRITE", "MAINTAIN", "ADMIN")
-    if can_push:
+    writer = repo.get("viewerPermission") in ("WRITE", "MAINTAIN", "ADMIN")
+    if (rule["viewerCanPush"] if rule else writer):
+        publish("main")
         ok()
+        return
+    if writer:
+        publish("branch")
+    elif check_fork(COMMUNITY_TC_CONFIG):
+        publish("fork")
     else:
-        fail(f"GitHub: you can't push to main of {COMMUNITY_TC_CONFIG} (it is protected: only its admins can push "
-             f"to it directly, which imageset.sh does)", HOW["community-tc-admin"])
+        return
+    ok()
+    warn(f"GitHub: you can't push to main of {COMMUNITY_TC_CONFIG} (only its admins can), so its changes will be in "
+         f"pull requests, which the run waits for someone to approve and merge", f"to push them directly, "
+         + HOW["community-tc-admin"])
+
+
+def publish(how):
+    with open(os.environ["IMAGESET_ACCESS_FILE"], "a") as f:
+        f.write(f"COMMUNITY_TC_CONFIG_PUBLISH={how}\n")
 
 
 def check_worker_images():
@@ -189,17 +210,25 @@ def workflows():
     return sorted(module.WORKFLOWS)
 
 
-def check_fxci_fork():
-    status, _, repo = gh(f"repos/{FXCI_CONFIG}")
+def check_fork(upstream):
+    """That a pull request can come from your fork of upstream (which may not
+    exist yet)"""
+    status, _, repo = gh(f"repos/{upstream}")
     if status != 200 or not repo.get("allow_forking"):
-        fail(f"GitHub: {FXCI_CONFIG} can't be forked, for its pull request", "ask Release Engineering (unverified)")
-        return
+        fail(f"GitHub: {upstream} can't be forked, for its pull request", "ask its admins (unverified)")
+        return False
     login = gh("user")[2]["login"]
-    status, _, fork = gh(f"repos/{login}/fxci-config")
-    if status == 200 and (fork.get("parent") or {}).get("full_name") != FXCI_CONFIG:
-        fail(f"GitHub: your repository {login}/fxci-config isn't a fork of {FXCI_CONFIG}, so it can't be used for "
-             f"the pull request", f"rename or delete it (https://github.com/{login}/fxci-config/settings)")
-    else:
+    name = upstream.split("/")[1]
+    status, _, fork = gh(f"repos/{login}/{name}")
+    if status == 200 and (fork.get("parent") or {}).get("full_name") != upstream:
+        fail(f"GitHub: your repository {login}/{name} isn't a fork of {upstream}, so it can't be used for its pull "
+             f"request", f"rename or delete it (https://github.com/{login}/{name}/settings)")
+        return False
+    return True
+
+
+def check_fxci_fork():
+    if check_fork(FXCI_CONFIG):
         ok()
 
 
