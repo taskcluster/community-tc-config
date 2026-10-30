@@ -1,0 +1,46 @@
+#!/bin/sh
+# open-url URL [CODE]
+#
+# The browser of the tools in the container (BROWSER): has imageset.sh, on the
+# host, open URL in your browser, and copy CODE (a one-time code to enter on
+# the page) to your clipboard, through files in /bridge. Says what was done.
+
+set -eu
+
+url="${1}"
+code="${2-}"
+# Without the query, which is long, and may have tokens
+shown="${url%%\?*}"
+id="$(date +%s)-$$"
+printf '%s\n%s\n' "${url}" "${code}" > "/bridge/.${id}"
+mv "/bridge/.${id}" "/bridge/${id}.request"
+
+# The host answers "opened" and/or "copied", or "none" (it can't open a
+# browser, e.g. over ssh)
+result=none
+i=0
+while [ "${i}" -lt 100 ]; do
+  if [ -f "/bridge/${id}.done" ]; then
+    result="$(cat "/bridge/${id}.done")"
+    break
+  fi
+  sleep 0.1
+  i=$((i + 1))
+done
+# The request first, so that imageset.sh doesn't see it again, without its answer
+rm -f "/bridge/${id}.request" "/bridge/${id}.done"
+
+case "${result}" in
+  *opened*)
+    if [ -z "${code}" ]; then
+      echo "Opened ${shown} in your browser." >&2
+    elif [ "${result}" != "${result#*copied}" ]; then
+      echo "Opened ${shown} in your browser: paste the code ${code} there (it is in your clipboard)." >&2
+    else
+      echo "Opened ${shown} in your browser: enter the code ${code} there." >&2
+    fi
+    ;;
+  *)
+    echo "Open ${url} in your browser${code:+, and enter the code ${code}}." >&2
+    ;;
+esac
