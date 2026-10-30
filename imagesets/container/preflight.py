@@ -26,12 +26,16 @@ import urllib.parse
 # How to get each kind of access. TODO: the ones marked (unverified) are the
 # best guesses of an audit: confirm them with the team, and update them.
 HOW = {
-    "community-tc-admin": "ask the Taskcluster team (#taskcluster on Matrix, chat.mozilla.org) to add you to the "
-                          "taskcluster/community-tc-admins GitHub team (unverified)",
+    # Its members are all maintainers, who can add you
+    "community-tc-admin": "ask a member of the taskcluster/community-tc-admins GitHub team "
+                          "(https://github.com/orgs/taskcluster/teams/community-tc-admins/members), e.g. in "
+                          "#taskcluster:mozilla.org on Matrix (https://chat.mozilla.org), to add you to it",
     "github-org": "ask for access to the {org} GitHub organization: see https://wiki.mozilla.org/GitHub "
                   "(a people.mozilla.org group, ghe_{org}_users, and a GitHub Administration bug) (unverified)",
-    "worker-images": "ask Release Operations (relops) for write access to mozilla-platform-ops/worker-images, "
-                     "e.g. through its tceng team (unverified)",
+    # The tceng team (Taskcluster Engineering) has the TCEng configs (CODEOWNERS); its maintainer is in relops
+    "worker-images": "ask a maintainer of the mozilla-platform-ops/tceng GitHub team "
+                     "(https://github.com/orgs/mozilla-platform-ops/teams/tceng/members) to add you to it, for "
+                     "write access to mozilla-platform-ops/worker-images",
     "gcp": "ask the Taskcluster team for access to the {project} Google Cloud project (unverified)",
     "azure": "ask the Taskcluster team for access to the Azure subscription {subscription} (unverified)",
     "azure-other": "ask Release Operations (relops) for read access to the images in the Azure subscription(s) {names} "
