@@ -275,7 +275,7 @@ def connect():
         f.write(config)
     # Records the DNS servers that the VPN pushes (through sh, as /dev/shm is noexec)
     with open(f"{RUN}/up.sh", "w") as f:
-        f.write(f"env | grep '^foreign_option_' > {pushed}\n")
+        f.write(f"env | grep '^foreign_option_' > {pushed} || true\n")
     print(f"Connecting to the Mozilla VPN ({remote.group(1) if remote else 'mdc1'})...")
     vpn = subprocess.Popen(["openvpn", "--config", conf, "--management", sock, "unix", "--management-query-passwords",
                             "--management-hold", "--auth-retry", "interact", "--script-security", "2",

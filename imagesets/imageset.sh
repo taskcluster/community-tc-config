@@ -34,7 +34,8 @@ function open-browser {
   if [ "$(uname)" == Darwin ]; then
     open "${1}"
   else
-    xdg-open "${1}" > /dev/null 2>&1
+    # It can stay in the foreground until the browser exits
+    xdg-open "${1}" > /dev/null 2>&1 &
   fi
 }
 
@@ -156,7 +157,9 @@ function checkout-files {
     cd "${1}"
     git ls-files -z --cached --others --exclude-standard -- . ':(exclude)config' |
       while IFS= read -r -d '' file; do
-        [ -e "${file}" ] && printf '%s\0' "${file}"
+        if [ -e "${file}" ]; then
+          printf '%s\0' "${file}"
+        fi
       done
   )
 }
@@ -169,9 +172,11 @@ function offer-local-changes {
   local file
   local changed=()
   local answer
-  if [ -n "${IMAGESET_LOCAL_CHANGES-}" ]; then
-    return
-  fi
+  case "${IMAGESET_LOCAL_CHANGES-}" in
+    true | false) return ;;
+    '') ;;
+    *) echo "IMAGESET_LOCAL_CHANGES must be true or false" >&2; return 1 ;;
+  esac
   IMAGESET_LOCAL_CHANGES=false
   while IFS= read -r -d '' file; do
     cmp -s "${checkout}/${file}" "${clone}/${file}" || changed+=("${file}")
@@ -236,10 +241,18 @@ function remove-stale-runs {
   for dir in "${STATE_DIR}"/run.*; do
     [ -d "${dir}" ] || continue
     pid="$(cat "${dir}/pid" 2> /dev/null || true)"
-    if [ -z "${pid}" ] || ! kill -0 "${pid}" 2> /dev/null; then
-      rm -rf "${dir}"
+    if [ -n "${pid}" ] && kill -0 "${pid}" 2> /dev/null; then
+      continue
     fi
+    # Its container may outlive it (e.g. if its terminal was closed)
+    docker rm --force "imageset-${dir##*/}" > /dev/null 2>&1 || true
+    remove-dir "${dir}"
   done
+}
+
+# A container killed before it could clean up may have left files owned by root
+function remove-dir {
+  rm -rf "${1}" 2> /dev/null || echo "WARNING: couldn't remove ${1} (e.g. sudo rm -rf it)" >&2
 }
 
 function cleanup {
@@ -247,7 +260,9 @@ function cleanup {
     kill "${BRIDGE_PID}" 2> /dev/null || true
   fi
   if [ -n "${WORK}" ]; then
-    rm -rf "${WORK}"
+    # Without a terminal (e.g. if it was closed), the container would carry on, without its files
+    docker rm --force "imageset-${WORK##*/}" > /dev/null 2>&1 || true
+    remove-dir "${WORK}"
   fi
 }
 
@@ -296,7 +311,9 @@ bridge "${WORK}/bridge" &
 BRIDGE_PID=$!
 
 docker_options=(
-  --rm --interactive --tty --init
+  --rm --interactive --tty --init --name "imageset-${WORK##*/}"
+  # Otherwise SELinux (e.g. on Fedora) denies access to the mounts
+  --security-opt label=disable
   # For openvpn
   --cap-add NET_ADMIN --device /dev/net/tun
   --volume "${WORK}/community-tc-config:/work"
