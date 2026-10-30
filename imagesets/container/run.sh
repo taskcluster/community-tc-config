@@ -98,6 +98,14 @@ MAC_FILES=(
 function install-mac-files {
   local host="${1}"
   local entry file dest mode
+  # Before the pipeline, where a missing file wouldn't stop it
+  for entry in "${MAC_FILES[@]}"; do
+    IFS=: read -r file dest mode <<< "${entry}"
+    if ! [ -f "${IMAGESETS_DIR}/../misc/mac/${file}" ]; then
+      echo "misc/mac/${file} is missing" >&2
+      return 1
+    fi
+  done
   {
     cat << 'EOF'
 set -eu
@@ -457,7 +465,11 @@ function push-to-main {
     git rebase --abort 2> /dev/null || true
     return 1
   fi
-  check-signed FETCH_HEAD..HEAD
+  # Exits, rather than returns, as retry runs this as a condition (where set -e
+  # is off), and retrying wouldn't help
+  if ! check-signed FETCH_HEAD..HEAD; then
+    exit 1
+  fi
   git push "${OFFICIAL_GIT_REPO}" HEAD:refs/heads/main
 }
 
@@ -527,7 +539,11 @@ function finish {
     fi
   elif [ -n "${STEPS_FILE}" ]; then
     echo >&2
-    echo "imageset.sh failed${CURRENT_STEP:+ during step: ${CURRENT_STEP}}. To continue from there, rerun the same command: it will offer to resume." >&2
+    if [ -f "${STEPS_FILE}" ] || [ -f "${IMAGESET_RUNS_FILE}" ]; then
+      echo "imageset.sh failed${CURRENT_STEP:+ during step: ${CURRENT_STEP}}. To continue from there, rerun the same command: it will offer to resume." >&2
+    else
+      echo "imageset.sh failed${CURRENT_STEP:+ during step: ${CURRENT_STEP}}, before completing any step: rerun the same command to start again." >&2
+    fi
   fi
 }
 
@@ -552,6 +568,15 @@ function set-defaults {
   : ${DEPLOY_MACS:=${prod_default}}
 
   : ${UPDATE_OFFERINGS:=${prod_default}}
+
+  # As they are run (as true or false)
+  local setting
+  for setting in BUILD_IMAGES DEPLOY_IMAGES UPDATE_TASKCLUSTER_VERSION UPDATE_FXCI_IMAGES DEPLOY_MACS UPDATE_OFFERINGS IMAGESET_HOST_BROWSER; do
+    case "${!setting-}" in
+      true | false) ;;
+      *) echo "${setting} must be true or false, rather than '${!setting-}'" >&2; exit 64 ;;
+    esac
+  done
 }
 
 # The tools' configuration, other than for gpg (setup-gpg)
@@ -711,8 +736,12 @@ function on-exit {
   stop-gpg
   stop-host-gnupg
   rm -rf "${PREP_DIR}"
-  # Files written as root are yours, on the host (with Docker on Linux)
-  chown -R "${IMAGESET_HOST_UID}:${IMAGESET_HOST_GID}" /work /state 2> /dev/null || true
+  # Files written as root are yours, on the host, with Docker on Linux, where
+  # the mounts show your uid (rather than with rootless Docker, where root is
+  # you, or Docker on macOS, which maps them)
+  if [ "$(stat -c %u /state)" == "${IMAGESET_HOST_UID}" ] && [ "${IMAGESET_HOST_UID}" != 0 ]; then
+    chown -R "${IMAGESET_HOST_UID}:${IMAGESET_HOST_GID}" /work /state 2> /dev/null || true
+  fi
   finish "${status}"
 }
 
@@ -762,7 +791,7 @@ function deploy-image-sets {
   echo "Signing in to GitHub..."
   login-github
   echo "Signing in to Azure..."
-  retry login-azure
+  login-azure
   if "${UPDATE_OFFERINGS}" && ! step-done offerings; then
     login-aws
   fi
