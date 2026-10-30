@@ -44,9 +44,12 @@ HOW = {
            "on it (roles/compute.viewer)",
     "gcp-passwords": "ask an owner of the {project} Google Cloud project (in the Taskcluster team) for the Source "
                      "Repository Reader role on it (roles/source.reader)",
-    "azure": "ask the Taskcluster team for access to the Azure subscription {subscription} (unverified)",
-    "azure-other": "ask Release Operations (relops) for read access to the images in the Azure subscription(s) {names} "
-                   "(unverified)",
+    # The Taskcluster group (in Microsoft Entra, managed by relops) is Contributor on our subscription, and
+    # Reader on the FXCI one, where worker-images builds some images
+    "azure": "ask Release Operations (relops), who manage it, to add you to the Taskcluster group in Mozilla's "
+             "Microsoft Entra (Azure) tenant, which has access to the Azure subscription {subscription}",
+    "azure-other": "ask Release Operations (relops), who manage it, to add you to the Taskcluster group in Mozilla's "
+                   "Microsoft Entra (Azure) tenant, which can read the images in the Azure subscription(s) {names}",
     # From mozilla/global-platform-admin's aws/tf/sso/cloudservices/main.tf
     "aws": "request membership of the cloudservices_aws_taskcluster_devs access group at "
            "https://people.mozilla.org (which gives the AdministratorAccess role on the AWS account "
