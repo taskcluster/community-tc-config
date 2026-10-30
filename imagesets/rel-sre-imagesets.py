@@ -17,6 +17,8 @@ from requests import Response
 # ---- Config ----
 REPO = "mozilla-platform-ops/worker-images"
 REF = "main"
+# imageset.sh gives gpg the passphrase on this file descriptor
+GPG_PASSPHRASE_FDS = (int(os.environ["IMAGESET_GPG_PASSPHRASE_FD"]),) if os.environ.get("IMAGESET_GPG_PASSPHRASE_FD") else ()
 # Image sets that worker-images builds for us, per workflow, for each target of
 # imageset.sh. Staging builds use the workflows' default TASKCLUSTER_REF (main).
 TARGET_WORKFLOWS = {
@@ -223,6 +225,42 @@ def enable_auto_merge(pr):
     else:
         print(f"🤖 Enabled auto-merge on {pr['html_url']}")
 
+def create_signed_commit(message, tree, parent):
+    """Create a commit with the GitHub API, signed with the gpg key that
+    imageset.sh signs commits with, as GitHub can't sign it with that key."""
+    name, email, key = os.environ["IMAGESET_GIT_NAME"], os.environ["IMAGESET_GIT_EMAIL"], os.environ["IMAGESET_GPG_KEY"]
+    if not message.endswith("\n"):
+        message += "\n"
+    now = int(time.time())
+    identity = f"{name} <{email}> {now} +0000"
+    headers = f"tree {tree}\nparent {parent}\nauthor {identity}\ncommitter {identity}\n"
+    # Signs the commit as git writes it to the object database
+    signature = subprocess.run(["gpg", "--local-user", key, "--armor", "--detach-sign"],
+                               input=f"{headers}\n{message}".encode(), capture_output=True,
+                               pass_fds=GPG_PASSPHRASE_FDS)
+    if signature.returncode != 0:
+        raise SystemExit(f"❌ Couldn't sign the commit with gpg key {key}:\n{signature.stderr.decode()}")
+    signature = signature.stdout.decode()
+    date = datetime.fromtimestamp(now, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    commit = gh(f"{API_ROOT}/repos/{REPO}/git/commits", "POST", json={
+        "message": message, "tree": tree, "parents": [parent],
+        "author": {"name": name, "email": email, "date": date},
+        "committer": {"name": name, "email": email, "date": date},
+        "signature": signature,
+    }).json()
+    # The hash covers the signature, so it matches only if GitHub created the
+    # commit that was signed
+    gpgsig = "gpgsig " + signature.rstrip("\n").replace("\n", "\n ") + "\n"
+    signed = f"{headers}{gpgsig}\n{message}".encode()
+    expected = hashlib.sha1(f"commit {len(signed)}\0".encode() + signed).hexdigest()
+    if commit["sha"] != expected:
+        raise SystemExit(f"❌ GitHub created commit {commit['sha']}, rather than the signed commit {expected}")
+    verification = commit.get("verification") or {}
+    if not verification.get("verified"):
+        print(f"⚠️  GitHub doesn't show commit {commit['sha']} as verified ({verification.get('reason')}): "
+              f"add gpg key {key} to your GitHub account, if it isn't there")
+    return commit["sha"]
+
 def open_bump_pr(version, changes, base_sha):
     branch = f"tceng-tc-v{version}"
     pr = find_pr(branch)
@@ -239,9 +277,7 @@ def open_bump_pr(version, changes, base_sha):
         "base_tree": base_tree,
         "tree": [{"path": p, "mode": "100644", "type": "blob", "content": c} for p, c in changes.items()],
     }).json()["sha"]
-    commit = gh(f"{API_ROOT}/repos/{REPO}/git/commits", "POST", json={
-        "message": title, "tree": tree, "parents": [base_sha],
-    }).json()["sha"]
+    commit = create_signed_commit(title, tree, base_sha)
     try:
         gh(f"{API_ROOT}/repos/{REPO}/git/refs", "POST", json={"ref": f"refs/heads/{branch}", "sha": commit})
     except requests.exceptions.HTTPError as e:
@@ -778,7 +814,7 @@ def open_fxci_pr():
     with tempfile.TemporaryDirectory() as tmp:
         def git(*args):
             return subprocess.run(["git", *args], cwd=f"{tmp}/fxci-config", check=True,
-                                  capture_output=True, text=True).stdout.strip()
+                                  capture_output=True, text=True, pass_fds=GPG_PASSPHRASE_FDS).stdout.strip()
 
         # Clones your fork (creating it if needed) as `origin`, with fxci-config as `upstream`
         fork = subprocess.run(["gh", "repo", "fork", FXCI_REPO, "--clone", "--default-branch-only"], cwd=tmp,
