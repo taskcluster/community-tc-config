@@ -39,7 +39,11 @@ HOW = {
     "worker-images": "ask a maintainer of the mozilla-platform-ops/tceng GitHub team "
                      "(https://github.com/orgs/mozilla-platform-ops/teams/tceng/members) to add you to it, for "
                      "write access to mozilla-platform-ops/worker-images",
-    "gcp": "ask the Taskcluster team for access to the {project} Google Cloud project (unverified)",
+    # The owners of the projects (gcloud projects get-iam-policy) are in the Taskcluster team
+    "gcp": "ask an owner of the {project} Google Cloud project (in the Taskcluster team) for the Compute Viewer role "
+           "on it (roles/compute.viewer)",
+    "gcp-passwords": "ask an owner of the {project} Google Cloud project (in the Taskcluster team) for the Source "
+                     "Repository Reader role on it (roles/source.reader)",
     "azure": "ask the Taskcluster team for access to the Azure subscription {subscription} (unverified)",
     "azure-other": "ask Release Operations (relops) for read access to the images in the Azure subscription(s) {names} "
                    "(unverified)",
@@ -47,8 +51,9 @@ HOW = {
     "aws": "request membership of the cloudservices_aws_taskcluster_devs access group at "
            "https://people.mozilla.org (which gives the AdministratorAccess role on the AWS account "
            "moz-fx-tc-community-workers, 885316786408, in Mozilla's AWS SSO)",
-    "password-store": "ask the Taskcluster team to add your gpg key ({key}) to the password store's .gpg-id, and "
-                      "re-encrypt it (pass init) (unverified)",
+    # Anyone whose key is in its .gpg-id can
+    "password-store": "ask someone whose gpg key the password store is encrypted to (in the Taskcluster team) to add "
+                      "yours ({key}) to its .gpg-id, and re-encrypt it (pass init)",
     "taskcluster": "ask the Taskcluster team: community-tc/root in the password store may be out of date (unverified)",
 }
 
@@ -292,7 +297,7 @@ def check_password_store_access():
     else:
         project = urllib.parse.urlsplit(url).path.split("/")[2] if "/p/" in url else url
         fail(f"Google Cloud: you can't read the password store ({url}): {last_line(r.stderr)}",
-             HOW["gcp"].format(project=project))
+             HOW["gcp-passwords"].format(project=project))
 
 
 def last_line(text):
