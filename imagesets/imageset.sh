@@ -46,6 +46,7 @@ function install-hint {
   if command -v apt-get > /dev/null; then
     case "${tool}" in
       curl | git | pass | python3 | tar) package="${tool}" ;;
+      cmp) package=diffutils ;;
       gpg) package=gnupg ;;
       ssh) package=openssh-client ;;
       *) package=coreutils ;;
@@ -54,6 +55,7 @@ function install-hint {
   elif command -v dnf > /dev/null; then
     case "${tool}" in
       curl | git | pass | python3 | tar) package="${tool}" ;;
+      cmp) package=diffutils ;;
       gpg) package=gnupg2 ;;
       ssh) package=openssh-clients ;;
       *) package=coreutils ;;
@@ -65,7 +67,7 @@ function install-hint {
 }
 
 function check-required-tools {
-  local tools=(az cat chmod dirname env gcloud gh git gpg grep id mkdir mktemp pass paste python3 rm sed sleep tee tr tty uname)
+  local tools=(awk az cat chmod cmp cp dirname env gcloud gh git gpg gpg-connect-agent gpgconf grep id mkdir mktemp pass paste python3 rm sed sleep tar tee tr uname)
   local tool
   local missing=false
   local version
@@ -74,9 +76,6 @@ function check-required-tools {
   fi
   if "${UPDATE_OFFERINGS}"; then
     tools+=(aws curl sort)
-  fi
-  if "${IMAGESET_LOCAL_CHANGES}"; then
-    tools+=(tar)
   fi
   for tool in "${tools[@]}"; do
     if ! command -v "${tool}" > /dev/null; then
@@ -115,10 +114,14 @@ function check-required-tools {
     echo "Set your name and email for git commits, e.g. with: git config --global user.name 'Your Name'; git config --global user.email you@mozilla.com" >&2
     return 1
   fi
-  if [[ "$(gh auth login --help)" != *--insecure-storage* ]]; then
+  if [[ "$(gh auth login --help)" != *--clipboard* ]]; then
     echo "A newer gh is needed, rather than $(gh --version | head -1). To install it: $(install-hint gh)" >&2
     return 1
   fi
+  IMAGESET_GNUPG_HOME="$(gpgconf --list-dirs homedir)"
+  export IMAGESET_GNUPG_HOME
+  IMAGESET_GPG_KEY="$(find-gpg-key)" || return 1
+  export IMAGESET_GPG_KEY
 }
 
 function can-open-browser {
@@ -137,14 +140,18 @@ function update-gcloud {
   return 1
 }
 
-# Run a command on a macOS worker as administrator. stdin isn't passed to the
-# command, unless MAC_SSH_STDIN=true.
-function mac-ssh {
-  local host="${1}"
-  shift
-  local password_var="MAC_PASSWORD_$(mac-name "${host}")"
-  # StrictHostKeyChecking, as SSH_ASKPASS would answer a host key prompt
-  local ssh_options=(
+function open-browser {
+  if [ "$(uname)" == Darwin ]; then
+    open "${1}"
+  else
+    xdg-open "${1}" > /dev/null 2>&1
+  fi
+}
+
+# Sets MAC_SSH_OPTIONS, for ssh to the macOS workers as administrator.
+# StrictHostKeyChecking, as SSH_ASKPASS would answer a host key prompt.
+function mac-ssh-options {
+  MAC_SSH_OPTIONS=(
     -F /dev/null
     -o ConnectTimeout=10
     -o NumberOfPasswordPrompts=1
@@ -156,9 +163,156 @@ function mac-ssh {
     -o GlobalKnownHostsFile=/dev/null
     -o UpdateHostKeys=no
   )
+}
+
+# Run a command on a macOS worker as administrator. stdin isn't passed to the
+# command, unless MAC_SSH_STDIN=true.
+function mac-ssh {
+  local host="${1}"
+  shift
+  local password_var="MAC_PASSWORD_$(mac-name "${host}")"
+  local ssh_options
+  mac-ssh-options
+  ssh_options=("${MAC_SSH_OPTIONS[@]}")
   "${MAC_SSH_STDIN:-false}" || ssh_options+=(-n)
   MAC_SSH_PASSWORD="${!password_var}" SSH_ASKPASS="${PREP_DIR}/mac-askpass" SSH_ASKPASS_REQUIRE=force \
     ssh "${ssh_options[@]}" "administrator@${host}" "$@"
+}
+
+# Connects to a macOS worker with ssh, checking its host key, but doesn't log
+# in, so its password isn't needed. Outputs ssh's errors. A reachable worker
+# rejects the (non-existent) password, with "Permission denied".
+function mac-ssh-probe {
+  local host="${1}"
+  mac-ssh-options
+  # Before MAC_SSH_OPTIONS, as ssh uses the first value of each option
+  ssh -o BatchMode=yes -o ConnectTimeout=5 "${MAC_SSH_OPTIONS[@]}" -n "administrator@${host}" true 2>&1
+}
+
+function have-viscosity {
+  [ "$(uname)" == Darwin ] && open -Ra Viscosity 2> /dev/null
+}
+
+# The names of Viscosity's connections, one per line
+function viscosity-connections {
+  osascript << 'EOF'
+tell application "Viscosity" to set names to name of connections
+set AppleScript's text item delimiters to linefeed
+names as text
+EOF
+}
+
+function viscosity-connected-count {
+  osascript -e 'tell application "Viscosity" to count (connections whose state is "Connected")'
+}
+
+function viscosity-connect {
+  echo "Connecting ${1} with Viscosity: complete its sign-in."
+  osascript -e 'on run argv' -e 'tell application "Viscosity" to connect (item 1 of argv)' -e 'end run' "${1}" > /dev/null ||
+    echo "Couldn't have Viscosity connect ${1}: connect it with Viscosity yourself." >&2
+}
+
+# Explains why the macOS workers can't be reached, and on macOS, connects to
+# the VPN with Viscosity, if it has one connection and none is connected. Sets
+# VPN_CHOICES to the connections that the user can choose from by number.
+function suggest-vpn {
+  local connected
+  local name
+  local i
+  VPN_CHOICES=()
+  if ! have-viscosity; then
+    echo "The macOS workers are only reachable through the Mozilla corporate VPN: connect to it with Viscosity. If you are connected already, they may be rebooting."
+    return
+  fi
+  if ! connected="$(viscosity-connected-count 2> /dev/null)"; then
+    echo "The macOS workers are only reachable through the Mozilla corporate VPN: connect to it with Viscosity (allowing your terminal to control Viscosity would let imageset.sh connect it)."
+    return
+  fi
+  if [ "${connected}" != 0 ]; then
+    echo "Viscosity is connected, so the macOS workers may be rebooting, or the VPN connection doesn't route to them (if so, connect another one with Viscosity)."
+    return
+  fi
+  echo "The macOS workers are only reachable through the Mozilla corporate VPN, which Viscosity isn't connected to."
+  while IFS= read -r name; do
+    if [ -n "${name}" ]; then
+      VPN_CHOICES+=("${name}")
+    fi
+  done < <(viscosity-connections 2> /dev/null || true)
+  case "${#VPN_CHOICES[@]}" in
+    0)
+      echo "Viscosity has no connections: add the Mozilla corporate VPN to it, and connect."
+      ;;
+    1)
+      viscosity-connect "${VPN_CHOICES[0]}"
+      VPN_CHOICES=()
+      ;;
+    *)
+      if [ -t 0 ]; then
+        echo "Enter the number of the connection to connect with Viscosity (or connect with Viscosity yourself):"
+        for i in "${!VPN_CHOICES[@]}"; do
+          echo "  $((i + 1))) ${VPN_CHOICES[i]}"
+        done
+      else
+        echo "Connect to it with Viscosity."
+        VPN_CHOICES=()
+      fi
+      ;;
+  esac
+}
+
+# Waits until each macOS worker accepts ssh connections. This runs before the
+# sign-ins (and their 2FA), so that being off the VPN doesn't mean signing in
+# again after connecting. The passwords are checked later, once the password
+# store has been read, by check-mac-connectivity.
+function wait-for-macs {
+  local host
+  local output
+  local last_output
+  local status
+  local unreachable
+  local waiting=false
+  local answer
+  VPN_CHOICES=()
+  while true; do
+    unreachable=()
+    for host in "$@"; do
+      status=0
+      output="$(mac-ssh-probe "${host}")" || status=$?
+      if [ "${status}" == 0 ] || [[ "${output}" == *"Permission denied"* ]]; then
+        continue
+      fi
+      if [[ "${output}" == *"Host key verification failed"* ]]; then
+        echo "The host key of ${host} isn't in ${IMAGESETS_DIR}/mac_known_hosts: if the worker was reinstalled, update it (ssh-keyscan -t ed25519 <host>), or rerun with DEPLOY_MACS=false to skip the macOS workers." >&2
+        return 1
+      fi
+      unreachable+=("${host}")
+      last_output="${output}"
+    done
+    if [ "${#unreachable[@]}" == 0 ]; then
+      if "${waiting}"; then
+        echo "The macOS workers are reachable: continuing."
+      fi
+      return 0
+    fi
+    if ! "${waiting}"; then
+      waiting=true
+      echo
+      echo "Can't connect to ${unreachable[*]} with ssh: ${last_output}"
+      suggest-vpn
+      echo "Waiting until they are reachable (or press Ctrl-C to stop, and rerun with DEPLOY_MACS=false to skip the macOS workers)..."
+    fi
+    if [ "${#VPN_CHOICES[@]}" -gt 0 ]; then
+      answer=''
+      read -r -t 5 answer || true
+      if [[ "${answer}" =~ ^[0-9]+$ ]] && [ "${answer}" -ge 1 ] && [ "${answer}" -le "${#VPN_CHOICES[@]}" ]; then
+        viscosity-connect "${VPN_CHOICES[answer - 1]}"
+      elif [ -n "${answer}" ]; then
+        echo "Enter a number from 1 to ${#VPN_CHOICES[@]}."
+      fi
+    else
+      sleep 5
+    fi
+  done
 }
 
 function mac-name {
@@ -332,6 +486,12 @@ function isolate-environment {
   export GIT_TERMINAL_PROMPT=0
   git config --global user.name "${git_name}"
   git config --global user.email "${git_email}"
+  # Whatever your own settings, with the wrapper of setup-gpg
+  git config --global commit.gpgsign true
+  git config --global tag.gpgsign true
+  git config --global gpg.format openpgp
+  git config --global user.signingkey "${IMAGESET_GPG_KEY}"
+  git config --global gpg.program "${PREP_DIR}/bin/gpg"
   git config --global credential.https://github.com.helper '!gh auth git-credential'
   git config --global credential.https://source.developers.google.com.helper '!gcloud auth git-helper --ignore-unknown "$@"'
 
@@ -356,36 +516,181 @@ function isolate-environment {
 
 function read-pass {
   local entry="${1}"
-  if ! pass show "${entry}"; then
-    echo "Couldn't decrypt ${entry} from the password store. Check that your gpg key is one that the password store is encrypted to (see ${PASSWORD_STORE_DIR}/.gpg-id), and that gpg can prompt for its passphrase." >&2
+  if ! with-gpg pass show "${entry}"; then
+    echo "Couldn't decrypt ${entry} from the password store. Check that your gpg key is one that the password store is encrypted to (see ${PASSWORD_STORE_DIR}/.gpg-id)." >&2
     return 1
   fi
 }
 
-# Everything that needs a passphrase (gpg, for the password store) runs at the
-# start. Afterwards, gpg and ssh keys fail rather than prompt, as a late prompt
-# can time out while nobody is watching, and pass only serves the entries in
-# PASS_CACHE (read at the start), e.g. for tc-admin's secret values.
-function disable-passphrase-prompts {
-  local bin="${PREP_DIR}/no-passphrase-prompts"
-  local tool
-  mkdir "${bin}"
-  printf '#!/bin/sh\n[ "$1" = show ] && shift\nif [ $# = 1 ] && [ -f "%s/$1" ]; then exec cat "%s/$1"; fi\necho "imageset.sh: pass is disabled after the start, so that it cannot prompt for a passphrase, and $* was not read then" >&2\nexit 1\n' "${PASS_CACHE}" "${PASS_CACHE}" > "${bin}/pass"
-  chmod 755 "${bin}/pass"
-  for tool in gpg gpg2 ssh-for-git; do
-    printf '#!/bin/sh\necho "imageset.sh: %s is disabled after the start, so that it cannot prompt for a passphrase" >&2\nexit 1\n' "${tool}" > "${bin}/${tool}"
-    chmod 755 "${bin}/${tool}"
-  done
-  export PATH="${bin}:${PATH}"
-  export GIT_SSH_COMMAND="${bin}/ssh-for-git"
-  unset SSH_AUTH_SOCK
+# The fingerprint of the gpg key that commits are signed with, and the password
+# store decrypted with: user.signingkey, or else the key of user.email
+function find-gpg-key {
+  local key
+  local fprs
+  key="$(git -C "${IMAGESETS_DIR}" config user.signingkey || true)"
+  key="${key%!}"
+  key="${key:-<${IMAGESET_GIT_EMAIL}>}"
+  # Keys that can sign and encrypt (uppercase capabilities are the usable ones)
+  fprs="$(gpg --batch --with-colons --list-secret-keys -- "${key}" 2> /dev/null |
+    awk -F: '$1 == "sec" && $12 ~ /S/ && $12 ~ /E/ { sec = 1; next } sec && $1 == "fpr" { print $10 } { sec = 0 }')" || true
+  case "$(printf '%s' "${fprs}" | grep -c .)" in
+    1) echo "${fprs}" ;;
+    0)
+      echo "No usable gpg secret key (that can sign and encrypt) matches ${key}: set user.signingkey to the fingerprint of yours (git config --global user.signingkey <fingerprint>). Commits are always signed with it." >&2
+      return 1
+      ;;
+    *)
+      echo "Several gpg secret keys match ${key}: set user.signingkey to the fingerprint of the one to use (git config --global user.signingkey <fingerprint>)." >&2
+      return 1
+      ;;
+  esac
 }
 
-# Decrypts a password store entry into PASS_CACHE, for disable-passphrase-prompts
-function cache-pass-entry {
-  local entry="${1}"
-  mkdir -p -m 700 "${PASS_CACHE}/$(dirname "${entry}")"
-  (umask 077 && read-pass "${entry}" > "${PASS_CACHE}/${entry}")
+# gpg (for the password store, and signing commits) uses an agent of its own,
+# with a copy of the key (IMAGESET_GPG_KEY), so that a passphrase cached by
+# your own agent or keychain isn't used. The agent caches nothing, so nothing
+# can use the key through its socket. Instead, the passphrase is asked for at
+# the start, kept in GPG_PASSPHRASE (not exported), and given only to the
+# commands that need it, by with-gpg. gpg, on PATH, is a wrapper that reads it
+# from there, or fails (rather than prompts) if it can't.
+function setup-gpg {
+  local real_gpg
+  local bin="${PREP_DIR}/bin"
+  local name
+  local grip
+  local type
+  local protection
+  local protected=false
+  local found=false
+  unset GPG_PASSPHRASE
+  real_gpg="$(command -v gpg)"
+  # Short, as the agent's socket path is limited to about 100 characters
+  RUN_GNUPGHOME="$(mktemp -d /tmp/imageset-gnupg.XXXXXXXX)"
+  export GNUPGHOME="${RUN_GNUPGHOME}"
+  printf 'default-cache-ttl 0\nmax-cache-ttl 0\nallow-loopback-pinentry\nno-allow-external-cache\ndisable-scdaemon\npinentry-program %s\n' "$(command -v false)" > "${GNUPGHOME}/gpg-agent.conf"
+  GNUPGHOME="${IMAGESET_GNUPG_HOME}" "${real_gpg}" --batch --export "${IMAGESET_GPG_KEY}" |
+    "${real_gpg}" --batch --quiet --import
+  # The private key files are encrypted with the passphrase
+  mkdir -p -m 700 "${GNUPGHOME}/private-keys-v1.d"
+  for grip in $(GNUPGHOME="${IMAGESET_GNUPG_HOME}" "${real_gpg}" --batch --with-colons --with-keygrip --list-secret-keys "${IMAGESET_GPG_KEY}" | awk -F: '$1 == "grp" { print $10 }'); do
+    if [ -f "${IMAGESET_GNUPG_HOME}/private-keys-v1.d/${grip}.key" ]; then
+      cp "${IMAGESET_GNUPG_HOME}/private-keys-v1.d/${grip}.key" "${GNUPGHOME}/private-keys-v1.d/"
+    fi
+  done
+  while read -r grip type protection; do
+    found=true
+    if [ "${type}" == T ]; then
+      echo "Your gpg key ${IMAGESET_GPG_KEY} is on a smartcard, which imageset.sh doesn't support." >&2
+      return 1
+    fi
+    if [ "${protection}" == P ]; then
+      protected=true
+    fi
+  done < <(gpg-connect-agent 'KEYINFO --list' /bye | awk '$1 == "S" && $2 == "KEYINFO" { print $3, $4, $8 }')
+  if ! "${found}"; then
+    echo "No private key of ${IMAGESET_GPG_KEY} in ${IMAGESET_GNUPG_HOME}/private-keys-v1.d" >&2
+    return 1
+  fi
+
+  mkdir -p "${bin}"
+  for name in gpg gpg2; do
+    cat > "${bin}/${name}" << EOF
+#!/bin/sh
+# With the passphrase from imageset.sh's with-gpg, if the key has one
+if { : <&7; } 2> /dev/null; then
+  exec '${real_gpg}' --batch --pinentry-mode loopback --passphrase-fd 7 "\$@"
+fi
+exec '${real_gpg}' --batch --pinentry-mode error "\$@"
+EOF
+    chmod 755 "${bin}/${name}"
+  done
+  export PATH="${bin}:${PATH}"
+
+  if "${protected}"; then
+    read-gpg-passphrase
+    # For the Python scripts, as subprocess closes other file descriptors
+    export IMAGESET_GPG_PASSPHRASE_FD=7
+  elif ! check-gpg-key; then
+    echo "Your gpg key ${IMAGESET_GPG_KEY} can't sign and decrypt." >&2
+    return 1
+  fi
+}
+
+function stop-gpg {
+  if [ -n "${RUN_GNUPGHOME}" ]; then
+    GNUPGHOME="${RUN_GNUPGHOME}" gpgconf --kill gpg-agent 2> /dev/null || true
+    rm -rf "${RUN_GNUPGHOME}"
+  fi
+}
+
+function read-gpg-passphrase {
+  local uid
+  uid="$(gpg --with-colons --list-keys "${IMAGESET_GPG_KEY}" | awk -F: '$1 == "uid" { print $10; exit }')"
+  if ! [ -t 0 ]; then
+    echo "imageset.sh needs a terminal, to ask for the passphrase of your gpg key." >&2
+    return 1
+  fi
+  while true; do
+    IFS= read -r -s -p "Passphrase of your gpg key (${uid}, ${IMAGESET_GPG_KEY}): " GPG_PASSPHRASE
+    echo
+    if with-gpg check-gpg-key 2> /dev/null; then
+      return
+    fi
+    echo "That passphrase doesn't unlock it: try again (or press Ctrl-C to stop)." >&2
+  done
+}
+
+# Signs, and decrypts a message encrypted to, IMAGESET_GPG_KEY. One gpg at a
+# time, as each reads a line of with-gpg's passphrase.
+function check-gpg-key {
+  local message
+  message="$(echo imageset | gpg --quiet --trust-model always --armor --encrypt --recipient "${IMAGESET_GPG_KEY}")" &&
+    [ "$(printf '%s\n' "${message}" | gpg --quiet --decrypt)" == imageset ] &&
+    echo imageset | gpg --quiet --local-user "${IMAGESET_GPG_KEY}" --detach-sign > /dev/null
+}
+
+# Runs a command with the gpg passphrase (if the key has one) on file
+# descriptor 7, for the gpg wrapper of setup-gpg
+function with-gpg {
+  if [ -z "${GPG_PASSPHRASE-}" ]; then
+    "$@"
+    return
+  fi
+  "$@" 7< <(gpg-passphrase-lines)
+}
+
+# A line for each gpg that reads it
+function gpg-passphrase-lines {
+  local i
+  for ((i = 0; i < 1000; i++)); do
+    printf '%s\n' "${GPG_PASSPHRASE}"
+  done
+}
+
+# Fails unless each commit of a range is signed with IMAGESET_GPG_KEY
+function check-signed {
+  local commit
+  local status
+  for commit in $(git rev-list "${1}"); do
+    status="$(git verify-commit --raw "${commit}" 2>&1 || true)"
+    # The last field of VALIDSIG is the primary key's fingerprint
+    if ! printf '%s\n' "${status}" | grep -q "^\[GNUPG:\] VALIDSIG .* ${IMAGESET_GPG_KEY}\$"; then
+      echo "Commit ${commit} isn't signed with ${IMAGESET_GPG_KEY}: not pushing it." >&2
+      return 1
+    fi
+  done
+}
+
+# gpg needs a passphrase only from with-gpg, so can't prompt. ssh keys aren't
+# needed (git uses HTTPS, and ssh to the macOS workers uses passwords), so
+# fail rather than prompt for a passphrase.
+function disable-ssh-keys {
+  local bin="${PREP_DIR}/bin"
+  mkdir -p "${bin}"
+  printf '#!/bin/sh\necho "imageset.sh: ssh keys are disabled" >&2\nexit 1\n' > "${bin}/ssh-for-git"
+  chmod 755 "${bin}/ssh-for-git"
+  export GIT_SSH_COMMAND="${bin}/ssh-for-git"
+  unset SSH_AUTH_SOCK
 }
 
 function clone-password-store {
@@ -394,9 +699,37 @@ function clone-password-store {
   git clone --quiet --depth 1 "${IMAGESET_PASSWORD_STORE_URL}" "${PASSWORD_STORE_DIR}"
 }
 
-# The token is stored in GH_CONFIG_DIR, rather than the user's keychain
+# The token is stored in GH_CONFIG_DIR, rather than the user's keychain. As
+# prompts are disabled, gh only shows the URL, which is opened here, with the
+# code in the clipboard.
 function login-github {
-  gh auth login --hostname github.com --git-protocol https --scopes workflow --insecure-storage --web
+  local options=(--hostname github.com --git-protocol https --scopes workflow --insecure-storage --web)
+  local line
+  local url
+  local copied=false
+  if ! can-open-browser; then
+    gh auth login "${options[@]}"
+    return
+  fi
+  gh auth login "${options[@]}" --clipboard 2>&1 | while IFS= read -r line; do
+    case "${line}" in
+      *"copied to clipboard"*)
+        copied=true
+        echo "${line}"
+        ;;
+      *"to continue in your web browser: https://github.com/"*)
+        url="${line##* }"
+        if ! open-browser "${url}"; then
+          echo "${line}"
+        elif "${copied}"; then
+          echo "Opened ${url} in your browser: paste the code (from your clipboard) there."
+        else
+          echo "Opened ${url} in your browser: enter the code above there."
+        fi
+        ;;
+      *) echo "${line}" ;;
+    esac
+  done
 }
 
 function login-aws {
@@ -430,11 +763,51 @@ EOF
 }
 
 function push-to-main {
-  if ! git pull --quiet --rebase --autostash "${OFFICIAL_GIT_REPO}" main; then
+  if ! with-gpg git pull --quiet --rebase --autostash "${OFFICIAL_GIT_REPO}" main; then
     git rebase --abort 2> /dev/null || true
     return 1
   fi
+  check-signed FETCH_HEAD..HEAD
   git push "${OFFICIAL_GIT_REPO}" HEAD:refs/heads/main
+}
+
+# The files of the checkout that IMAGESET_LOCAL_CHANGES=true uses, NUL-separated
+function checkout-files {
+  (
+    cd "${1}"
+    git ls-files -z --cached --others --exclude-standard -- . ':(exclude)config' |
+      while IFS= read -r -d '' file; do
+        [ -e "${file}" ] && printf '%s\0' "${file}"
+      done
+  )
+}
+
+# If IMAGESET_LOCAL_CHANGES isn't set, and the checkout's files differ from
+# upstream main's, says so (as upstream main's run), and offers to use them
+function offer-local-changes {
+  local checkout="${1}"
+  local clone="${2}"
+  local file
+  local changed=()
+  local answer
+  if [ -n "${IMAGESET_LOCAL_CHANGES_SET}" ]; then
+    return
+  fi
+  while IFS= read -r -d '' file; do
+    cmp -s "${checkout}/${file}" "${clone}/${file}" || changed+=("${file}")
+  done < <(checkout-files "${checkout}")
+  if [ "${#changed[@]}" == 0 ]; then
+    return
+  fi
+  echo "These files of ${checkout} differ from upstream main's, which are the ones that run, unless IMAGESET_LOCAL_CHANGES=true:"
+  printf '  %s\n' "${changed[@]}"
+  if ! [ -t 0 ]; then
+    return
+  fi
+  read -r -p "Use your files rather than upstream main's (y/N)? " answer
+  case "${answer}" in
+    y | Y | yes) IMAGESET_LOCAL_CHANGES=true ;;
+  esac
 }
 
 # Runs this script from a clone of upstream main, rather than the user's checkout
@@ -454,16 +827,10 @@ function run-from-clone {
     git clone --quiet --branch main "${OFFICIAL_GIT_REPO}" "${clone}"
   )
   git --no-pager -C "${clone}" log -1 --format='Using upstream main at %h: %s'
+  offer-local-changes "${checkout}" "${clone}"
   if "${IMAGESET_LOCAL_CHANGES}"; then
     echo "WARNING: IMAGESET_LOCAL_CHANGES=true: using the files of ${checkout} (other than config/) rather than upstream main's" >&2
-    (
-      cd "${checkout}"
-      git ls-files -z --cached --others --exclude-standard -- . ':(exclude)config' |
-        while IFS= read -r -d '' file; do
-          [ -e "${file}" ] && printf '%s\0' "${file}"
-        done |
-        tar -cf - --null -T -
-    ) | tar -C "${clone}" -xf -
+    checkout-files "${checkout}" | (cd "${checkout}" && tar -cf - --null -T -) | tar -C "${clone}" -xf -
   fi
   if ! grep -q IMAGESET_PREP_DIR "${clone}/imagesets/imageset.sh"; then
     echo "Upstream main's imageset.sh can't run from a clone yet: rerun with IMAGESET_LOCAL_CHANGES=true" >&2
@@ -494,20 +861,20 @@ function update-offerings {
   echo "Updating EC2 instance types..."
   misc/update-ec2-instance-types.sh
   git add 'config/ec2-instance-type-offerings'
-  git diff --cached --quiet || git commit -m "Ran script misc/update-ec2-instance-types.sh"
+  git diff --cached --quiet || with-gpg git commit -m "Ran script misc/update-ec2-instance-types.sh"
 
   echo "Updating Azure VM sizes..."
   misc/update-azure-vm-sizes.sh
   git add 'config/azure-vm-size-offerings'
-  git diff --cached --quiet || git commit -m "Ran script misc/update-azure-vm-sizes.sh"
+  git diff --cached --quiet || with-gpg git commit -m "Ran script misc/update-azure-vm-sizes.sh"
 
   echo "Updating GCE machine types..."
   misc/update-gce-machine-types.sh
   git add 'config/gce-machine-type-offerings.json'
-  git diff --cached --quiet || git commit -m "Ran script misc/update-gce-machine-types.sh"
+  git diff --cached --quiet || with-gpg git commit -m "Ran script misc/update-gce-machine-types.sh"
 
   retry push-to-main
-  retry tc-admin apply
+  retry with-gpg tc-admin apply
 }
 
 function update-mac {
@@ -518,15 +885,15 @@ function update-mac {
 }
 
 function build-images {
-  python3 imagesets/rel-sre-imagesets.py
+  with-gpg python3 imagesets/rel-sre-imagesets.py
   git add config/imagesets.yml
-  git diff --cached --quiet || git commit -m "Use new machine images built by mozilla-platform-ops/worker-images"
+  git diff --cached --quiet || with-gpg git commit -m "Use new machine images built by mozilla-platform-ops/worker-images"
   retry push-to-main
 }
 
 function deploy-images {
   python3 imagesets/copy-azure-images.py
-  retry tc-admin apply
+  retry with-gpg tc-admin apply
 }
 
 # On failure, says how to resume; on success, forgets the completed steps
@@ -632,6 +999,19 @@ function deploy-image-sets {
   export TASKCLUSTER_CLIENT_ID='static/taskcluster/root'
   export TASKCLUSTER_ROOT_URL='https://community-tc.services.mozilla.com'
 
+  setup-gpg
+
+  # Only the macOS workers that a resumed run hasn't updated yet
+  local pending_macs=()
+  if "${DEPLOY_MACS}"; then
+    for HOST in "${MAC_HOSTS[@]}"; do
+      step-done "mac ${HOST}" || pending_macs+=("${HOST}")
+    done
+  fi
+  if [ "${#pending_macs[@]}" -gt 0 ]; then
+    wait-for-macs "${pending_macs[@]}"
+  fi
+
   if "${UPDATE_GCLOUD}"; then
     retry update-gcloud
   fi
@@ -643,11 +1023,6 @@ function deploy-image-sets {
 
   login-github
 
-  # For a terminal pinentry
-  if [ -t 0 ]; then
-    GPG_TTY="$(tty)"
-    export GPG_TTY
-  fi
   clone-password-store
   local root_credentials
   root_credentials="$(read-pass community-tc/root)"
@@ -657,19 +1032,10 @@ function deploy-image-sets {
     exit 1
   fi
 
-  # Only the macOS workers that a resumed run hasn't updated yet
-  local pending_macs=()
-  if "${DEPLOY_MACS}"; then
-    for HOST in "${MAC_HOSTS[@]}"; do
-      step-done "mac ${HOST}" || pending_macs+=("${HOST}")
-    done
-  fi
   if [ "${#pending_macs[@]}" -gt 0 ]; then
     read-mac-passwords "${pending_macs[@]}"
   fi
-  # Read by tc-admin (generate/secret_values.py)
-  cache-pass-entry community-tc/secret-values.yml
-  disable-passphrase-prompts
+  disable-ssh-keys
   if [ "${#pending_macs[@]}" -gt 0 ]; then
     check-mac-connectivity "${pending_macs[@]}"
   fi
@@ -708,7 +1074,7 @@ function deploy-image-sets {
     # The worker-images PR needs someone to review and merge it, so open it
     # before anything else. Only triggering the image builds waits for it to be merged
     # (in rel-sre-imagesets.py below); the steps in between don't depend on it.
-    run-step bump-pr python3 imagesets/rel-sre-imagesets.py --open-bump-pr
+    run-step bump-pr with-gpg python3 imagesets/rel-sre-imagesets.py --open-bump-pr
   fi
 
   if "${UPDATE_OFFERINGS}"; then
@@ -724,7 +1090,9 @@ function deploy-image-sets {
   ###### Update macOS workers ######
   ##################################
   #
-  # ssh connectivity is checked at the start of the script.
+  # The macOS workers are checked to be reachable (e.g. that the VPN is
+  # connected) before the sign-ins, and ssh as administrator after reading
+  # their passwords.
   # Remeber to vnc as administrator onto macs before running this script, to avoid ssh connection problems!
 
   # TODO: report if macs need to be logged into first with vnc
@@ -747,7 +1115,7 @@ function deploy-image-sets {
     python3 imagesets/rel-sre-imagesets.py --log-images
     # fxci's config can only be changed with a reviewed PR
     if "${UPDATE_FXCI_IMAGES}"; then
-      run-step fxci-pr python3 imagesets/rel-sre-imagesets.py --open-fxci-pr
+      run-step fxci-pr with-gpg python3 imagesets/rel-sre-imagesets.py --open-fxci-pr
     fi
   fi
 
@@ -772,6 +1140,8 @@ fi
 
 export IMAGESET_TARGET="${1}"
 
+# Whether the user chose, rather than set-defaults
+IMAGESET_LOCAL_CHANGES_SET="${IMAGESET_LOCAL_CHANGES+set}"
 set-defaults
 
 if [ -z "${IMAGESET_PREP_DIR-}" ]; then
@@ -786,12 +1156,12 @@ if [ "$(pwd -P)" != "$(cd "${IMAGESET_PREP_DIR}" && pwd -P)/community-tc-config/
 fi
 PREP_DIR="${IMAGESET_PREP_DIR}"
 unset IMAGESET_PREP_DIR
-PASS_CACHE="${PREP_DIR}/pass-cache"
 
 STEPS_FILE=''
 IMAGESET_RUNS_FILE=''
 CURRENT_STEP=''
-trap 'status=$?; cd; rm -rf "${PREP_DIR}"; finish "${status}"; exit "${status}"' EXIT
+RUN_GNUPGHOME=''
+trap 'status=$?; cd; stop-gpg; rm -rf "${PREP_DIR}"; finish "${status}"; exit "${status}"' EXIT
 
 state-paths
 export IMAGESET_RUNS_FILE

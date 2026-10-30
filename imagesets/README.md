@@ -26,17 +26,30 @@ steps.
 
 2) Azure and GCP: `az` and `gcloud` installed.
 
-3) GitHub: `gh` installed, and an account that can push to this repository.
+3) GitHub: `gh` (2.79.0 or later) installed, and an account that can push to
+   this repository. When signing in, the one-time code is copied to the
+   clipboard and the GitHub page to paste it into is opened.
 
 4) git: `user.name` and `user.email` set.
 
-5) gpg: a key that the taskcluster team password store is encrypted to. Its
-   passphrase is only asked for (if gpg-agent hasn't cached it) at the start.
+5) gpg: a key that the taskcluster team password store is encrypted to, and
+   which can sign: `user.signingkey`, or else the key of `user.email`. Every
+   commit the script makes is signed with it, whatever your git settings, and
+   checked before pushing; add it to your GitHub account, for GitHub to show
+   them as verified. Its passphrase is always asked for once, at the start: the
+   script uses a gpg-agent of its own, which caches nothing (so your agent's or
+   keychain's cached passphrase isn't used), and keeps the passphrase only in
+   memory, giving it to the commands that need it. Keys on a smartcard aren't
+   supported.
 
-6) macOS workers (`prod` and `all`): **you must be connected to the Mozilla
-   corporate VPN**, as the Macs are only reachable through it, and have a VNC
-   session as administrator on each Mac. If a Mac is reinstalled, update
-   [`mac_known_hosts`](mac_known_hosts).
+6) macOS workers (`prod` and `all`): the Mozilla corporate VPN, through
+   [Viscosity](https://www.sparklabs.com/viscosity/), as the Macs are only
+   reachable through it, and a VNC session as administrator on each Mac. Before
+   any sign-ins, the script checks that the Macs are reachable; if not, it
+   waits until they are. On macOS, if Viscosity isn't connected, it connects
+   it (or, if Viscosity has several connections, asks which one to connect),
+   so you only need to complete Viscosity's sign-in. If a Mac is reinstalled,
+   update [`mac_known_hosts`](mac_known_hosts).
 
 The script doesn't use your own configuration of these tools (e.g.
 `~/.ssh/config`, `~/.gitconfig`, `~/.aws/config`, `~/.azure`,
@@ -44,7 +57,8 @@ The script doesn't use your own configuration of these tools (e.g.
 (`~/.aws/sso/cache`), nor your checkout of this repository: it signs in during
 the run, and clones upstream `main` and the password store into a temporary
 directory. To test local changes to the scripts, set
-`IMAGESET_LOCAL_CHANGES=true`.
+`IMAGESET_LOCAL_CHANGES=true`. If it isn't set, and your checkout's files differ
+from upstream `main`'s, the script lists them, and asks whether to use them.
 
 ## What it does
 

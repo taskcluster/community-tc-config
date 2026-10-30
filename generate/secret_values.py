@@ -4,6 +4,7 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file, You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 
+import os
 import subprocess
 import sys
 import yaml
@@ -17,7 +18,11 @@ class SecretValues:
 
     def __init__(self):
         print("Fetching secrets with passwordstore", file=sys.stderr)
-        secret_values_yml = subprocess.check_output(["pass", PASSWORDSTORE_NAME])
+        # imageset.sh gives gpg the passphrase on this file descriptor
+        fd = os.environ.get("IMAGESET_GPG_PASSPHRASE_FD")
+        secret_values_yml = subprocess.check_output(
+            ["pass", PASSWORDSTORE_NAME], pass_fds=(int(fd),) if fd else ()
+        )
         self.values = yaml.safe_load(secret_values_yml)
         print("Secrets fetched", file=sys.stderr)
 
