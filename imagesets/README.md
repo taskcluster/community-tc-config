@@ -31,7 +31,11 @@ steps.
 2) AWS: the `AdministratorAccess` role on account `moz-fx-tc-community-workers`
    (885316786408) in [Mozilla's AWS SSO](https://mozilla-cloudservices.awsapps.com/start).
 
-3) GitHub: an account that can push to this repository.
+3) GitHub: an account that is a member of the `taskcluster` and
+   `mozilla-platform-ops` organizations, an admin of this repository (in the
+   `taskcluster/community-tc-admins` team: `main` is protected, and only its
+   admins can push to it directly, which the script does), with write access
+   to `mozilla-platform-ops/worker-images`.
 
 4) Your name and email for commits: taken from your git configuration
    (`user.name` and `user.email`), if you have git, and otherwise asked for.
@@ -63,6 +67,12 @@ steps.
    key; connecting needs another 2FA code, each time. The Macs are updated
    right after the sign-ins, so that the VPN is only needed while you are
    there. If a Mac is reinstalled, update [`mac_known_hosts`](mac_known_hosts).
+
+Right after signing in, and before changing anything, the script checks that
+you have all the access that the run needs (in GitHub, Google Cloud, Azure,
+AWS, the password store and Taskcluster: see
+[`container/preflight.py`](container/preflight.py)), and if you don't, it
+stops, saying what is missing, and how to get it.
 
 Signing in to Google Cloud, GitHub, Azure and AWS happens in your browser:
 the script opens each page, with any one-time code in your clipboard. Without
