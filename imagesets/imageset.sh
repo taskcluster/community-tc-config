@@ -4,10 +4,12 @@
 # Has mozilla-platform-ops/worker-images build image sets, and deploys them
 # (see README.md). The work is done by container/run.sh, in a Docker container
 # with the tools it needs (container/Dockerfile), from a clone of upstream
-# main. This script, on your machine, only needs Docker and git, and:
+# main (by container/clone.sh). This script, on your machine, only needs
+# Docker, and:
 #
 #   - your git name, email and signing key (user.signingkey), from your git
-#     configuration
+#     configuration, if you have git (otherwise, or to change them, you're
+#     asked)
 #   - your gpg key, from your gpg home ($GNUPGHOME, or ~/.gnupg), which the
 #     container reads (read-only) for the key alone
 #   - your browser, which the container has this script open for sign-ins
@@ -19,7 +21,6 @@ set -eu
 set -o pipefail
 
 IMAGE=community-tc-imagesets
-OFFICIAL_GIT_REPO='https://github.com/taskcluster/community-tc-config'
 # Under your home directory, as Docker (e.g. Colima) may only be able to mount that
 STATE_DIR="${HOME}/.cache/community-tc-imagesets"
 # The settings that are passed to the container (see README.md)
@@ -100,15 +101,17 @@ function check-docker {
   fi
 }
 
-# Your identity, from your git configuration (read in your checkout, for any
-# includeIf), and gpg home
+# Your identity, from your git configuration if you have git (read in your
+# checkout, for any includeIf), which run.sh asks you to confirm or change, and
+# your gpg home
 function read-identity {
-  IMAGESET_GIT_NAME="$(git -C "${CHECKOUT}" config user.name || true)"
-  IMAGESET_GIT_EMAIL="$(git -C "${CHECKOUT}" config user.email || true)"
-  IMAGESET_GIT_SIGNINGKEY="$(git -C "${CHECKOUT}" config user.signingkey || true)"
-  if [ -z "${IMAGESET_GIT_NAME}" ] || [ -z "${IMAGESET_GIT_EMAIL}" ]; then
-    echo "Set your name and email for git commits, e.g. with: git config --global user.name 'Your Name'; git config --global user.email you@mozilla.com" >&2
-    return 1
+  IMAGESET_GIT_NAME=''
+  IMAGESET_GIT_EMAIL=''
+  IMAGESET_GIT_SIGNINGKEY=''
+  if command -v git > /dev/null; then
+    IMAGESET_GIT_NAME="$(git -C "${CHECKOUT}" config user.name || true)"
+    IMAGESET_GIT_EMAIL="$(git -C "${CHECKOUT}" config user.email || true)"
+    IMAGESET_GIT_SIGNINGKEY="$(git -C "${CHECKOUT}" config user.signingkey || true)"
   fi
   GNUPG_HOME="${GNUPGHOME:-${HOME}/.gnupg}"
   if ! [ -d "${GNUPG_HOME}/private-keys-v1.d" ]; then
@@ -149,71 +152,6 @@ function choose-resume {
       s | S) IMAGESET_RESUME=false; break ;;
     esac
   done
-}
-
-# The files of the checkout that IMAGESET_LOCAL_CHANGES=true uses, NUL-separated
-function checkout-files {
-  (
-    cd "${1}"
-    git ls-files -z --cached --others --exclude-standard -- . ':(exclude)config' |
-      while IFS= read -r -d '' file; do
-        if [ -e "${file}" ]; then
-          printf '%s\0' "${file}"
-        fi
-      done
-  )
-}
-
-# If IMAGESET_LOCAL_CHANGES isn't set, and the checkout's files differ from
-# upstream main's, says so (as upstream main's run), and offers to use them
-function offer-local-changes {
-  local checkout="${1}"
-  local clone="${2}"
-  local file
-  local changed=()
-  local answer
-  case "${IMAGESET_LOCAL_CHANGES-}" in
-    true | false) return ;;
-    '') ;;
-    *) echo "IMAGESET_LOCAL_CHANGES must be true or false" >&2; return 1 ;;
-  esac
-  IMAGESET_LOCAL_CHANGES=false
-  while IFS= read -r -d '' file; do
-    cmp -s "${checkout}/${file}" "${clone}/${file}" || changed+=("${file}")
-  done < <(checkout-files "${checkout}")
-  if [ "${#changed[@]}" == 0 ]; then
-    return
-  fi
-  echo "These files of ${checkout} differ from upstream main's, which are the ones that run, unless IMAGESET_LOCAL_CHANGES=true:"
-  printf '  %s\n' "${changed[@]}"
-  read -r -p "Use your files rather than upstream main's (y/N)? " answer
-  case "${answer}" in
-    y | Y | yes) IMAGESET_LOCAL_CHANGES=true ;;
-  esac
-}
-
-# A clone of upstream main (with your changes, for IMAGESET_LOCAL_CHANGES=true)
-function clone-upstream {
-  local clone="${1}"
-  local var
-  echo "Cloning ${OFFICIAL_GIT_REPO} (main)..."
-  (
-    for var in $(compgen -e); do
-      case "${var}" in GIT_*) unset "${var}" ;; esac
-    done
-    export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0
-    git clone --quiet --branch main "${OFFICIAL_GIT_REPO}" "${clone}"
-  )
-  git --no-pager -C "${clone}" log -1 --format='Using upstream main at %h: %s'
-  offer-local-changes "${CHECKOUT}" "${clone}"
-  if "${IMAGESET_LOCAL_CHANGES}"; then
-    echo "WARNING: IMAGESET_LOCAL_CHANGES=true: using the files of ${CHECKOUT} (other than config/) rather than upstream main's" >&2
-    checkout-files "${CHECKOUT}" | (cd "${CHECKOUT}" && tar -cf - --null -T -) | tar -C "${clone}" -xf -
-  fi
-  if ! [ -f "${clone}/imagesets/container/Dockerfile" ]; then
-    echo "Upstream main's imagesets don't run in a container yet: rerun with IMAGESET_LOCAL_CHANGES=true" >&2
-    return 1
-  fi
 }
 
 # Builds the image, which Docker caches, other than the tools, which are
@@ -303,8 +241,21 @@ trap 'exit 143' TERM
 remove-stale-runs
 WORK="$(mktemp -d "${STATE_DIR}/run.XXXXXXXX")"
 echo $$ > "${WORK}/pid"
-clone-upstream "${WORK}/community-tc-config"
-build-image "${WORK}/community-tc-config/imagesets/container"
+case "${IMAGESET_LOCAL_CHANGES-}" in
+  true | false | '') ;;
+  *) echo "IMAGESET_LOCAL_CHANGES must be true or false" >&2; exit 64 ;;
+esac
+
+# The image of your checkout clones upstream main (with your changes, if you
+# choose), and then upstream main's image runs it. They are usually the same,
+# so the second build is cached.
+build-image "${CHECKOUT}/imagesets/container"
+mkdir "${WORK}/clone"
+docker run --rm --interactive --tty --init --name "imageset-${WORK##*/}" --security-opt label=disable \
+  --volume "${CHECKOUT}:/checkout:ro" --volume "${WORK}/clone:/work" \
+  --env IMAGESET_LOCAL_CHANGES="${IMAGESET_LOCAL_CHANGES-}" --env IMAGESET_HOST_UID="$(id -u)" --env IMAGESET_HOST_GID="$(id -g)" \
+  "${IMAGE}" bash /checkout/imagesets/container/clone.sh
+build-image "${WORK}/clone/community-tc-config/imagesets/container"
 
 mkdir -m 700 "${WORK}/bridge"
 bridge "${WORK}/bridge" &
@@ -316,7 +267,7 @@ docker_options=(
   --security-opt label=disable
   # For openvpn
   --cap-add NET_ADMIN --device /dev/net/tun
-  --volume "${WORK}/community-tc-config:/work"
+  --volume "${WORK}/clone/community-tc-config:/work"
   --volume "${STATE_DIR}:/state"
   --volume "${WORK}/bridge:/bridge"
   --volume "${GNUPG_HOME}:/host-gnupg:ro"

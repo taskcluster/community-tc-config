@@ -23,7 +23,7 @@ steps.
 
 1) Docker, e.g. [Colima](https://github.com/abiosoft/colima) (`brew install
    colima docker && colima start`) or Docker Desktop on macOS, or Docker Engine
-   on Linux, and `git`. Nothing else needs installing: the script runs in a
+   on Linux. Nothing else needs installing (not even git): the script runs in a
    container with the tools it needs ([`container/Dockerfile`](container/Dockerfile)),
    which it builds, and rebuilds each week to update them (which takes a few
    minutes).
@@ -33,7 +33,13 @@ steps.
 
 3) GitHub: an account that can push to this repository.
 
-4) git: `user.name` and `user.email` set.
+4) Your name and email for commits: taken from your git configuration
+   (`user.name` and `user.email`), if you have git, and otherwise asked for.
+   At the start, the script shows them, the gpg key that signs the commits,
+   and the repositories it commits to (`taskcluster/community-tc-config`,
+   pushed to `main`; `mozilla-platform-ops/worker-images` and
+   `mozilla-releng/fxci-config`, in pull requests), and asks whether to use
+   them, or change them.
 
 5) gpg: a key that the taskcluster team password store is encrypted to, and
    which can sign: `user.signingkey`, or else the key of `user.email`, in your
@@ -45,8 +51,9 @@ steps.
    your GitHub account, for GitHub to show them as verified. Keys on a
    smartcard aren't supported.
 
-6) macOS workers (`prod` and `all`): a Mozilla LDAP account (your git email,
-   if it is a mozilla.com one, or set `IMAGESET_LDAP_USERNAME`) with an
+6) macOS workers (`prod` and `all`): a Mozilla LDAP account (asked for,
+   suggesting your git email, or your GitHub account's mozilla.com email, or
+   set `IMAGESET_LDAP_USERNAME`) with an
    authenticator app for 2FA (Duo's "Hardware token" option), and a VNC session
    as administrator on each Mac. The Macs are only reachable through the
    Mozilla VPN, which the container connects to (only the container uses it,
@@ -106,7 +113,7 @@ its worker pools.
 | `UPDATE_FXCI_IMAGES` | Open the fxci-config PR to use the new images | `true` |
 | `IMAGESET_LOCAL_CHANGES` | Use the files of your checkout (other than `config/`), rather than upstream `main`'s, to test changes to the scripts | `false` |
 | `IMAGESET_RESUME` | Whether to resume an unfinished run of the same target (skipping the steps it completed, and waiting for its worker-images builds rather than triggering new ones), rather than start again | asks |
-| `IMAGESET_LDAP_USERNAME` | Your Mozilla LDAP username, for the VPN | your git email, if a mozilla.com one |
+| `IMAGESET_LDAP_USERNAME` | Your Mozilla LDAP username, for the VPN | asks |
 
 If a run fails, it says which step failed. Rerun the same command to continue
 from there: it asks whether to resume, or to start again.
