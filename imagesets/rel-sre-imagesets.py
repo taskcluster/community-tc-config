@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import base64
+import email.utils
 import hashlib
 import json
 import os
@@ -10,15 +11,22 @@ import time
 import requests
 import re
 import urllib.parse
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from ruamel.yaml import YAML
 from requests import Response
 
 # ---- Config ----
 REPO = "mozilla-platform-ops/worker-images"
 REF = "main"
-# imageset.sh gives gpg the passphrase on this file descriptor
-GPG_PASSPHRASE_FDS = (int(os.environ["IMAGESET_GPG_PASSPHRASE_FD"]),) if os.environ.get("IMAGESET_GPG_PASSPHRASE_FD") else ()
+# imageset.sh gives gpg the passphrase on this file descriptor (only when it
+# runs this with it open: with-gpg)
+def _open_fds(fd):
+    try:
+        os.fstat(fd)
+        return (fd,)
+    except OSError:
+        return ()
+GPG_PASSPHRASE_FDS = _open_fds(int(os.environ["IMAGESET_GPG_PASSPHRASE_FD"])) if os.environ.get("IMAGESET_GPG_PASSPHRASE_FD") else ()
 # Image sets that worker-images builds for us, per workflow, for each target of
 # imageset.sh. Staging builds use the workflows' default TASKCLUSTER_REF (main).
 TARGET_WORKFLOWS = {
@@ -199,11 +207,16 @@ def trigger_workflow(workflow_file, config, attempts=10):
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout, requests.exceptions.HTTPError) as e:
             if isinstance(e, requests.exceptions.HTTPError) and e.response.status_code < 500:
                 raise
-            # Long enough for a run that GitHub did create to show up
-            wait_time = max(15, min(2 ** attempt, 60))
-            print(f"⚠️  Triggering {workflow_file} for config={config} failed ({e}): checking in {wait_time}s whether "
+            # For up to 90 seconds, as a run that GitHub did create can take a while to show up
+            print(f"⚠️  Triggering {workflow_file} for config={config} failed ({e}): checking for up to 90s whether "
                   f"it was triggered anyway, before trying again")
-            time.sleep(wait_time)
+            for _ in range(9):
+                time.sleep(10)
+                try:
+                    if find_new_run_by_config(workflow_file, config, set()):
+                        break
+                except requests.exceptions.RequestException:
+                    pass
     raise SystemExit(f"❌ Couldn't trigger {workflow_file} for config={config}")
 
 def list_dispatch_runs_for_workflow(workflow_file, per_page=100):
@@ -413,14 +426,42 @@ def pinned_taskcluster_version(config, ref):
     m = TASKCLUSTER_VERSION_RE.search(content)
     return m.group(3) if m else None
 
+def run_images(workflow_file, config, run_id):
+    """The image IDs that run `run_id` built for `config` (as in imagesets.yml), or None"""
+    cloud = get_cloud_provider(workflow_file)
+    images = []
+    for job in get_workflow_jobs(run_id):
+        name = job["name"]
+        if cloud in ("aws", "gcp"):
+            if name.strip() != f"{cloud.upper()} {config}":
+                continue
+        elif parse_job_name(name)[0] != config:
+            continue
+        if job["conclusion"] != "success":
+            return None
+        image = extract_image_name(download_job_log(job["id"]), cloud)
+        if not image:
+            return None
+        images.extend(image.values() if isinstance(image, dict) else [image])
+    return images or None
+
+def deployed(config, cloud, images):
+    """Whether community-tc's imagesets.yml uses all of `images` for `config`
+    in `cloud`"""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", IMAGESETS_FILE)
+    with open(path) as f:
+        used = json.dumps((YAML(typ="safe").load(f).get(config) or {}).get(cloud) or {})
+    return all(image in used for image in images)
+
 def check_built(output):
     """Writes to `output` (JSON) the image sets of this target whose latest
     successful build has the Taskcluster that a new build would: for prod
     image sets, the latest release (which the bump PR pins), and for staging
-    image sets, Taskcluster's main, with no newer commit. worker-images changes
-    a lot, but it is usually only the Taskcluster version that matters, so
-    imageset.sh asks whether to rebuild them, saying what changed in
-    worker-images since."""
+    image sets, Taskcluster's main, with no newer commit, and whose images are
+    the ones that community-tc uses (as otherwise, skipping them would leave it
+    on older images). worker-images changes a lot, but it is usually only the
+    Taskcluster version that matters, so imageset.sh asks whether to rebuild
+    them, saying what changed in worker-images since."""
     head = gh(f"{API_ROOT}/repos/{REPO}/git/ref/heads/{REF}").json()["object"]["sha"]
     latest = latest_taskcluster_version()
     compared = {}  # worker-images commit -> (commits since, files changed since), on main
@@ -441,6 +482,9 @@ def check_built(output):
                 if pinned_taskcluster_version(config, sha) != latest:
                     continue
                 taskcluster = f"Taskcluster v{latest}, the latest release"
+            images = run_images(workflow_file, config, run["id"])
+            if not images or not deployed(config, get_cloud_provider(workflow_file), images):
+                continue
             if sha not in compared:
                 if sha == head:
                     compared[sha] = (0, [])
@@ -1052,7 +1096,11 @@ def main():
                 SCRIPT_START_TIME = datetime.fromisoformat(f.read().strip())
             print(f"♻️  Using the builds triggered since {SCRIPT_START_TIME:%Y-%m-%d %H:%M} UTC, by an interrupted run")
         else:
-            SCRIPT_START_TIME = datetime.now(timezone.utc)
+            # GitHub's clock, as the runs' times are, rather than this one's
+            # (which can drift, e.g. in a VM), less a margin
+            date = gh(f"{API_ROOT}/rate_limit").headers.get("Date")
+            SCRIPT_START_TIME = (email.utils.parsedate_to_datetime(date) if date else datetime.now(timezone.utc)) \
+                - timedelta(seconds=5)
             if started:
                 with open(started, "w") as f:
                     f.write(SCRIPT_START_TIME.isoformat())

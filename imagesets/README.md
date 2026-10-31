@@ -48,7 +48,7 @@ steps.
    them, or change them.
 
 5) gpg: a key that the taskcluster team password store is encrypted to, and
-   which can sign: `user.signingkey`, or else the key of `user.email`, in your
+   which can sign and encrypt (an ssh signing key won't do): `user.signingkey`, or else the key of `user.email`, in your
    gpg home (`$GNUPGHOME`, or `~/.gnupg`). Only the key is used, by the
    container's gpg (rather than your gpg, agent or configuration): its
    passphrase is asked for once, at the start, and kept only in memory, giving
@@ -58,8 +58,9 @@ steps.
    smartcard aren't supported.
 
 6) macOS workers (`prod` and `all`): a Mozilla LDAP account (asked for,
-   suggesting your git email, or your GitHub account's mozilla.com email, or
-   set `IMAGESET_LDAP_USERNAME`) with an
+   suggesting the account you signed in to Google Cloud with, or else your
+   git email, or your GitHub account's mozilla.com email, or set
+   `IMAGESET_LDAP_USERNAME`) with an
    authenticator app for 2FA (Duo's "Hardware token" option), and a VNC session
    as administrator on each Mac. The Macs are only reachable through the
    Mozilla VPN, which the container connects to (only the container uses it,
@@ -83,9 +84,10 @@ a browser (e.g. over ssh), it shows the URL and code instead.
 The script doesn't use your own configuration of any tools, nor your checkout
 of this repository: it clones upstream `main`, and the container signs in
 during the run, and clones the password store. To test local changes to the
-scripts, set `IMAGESET_LOCAL_CHANGES=true`. If it isn't set, and your
-checkout's files differ from upstream `main`'s, the script lists them, and
-asks whether to use them. It keeps progress (for resuming) and the encrypted
+scripts, set `IMAGESET_LOCAL_CHANGES=true`. If it isn't set, and your checkout
+has changes (files that differ from upstream `main`'s, other than ones where
+your checkout is just behind it), the script lists them, and asks whether to
+use them. It keeps progress (for resuming) and the encrypted
 VPN certificate in `~/.cache/community-tc-imagesets`.
 
 ## What it does
@@ -131,9 +133,10 @@ its worker pools.
 | `MAX_RUN_ATTEMPTS` | Attempts per worker-images workflow run, including reruns of failed jobs (and of jobs cancelled for exceeding their time limit, but not of jobs cancelled by hand) | `5` |
 | `DEPLOY_IMAGES` | Copy Azure images into place and `tc-admin apply` | `true` |
 | `UPDATE_FXCI_IMAGES` | Open the fxci-config PR to use the new images | `true` |
-| `IMAGESET_LOCAL_CHANGES` | Use the files of your checkout (other than `config/`), rather than upstream `main`'s, to test changes to the scripts | `false` |
+| `IMAGESET_LOCAL_CHANGES` | Use your checkout's changes (other than to `config/`), rather than upstream `main`'s files, to test changes to the scripts | asks, if your checkout has changes |
 | `IMAGESET_RESUME` | Whether to resume an unfinished run of the same target (skipping the steps it completed, and waiting for its worker-images builds rather than triggering new ones), rather than start again | asks |
 | `IMAGESET_LDAP_USERNAME` | Your Mozilla LDAP username, for the VPN | asks |
+| `IMAGESET_PASSWORD_STORE_URL` | The git URL of the password store | `https://source.developers.google.com/p/taskcluster-passwords/r/secrets` |
 
 If a run fails, it says which step failed. Rerun the same command to continue
 from there: it asks whether to resume, or to start again.

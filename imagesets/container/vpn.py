@@ -41,7 +41,14 @@ ASKED_CODE = f"{RUN}/asked-code"
 # Warn this long before the certificate expires
 EXPIRY_WARNING = datetime.timedelta(days=30)
 ATTEMPTS = 3
-GPG_FDS = (int(os.environ["IMAGESET_GPG_PASSPHRASE_FD"]),) if os.environ.get("IMAGESET_GPG_PASSPHRASE_FD") else ()
+# The file descriptor that with-gpg gives the passphrase on, if it's open
+def _open_fds(fd):
+    try:
+        os.fstat(fd)
+        return (fd,)
+    except OSError:
+        return ()
+GPG_FDS = _open_fds(int(os.environ["IMAGESET_GPG_PASSPHRASE_FD"])) if os.environ.get("IMAGESET_GPG_PASSPHRASE_FD") else ()
 
 
 class VpnError(Exception):

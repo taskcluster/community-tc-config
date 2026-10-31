@@ -83,7 +83,14 @@ FXCI_CONFIG = "mozilla-releng/fxci-config"
 GCP_PROJECT = os.environ.get("GCP_PROJECT", "taskcluster-imaging")
 AZURE_SUBSCRIPTION_ID = os.environ.get("AZURE_SUBSCRIPTION_ID", "")
 AZURE_RESOURCE_GROUP = os.environ.get("AZURE_IMAGE_RESOURCE_GROUP", "rg-tc-eng-images")
-GPG_FDS = (int(os.environ["IMAGESET_GPG_PASSPHRASE_FD"]),) if os.environ.get("IMAGESET_GPG_PASSPHRASE_FD") else ()
+# The file descriptor that with-gpg gives the passphrase on, if it's open
+def _open_fds(fd):
+    try:
+        os.fstat(fd)
+        return (fd,)
+    except OSError:
+        return ()
+GPG_FDS = _open_fds(int(os.environ["IMAGESET_GPG_PASSPHRASE_FD"])) if os.environ.get("IMAGESET_GPG_PASSPHRASE_FD") else ()
 
 # Errors of a command that may well not happen again if it is repeated (e.g. a
 # dropped connection)
