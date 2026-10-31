@@ -30,12 +30,14 @@ HOW = {
     "community-tc-admin": "ask a member of the taskcluster/community-tc-admins GitHub team "
                           "(https://github.com/orgs/taskcluster/teams/community-tc-admins/members), e.g. in "
                           "#taskcluster:mozilla.org on Matrix (https://chat.mozilla.org), to add you to it",
-    # Managed in mozilla/global-platform-admin (github/tf/mozilla-corporation/organization_teams.tf)
-    "github-org": "open a pull request that adds your Mozilla email to organization_members[\"{org}\"] in "
+    # Membership is managed in mozilla/global-platform-admin (github/tf/mozilla-corporation/organization_teams.tf),
+    # and single sign-on to the organization needs the ghe_<org>_users access group
+    "github-org": "request the ghe_{org}_users access group at https://people.mozilla.org, and open a pull request "
+                  "that adds your Mozilla email to organization_members[\"{org}\"] in "
                   "github/tf/mozilla-corporation/organization_teams.tf of https://github.com/mozilla/global-platform-admin "
                   "(your people.mozilla.org profile needs your GitHub username, and you need to be in the "
                   "gh_access_mozilla LDAP group, which you request in a bug in Infrastructure & Operations :: "
-                  "Infrastructure: LDAP, at https://bugzilla.mozilla.org, and a member of Mozilla's GitHub enterprise)",
+                  "Infrastructure: LDAP, at https://bugzilla.mozilla.org)",
     # The tceng team (Taskcluster Engineering) has the TCEng configs (CODEOWNERS); its maintainer is in relops
     "worker-images": "ask a maintainer of the mozilla-platform-ops/tceng GitHub team "
                      "(https://github.com/orgs/mozilla-platform-ops/teams/tceng/members) to add you to it, for "
