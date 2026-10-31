@@ -333,10 +333,16 @@ function stop-gpg {
   fi
 }
 
+# The user ID of IMAGESET_GPG_KEY with your commit email, or else its primary one
+function key-uid {
+  # awk reads all of gpg's output, which pipefail would otherwise fail on
+  gpg --with-colons --list-keys "${IMAGESET_GPG_KEY}" |
+    awk -F: -v email="<${IMAGESET_GIT_EMAIL}>" '$1 == "uid" { if (!first) first = $10; if (index($10, email)) found = $10 } END { print (found ? found : first) }'
+}
+
 function read-gpg-passphrase {
   local uid
-  # Reading all of gpg's output, which pipefail would otherwise fail on
-  uid="$(gpg --with-colons --list-keys "${IMAGESET_GPG_KEY}" | awk -F: '$1 == "uid" && !found { print $10; found = 1 }')"
+  uid="$(key-uid)"
   if ! [ -t 0 ]; then
     echo "imageset.sh needs a terminal, to ask for the passphrase of your gpg key." >&2
     return 1
@@ -595,6 +601,8 @@ function update-mac {
   retry-mac install-mac-files "${host}"
   # The lock stops a retry from running alongside an interrupted run
   retry-mac mac-ssh "${host}" sudo -n lockf -t 900 /var/run/com.mozilla.genericworker.update.lock /var/root/update.sh
+  # update.sh only says when something is wrong
+  echo "${host%%.*}: updated the worker to the latest Taskcluster release ($(gh api repos/taskcluster/taskcluster/releases/latest --jq .tag_name 2> /dev/null || echo latest)), and restarted it"
 }
 
 function build-images {
@@ -774,8 +782,7 @@ function confirm-identity {
       ask-identity
       continue
     fi
-    uid="$(GNUPGHOME="${HOST_GNUPGHOME}" gpg --with-colons --list-keys "${IMAGESET_GPG_KEY}" |
-      awk -F: -v email="<${IMAGESET_GIT_EMAIL}>" '$1 == "uid" { if (!first) first = $10; if (index($10, email)) match_ = $10 } END { print (match_ ? match_ : first) }')"
+    uid="$(GNUPGHOME="${HOST_GNUPGHOME}" key-uid)"
     echo
     echo "Commits will be made as ${IMAGESET_GIT_NAME} <${IMAGESET_GIT_EMAIL}>, signed with your gpg key ${IMAGESET_GPG_KEY} (${uid}), with the GitHub account you sign in with, to:"
     repositories | sed 's/^/  - /'
@@ -815,7 +822,8 @@ function login-gcloud {
     return
   fi
   address="$(ip -4 -o addr show eth0 | awk '{ print $4 }' | cut -d/ -f1)"
-  socat "TCP-LISTEN:8085,bind=${address},fork,reuseaddr" TCP:127.0.0.1:8085 &
+  # Quiet, as it says when it is stopped
+  socat "TCP-LISTEN:8085,bind=${address},fork,reuseaddr" TCP:127.0.0.1:8085 2> /dev/null &
   socat_pid=$!
   # gcloud only launches a browser if there's a display. Its messages go to a
   # file, as it doesn't launch one if they go to a pipe.
