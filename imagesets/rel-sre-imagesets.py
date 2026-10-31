@@ -100,6 +100,17 @@ yaml.explicit_end = False
 SCRIPT_START_TIME = datetime.now(timezone.utc)
 
 
+# Errors of a command that may well not happen again if it is repeated (e.g. a
+# dropped connection)
+TRANSIENT_RE = re.compile(
+    r"SSL|EOF|Connection (aborted|reset|refused|timed out|closed)|RemoteDisconnected|timed out|Timeout|"
+    r"Could not resolve|Name or service not known|Temporary failure in name resolution|Max retries exceeded|"
+    r"TooManyRequests|Throttl|InternalServerError|ServiceUnavailable|GatewayTimeout|BadGateway|"
+    r"HTTP 5\d\d|error: 5\d\d|remote end hung up|RPC failed|i/o timeout|TLS handshake|No route to host|"
+    r"Network is unreachable", re.I)
+# Up to about 6 minutes
+RETRY_SECONDS = [5, 10, 20, 40, 60, 60, 60, 60, 60]
+
 # ---- Utility ----
 def gh(url, method="GET", max_retries=12, **kwargs) -> Response:
     """Make a GitHub API request with retry logic for network failures and
@@ -129,6 +140,17 @@ def gh(url, method="GET", max_retries=12, **kwargs) -> Response:
                 raise
     # This should never be reached due to raise, but satisfies type checker
     raise RuntimeError("Unexpected: max_retries loop completed without return or raise")
+
+def run_retrying(args, **kwargs):
+    """subprocess.run, repeated on transient errors, for commands that can be
+    repeated (reads, or writes that are the same if repeated)"""
+    for wait in [*RETRY_SECONDS, None]:
+        r = subprocess.run(args, capture_output=True, text=True, **kwargs)
+        if r.returncode == 0 or wait is None or not TRANSIENT_RE.search(r.stderr):
+            return r
+        print(f"⚠️  {' '.join(args[:3])} failed ({r.stderr.strip().splitlines()[-1][:120] if r.stderr.strip() else ''}): "
+              f"trying again in {wait}s")
+        time.sleep(wait)
 
 def get_cloud_provider(workflow_file: str) -> str:
     """
@@ -917,12 +939,33 @@ def open_fxci_pr():
         imagesets = yaml.load(f)
     with tempfile.TemporaryDirectory() as tmp:
         def git(*args):
-            return subprocess.run(["git", *args], cwd=f"{tmp}/fxci-config", check=True,
-                                  capture_output=True, text=True, pass_fds=GPG_PASSPHRASE_FDS).stdout.strip()
+            # fetch, and a push of the same commit, can be repeated (and the others don't use the network)
+            r = run_retrying(["git", *args], cwd=f"{tmp}/fxci-config", pass_fds=GPG_PASSPHRASE_FDS)
+            if r.returncode:
+                raise subprocess.CalledProcessError(r.returncode, r.args, r.stdout, r.stderr)
+            return r.stdout.strip()
+
+        def gh_cli(*args):
+            r = run_retrying(["gh", *args])
+            if r.returncode:
+                raise subprocess.CalledProcessError(r.returncode, r.args, r.stdout, r.stderr)
+            return r.stdout.strip()
+
+        def existing_pr(branch):
+            return gh_cli("pr", "list", "--repo", FXCI_REPO, "--head", branch, "--state", "open",
+                          "--json", "url", "--jq", ".[].url")
 
         # Clones your fork (creating it if needed) as `origin`, with fxci-config as `upstream`
-        fork = subprocess.run(["gh", "repo", "fork", FXCI_REPO, "--clone", "--default-branch-only"], cwd=tmp,
-                              capture_output=True, text=True)
+        # A failed clone's leftovers are removed, so that it can be repeated
+        def fork_and_clone():
+            subprocess.run(["rm", "-rf", f"{tmp}/fxci-config"])
+            return subprocess.run(["gh", "repo", "fork", FXCI_REPO, "--clone", "--default-branch-only"], cwd=tmp,
+                                  capture_output=True, text=True)
+        for wait in [*RETRY_SECONDS, None]:
+            fork = fork_and_clone()
+            if fork.returncode == 0 or wait is None or not TRANSIENT_RE.search(fork.stderr):
+                break
+            time.sleep(wait)
         if fork.returncode != 0:
             raise SystemExit(f"❌ Couldn't fork and clone {FXCI_REPO}:\n{fork.stdout}{fork.stderr}")
         git("fetch", "upstream", "main")
@@ -946,8 +989,7 @@ def open_fxci_pr():
         # The same images give the same branch, so a rerun reuses the PR
         with open(images_file, "rb") as f:
             branch = f"tceng-images-{hashlib.sha256(f.read()).hexdigest()[:12]}"
-        existing = subprocess.run(["gh", "pr", "list", "--repo", FXCI_REPO, "--head", branch, "--state", "open",
-                                   "--json", "url", "--jq", ".[].url"], capture_output=True, text=True, check=True).stdout.strip()
+        existing = existing_pr(branch)
         if existing:
             print(f"♻️  Reusing {existing}")
             return
@@ -955,9 +997,20 @@ def open_fxci_pr():
         title, body = fxci_pr_text(changes, scripts)
         git("commit", "--all", "--message", title)
         git("push", "--force", "origin", f"HEAD:refs/heads/{branch}")
-        fork_owner = subprocess.run(["gh", "api", "user", "--jq", ".login"], capture_output=True, text=True, check=True).stdout.strip()
-        subprocess.run(["gh", "pr", "create", "--repo", FXCI_REPO, "--base", "main", "--head", f"{fork_owner}:{branch}",
-                        "--title", title, "--body", body], check=True)
+        fork_owner = gh_cli("api", "user", "--jq", ".login")
+        # Creating it isn't simply repeated (it may have been created, if
+        # creating it failed), but whether it exists is checked again
+        for attempt in range(5):
+            created = subprocess.run(["gh", "pr", "create", "--repo", FXCI_REPO, "--base", "main",
+                                      "--head", f"{fork_owner}:{branch}", "--title", title, "--body", body])
+            if created.returncode == 0:
+                return
+            time.sleep(30)
+            existing = existing_pr(branch)
+            if existing:
+                print(f"♻️  {existing} was opened, although opening it failed")
+                return
+        raise SystemExit(f"❌ Couldn't open the pull request for {fork_owner}:{branch} in {FXCI_REPO}")
 
 
 # ---- Main ----
