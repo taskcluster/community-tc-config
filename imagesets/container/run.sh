@@ -830,11 +830,31 @@ function login-gcloud {
   echo "Signed in to Google Cloud as $(gcloud auth list --filter=status:ACTIVE --format='value(account)')."
 }
 
+# The GitHub organizations that this run needs single sign-on to (as GitHub
+# shows them, when signing in), one per line: taskcluster for
+# community-tc-config, and mozilla-platform-ops for worker-images. fxci-config's
+# (mozilla-releng) has no single sign-on.
+function sso-organizations {
+  if "${UPDATE_OFFERINGS}" || "${BUILD_IMAGES}"; then
+    echo "Taskcluster Platform (taskcluster)"
+  fi
+  if "${BUILD_IMAGES}"; then
+    echo "mozilla-platform-ops"
+  fi
+}
+
 # The token is stored in GH_CONFIG_DIR, in the container. gh only shows the
 # code and URL (as prompts are disabled), which are opened in your browser.
 function login-github {
   local line
   local code=''
+  local organizations
+  organizations="$(sso-organizations | paste -sd ',' - | sed 's/,/ and /')"
+  if [ -n "${organizations}" ]; then
+    echo "When GitHub asks which organizations to authorize single sign-on to, choose ${organizations}: the others aren't needed."
+  else
+    echo "When GitHub asks which organizations to authorize single sign-on to, none are needed."
+  fi
   # user:email and read:gpg_key, to check that your commits will show as verified
   gh auth login --hostname github.com --git-protocol https --scopes workflow,read:org,user:email,read:gpg_key --insecure-storage --web 2>&1 |
     while IFS= read -r line; do
