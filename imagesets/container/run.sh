@@ -91,9 +91,10 @@ MAC_FILES=(
 
 # Install MAC_FILES on a macOS worker, with a script that runs on the worker as
 # root. In runner.yml, @WORKER_ID@ is replaced with the worker's hostname,
-# @PUBLIC_IP@ with its public IP address, and @STATIC_SECRET@ with the
+# @PUBLIC_IP@ with its public IP address, @STATIC_SECRET@ with the
 # staticSecret in its existing runner.yml (so the secret never leaves the
-# worker). Each file is written to a new file that is renamed
+# worker), and @MISC_MAC_COMMIT@ with MISC_MAC_COMMIT (see
+# misc-mac-commit). Each file is written to a new file that is renamed
 # into place, so that a running script isn't modified.
 function install-mac-files {
   local host="${1}"
@@ -124,6 +125,7 @@ function replace_placeholders {
       replace("@WORKER_ID@", ENVIRON["WORKER_ID"])
       replace("@PUBLIC_IP@", ENVIRON["PUBLIC_IP"])
       replace("@STATIC_SECRET@", ENVIRON["STATIC_SECRET"])
+      replace("@MISC_MAC_COMMIT@", ENVIRON["MISC_MAC_COMMIT"])
     }
     { print }
   '
@@ -140,6 +142,7 @@ fi
 export PUBLIC_IP
 EOF
     echo "export WORKER_ID='${host%%.*}'"
+    echo "export MISC_MAC_COMMIT='${MISC_MAC_COMMIT}'"
     for entry in "${MAC_FILES[@]}"; do
       IFS=: read -r file dest mode <<< "${entry}"
       echo "base64 -d << 'END_OF_BASE64' | replace_placeholders > '${dest}.new'"
@@ -955,8 +958,20 @@ function vpn {
 # The macOS workers are only reachable through the VPN, which is only
 # connected for them, while you are there (it needs a 2FA code to connect, and
 # again to reconnect).
+# Sets MISC_MAC_COMMIT, for the workers' machine-setup link (in runner.yml):
+# the upstream commit that last changed misc/mac, so that the link only
+# changes when the files do. Your local changes (IMAGESET_LOCAL_CHANGES) to
+# misc/mac aren't in any upstream commit, so it can only be upstream's.
+function misc-mac-commit {
+  MISC_MAC_COMMIT="$(git -C "${IMAGESETS_DIR}/.." log -1 --format=%H -- misc/mac)"
+  if [ -n "$(git -C "${IMAGESETS_DIR}/.." status --porcelain -- misc/mac)" ]; then
+    echo "WARNING: your checkout's misc/mac differs from upstream main's, so the macOS workers' machine-setup link (to ${MISC_MAC_COMMIT:0:7}) won't show your changes" >&2
+  fi
+}
+
 function update-macs {
   local host
+  misc-mac-commit
   vpn connect
   VPN_CONNECTED=true
   check-mac-connectivity "$@"
