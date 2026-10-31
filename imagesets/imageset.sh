@@ -134,7 +134,7 @@ function choose-resume {
     true | false | '') ;;
     *) echo "IMAGESET_RESUME must be true or false" >&2; return 1 ;;
   esac
-  if [ -n "${IMAGESET_RESUME-}" ] || ! { [ -f "${steps}" ] || [ -f "${runs}" ]; }; then
+  if [ -n "${IMAGESET_RESUME-}" ] || ! { [ -f "${steps}" ] || [ -f "${runs}" ] || [ -f "${runs}.started" ]; }; then
     IMAGESET_RESUME="${IMAGESET_RESUME:-false}"
     return
   fi
@@ -142,7 +142,7 @@ function choose-resume {
   if [ -f "${steps}" ]; then
     echo "Steps it completed: $(paste -sd , - < "${steps}")"
   fi
-  if [ -f "${runs}" ]; then
+  if [ -f "${runs}" ] || [ -f "${runs}.started" ]; then
     echo "It triggered worker-images builds, which resuming waits for, rather than triggering new ones."
   fi
   while true; do

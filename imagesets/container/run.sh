@@ -622,7 +622,7 @@ function finish {
   local status="${1}"
   if [ "${status}" == 0 ]; then
     if [ -n "${STEPS_FILE}" ]; then
-      rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}"
+      rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}" "${IMAGESET_RUNS_FILE}.started"
     fi
   elif [ -n "${STEPS_FILE}" ]; then
     echo >&2
@@ -1036,8 +1036,8 @@ function deploy-image-sets {
   clone-password-store
   preflight secrets
 
-  # Unless resuming builds that a previous run started
-  if "${BUILD_IMAGES}" && ! step-done build-images && ! [ -f "${IMAGESET_RUNS_FILE}" ]; then
+  # Unless resuming builds that a previous run started (or started triggering)
+  if "${BUILD_IMAGES}" && ! step-done build-images && ! [ -f "${IMAGESET_RUNS_FILE}" ] && ! [ -f "${IMAGESET_RUNS_FILE}.started" ]; then
     check-built-images
   fi
 
@@ -1142,7 +1142,7 @@ VPN_CONNECTED=false
 trap 'status=$?; on-exit "${status}"; exit "${status}"' EXIT
 
 if ! "${IMAGESET_RESUME:-false}"; then
-  rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}"
+  rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}" "${IMAGESET_RUNS_FILE}.started"
 elif [ -f "${STEPS_FILE}" ]; then
   echo "Resuming the previous run: skipping the steps it completed ($(paste -sd , - < "${STEPS_FILE}"))"
 fi
