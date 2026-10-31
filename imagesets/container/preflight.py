@@ -24,8 +24,9 @@ import sys
 import time
 import urllib.parse
 
-# How to get each kind of access. TODO: the ones marked (unverified) are the
-# best guesses of an audit: confirm them with the team, and update them.
+# How to get each kind of access, as found in mozilla/global-platform-admin,
+# the cloud projects' IAM policies, the password store's .gpg-id, past
+# Bugzilla requests, and deployment-details.md.
 HOW = {
     # Its members are all maintainers, who can add you
     "community-tc-admin": "ask a member of the taskcluster/community-tc-admins GitHub team "
@@ -62,7 +63,10 @@ HOW = {
     # Anyone whose key is in its .gpg-id can
     "password-store": "ask someone whose gpg key the password store is encrypted to (in the Taskcluster team) to add "
                       "yours ({key}) to its .gpg-id, and re-encrypt it (pass init)",
-    "taskcluster": "ask the Taskcluster team: community-tc/root in the password store may be out of date (unverified)",
+    # The root credentials are in the deployment's configuration (deployment-details.md)
+    "taskcluster": "ask the Taskcluster team: community-tc/root in the password store may be out of date, or the "
+                   "deployment's root credentials may have changed (which cloudops manage: see Cloud Services :: "
+                   "Operations: Taskcluster Services, at https://bugzilla.mozilla.org)",
 }
 
 BUILD_IMAGES = os.environ["BUILD_IMAGES"] == "true"
@@ -231,7 +235,7 @@ def check_worker_images():
         else:
             fail(f"GitHub: workflow {workflow} of {WORKER_IMAGES} isn't active ({status}: "
                  f"{(body or {}).get('state') or (body or {}).get('message')})",
-                 "ask Release Operations (relops) about it (unverified)")
+                 "ask Release Operations (relops), who own the repository (see its CODEOWNERS)")
     if UPDATE_TASKCLUSTER_VERSION:
         status, _, rules = gh(f"repos/{WORKER_IMAGES}/rules/branches/tceng-tc-v0.0.0")
         if status == 200 and rules:
@@ -252,7 +256,7 @@ def check_fork(upstream):
     exist yet)"""
     status, _, repo = gh(f"repos/{upstream}")
     if status != 200 or not repo.get("allow_forking"):
-        fail(f"GitHub: {upstream} can't be forked, for its pull request", "ask its admins (unverified)")
+        fail(f"GitHub: {upstream} can't be forked, for its pull request", "ask its admins")
         return False
     login = gh("user")[2]["login"]
     name = upstream.split("/")[1]
