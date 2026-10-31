@@ -55,12 +55,30 @@ def log(prefix, message):
         print(f"   [{prefix}] {message}" if prefix else message, flush=True)
 
 
+# Errors of a request that may well succeed if it is repeated (e.g. after a
+# connection drops)
+TRANSIENT_RE = re.compile(
+    r"SSL|EOF occurred|Connection (aborted|reset|refused)|RemoteDisconnected|timed out|Timeout|"
+    r"Name or service not known|Temporary failure in name resolution|Max retries exceeded|"
+    r"TooManyRequests|InternalServerError|ServiceUnavailable|GatewayTimeout|BadGateway", re.I)
+# Up to about 6 minutes
+RETRY_SECONDS = [5, 10, 20, 40, 60, 60, 60, 60, 60]
+
+
 def az(*args):
-    result = subprocess.run(["az", *args, "--only-show-errors", "-o", "json"],
-                            capture_output=True, text=True)
-    if result.returncode:
-        raise CopyError(f"az {' '.join(args[:3])} failed: {result.stderr.strip()}")
-    return json.loads(result.stdout) if result.stdout.strip() else None
+    """Runs az. Read-only calls (show, list) are repeated on transient errors,
+    for a few minutes: others aren't, as a failed call may have been done, but
+    what exists is checked again when the copy is rerun."""
+    read_only = any(a in ("show", "list") for a in args[:3])
+    for wait in [*RETRY_SECONDS, None]:
+        result = subprocess.run(["az", *args, "--only-show-errors", "-o", "json"],
+                                capture_output=True, text=True)
+        if not result.returncode:
+            return json.loads(result.stdout) if result.stdout.strip() else None
+        if not read_only or wait is None or not TRANSIENT_RE.search(result.stderr):
+            raise CopyError(f"az {' '.join(args[:3])} failed: {result.stderr.strip()}")
+        log("", f"   az {' '.join(args[:3])} failed ({result.stderr.strip().splitlines()[0][:120]}): retrying in {wait}s")
+        time.sleep(wait)
 
 
 def az_or_none(*args):
