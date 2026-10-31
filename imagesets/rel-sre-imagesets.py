@@ -852,14 +852,55 @@ def update_fxci_script(imagesets, image_set, worker_images, fxci_image):
     image[FXCI_METADATA_KEY].setdefault("machine-setup", {})["script"] = script
     return script
 
+def same_taskcluster(image_set, cloud, old_names, new_names, old_script, new_script):
+    """Whether new images of `image_set` would have the Taskcluster that fxci's
+    current (old) ones have: for production image sets, the same pinned
+    release (at the worker-images commits that their bootstrap script links
+    are at), and for staging image sets, no commit on Taskcluster's main
+    between their builds. False if that can't be told."""
+    if image_set.endswith("-staging"):
+        _, old_run = worker_images_jobs(image_set, cloud, old_names)
+        _, new_run = worker_images_jobs(image_set, cloud, new_names)
+        if not old_run or not new_run:
+            return False
+        newer = gh(f"{API_ROOT}/repos/taskcluster/taskcluster/commits",
+                   params={"sha": "main", "since": old_run["created_at"], "until": new_run["created_at"],
+                           "per_page": 1}).json()
+        return not newer
+    sha = re.compile(re.escape(WORKER_IMAGES_RAW_URL) + r"([0-9a-f]{40})/")
+    old, new = sha.match(old_script or ""), sha.match(new_script or "")
+    if not old or not new:
+        return False
+    old_version = pinned_taskcluster_version(image_set, old.group(1))
+    return old_version is not None and old_version == pinned_taskcluster_version(image_set, new.group(1))
+
 def update_fxci_images(imagesets, worker_images):
     """Point the images in `worker_images` (fxci's worker-images.yml) at those in
     `imagesets`, in place, and link the updated ones to the bootstrap scripts
-    they were built with. Returns ([(fxci image, location, old, new)],
-    {fxci image: bootstrap script URL})."""
+    they were built with.
+    Returns ([(fxci image, location, old, new)],
+    {fxci image: bootstrap script URL}).
+
+    As it is usually only the Taskcluster version of the images that matters,
+    images that would have the Taskcluster that fxci's have already (e.g. as a
+    pull request like this one, from another run, has been merged) aren't
+    updated, unless their image set was rebuilt anyway, when you were asked
+    (IMAGESET_REBUILD_SAME, from imageset.sh)."""
     changes = []
     scripts = {}
     missing = []
+    rebuilt_anyway = os.environ.get("IMAGESET_REBUILD_SAME", "").split()
+
+    def wanted(fxci_image, image_set, cloud, old_names, new_names):
+        old_script = (worker_images[fxci_image].get(FXCI_METADATA_KEY) or {}).get("machine-setup", {}).get("script")
+        new_script = (imagesets[image_set].get("workerConfig", {}).get("genericWorker", {}).get("config", {})
+                      .get("workerTypeMetadata", {}).get("machine-setup", {}).get("script"))
+        if image_set in rebuilt_anyway or not same_taskcluster(image_set, cloud, old_names, new_names,
+                                                               old_script, new_script):
+            return True
+        print(f"ℹ️  fxci's {fxci_image} already has the Taskcluster that {image_set}'s new images have, so not updating it")
+        return False
+
     for fxci_image, (image_set, provider_id) in FXCI_IMAGES.items():
         if provider_id not in worker_images.get(fxci_image, {}):
             print(f"ℹ️  fxci has no {fxci_image} image for {provider_id}, so not updating it")
@@ -869,7 +910,8 @@ def update_fxci_images(imagesets, worker_images):
         if isinstance(current, str):
             # GCP: one image for all regions
             new = imagesets[image_set]["gcp"]["image"]
-            if current != new:
+            if current != new and wanted(fxci_image, image_set, "gcp", [current.rsplit("/", 1)[-1]],
+                                         [new.rsplit("/", 1)[-1]]):
                 worker_images[fxci_image][provider_id] = new
                 changes.append((fxci_image, None, current, new))
                 scripts[fxci_image] = update_fxci_script(imagesets, image_set, worker_images, fxci_image)
@@ -882,6 +924,7 @@ def update_fxci_images(imagesets, worker_images):
             raise SystemExit(f"❌ fxci's {fxci_image} has a deployment_id, which fxci appends to managed image "
                              "names, so can't be updated with full image names")
         built = imagesets[image_set]["azure"]["images"]
+        updates = {}
         for location in [k for k in current if k not in FXCI_AZURE_SETTINGS]:
             path = built.get(location.replace("-", ""))
             if not path:
@@ -889,6 +932,9 @@ def update_fxci_images(imagesets, worker_images):
                 continue
             new = path.rsplit("/", 1)[-1]
             if current[location] != new:
+                updates[location] = new
+        if updates and wanted(fxci_image, image_set, "azure", [current[l] for l in updates], list(updates.values())):
+            for location, new in updates.items():
                 changes.append((fxci_image, location, current[location], new))
                 current[location] = new
         if len(changes) > changed:

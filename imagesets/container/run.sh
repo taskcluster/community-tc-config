@@ -689,7 +689,7 @@ function finish {
   local status="${1}"
   if [ "${status}" == 0 ]; then
     if [ -n "${STEPS_FILE}" ]; then
-      rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}" "${IMAGESET_RUNS_FILE}.started" "${IMAGESET_RUNS_FILE}.skip"
+      rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}" "${IMAGESET_RUNS_FILE}.started" "${IMAGESET_RUNS_FILE}.skip" "${IMAGESET_RUNS_FILE}.rebuild"
     fi
   elif [ -n "${STEPS_FILE}" ]; then
     echo >&2
@@ -975,7 +975,14 @@ function check-built-images {
   while true; do
     read -r -p "Rebuild them anyway (r), or skip them (s)? " answer
     case "${answer}" in
-      r | R) return ;;
+      r | R)
+        # So that fxci is updated to them too, which it otherwise isn't, for
+        # images with the Taskcluster it has (see rel-sre-imagesets.py)
+        IMAGESET_REBUILD_SAME="$(built-field configs "${built}")"
+        export IMAGESET_REBUILD_SAME
+        echo "${IMAGESET_REBUILD_SAME}" > "${IMAGESET_RUNS_FILE}.rebuild"
+        return
+        ;;
       s | S) break ;;
     esac
   done
@@ -985,7 +992,7 @@ function check-built-images {
   echo "${IMAGESET_SKIP_BUILDS}" > "${IMAGESET_RUNS_FILE}.skip"
 }
 
-# A field of check-built-images' JSON: count, head, list or skip
+# A field of check-built-images' JSON: count, head, list, skip or configs
 function built-field {
   python3 - "${1}" "${2}" << 'EOF'
 import json, sys
@@ -1012,6 +1019,8 @@ elif field == "list":
         print(f"      {'; '.join(changes)}")
 elif field == "skip":
     print(" ".join(f"{b['workflow']}:{b['config']}" for b in built))
+elif field == "configs":
+    print(" ".join(sorted({b["config"] for b in built})))
 EOF
 }
 
@@ -1131,9 +1140,10 @@ function deploy-image-sets {
 
   # Unless resuming builds that a previous run started (or started
   # triggering), whose choice of what to skip is kept
-  if [ -f "${IMAGESET_RUNS_FILE}.skip" ]; then
-    IMAGESET_SKIP_BUILDS="$(cat "${IMAGESET_RUNS_FILE}.skip")"
-    export IMAGESET_SKIP_BUILDS
+  if [ -f "${IMAGESET_RUNS_FILE}.skip" ] || [ -f "${IMAGESET_RUNS_FILE}.rebuild" ]; then
+    IMAGESET_SKIP_BUILDS="$(cat "${IMAGESET_RUNS_FILE}.skip" 2> /dev/null || true)"
+    IMAGESET_REBUILD_SAME="$(cat "${IMAGESET_RUNS_FILE}.rebuild" 2> /dev/null || true)"
+    export IMAGESET_SKIP_BUILDS IMAGESET_REBUILD_SAME
   elif "${BUILD_IMAGES}" && ! step-done build-images && ! [ -f "${IMAGESET_RUNS_FILE}" ] && ! [ -f "${IMAGESET_RUNS_FILE}.started" ]; then
     check-built-images
   fi
@@ -1239,7 +1249,7 @@ VPN_CONNECTED=false
 trap 'status=$?; on-exit "${status}"; exit "${status}"' EXIT
 
 if ! "${IMAGESET_RESUME:-false}"; then
-  rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}" "${IMAGESET_RUNS_FILE}.started" "${IMAGESET_RUNS_FILE}.skip"
+  rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}" "${IMAGESET_RUNS_FILE}.started" "${IMAGESET_RUNS_FILE}.skip" "${IMAGESET_RUNS_FILE}.rebuild"
 elif [ -f "${STEPS_FILE}" ]; then
   echo "Resuming the previous run: skipping the steps it completed ($(paste -sd , - < "${STEPS_FILE}"))"
 fi
