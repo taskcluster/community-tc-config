@@ -58,8 +58,13 @@ for _workflows in (TARGET_WORKFLOWS["prod"], TARGET_WORKFLOWS["staging"]):
 TARGET = os.environ.get("IMAGESET_TARGET", "prod")
 if TARGET not in TARGET_WORKFLOWS:
     raise SystemExit(f"IMAGESET_TARGET must be one of {', '.join(TARGET_WORKFLOWS)}, not {TARGET!r}")
-# The image sets to build and log
-WORKFLOWS = TARGET_WORKFLOWS[TARGET]
+# The image sets to build and log, other than the ones that imageset.sh was told
+# to skip (as "workflow_file:config", space-separated), e.g. as already built
+WORKFLOWS = {
+    workflow_file: [c for c in configs if f"{workflow_file}:{c}" not in os.environ.get("IMAGESET_SKIP_BUILDS", "").split()]
+    for workflow_file, configs in TARGET_WORKFLOWS[TARGET].items()
+}
+WORKFLOWS = {workflow_file: configs for workflow_file, configs in WORKFLOWS.items() if configs}
 IMAGESETS_FILE = "config/imagesets.yml"
 # Every file in this worker-images directory that pins `taskcluster_version`
 # is bumped to the latest Taskcluster release before building.
@@ -331,6 +336,41 @@ def bump_taskcluster_version(wait=True):
     still = outdated_tceng_configs(base_sha, version)
     if still:
         raise SystemExit(f"❌ {REF} still doesn't pin v{version} after merge: {', '.join(sorted(still))}")
+
+
+# ---- Already built? ----
+def latest_successful_run(workflow_file, config):
+    """The latest successful build of `config` by `workflow_file`, or None"""
+    runs = list_dispatch_runs_for_workflow(workflow_file, per_page=100)
+    for run in sorted(runs, key=lambda r: r["created_at"], reverse=True):
+        if title_to_config(run.get("display_title") or run.get("name", "")) == config and run["conclusion"] == "success":
+            return run
+    return None
+
+def check_built(output):
+    """Writes to `output` (JSON) the image sets of this target that are already
+    built from what a new build would use: worker-images' current main, which
+    pins the latest Taskcluster release, and for staging image sets, with no
+    newer commit on Taskcluster's main. Rebuilding them would only pick up
+    changes elsewhere (e.g. updates of the base images), so imageset.sh asks."""
+    head = gh(f"{API_ROOT}/repos/{REPO}/git/ref/heads/{REF}").json()["object"]["sha"]
+    bumps = outdated_tceng_configs(head, latest_taskcluster_version()) if \
+        os.environ.get("UPDATE_TASKCLUSTER_VERSION", "true") == "true" else {}
+    built = []
+    for workflow_file, configs in WORKFLOWS.items():
+        for config in configs:
+            run = latest_successful_run(workflow_file, config)
+            if not run or run["head_sha"] != head or f"{TCENG_CONFIG_DIR}/{config}.yaml" in bumps:
+                continue
+            if config.endswith("-staging"):
+                newer = gh(f"{API_ROOT}/repos/taskcluster/taskcluster/commits",
+                           params={"sha": "main", "since": run["created_at"], "per_page": 1}).json()
+                if newer:
+                    continue
+            built.append({"workflow": workflow_file, "config": config, "cloud": get_cloud_provider(workflow_file),
+                          "built": run["created_at"][:10], "url": run["html_url"]})
+    with open(output, "w") as f:
+        json.dump({"head": head, "built": built}, f)
 
 
 # ---- Selection / matching ----
@@ -868,6 +908,12 @@ def main():
         return
     if sys.argv[1:] == ["--open-fxci-pr"]:
         open_fxci_pr()
+        return
+    if sys.argv[1:2] == ["--check-built"] and len(sys.argv) == 3:
+        check_built(sys.argv[2])
+        return
+    if not WORKFLOWS:
+        print("ℹ️  No image sets to build (all were skipped).")
         return
 
     if RUNS_FILE and os.path.exists(RUNS_FILE):
