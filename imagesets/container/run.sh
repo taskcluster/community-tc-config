@@ -34,6 +34,33 @@ function retry {
 
 # Sets MAC_SSH_OPTIONS, for ssh to the macOS workers as administrator.
 # StrictHostKeyChecking, as SSH_ASKPASS would answer a host key prompt.
+# Errors that may well not happen again if the command is repeated (e.g. a
+# dropped connection)
+TRANSIENT_ERRORS='SSL|EOF|[Cc]onnection (aborted|reset|refused|timed out|closed)|RemoteDisconnected|[Tt]imed out|[Tt]imeout|Could not resolve|[Nn]ame or service not known|[Tt]emporary failure in name resolution|Max retries exceeded|TooManyRequests|[Tt]hrottl|InternalServerError|ServiceUnavailable|GatewayTimeout|BadGateway|HTTP 5[0-9][0-9]|error: 5[0-9][0-9]|remote end hung up|RPC failed|i/o timeout|TLS handshake|[Nn]o route to host|[Nn]etwork is unreachable'
+
+# Runs a command, repeating it for about 6 minutes if it fails with a transient
+# error (rather than any error, which retry repeats): only for commands that
+# can be repeated, i.e. reads, or writes that are the same if repeated (e.g.
+# pushing the same commit)
+function retry-transient {
+  local wait
+  local status
+  local errors
+  errors="$(mktemp)"
+  for wait in 5 10 20 40 60 60 60 60 60 ''; do
+    status=0
+    # Its errors are copied to the file, and its output is kept as it is (with
+    # pipefail, the pipeline's status is the command's)
+    { "$@" 2>&1 1>&3 3>&- | tee "${errors}" >&2 3>&-; } 3>&1 || status=$?
+    if [ "${status}" == 0 ] || [ -z "${wait}" ] || ! grep -qE "${TRANSIENT_ERRORS}" "${errors}"; then
+      rm -f "${errors}"
+      return "${status}"
+    fi
+    echo "That looks like a transient error: trying again in ${wait}s..." >&2
+    sleep "${wait}"
+  done
+}
+
 function mac-ssh-options {
   MAC_SSH_OPTIONS=(
     -F /dev/null
@@ -416,7 +443,13 @@ function disable-ssh-keys {
 function clone-password-store {
   export PASSWORD_STORE_DIR="${PREP_DIR}/password-store"
   echo "Cloning the password store from ${IMAGESET_PASSWORD_STORE_URL}..."
-  git clone --quiet --depth 1 "${IMAGESET_PASSWORD_STORE_URL}" "${PASSWORD_STORE_DIR}"
+  retry-transient fresh-clone "${IMAGESET_PASSWORD_STORE_URL}" "${PASSWORD_STORE_DIR}"
+}
+
+# Without what a failed clone left behind, so that it can be repeated
+function fresh-clone {
+  rm -rf "${2}"
+  git clone --quiet --depth 1 "${1}" "${2}"
 }
 
 function filter-aws-login {
@@ -462,7 +495,7 @@ EOF
   else
     aws sso login --sso-session community-tc-imagesets --use-device-code --no-browser
   fi
-  if ! account="$(aws sts get-caller-identity --query Account --output text)"; then
+  if ! account="$(retry-transient aws sts get-caller-identity --query Account --output text)"; then
     echo "You don't have the AdministratorAccess role on the AWS account moz-fx-tc-community-workers (${AWS_ACCOUNT_ID}): request membership of the cloudservices_aws_taskcluster_devs access group at https://people.mozilla.org" >&2
     return 1
   fi
@@ -496,7 +529,7 @@ function push-to-main {
 # deployed is on main
 function publish-changes {
   local step="${1}"
-  git fetch --quiet "${OFFICIAL_GIT_REPO}" main
+  retry-transient git fetch --quiet "${OFFICIAL_GIT_REPO}" main
   if [ -z "$(git rev-list FETCH_HEAD..HEAD)" ]; then
     return
   fi
@@ -519,28 +552,42 @@ function pull-request {
   local url
   local title
   local state
-  login="$(gh api user --jq .login)"
+  local attempt
+  login="$(retry-transient gh api user --jq .login)"
   if [ "${COMMUNITY_TC_CONFIG_PUBLISH}" == fork ]; then
     owner="${login}"
     # Nothing, if it exists already
-    gh repo fork taskcluster/community-tc-config --clone=false --default-branch-only > /dev/null 2>&1 || true
+    retry-transient gh repo fork taskcluster/community-tc-config --clone=false --default-branch-only > /dev/null 2>&1 || true
   else
     owner=taskcluster
   fi
   remote="https://github.com/${owner}/community-tc-config"
   # A new fork may take a moment to appear
   retry git push --quiet --force "${remote}" "HEAD:refs/heads/${branch}"
-  url="$(gh pr list --repo taskcluster/community-tc-config --head "${branch}" --state open --json url,headRepositoryOwner \
-    --jq "[.[] | select(.headRepositoryOwner.login == \"${owner}\") | .url][0] // empty")"
-  if [ -z "${url}" ]; then
-    if [ "$(git rev-list --count FETCH_HEAD..HEAD)" == 1 ]; then
-      title="$(git log -1 --format=%s)"
-    else
-      title="imageset.sh ${IMAGESET_TARGET}: ${step}"
+  if [ "$(git rev-list --count FETCH_HEAD..HEAD)" == 1 ]; then
+    title="$(git log -1 --format=%s)"
+  else
+    title="imageset.sh ${IMAGESET_TARGET}: ${step}"
+  fi
+  # Creating it isn't simply repeated (it may have been created, if creating it
+  # failed), but whether it exists is checked again
+  for attempt in 1 2 3 4 5; do
+    url="$(retry-transient gh pr list --repo taskcluster/community-tc-config --head "${branch}" --state open \
+      --json url,headRepositoryOwner --jq "[.[] | select(.headRepositoryOwner.login == \"${owner}\") | .url][0] // empty")"
+    if [ -n "${url}" ]; then
+      break
     fi
-    url="$(gh pr create --repo taskcluster/community-tc-config --base main --head "${owner}:${branch}" --title "${title}" \
+    if url="$(gh pr create --repo taskcluster/community-tc-config --base main --head "${owner}:${branch}" --title "${title}" \
       --body "$(printf 'Opened by `imageset.sh %s` (step: %s), which waits for it to be merged.\n\n%s\n' \
-        "${IMAGESET_TARGET}" "${step}" "$(git log --format='* %s' FETCH_HEAD..HEAD)")")"
+        "${IMAGESET_TARGET}" "${step}" "$(git log --format='* %s' FETCH_HEAD..HEAD)")")"; then
+      break
+    fi
+    echo "Opening the pull request failed: checking whether it was opened anyway, before trying again..." >&2
+    sleep 30
+  done
+  if [ -z "${url}" ]; then
+    echo "Couldn't open a pull request for ${owner}:${branch}." >&2
+    return 1
   fi
   # So that it is merged as soon as it is approved, where that is allowed
   gh pr merge --auto --merge "${url}" > /dev/null 2>&1 || true
@@ -557,7 +604,7 @@ function pull-request {
     sleep 60
   done
   echo "${url} was merged."
-  git fetch --quiet "${OFFICIAL_GIT_REPO}" main
+  retry-transient git fetch --quiet "${OFFICIAL_GIT_REPO}" main
   git reset --quiet --hard FETCH_HEAD
 }
 
@@ -581,17 +628,17 @@ function run-step {
 
 function update-offerings {
   echo "Updating EC2 instance types..."
-  misc/update-ec2-instance-types.sh
+  retry-transient misc/update-ec2-instance-types.sh
   git add 'config/ec2-instance-type-offerings'
   git diff --cached --quiet || with-gpg git commit -m "Ran script misc/update-ec2-instance-types.sh"
 
   echo "Updating Azure VM sizes..."
-  misc/update-azure-vm-sizes.sh
+  retry-transient misc/update-azure-vm-sizes.sh
   git add 'config/azure-vm-size-offerings'
   git diff --cached --quiet || with-gpg git commit -m "Ran script misc/update-azure-vm-sizes.sh"
 
   echo "Updating GCE machine types..."
-  misc/update-gce-machine-types.sh
+  retry-transient misc/update-gce-machine-types.sh
   git add 'config/gce-machine-type-offerings.json'
   git diff --cached --quiet || with-gpg git commit -m "Ran script misc/update-gce-machine-types.sh"
 
@@ -701,6 +748,8 @@ function configure-tools {
   export AWS_CONFIG_FILE="${PREP_DIR}/aws-config"
   export AWS_SHARED_CREDENTIALS_FILE=/dev/null
   export AWS_PAGER=''
+  # More, and adaptive, retries of transient errors than the 3 by default
+  export AWS_RETRY_MODE=adaptive AWS_MAX_ATTEMPTS=10
 
   # Opens your browser, on the host
   export BROWSER="${IMAGESETS_DIR}/container/open-url"
@@ -890,7 +939,7 @@ function login-azure {
         echo "${line}"
       fi
     done
-  az account set --subscription "${AZURE_SUBSCRIPTION_ID}"
+  retry-transient az account set --subscription "${AZURE_SUBSCRIPTION_ID}"
 }
 
 # Asks whether to rebuild the image sets that are already built from what a new
@@ -1086,7 +1135,7 @@ function deploy-image-sets {
 
   cd "${IMAGESETS_DIR}/.."
   echo "Installing tc-admin..."
-  pip install --quiet --break-system-packages --no-build-isolation -e . > "${PREP_DIR}/pip.log" 2>&1 || {
+  retry-transient pip install --quiet --break-system-packages --no-build-isolation -e . > "${PREP_DIR}/pip.log" 2>&1 || {
     cat "${PREP_DIR}/pip.log" >&2
     exit 1
   }

@@ -21,6 +21,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 import urllib.parse
 
 # How to get each kind of access. TODO: the ones marked (unverified) are the
@@ -84,6 +85,17 @@ AZURE_SUBSCRIPTION_ID = os.environ.get("AZURE_SUBSCRIPTION_ID", "")
 AZURE_RESOURCE_GROUP = os.environ.get("AZURE_IMAGE_RESOURCE_GROUP", "rg-tc-eng-images")
 GPG_FDS = (int(os.environ["IMAGESET_GPG_PASSPHRASE_FD"]),) if os.environ.get("IMAGESET_GPG_PASSPHRASE_FD") else ()
 
+# Errors of a command that may well not happen again if it is repeated (e.g. a
+# dropped connection)
+TRANSIENT_RE = re.compile(
+    r"SSL|EOF|Connection (aborted|reset|refused|timed out|closed)|RemoteDisconnected|timed out|Timeout|"
+    r"Could not resolve|Name or service not known|Temporary failure in name resolution|Max retries exceeded|"
+    r"TooManyRequests|Throttl|InternalServerError|ServiceUnavailable|GatewayTimeout|BadGateway|"
+    r"HTTP 5\d\d|error: 5\d\d|remote end hung up|RPC failed|i/o timeout|TLS handshake|No route to host|"
+    r"Network is unreachable", re.I)
+# Up to about 6 minutes
+RETRY_SECONDS = [5, 10, 20, 40, 60, 60, 60, 60, 60]
+
 failures = []
 warnings = []
 passed = 0
@@ -103,7 +115,13 @@ def warn(what, how=""):
 
 
 def run(*args, **kwargs):
-    return subprocess.run(args, capture_output=True, text=True, **kwargs)
+    """Runs a command (each check only reads), repeating it on transient
+    errors, so that they aren't mistaken for missing access"""
+    for wait in [*RETRY_SECONDS, None]:
+        r = subprocess.run(args, capture_output=True, text=True, **kwargs)
+        if r.returncode == 0 or wait is None or not TRANSIENT_RE.search(r.stderr + r.stdout[:2000]):
+            return r
+        time.sleep(wait)
 
 
 # ---- GitHub ----
