@@ -788,10 +788,16 @@ function confirm-identity {
   export IMAGESET_GIT_NAME IMAGESET_GIT_EMAIL IMAGESET_GPG_KEY
 }
 
-# Suggests your LDAP username, for the VPN: your git email, or else a
-# mozilla.com email of your GitHub account
+# Suggests your LDAP username, for the VPN: the account you signed in to
+# Google Cloud with (through Mozilla's SSO, so your canonical address, rather
+# than an alias), or else your git email, or a mozilla.com email of your
+# GitHub account
 function suggest-ldap-username {
-  if [[ "${IMAGESET_GIT_EMAIL}" == *@mozilla.com ]]; then
+  local account
+  account="$(gcloud config get-value account 2> /dev/null || true)"
+  if [[ "${account}" == *@mozilla.com ]]; then
+    echo "${account}"
+  elif [[ "${IMAGESET_GIT_EMAIL}" == *@mozilla.com ]]; then
     echo "${IMAGESET_GIT_EMAIL}"
   else
     gh api user/emails --jq '[.[] | select(.verified and (.email | endswith("@mozilla.com"))) | .email][0] // empty' 2> /dev/null || true
