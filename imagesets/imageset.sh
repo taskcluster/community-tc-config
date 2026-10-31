@@ -154,22 +154,54 @@ function choose-resume {
   done
 }
 
-# Builds the image, which Docker caches, other than the tools, which are
-# updated each week. Old images are removed.
+# A short hash of a file
+function file-hash {
+  if command -v shasum > /dev/null; then
+    shasum -a 256 "${1}"
+  else
+    sha256sum "${1}"
+  fi | cut -c1-16
+}
+
+# Builds the image, unless it is built already for this week's tools (as they
+# are updated each week) and the Dockerfile, as building needs the network
+# (to check its base image), even when Docker has cached everything. A build
+# that fails with what looks like a transient error is repeated, and if it
+# still fails, an existing image of the same Dockerfile (with older tools) is
+# used. Old images are removed.
 function build-image {
   local context="${1}"
   local log="${WORK}/build.log"
   local week
+  local hash
+  local built
+  local attempt
   week="$(date +%G-%V)"
-  if ! docker image inspect --format '{{index .Config.Labels "org.mozilla.community-tc-imagesets.week"}}' "${IMAGE}" 2> /dev/null | grep -qx "${week}"; then
-    echo "Building the container image, with this week's tools (this takes a few minutes, once a week)..."
+  hash="$(file-hash "${context}/Dockerfile")"
+  built="$(docker image inspect --format '{{index .Config.Labels "org.mozilla.community-tc-imagesets.week"}} {{index .Config.Labels "org.mozilla.community-tc-imagesets.dockerfile"}}' "${IMAGE}" 2> /dev/null || true)"
+  if [ "${built}" == "${week} ${hash}" ]; then
+    return
   fi
-  if ! docker build --progress=plain --build-arg "TOOLS_WEEK=${week}" --label "org.mozilla.community-tc-imagesets.week=${week}" -t "${IMAGE}" "${context}" > "${log}" 2>&1; then
-    tail -30 "${log}" >&2
-    echo "Building the container image failed: see above." >&2
-    return 1
+  echo "Building the container image, with this week's tools (this takes a few minutes, once a week)..."
+  for attempt in 1 2 3 4 5; do
+    if docker build --progress=plain --build-arg "TOOLS_WEEK=${week}" --label "org.mozilla.community-tc-imagesets.week=${week}" \
+      --label "org.mozilla.community-tc-imagesets.dockerfile=${hash}" -t "${IMAGE}" "${context}" > "${log}" 2>&1; then
+      docker image prune --force --filter label=org.mozilla.community-tc-imagesets=true > /dev/null 2>&1 || true
+      return
+    fi
+    if [ "${attempt}" == 5 ] || ! grep -qiE 'i/o timeout|lookup .* on|no such host|TLS handshake timeout|connection (reset|refused)|unexpected EOF|temporary failure|5[0-9][0-9] (internal server error|bad gateway|service unavailable|gateway timeout)' "${log}"; then
+      break
+    fi
+    echo "Building the container image failed with what looks like a transient error: trying again in $((attempt * 15))s..." >&2
+    sleep $((attempt * 15))
+  done
+  tail -30 "${log}" >&2
+  if [ "${built#* }" == "${hash}" ]; then
+    echo "WARNING: building the container image failed (see above), so using the existing one, of the same Dockerfile, with the tools of week ${built%% *}." >&2
+    return
   fi
-  docker image prune --force --filter label=org.mozilla.community-tc-imagesets=true > /dev/null 2>&1 || true
+  echo "Building the container image failed: see above." >&2
+  return 1
 }
 
 # Removes the work directories of runs that were killed before they could
