@@ -890,6 +890,50 @@ function login-azure {
   az account set --subscription "${AZURE_SUBSCRIPTION_ID}"
 }
 
+# Asks whether to rebuild the image sets that are already built from what a new
+# build would use (see rel-sre-imagesets.py --check-built), or to skip them
+# (IMAGESET_SKIP_BUILDS)
+function check-built-images {
+  local built="${PREP_DIR}/built.json"
+  local answer
+  GITHUB_TOKEN="$(gh auth token)" python3 "${IMAGESETS_DIR}/rel-sre-imagesets.py" --check-built "${built}"
+  if [ "$(built-field count "${built}")" == 0 ]; then
+    return
+  fi
+  echo
+  echo "These image sets are already built from what a new build would use (worker-images' main, $(built-field head "${built}"), with the latest Taskcluster):"
+  built-field list "${built}"
+  echo "Rebuilding them would only pick up changes elsewhere (e.g. updates of the base images)."
+  while true; do
+    read -r -p "Rebuild them anyway (r), or skip them (s)? " answer
+    case "${answer}" in
+      r | R) return ;;
+      s | S) break ;;
+    esac
+  done
+  IMAGESET_SKIP_BUILDS="$(built-field skip "${built}")"
+  export IMAGESET_SKIP_BUILDS
+}
+
+# A field of check-built-images' JSON: count, head, list or skip
+function built-field {
+  python3 - "${1}" "${2}" << 'EOF'
+import json, sys
+field, path = sys.argv[1:]
+data = json.load(open(path))
+built = data["built"]
+if field == "count":
+    print(len(built))
+elif field == "head":
+    print(data["head"][:7])
+elif field == "list":
+    for b in built:
+        print(f"  - {b['config']} ({b['cloud']}), built on {b['built']}: {b['url']}")
+elif field == "skip":
+    print(" ".join(f"{b['workflow']}:{b['config']}" for b in built))
+EOF
+}
+
 function preflight {
   with-gpg python3 "${IMAGESETS_DIR}/container/preflight.py" "$@"
 }
@@ -991,6 +1035,11 @@ function deploy-image-sets {
   source "${IMAGESET_ACCESS_FILE}"
   clone-password-store
   preflight secrets
+
+  # Unless resuming builds that a previous run started
+  if "${BUILD_IMAGES}" && ! step-done build-images && ! [ -f "${IMAGESET_RUNS_FILE}" ]; then
+    check-built-images
+  fi
 
   if [ "${#pending_macs[@]}" -gt 0 ]; then
     IMAGESET_LDAP_SUGGESTION="$(suggest-ldap-username)"
