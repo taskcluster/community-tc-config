@@ -101,9 +101,10 @@ SCRIPT_START_TIME = datetime.now(timezone.utc)
 
 
 # ---- Utility ----
-def gh(url, method="GET", max_retries=5, **kwargs) -> Response:
+def gh(url, method="GET", max_retries=12, **kwargs) -> Response:
     """Make a GitHub API request with retry logic for network failures and
-    server errors."""
+    server errors, for about 6 minutes, e.g. while the network comes back after
+    the laptop that this runs on sleeps."""
     for attempt in range(max_retries):
         try:
             # Add timeout to prevent hanging indefinitely
@@ -119,7 +120,7 @@ def gh(url, method="GET", max_retries=5, **kwargs) -> Response:
             if isinstance(e, requests.exceptions.HTTPError) and e.response.status_code < 500:
                 raise
             if attempt < max_retries - 1:
-                wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s, 8s, 16s
+                wait_time = min(2 ** attempt, 60)  # Exponential backoff: 1s, 2s, 4s, ..., 60s
                 print(f"⚠️  Request failed (attempt {attempt + 1}/{max_retries}): {e}")
                 print(f"   Retrying in {wait_time}s...")
                 time.sleep(wait_time)
@@ -158,10 +159,30 @@ def title_to_config(title: str | None) -> str | None:
 
 
 # ---- GitHub API helpers ----
-def trigger_workflow(workflow_file, config):
+def trigger_workflow(workflow_file, config, attempts=10):
+    """Triggers a build of `config`, unless one was triggered already since
+    SCRIPT_START_TIME: by an interrupted run, or by a request that failed only
+    after GitHub got it (e.g. its response timed out), which isn't simply
+    repeated, as that could trigger a second build."""
     url = f"{API_ROOT}/repos/{REPO}/actions/workflows/{workflow_file}/dispatches"
-    gh(url, "POST", json={"ref": REF, "inputs": {"config": config}})
-    print(f"🚀 Triggered workflow {workflow_file} for config={config}")
+    for attempt in range(attempts):
+        run = find_new_run_by_config(workflow_file, config, set())
+        if run:
+            print(f"♻️  {workflow_file} for config={config} was triggered already: run #{run['run_number']}")
+            return
+        try:
+            gh(url, "POST", max_retries=1, json={"ref": REF, "inputs": {"config": config}})
+            print(f"🚀 Triggered workflow {workflow_file} for config={config}")
+            return
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout, requests.exceptions.HTTPError) as e:
+            if isinstance(e, requests.exceptions.HTTPError) and e.response.status_code < 500:
+                raise
+            # Long enough for a run that GitHub did create to show up
+            wait_time = max(15, min(2 ** attempt, 60))
+            print(f"⚠️  Triggering {workflow_file} for config={config} failed ({e}): checking in {wait_time}s whether "
+                  f"it was triggered anyway, before trying again")
+            time.sleep(wait_time)
+    raise SystemExit(f"❌ Couldn't trigger {workflow_file} for config={config}")
 
 def list_dispatch_runs_for_workflow(workflow_file, per_page=100):
     url = f"{API_ROOT}/repos/{REPO}/actions/workflows/{workflow_file}/runs"
@@ -925,9 +946,20 @@ def main():
         if os.environ.get("UPDATE_TASKCLUSTER_VERSION", "true") == "true":
             bump_taskcluster_version()
 
-        # Only match runs triggered from here on, not any started while waiting for the PR.
+        # Only match runs triggered from here on, not any started while waiting
+        # for the PR, or since an interrupted run started triggering them (so
+        # that its runs are used, rather than triggered again)
         global SCRIPT_START_TIME
-        SCRIPT_START_TIME = datetime.now(timezone.utc)
+        started = f"{RUNS_FILE}.started" if RUNS_FILE else None
+        if started and os.path.exists(started):
+            with open(started) as f:
+                SCRIPT_START_TIME = datetime.fromisoformat(f.read().strip())
+            print(f"♻️  Using the builds triggered since {SCRIPT_START_TIME:%Y-%m-%d %H:%M} UTC, by an interrupted run")
+        else:
+            SCRIPT_START_TIME = datetime.now(timezone.utc)
+            if started:
+                with open(started, "w") as f:
+                    f.write(SCRIPT_START_TIME.isoformat())
 
         # 1) Trigger all workflows in parallel and wait for all to complete
         run_map = trigger_all_workflows(WORKFLOWS)
