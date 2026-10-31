@@ -205,6 +205,10 @@ function build-image {
     if docker build --progress=plain --build-arg "TOOLS_WEEK=${week}" --label "org.mozilla.community-tc-imagesets.week=${week}" \
       --label "org.mozilla.community-tc-imagesets.dockerfile=${hash}" -t "${tag}" "${context}" > "${log}" 2>&1; then
       docker image prune --force --filter label=org.mozilla.community-tc-imagesets=true > /dev/null 2>&1 || true
+      # Each week's build adds a few GB of build cache, which nothing else
+      # removes. Build cache has no labels, so this is all of it (of any
+      # project) that is older than two weeks, which is rebuilt if needed.
+      docker builder prune --force --filter until=336h > /dev/null 2>&1 || true
       return
     fi
     if [ "${attempt}" == 5 ] || ! grep -qiE 'i/o timeout|lookup .* on|no such host|TLS handshake timeout|connection (reset|refused)|unexpected EOF|temporary failure|5[0-9][0-9] (internal server error|bad gateway|service unavailable|gateway timeout)' "${log}"; then
