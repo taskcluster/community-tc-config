@@ -6,8 +6,10 @@
 #
 # When it is installed, @WORKER_ID@ is replaced with the worker's hostname (e.g.
 # macmini-m4-126), @PUBLIC_IP@ with its public IP address (as seen from the
-# internet), and @STATIC_SECRET@ with the staticSecret value in the worker's
-# existing runner.yml, so that the secret isn't stored here.
+# internet), @STATIC_SECRET@ with the staticSecret value in the worker's
+# existing runner.yml, so that the secret isn't stored here, and
+# @MISC_MAC_COMMIT@ with the community-tc-config commit that last changed
+# misc/mac (whose files are the ones installed).
 provider:
   providerType: static
   rootURL: "https://firefox-ci-tc.services.mozilla.com"
@@ -40,3 +42,9 @@ workerConfig:
   tasksDir: "/Users"
   wstAudience: "firefoxcitc"
   wstServerURL: "https://firefoxci-websocktunnel.services.mozilla.com/"
+  # As for the cloud workers' images (see config/imagesets.yml): the script
+  # that installed the worker
+  workerTypeMetadata:
+    machine-setup:
+      maintainer: taskcluster-notifications+workers@mozilla.com
+      script: https://github.com/taskcluster/community-tc-config/blob/@MISC_MAC_COMMIT@/misc/mac/update.sh

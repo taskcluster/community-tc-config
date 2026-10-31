@@ -4,11 +4,25 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file, You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 
+import os
 import subprocess
 import sys
 import yaml
 
 PASSWORDSTORE_NAME = "community-tc/secret-values.yml"
+
+
+def passphrase_fds():
+    """imageset.sh gives gpg the passphrase on this file descriptor, when it
+    runs tc-admin with it open (and otherwise, there is none)"""
+    fd = os.environ.get("IMAGESET_GPG_PASSPHRASE_FD")
+    if not fd:
+        return ()
+    try:
+        os.fstat(int(fd))
+    except OSError:
+        return ()
+    return (int(fd),)
 
 
 class SecretValues:
@@ -17,7 +31,9 @@ class SecretValues:
 
     def __init__(self):
         print("Fetching secrets with passwordstore", file=sys.stderr)
-        secret_values_yml = subprocess.check_output(["pass", PASSWORDSTORE_NAME])
+        secret_values_yml = subprocess.check_output(
+            ["pass", PASSWORDSTORE_NAME], pass_fds=passphrase_fds()
+        )
         self.values = yaml.safe_load(secret_values_yml)
         print("Secrets fetched", file=sys.stderr)
 
