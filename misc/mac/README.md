@@ -29,8 +29,13 @@ Startup script executed by the LaunchDaemon that:
 Taskcluster worker configuration file used by `start-worker`, installed as
 `/etc/generic-worker/runner.yml`. `@WORKER_ID@` is replaced with the worker's
 hostname, `@PUBLIC_IP@` with its public IP address (as seen from the internet),
-and `@STATIC_SECRET@` with the `staticSecret` in the worker's existing
-`runner.yml`, so that the secret isn't stored in this repository.
+`@STATIC_SECRET@` with the `staticSecret` in the worker's existing
+`runner.yml`, so that the secret isn't stored in this repository, and
+`@MISC_MAC_COMMIT@` with the commit that last changed this directory. As the
+pool is static, its worker configuration is only here (rather than in
+fxci-config's worker pool), including `workerTypeMetadata.machine-setup`,
+which links to `update.sh` at that commit, like the cloud workers' images'
+links to their bootstrap scripts (see `config/imagesets.yml`).
 
 ### [update.sh](update.sh)
 Maintenance script for updating Taskcluster worker components:
@@ -43,3 +48,18 @@ Maintenance script for updating Taskcluster worker components:
   next time it is run
 - Restarts the worker services
 - Includes retry logic with exponential backoff for network operations
+
+## Set up outside this repository
+
+Each worker also relies on setup that isn't in this repository, done once when
+it was installed, which these files assume:
+
+- An `administrator` account, with passwordless `sudo`, which `imageset.sh`
+  logs in to over ssh with a password (`mdc1/generic-worker-ci/<host>` in the
+  password store).
+- A console user that is logged in (`imageset.sh` notes that you should VNC
+  in as administrator first), with a LaunchAgent,
+  `~/Library/LaunchAgents/com.mozilla.genericworker.launchagent.plist`, which
+  `update.sh` restarts.
+- The worker's signing key, `/etc/generic-worker/ed25519_key`.
+- The worker's `staticSecret`, in its `/etc/generic-worker/runner.yml`.
