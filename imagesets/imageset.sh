@@ -278,98 +278,107 @@ function cleanup {
 
 ################## Entry point ##################
 
-# See README.md for the environment variables that control which steps run.
-if [ "${#}" -ne 1 ] || ! [[ "${1}" =~ ^(prod|staging|all)$ ]]; then
-  echo "Usage: ${0} prod|staging|all" >&2
-  echo "Has mozilla-platform-ops/worker-images build the production image sets (prod), the staging image sets (staging), or both (all), and deploys them; see README.md." >&2
-  exit 64
-fi
-IMAGESET_TARGET="${1}"
-CHECKOUT="$(cd "$(dirname "${0}")/.." && pwd)"
+# All of it in a function, which bash reads in full before running it, and
+# calling it on the last line (with exit, so that bash reads no further): a run
+# lasts hours, and bash reads a script as it runs it, so a change to this file
+# meanwhile (e.g. git pull) would otherwise break the run.
+function main {
 
-if ! [ -t 0 ] || ! [ -t 1 ]; then
-  echo "imageset.sh needs a terminal, for its prompts and sign-ins." >&2
-  exit 1
-fi
+  # See README.md for the environment variables that control which steps run.
+  if [ "${#}" -ne 1 ] || ! [[ "${1}" =~ ^(prod|staging|all)$ ]]; then
+    echo "Usage: ${0} prod|staging|all" >&2
+    echo "Has mozilla-platform-ops/worker-images build the production image sets (prod), the staging image sets (staging), or both (all), and deploys them; see README.md." >&2
+    exit 64
+  fi
+  IMAGESET_TARGET="${1}"
+  CHECKOUT="$(cd "$(dirname "${0}")/.." && pwd)"
 
-check-docker
-read-identity
-
-mkdir -p -m 700 "${STATE_DIR}"
-if [ -L "${STATE_DIR}" ] || ! [ -O "${STATE_DIR}" ]; then
-  echo "${STATE_DIR} isn't a directory of yours" >&2
-  exit 1
-fi
-chmod 700 "${STATE_DIR}"
-LOCK=''
-WORK=''
-BRIDGE_PID=''
-trap 'status=$?; cleanup; exit "${status}"' EXIT
-# So that the EXIT trap runs
-trap 'exit 129' HUP
-trap 'exit 130' INT
-trap 'exit 143' TERM
-lock-target
-choose-resume
-
-remove-stale-runs
-WORK="$(mktemp -d "${STATE_DIR}/run.XXXXXXXX")"
-echo $$ > "${WORK}/pid"
-case "${IMAGESET_LOCAL_CHANGES-}" in
-  true | false | '') ;;
-  *) echo "IMAGESET_LOCAL_CHANGES must be true or false" >&2; exit 64 ;;
-esac
-
-# The image of your checkout clones upstream main (with your changes, if you
-# choose), and then upstream main's image runs it. They are usually the same,
-# so the second build is cached.
-build-image "${CHECKOUT}/imagesets/container" "${IMAGE}:checkout"
-mkdir "${WORK}/clone"
-docker run --rm --interactive --tty --init --name "imageset-${WORK##*/}" --security-opt label=disable \
-  --volume "${CHECKOUT}:/checkout:ro" --volume "${WORK}/clone:/work" \
-  --env IMAGESET_LOCAL_CHANGES="${IMAGESET_LOCAL_CHANGES-}" --env IMAGESET_HOST_UID="$(id -u)" --env IMAGESET_HOST_GID="$(id -g)" \
-  "${IMAGE}:checkout" bash /checkout/imagesets/container/clone.sh
-build-image "${WORK}/clone/community-tc-config/imagesets/container" "${IMAGE}:latest"
-
-mkdir -m 700 "${WORK}/bridge"
-bridge "${WORK}/bridge" &
-BRIDGE_PID=$!
-
-docker_options=(
-  --rm --interactive --tty --init --name "imageset-${WORK##*/}"
-  # Otherwise SELinux (e.g. on Fedora) denies access to the mounts
-  --security-opt label=disable
-  # For openvpn
-  --cap-add NET_ADMIN --device /dev/net/tun
-  --volume "${WORK}/clone/community-tc-config:/work"
-  --volume "${STATE_DIR}:/state"
-  --volume "${WORK}/bridge:/bridge"
-  --volume "${GNUPG_HOME}:/host-gnupg:ro"
-  --env IMAGESET_GIT_NAME="${IMAGESET_GIT_NAME}"
-  --env IMAGESET_GIT_EMAIL="${IMAGESET_GIT_EMAIL}"
-  --env IMAGESET_GIT_SIGNINGKEY="${IMAGESET_GIT_SIGNINGKEY}"
-  --env IMAGESET_GNUPG_HOME_ON_HOST="${GNUPG_HOME}"
-  --env IMAGESET_STATE_DIR_ON_HOST="${STATE_DIR}"
-  --env IMAGESET_RESUME="${IMAGESET_RESUME}"
-  --env IMAGESET_HOST_UID="$(id -u)"
-  --env IMAGESET_HOST_GID="$(id -g)"
-)
-if can-open-browser; then
-  # gcloud's sign-in sends your browser to http://localhost:8085/
-  if (exec 3<> /dev/tcp/127.0.0.1/8085) 2> /dev/null; then
-    echo "Port 8085 is in use, but gcloud's sign-in needs it: stop what is using it (e.g. another gcloud auth login)." >&2
+  if ! [ -t 0 ] || ! [ -t 1 ]; then
+    echo "imageset.sh needs a terminal, for its prompts and sign-ins." >&2
     exit 1
   fi
-  docker_options+=(--publish 127.0.0.1:8085:8085 --env IMAGESET_HOST_BROWSER=true)
-else
-  docker_options+=(--env IMAGESET_HOST_BROWSER=false)
-fi
-for setting in "${SETTINGS[@]}"; do
-  if [ -n "${!setting+set}" ]; then
-    docker_options+=(--env "${setting}=${!setting}")
-  fi
-done
 
-status=0
-docker run "${docker_options[@]}" "${IMAGE}:latest" /work/imagesets/container/run.sh "${IMAGESET_TARGET}" || status=$?
-exit "${status}"
+  check-docker
+  read-identity
+
+  mkdir -p -m 700 "${STATE_DIR}"
+  if [ -L "${STATE_DIR}" ] || ! [ -O "${STATE_DIR}" ]; then
+    echo "${STATE_DIR} isn't a directory of yours" >&2
+    exit 1
+  fi
+  chmod 700 "${STATE_DIR}"
+  LOCK=''
+  WORK=''
+  BRIDGE_PID=''
+  trap 'status=$?; cleanup; exit "${status}"' EXIT
+  # So that the EXIT trap runs
+  trap 'exit 129' HUP
+  trap 'exit 130' INT
+  trap 'exit 143' TERM
+  lock-target
+  choose-resume
+
+  remove-stale-runs
+  WORK="$(mktemp -d "${STATE_DIR}/run.XXXXXXXX")"
+  echo $$ > "${WORK}/pid"
+  case "${IMAGESET_LOCAL_CHANGES-}" in
+    true | false | '') ;;
+    *) echo "IMAGESET_LOCAL_CHANGES must be true or false" >&2; exit 64 ;;
+  esac
+
+  # The image of your checkout clones upstream main (with your changes, if you
+  # choose), and then upstream main's image runs it. They are usually the same,
+  # so the second build is cached.
+  build-image "${CHECKOUT}/imagesets/container" "${IMAGE}:checkout"
+  mkdir "${WORK}/clone"
+  docker run --rm --interactive --tty --init --name "imageset-${WORK##*/}" --security-opt label=disable \
+    --volume "${CHECKOUT}:/checkout:ro" --volume "${WORK}/clone:/work" \
+    --env IMAGESET_LOCAL_CHANGES="${IMAGESET_LOCAL_CHANGES-}" --env IMAGESET_HOST_UID="$(id -u)" --env IMAGESET_HOST_GID="$(id -g)" \
+    "${IMAGE}:checkout" bash /checkout/imagesets/container/clone.sh
+  build-image "${WORK}/clone/community-tc-config/imagesets/container" "${IMAGE}:latest"
+
+  mkdir -m 700 "${WORK}/bridge"
+  bridge "${WORK}/bridge" &
+  BRIDGE_PID=$!
+
+  docker_options=(
+    --rm --interactive --tty --init --name "imageset-${WORK##*/}"
+    # Otherwise SELinux (e.g. on Fedora) denies access to the mounts
+    --security-opt label=disable
+    # For openvpn
+    --cap-add NET_ADMIN --device /dev/net/tun
+    --volume "${WORK}/clone/community-tc-config:/work"
+    --volume "${STATE_DIR}:/state"
+    --volume "${WORK}/bridge:/bridge"
+    --volume "${GNUPG_HOME}:/host-gnupg:ro"
+    --env IMAGESET_GIT_NAME="${IMAGESET_GIT_NAME}"
+    --env IMAGESET_GIT_EMAIL="${IMAGESET_GIT_EMAIL}"
+    --env IMAGESET_GIT_SIGNINGKEY="${IMAGESET_GIT_SIGNINGKEY}"
+    --env IMAGESET_GNUPG_HOME_ON_HOST="${GNUPG_HOME}"
+    --env IMAGESET_STATE_DIR_ON_HOST="${STATE_DIR}"
+    --env IMAGESET_RESUME="${IMAGESET_RESUME}"
+    --env IMAGESET_HOST_UID="$(id -u)"
+    --env IMAGESET_HOST_GID="$(id -g)"
+  )
+  if can-open-browser; then
+    # gcloud's sign-in sends your browser to http://localhost:8085/
+    if (exec 3<> /dev/tcp/127.0.0.1/8085) 2> /dev/null; then
+      echo "Port 8085 is in use, but gcloud's sign-in needs it: stop what is using it (e.g. another gcloud auth login)." >&2
+      exit 1
+    fi
+    docker_options+=(--publish 127.0.0.1:8085:8085 --env IMAGESET_HOST_BROWSER=true)
+  else
+    docker_options+=(--env IMAGESET_HOST_BROWSER=false)
+  fi
+  for setting in "${SETTINGS[@]}"; do
+    if [ -n "${!setting+set}" ]; then
+      docker_options+=(--env "${setting}=${!setting}")
+    fi
+  done
+
+  status=0
+  docker run "${docker_options[@]}" "${IMAGE}:latest" /work/imagesets/container/run.sh "${IMAGESET_TARGET}" || status=$?
+  exit "${status}"
+}
+
+main "$@"; exit
