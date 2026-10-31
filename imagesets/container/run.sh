@@ -205,7 +205,7 @@ function check-mac-connectivity {
     if [ "${status}" != 0 ] || [ "${output}" != "hello" ]; then
       echo "Cannot ssh to administrator@${host} and run sudo: ${output}" >&2
       if [ "${status}" == 255 ] && ! [[ "${output}" =~ "Host key verification failed"|"Permission denied" ]]; then
-        echo "Updating macOS workers (DEPLOY_MACS=true) requires connecting to the Mozilla corporate VPN." >&2
+        echo "The VPN is connected, but ${host} can't be reached through it: it may be rebooting, or you may not be in the vpn_releng group, which you request in a bug in Infrastructure & Operations :: Corporate VPN: ACL requests, at https://bugzilla.mozilla.org." >&2
       fi
       if [[ "${output}" == *"Host key verification failed"* ]]; then
         echo "The host key of ${host} isn't in ${IMAGESETS_DIR}/mac_known_hosts: if the worker was reinstalled, update it (ssh-keyscan -t ed25519 <host>)." >&2

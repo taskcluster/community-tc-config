@@ -34,7 +34,8 @@ HOW = {
     "github-org": "open a pull request that adds your Mozilla email to organization_members[\"{org}\"] in "
                   "github/tf/mozilla-corporation/organization_teams.tf of https://github.com/mozilla/global-platform-admin "
                   "(your people.mozilla.org profile needs your GitHub username, and you need to be in the "
-                  "gh_access_mozilla LDAP group, and a member of Mozilla's GitHub enterprise)",
+                  "gh_access_mozilla LDAP group, which you request in a bug in Infrastructure & Operations :: "
+                  "Infrastructure: LDAP, at https://bugzilla.mozilla.org, and a member of Mozilla's GitHub enterprise)",
     # The tceng team (Taskcluster Engineering) has the TCEng configs (CODEOWNERS); its maintainer is in relops
     "worker-images": "ask a maintainer of the mozilla-platform-ops/tceng GitHub team "
                      "(https://github.com/orgs/mozilla-platform-ops/teams/tceng/members) to add you to it, for "
@@ -53,7 +54,8 @@ HOW = {
     # From mozilla/global-platform-admin's aws/tf/sso/cloudservices/main.tf
     "aws": "request membership of the cloudservices_aws_taskcluster_devs access group at "
            "https://people.mozilla.org (which gives the AdministratorAccess role on the AWS account "
-           "moz-fx-tc-community-workers, 885316786408, in Mozilla's AWS SSO)",
+           "moz-fx-tc-community-workers, 885316786408, in Mozilla's AWS SSO), or else in a bug in Infrastructure & "
+           "Operations :: SSO: Requests, at https://bugzilla.mozilla.org",
     # Anyone whose key is in its .gpg-id can
     "password-store": "ask someone whose gpg key the password store is encrypted to (in the Taskcluster team) to add "
                       "yours ({key}) to its .gpg-id, and re-encrypt it (pass init)",
