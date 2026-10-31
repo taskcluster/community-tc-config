@@ -368,28 +368,71 @@ def latest_successful_run(workflow_file, config):
             return run
     return None
 
+def tceng_files(workflow_file, config):
+    """Whether a file of worker-images is one that builds `config` with
+    `workflow_file` alone (rather than shared code, or other teams' files)"""
+    cloud = get_cloud_provider(workflow_file)
+    scripts = "scripts/windows/tceng/" if cloud == "azure" else "scripts/linux/tceng/"
+    def matches(path):
+        return (path in (f".github/workflows/{workflow_file}", ".github/tceng.json", f"{TCENG_CONFIG_DIR}/{config}.yaml")
+                or path.startswith(("packer/tceng-", scripts)))
+    return matches
+
+# worker-images code that every image's build runs (e.g. New-GCPWorkerImage)
+SHARED_CODE = ("bin/WorkerImages/",)
+
+def pinned_taskcluster_version(config, ref):
+    """The taskcluster_version that `config` pins at worker-images' `ref`, or None"""
+    url = f"{API_ROOT}/repos/{REPO}/contents/{TCENG_CONFIG_DIR}/{urllib.parse.quote(config)}.yaml"
+    try:
+        content = base64.b64decode(gh(url, params={"ref": ref}).json()["content"]).decode("utf-8")
+    except requests.exceptions.HTTPError:
+        return None
+    m = TASKCLUSTER_VERSION_RE.search(content)
+    return m.group(3) if m else None
+
 def check_built(output):
-    """Writes to `output` (JSON) the image sets of this target that are already
-    built from what a new build would use: worker-images' current main, which
-    pins the latest Taskcluster release, and for staging image sets, with no
-    newer commit on Taskcluster's main. Rebuilding them would only pick up
-    changes elsewhere (e.g. updates of the base images), so imageset.sh asks."""
+    """Writes to `output` (JSON) the image sets of this target whose latest
+    successful build has the Taskcluster that a new build would: for prod
+    image sets, the latest release (which the bump PR pins), and for staging
+    image sets, Taskcluster's main, with no newer commit. worker-images changes
+    a lot, but it is usually only the Taskcluster version that matters, so
+    imageset.sh asks whether to rebuild them, saying what changed in
+    worker-images since."""
     head = gh(f"{API_ROOT}/repos/{REPO}/git/ref/heads/{REF}").json()["object"]["sha"]
-    bumps = outdated_tceng_configs(head, latest_taskcluster_version()) if \
-        os.environ.get("UPDATE_TASKCLUSTER_VERSION", "true") == "true" else {}
+    latest = latest_taskcluster_version()
+    compared = {}  # worker-images commit -> (commits since, files changed since), on main
     built = []
     for workflow_file, configs in WORKFLOWS.items():
         for config in configs:
             run = latest_successful_run(workflow_file, config)
-            if not run or run["head_sha"] != head or f"{TCENG_CONFIG_DIR}/{config}.yaml" in bumps:
+            if not run:
                 continue
+            sha = run["head_sha"]
             if config.endswith("-staging"):
                 newer = gh(f"{API_ROOT}/repos/taskcluster/taskcluster/commits",
                            params={"sha": "main", "since": run["created_at"], "per_page": 1}).json()
                 if newer:
                     continue
+                taskcluster = "Taskcluster's main, with no newer commit"
+            else:
+                if pinned_taskcluster_version(config, sha) != latest:
+                    continue
+                taskcluster = f"Taskcluster v{latest}, the latest release"
+            if sha not in compared:
+                if sha == head:
+                    compared[sha] = (0, [])
+                else:
+                    comparison = gh(f"{API_ROOT}/repos/{REPO}/compare/{sha}...{head}").json()
+                    compared[sha] = (comparison.get("total_commits", 0),
+                                     [f["filename"] for f in comparison.get("files", [])])
+            commits, files = compared[sha]
+            own = tceng_files(workflow_file, config)
             built.append({"workflow": workflow_file, "config": config, "cloud": get_cloud_provider(workflow_file),
-                          "built": run["created_at"][:10], "url": run["html_url"]})
+                          "built": run["created_at"][:10], "url": run["html_url"], "sha": sha[:7],
+                          "taskcluster": taskcluster, "commits": commits,
+                          "own": sorted(p for p in files if own(p)),
+                          "shared": sorted(p for p in files if p.startswith(SHARED_CODE))})
     with open(output, "w") as f:
         json.dump({"head": head, "built": built}, f)
 

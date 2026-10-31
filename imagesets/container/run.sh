@@ -901,9 +901,8 @@ function check-built-images {
     return
   fi
   echo
-  echo "These image sets are already built from what a new build would use (worker-images' main, $(built-field head "${built}"), with the latest Taskcluster):"
+  echo "These image sets already have the Taskcluster that a new build would (so rebuilding them would only pick up changes to worker-images, now at $(built-field head "${built}"), and e.g. updates of their base images):"
   built-field list "${built}"
-  echo "Rebuilding them would only pick up changes elsewhere (e.g. updates of the base images)."
   while true; do
     read -r -p "Rebuild them anyway (r), or skip them (s)? " answer
     case "${answer}" in
@@ -928,7 +927,18 @@ elif field == "head":
     print(data["head"][:7])
 elif field == "list":
     for b in built:
-        print(f"  - {b['config']} ({b['cloud']}), built on {b['built']}: {b['url']}")
+        print(f"  - {b['config']} ({b['cloud']}), with {b['taskcluster']}, built on {b['built']} from {b['sha']}: {b['url']}")
+        if not b["commits"]:
+            print("      worker-images hasn't changed since")
+            continue
+        changes = [f"{b['commits']} commit(s) to worker-images since"]
+        if b["own"]:
+            changes.append(f"changing its build's own files {', '.join(b['own'])}")
+        if b["shared"]:
+            changes.append(f"changing shared code {', '.join(b['shared'])}")
+        if not (b["own"] or b["shared"]):
+            changes.append("none changing its build's files, or shared code")
+        print(f"      {'; '.join(changes)}")
 elif field == "skip":
     print(" ".join(f"{b['workflow']}:{b['config']}" for b in built))
 EOF

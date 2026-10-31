@@ -91,12 +91,12 @@ VPN certificate in `~/.cache/community-tc-imagesets`.
 ## What it does
 
 Before anything slow starts (while you are still there, after the sign-ins
-and access checks), it checks whether any image set is already built from
-what a new build would use: worker-images' current `main`, pinning the latest
-Taskcluster release (and, for staging image sets, with no newer commit on
-Taskcluster's `main`). If so, it lists them, and asks whether to rebuild them
-anyway (which would only pick up changes elsewhere, e.g. updates of the base
-images), or skip them.
+and access checks), it checks which image sets already have the Taskcluster
+that a new build would: for production image sets, the latest release, and
+for staging image sets, Taskcluster's `main`, with no newer commit. As it is
+usually only the Taskcluster version that matters, it lists them, saying what
+changed in worker-images since they were built, and asks whether to rebuild
+them anyway, or skip them.
 
 Before triggering the builds, any `taskcluster_version` in worker-images' `config/tceng/` that
 isn't the latest Taskcluster release is bumped in a PR (with auto-merge enabled,
