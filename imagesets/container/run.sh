@@ -41,7 +41,9 @@ TRANSIENT_ERRORS='SSL|EOF|[Cc]onnection (aborted|reset|refused|timed out|closed)
 # Runs a command, repeating it for about 6 minutes if it fails with a transient
 # error (rather than any error, which retry repeats): only for commands that
 # can be repeated, i.e. reads, or writes that are the same if repeated (e.g.
-# pushing the same commit)
+# pushing the same commit). The output of each attempt is passed on (so that
+# you see it as it happens), so in $(...), only use it for commands that
+# output nothing when they fail.
 function retry-transient {
   local wait
   local status
@@ -274,7 +276,11 @@ function find-gpg-key {
   case "$(printf '%s' "${fprs}" | grep -c .)" in
     1) echo "${fprs}" ;;
     0)
-      echo "No usable gpg secret key (that can sign and encrypt) matches ${key}: set user.signingkey to the fingerprint of yours (git config --global user.signingkey <fingerprint>). Commits are always signed with it." >&2
+      if [[ "${key}" == ssh-* || "${key}" == */* || "${key}" == *.pub ]]; then
+        echo "Your user.signingkey (${key}) is an ssh key, but imageset.sh signs commits with a gpg key (which also decrypts the password store): set user.signingkey to its fingerprint, or give the email of your gpg key next." >&2
+      else
+        echo "No usable gpg secret key (that can sign and encrypt) matches ${key}: set user.signingkey to the fingerprint of yours (git config --global user.signingkey <fingerprint>). Commits are always signed with it." >&2
+      fi
       return 1
       ;;
     *)
@@ -605,7 +611,18 @@ function pull-request {
   done
   echo "${url} was merged."
   retry-transient git fetch --quiet "${OFFICIAL_GIT_REPO}" main
+  # Keeping uncommitted changes (IMAGESET_LOCAL_CHANGES=true's), which the
+  # rest of the run uses
+  local stashed=false
+  if [ -n "$(git status --porcelain)" ]; then
+    git stash push --quiet --include-untracked
+    stashed=true
+  fi
   git reset --quiet --hard FETCH_HEAD
+  if "${stashed}" && ! git stash pop --quiet; then
+    echo "Couldn't keep your local changes, after ${url} was merged: they conflict with main's (they are in git stash, in ${IMAGESETS_DIR}/..)." >&2
+    return 1
+  fi
 }
 
 function step-done {
@@ -672,7 +689,7 @@ function finish {
   local status="${1}"
   if [ "${status}" == 0 ]; then
     if [ -n "${STEPS_FILE}" ]; then
-      rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}" "${IMAGESET_RUNS_FILE}.started"
+      rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}" "${IMAGESET_RUNS_FILE}.started" "${IMAGESET_RUNS_FILE}.skip"
     fi
   elif [ -n "${STEPS_FILE}" ]; then
     echo >&2
@@ -964,6 +981,8 @@ function check-built-images {
   done
   IMAGESET_SKIP_BUILDS="$(built-field skip "${built}")"
   export IMAGESET_SKIP_BUILDS
+  # For resuming, which doesn't ask again
+  echo "${IMAGESET_SKIP_BUILDS}" > "${IMAGESET_RUNS_FILE}.skip"
 }
 
 # A field of check-built-images' JSON: count, head, list or skip
@@ -1110,8 +1129,12 @@ function deploy-image-sets {
   clone-password-store
   preflight secrets
 
-  # Unless resuming builds that a previous run started (or started triggering)
-  if "${BUILD_IMAGES}" && ! step-done build-images && ! [ -f "${IMAGESET_RUNS_FILE}" ] && ! [ -f "${IMAGESET_RUNS_FILE}.started" ]; then
+  # Unless resuming builds that a previous run started (or started
+  # triggering), whose choice of what to skip is kept
+  if [ -f "${IMAGESET_RUNS_FILE}.skip" ]; then
+    IMAGESET_SKIP_BUILDS="$(cat "${IMAGESET_RUNS_FILE}.skip")"
+    export IMAGESET_SKIP_BUILDS
+  elif "${BUILD_IMAGES}" && ! step-done build-images && ! [ -f "${IMAGESET_RUNS_FILE}" ] && ! [ -f "${IMAGESET_RUNS_FILE}.started" ]; then
     check-built-images
   fi
 
@@ -1216,7 +1239,7 @@ VPN_CONNECTED=false
 trap 'status=$?; on-exit "${status}"; exit "${status}"' EXIT
 
 if ! "${IMAGESET_RESUME:-false}"; then
-  rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}" "${IMAGESET_RUNS_FILE}.started"
+  rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}" "${IMAGESET_RUNS_FILE}.started" "${IMAGESET_RUNS_FILE}.skip"
 elif [ -f "${STEPS_FILE}" ]; then
   echo "Resuming the previous run: skipping the steps it completed ($(paste -sd , - < "${STEPS_FILE}"))"
 fi

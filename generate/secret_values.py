@@ -12,16 +12,27 @@ import yaml
 PASSWORDSTORE_NAME = "community-tc/secret-values.yml"
 
 
+def passphrase_fds():
+    """imageset.sh gives gpg the passphrase on this file descriptor, when it
+    runs tc-admin with it open (and otherwise, there is none)"""
+    fd = os.environ.get("IMAGESET_GPG_PASSPHRASE_FD")
+    if not fd:
+        return ()
+    try:
+        os.fstat(int(fd))
+    except OSError:
+        return ()
+    return (int(fd),)
+
+
 class SecretValues:
     """A container for secret values.  This is loaded only when --with-secrets,
     and requires `passwordstore` support."""
 
     def __init__(self):
         print("Fetching secrets with passwordstore", file=sys.stderr)
-        # imageset.sh gives gpg the passphrase on this file descriptor
-        fd = os.environ.get("IMAGESET_GPG_PASSPHRASE_FD")
         secret_values_yml = subprocess.check_output(
-            ["pass", PASSWORDSTORE_NAME], pass_fds=(int(fd),) if fd else ()
+            ["pass", PASSWORDSTORE_NAME], pass_fds=passphrase_fds()
         )
         self.values = yaml.safe_load(secret_values_yml)
         print("Secrets fetched", file=sys.stderr)

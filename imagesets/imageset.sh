@@ -62,13 +62,18 @@ function bridge {
   local url
   local code
   local result
+  local answer
   set +e
   while sleep 0.2; do
     for request in "${dir}"/*.request; do
-      if ! [ -f "${request}" ] || [ -e "${request%.request}.done" ]; then
+      # The directory is the container's too: symlinks aren't followed
+      if [ -L "${request}" ] || ! [ -f "${request}" ] || [ -e "${request%.request}.done" ] || [ -L "${request%.request}.done" ]; then
         continue
       fi
-      { IFS= read -r url; IFS= read -r code; } < "${request}"
+      url=''
+      code=''
+      # It may have been removed (if open-url gave up waiting)
+      { IFS= read -r url; IFS= read -r code; } < "${request}" 2> /dev/null || [ -n "${url}" ] || continue
       result=none
       # Only web pages
       if can-open-browser && [[ "${url}" =~ ^https?:// ]]; then
@@ -80,8 +85,11 @@ function bridge {
           result="opened ${result}"
         fi
       fi
-      echo "${result:-none}" > "${request%.request}.answer"
-      mv "${request%.request}.answer" "${request%.request}.done"
+      # A new file, renamed into place, so that nothing in the directory is
+      # written through
+      answer="$(mktemp "${dir}/.answer.XXXXXXXX")"
+      echo "${result:-none}" > "${answer}"
+      mv -f "${answer}" "${request%.request}.done"
     done
   done
 }
@@ -178,14 +186,24 @@ function build-image {
   local attempt
   week="$(date +%G-%V)"
   hash="$(file-hash "${context}/Dockerfile")"
-  built="$(docker image inspect --format '{{index .Config.Labels "org.mozilla.community-tc-imagesets.week"}} {{index .Config.Labels "org.mozilla.community-tc-imagesets.dockerfile"}}' "${IMAGE}" 2> /dev/null || true)"
+  local tag="${2}"
+  local same
+  built="$(docker image inspect --format '{{index .Config.Labels "org.mozilla.community-tc-imagesets.week"}} {{index .Config.Labels "org.mozilla.community-tc-imagesets.dockerfile"}}' "${tag}" 2> /dev/null || true)"
   if [ "${built}" == "${week} ${hash}" ]; then
+    return
+  fi
+  # e.g. the other tag's image (of your checkout's Dockerfile, and upstream
+  # main's), if they are the same
+  same="$(docker images --quiet --filter "label=org.mozilla.community-tc-imagesets.week=${week}" \
+    --filter "label=org.mozilla.community-tc-imagesets.dockerfile=${hash}" | head -1)"
+  if [ -n "${same}" ]; then
+    docker tag "${same}" "${tag}"
     return
   fi
   echo "Building the container image, with this week's tools (this takes a few minutes, once a week)..."
   for attempt in 1 2 3 4 5; do
     if docker build --progress=plain --build-arg "TOOLS_WEEK=${week}" --label "org.mozilla.community-tc-imagesets.week=${week}" \
-      --label "org.mozilla.community-tc-imagesets.dockerfile=${hash}" -t "${IMAGE}" "${context}" > "${log}" 2>&1; then
+      --label "org.mozilla.community-tc-imagesets.dockerfile=${hash}" -t "${tag}" "${context}" > "${log}" 2>&1; then
       docker image prune --force --filter label=org.mozilla.community-tc-imagesets=true > /dev/null 2>&1 || true
       return
     fi
@@ -225,7 +243,29 @@ function remove-dir {
   rm -rf "${1}" 2> /dev/null || echo "WARNING: couldn't remove ${1} (e.g. sudo rm -rf it)" >&2
 }
 
+# Only one run of a target at a time: a second would use (and could delete)
+# the first's progress, and trigger its builds again
+function lock-target {
+  local lock="${STATE_DIR}/${IMAGESET_TARGET}.lock"
+  local pid
+  if ! mkdir "${lock}" 2> /dev/null; then
+    pid="$(cat "${lock}/pid" 2> /dev/null || true)"
+    if [ -n "${pid}" ] && kill -0 "${pid}" 2> /dev/null; then
+      echo "Another ${IMAGESET_TARGET} run of imageset.sh is in progress (process ${pid}): wait for it to finish, or stop it." >&2
+      exit 1
+    fi
+    # Left by a run that was killed
+    rm -rf "${lock}"
+    mkdir "${lock}"
+  fi
+  echo $$ > "${lock}/pid"
+  LOCK="${lock}"
+}
+
 function cleanup {
+  if [ -n "${LOCK}" ]; then
+    rm -rf "${LOCK}"
+  fi
   if [ -n "${BRIDGE_PID}" ]; then
     kill "${BRIDGE_PID}" 2> /dev/null || true
   fi
@@ -261,8 +301,7 @@ if [ -L "${STATE_DIR}" ] || ! [ -O "${STATE_DIR}" ]; then
   exit 1
 fi
 chmod 700 "${STATE_DIR}"
-choose-resume
-
+LOCK=''
 WORK=''
 BRIDGE_PID=''
 trap 'status=$?; cleanup; exit "${status}"' EXIT
@@ -270,6 +309,9 @@ trap 'status=$?; cleanup; exit "${status}"' EXIT
 trap 'exit 129' HUP
 trap 'exit 130' INT
 trap 'exit 143' TERM
+lock-target
+choose-resume
+
 remove-stale-runs
 WORK="$(mktemp -d "${STATE_DIR}/run.XXXXXXXX")"
 echo $$ > "${WORK}/pid"
@@ -281,13 +323,13 @@ esac
 # The image of your checkout clones upstream main (with your changes, if you
 # choose), and then upstream main's image runs it. They are usually the same,
 # so the second build is cached.
-build-image "${CHECKOUT}/imagesets/container"
+build-image "${CHECKOUT}/imagesets/container" "${IMAGE}:checkout"
 mkdir "${WORK}/clone"
 docker run --rm --interactive --tty --init --name "imageset-${WORK##*/}" --security-opt label=disable \
   --volume "${CHECKOUT}:/checkout:ro" --volume "${WORK}/clone:/work" \
   --env IMAGESET_LOCAL_CHANGES="${IMAGESET_LOCAL_CHANGES-}" --env IMAGESET_HOST_UID="$(id -u)" --env IMAGESET_HOST_GID="$(id -g)" \
-  "${IMAGE}" bash /checkout/imagesets/container/clone.sh
-build-image "${WORK}/clone/community-tc-config/imagesets/container"
+  "${IMAGE}:checkout" bash /checkout/imagesets/container/clone.sh
+build-image "${WORK}/clone/community-tc-config/imagesets/container" "${IMAGE}:latest"
 
 mkdir -m 700 "${WORK}/bridge"
 bridge "${WORK}/bridge" &
@@ -329,5 +371,5 @@ for setting in "${SETTINGS[@]}"; do
 done
 
 status=0
-docker run "${docker_options[@]}" "${IMAGE}" /work/imagesets/container/run.sh "${IMAGESET_TARGET}" || status=$?
+docker run "${docker_options[@]}" "${IMAGE}:latest" /work/imagesets/container/run.sh "${IMAGESET_TARGET}" || status=$?
 exit "${status}"
