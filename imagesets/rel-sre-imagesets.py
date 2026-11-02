@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import base64
+import email.utils
 import hashlib
 import json
 import os
@@ -10,13 +11,22 @@ import time
 import requests
 import re
 import urllib.parse
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from ruamel.yaml import YAML
 from requests import Response
 
 # ---- Config ----
 REPO = "mozilla-platform-ops/worker-images"
 REF = "main"
+# imageset.sh gives gpg the passphrase on this file descriptor (only when it
+# runs this with it open: with-gpg)
+def _open_fds(fd):
+    try:
+        os.fstat(fd)
+        return (fd,)
+    except OSError:
+        return ()
+GPG_PASSPHRASE_FDS = _open_fds(int(os.environ["IMAGESET_GPG_PASSPHRASE_FD"])) if os.environ.get("IMAGESET_GPG_PASSPHRASE_FD") else ()
 # Image sets that worker-images builds for us, per workflow, for each target of
 # imageset.sh. Staging builds use the workflows' default TASKCLUSTER_REF (main).
 TARGET_WORKFLOWS = {
@@ -56,8 +66,13 @@ for _workflows in (TARGET_WORKFLOWS["prod"], TARGET_WORKFLOWS["staging"]):
 TARGET = os.environ.get("IMAGESET_TARGET", "prod")
 if TARGET not in TARGET_WORKFLOWS:
     raise SystemExit(f"IMAGESET_TARGET must be one of {', '.join(TARGET_WORKFLOWS)}, not {TARGET!r}")
-# The image sets to build and log
-WORKFLOWS = TARGET_WORKFLOWS[TARGET]
+# The image sets to build and log, other than the ones that imageset.sh was told
+# to skip (as "workflow_file:config", space-separated), e.g. as already built
+WORKFLOWS = {
+    workflow_file: [c for c in configs if f"{workflow_file}:{c}" not in os.environ.get("IMAGESET_SKIP_BUILDS", "").split()]
+    for workflow_file, configs in TARGET_WORKFLOWS[TARGET].items()
+}
+WORKFLOWS = {workflow_file: configs for workflow_file, configs in WORKFLOWS.items() if configs}
 IMAGESETS_FILE = "config/imagesets.yml"
 # Every file in this worker-images directory that pins `taskcluster_version`
 # is bumped to the latest Taskcluster release before building.
@@ -93,10 +108,22 @@ yaml.explicit_end = False
 SCRIPT_START_TIME = datetime.now(timezone.utc)
 
 
+# Errors of a command that may well not happen again if it is repeated (e.g. a
+# dropped connection)
+TRANSIENT_RE = re.compile(
+    r"SSL|EOF|Connection (aborted|reset|refused|timed out|closed)|RemoteDisconnected|timed out|Timeout|"
+    r"Could not resolve|Name or service not known|Temporary failure in name resolution|Max retries exceeded|"
+    r"TooManyRequests|Throttl|InternalServerError|ServiceUnavailable|GatewayTimeout|BadGateway|"
+    r"HTTP 5\d\d|error: 5\d\d|remote end hung up|RPC failed|i/o timeout|TLS handshake|No route to host|"
+    r"Network is unreachable", re.I)
+# Up to about 6 minutes
+RETRY_SECONDS = [5, 10, 20, 40, 60, 60, 60, 60, 60]
+
 # ---- Utility ----
-def gh(url, method="GET", max_retries=5, **kwargs) -> Response:
+def gh(url, method="GET", max_retries=12, **kwargs) -> Response:
     """Make a GitHub API request with retry logic for network failures and
-    server errors."""
+    server errors, for about 6 minutes, e.g. while the network comes back after
+    the laptop that this runs on sleeps."""
     for attempt in range(max_retries):
         try:
             # Add timeout to prevent hanging indefinitely
@@ -112,7 +139,7 @@ def gh(url, method="GET", max_retries=5, **kwargs) -> Response:
             if isinstance(e, requests.exceptions.HTTPError) and e.response.status_code < 500:
                 raise
             if attempt < max_retries - 1:
-                wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s, 8s, 16s
+                wait_time = min(2 ** attempt, 60)  # Exponential backoff: 1s, 2s, 4s, ..., 60s
                 print(f"⚠️  Request failed (attempt {attempt + 1}/{max_retries}): {e}")
                 print(f"   Retrying in {wait_time}s...")
                 time.sleep(wait_time)
@@ -121,6 +148,17 @@ def gh(url, method="GET", max_retries=5, **kwargs) -> Response:
                 raise
     # This should never be reached due to raise, but satisfies type checker
     raise RuntimeError("Unexpected: max_retries loop completed without return or raise")
+
+def run_retrying(args, **kwargs):
+    """subprocess.run, repeated on transient errors, for commands that can be
+    repeated (reads, or writes that are the same if repeated)"""
+    for wait in [*RETRY_SECONDS, None]:
+        r = subprocess.run(args, capture_output=True, text=True, **kwargs)
+        if r.returncode == 0 or wait is None or not TRANSIENT_RE.search(r.stderr):
+            return r
+        print(f"⚠️  {' '.join(args[:3])} failed ({r.stderr.strip().splitlines()[-1][:120] if r.stderr.strip() else ''}): "
+              f"trying again in {wait}s")
+        time.sleep(wait)
 
 def get_cloud_provider(workflow_file: str) -> str:
     """
@@ -151,10 +189,35 @@ def title_to_config(title: str | None) -> str | None:
 
 
 # ---- GitHub API helpers ----
-def trigger_workflow(workflow_file, config):
+def trigger_workflow(workflow_file, config, attempts=10):
+    """Triggers a build of `config`, unless one was triggered already since
+    SCRIPT_START_TIME: by an interrupted run, or by a request that failed only
+    after GitHub got it (e.g. its response timed out), which isn't simply
+    repeated, as that could trigger a second build."""
     url = f"{API_ROOT}/repos/{REPO}/actions/workflows/{workflow_file}/dispatches"
-    gh(url, "POST", json={"ref": REF, "inputs": {"config": config}})
-    print(f"🚀 Triggered workflow {workflow_file} for config={config}")
+    for attempt in range(attempts):
+        run = find_new_run_by_config(workflow_file, config, set())
+        if run:
+            print(f"♻️  {workflow_file} for config={config} was triggered already: run #{run['run_number']}")
+            return
+        try:
+            gh(url, "POST", max_retries=1, json={"ref": REF, "inputs": {"config": config}})
+            print(f"🚀 Triggered workflow {workflow_file} for config={config}")
+            return
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout, requests.exceptions.HTTPError) as e:
+            if isinstance(e, requests.exceptions.HTTPError) and e.response.status_code < 500:
+                raise
+            # For up to 90 seconds, as a run that GitHub did create can take a while to show up
+            print(f"⚠️  Triggering {workflow_file} for config={config} failed ({e}): checking for up to 90s whether "
+                  f"it was triggered anyway, before trying again")
+            for _ in range(9):
+                time.sleep(10)
+                try:
+                    if find_new_run_by_config(workflow_file, config, set()):
+                        break
+                except requests.exceptions.RequestException:
+                    pass
+    raise SystemExit(f"❌ Couldn't trigger {workflow_file} for config={config}")
 
 def list_dispatch_runs_for_workflow(workflow_file, per_page=100):
     url = f"{API_ROOT}/repos/{REPO}/actions/workflows/{workflow_file}/runs"
@@ -223,6 +286,42 @@ def enable_auto_merge(pr):
     else:
         print(f"🤖 Enabled auto-merge on {pr['html_url']}")
 
+def create_signed_commit(message, tree, parent):
+    """Create a commit with the GitHub API, signed with the gpg key that
+    imageset.sh signs commits with, as GitHub can't sign it with that key."""
+    name, email, key = os.environ["IMAGESET_GIT_NAME"], os.environ["IMAGESET_GIT_EMAIL"], os.environ["IMAGESET_GPG_KEY"]
+    if not message.endswith("\n"):
+        message += "\n"
+    now = int(time.time())
+    identity = f"{name} <{email}> {now} +0000"
+    headers = f"tree {tree}\nparent {parent}\nauthor {identity}\ncommitter {identity}\n"
+    # Signs the commit as git writes it to the object database
+    signature = subprocess.run(["gpg", "--local-user", key, "--armor", "--detach-sign"],
+                               input=f"{headers}\n{message}".encode(), capture_output=True,
+                               pass_fds=GPG_PASSPHRASE_FDS)
+    if signature.returncode != 0:
+        raise SystemExit(f"❌ Couldn't sign the commit with gpg key {key}:\n{signature.stderr.decode()}")
+    signature = signature.stdout.decode()
+    date = datetime.fromtimestamp(now, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    commit = gh(f"{API_ROOT}/repos/{REPO}/git/commits", "POST", json={
+        "message": message, "tree": tree, "parents": [parent],
+        "author": {"name": name, "email": email, "date": date},
+        "committer": {"name": name, "email": email, "date": date},
+        "signature": signature,
+    }).json()
+    # The hash covers the signature, so it matches only if GitHub created the
+    # commit that was signed
+    gpgsig = "gpgsig " + signature.rstrip("\n").replace("\n", "\n ") + "\n"
+    signed = f"{headers}{gpgsig}\n{message}".encode()
+    expected = hashlib.sha1(f"commit {len(signed)}\0".encode() + signed).hexdigest()
+    if commit["sha"] != expected:
+        raise SystemExit(f"❌ GitHub created commit {commit['sha']}, rather than the signed commit {expected}")
+    verification = commit.get("verification") or {}
+    if not verification.get("verified"):
+        print(f"⚠️  GitHub doesn't show commit {commit['sha']} as verified ({verification.get('reason')}): "
+              f"add gpg key {key} to your GitHub account, if it isn't there")
+    return commit["sha"]
+
 def open_bump_pr(version, changes, base_sha):
     branch = f"tceng-tc-v{version}"
     pr = find_pr(branch)
@@ -239,9 +338,7 @@ def open_bump_pr(version, changes, base_sha):
         "base_tree": base_tree,
         "tree": [{"path": p, "mode": "100644", "type": "blob", "content": c} for p, c in changes.items()],
     }).json()["sha"]
-    commit = gh(f"{API_ROOT}/repos/{REPO}/git/commits", "POST", json={
-        "message": title, "tree": tree, "parents": [base_sha],
-    }).json()["sha"]
+    commit = create_signed_commit(title, tree, base_sha)
     try:
         gh(f"{API_ROOT}/repos/{REPO}/git/refs", "POST", json={"ref": f"refs/heads/{branch}", "sha": commit})
     except requests.exceptions.HTTPError as e:
@@ -295,6 +392,115 @@ def bump_taskcluster_version(wait=True):
     still = outdated_tceng_configs(base_sha, version)
     if still:
         raise SystemExit(f"❌ {REF} still doesn't pin v{version} after merge: {', '.join(sorted(still))}")
+
+
+# ---- Already built? ----
+def latest_successful_run(workflow_file, config):
+    """The latest successful build of `config` by `workflow_file`, or None"""
+    runs = list_dispatch_runs_for_workflow(workflow_file, per_page=100)
+    for run in sorted(runs, key=lambda r: r["created_at"], reverse=True):
+        if title_to_config(run.get("display_title") or run.get("name", "")) == config and run["conclusion"] == "success":
+            return run
+    return None
+
+def tceng_files(workflow_file, config):
+    """Whether a file of worker-images is one that builds `config` with
+    `workflow_file` alone (rather than shared code, or other teams' files)"""
+    cloud = get_cloud_provider(workflow_file)
+    scripts = "scripts/windows/tceng/" if cloud == "azure" else "scripts/linux/tceng/"
+    def matches(path):
+        return (path in (f".github/workflows/{workflow_file}", ".github/tceng.json", f"{TCENG_CONFIG_DIR}/{config}.yaml")
+                or path.startswith(("packer/tceng-", scripts)))
+    return matches
+
+# worker-images code that every image's build runs (e.g. New-GCPWorkerImage)
+SHARED_CODE = ("bin/WorkerImages/",)
+
+def pinned_taskcluster_version(config, ref):
+    """The taskcluster_version that `config` pins at worker-images' `ref`, or None"""
+    url = f"{API_ROOT}/repos/{REPO}/contents/{TCENG_CONFIG_DIR}/{urllib.parse.quote(config)}.yaml"
+    try:
+        content = base64.b64decode(gh(url, params={"ref": ref}).json()["content"]).decode("utf-8")
+    except requests.exceptions.HTTPError:
+        return None
+    m = TASKCLUSTER_VERSION_RE.search(content)
+    return m.group(3) if m else None
+
+def run_images(workflow_file, config, run_id):
+    """The image IDs that run `run_id` built for `config` (as in imagesets.yml), or None"""
+    cloud = get_cloud_provider(workflow_file)
+    images = []
+    for job in get_workflow_jobs(run_id):
+        name = job["name"]
+        if cloud in ("aws", "gcp"):
+            if name.strip() != f"{cloud.upper()} {config}":
+                continue
+        elif parse_job_name(name)[0] != config:
+            continue
+        if job["conclusion"] != "success":
+            return None
+        image = extract_image_name(download_job_log(job["id"]), cloud)
+        if not image:
+            return None
+        images.extend(image.values() if isinstance(image, dict) else [image])
+    return images or None
+
+def deployed(config, cloud, images):
+    """Whether community-tc's imagesets.yml uses all of `images` for `config`
+    in `cloud`"""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", IMAGESETS_FILE)
+    with open(path) as f:
+        used = json.dumps((YAML(typ="safe").load(f).get(config) or {}).get(cloud) or {})
+    return all(image in used for image in images)
+
+def check_built(output):
+    """Writes to `output` (JSON) the image sets of this target whose latest
+    successful build has the Taskcluster that a new build would: for prod
+    image sets, the latest release (which the bump PR pins), and for staging
+    image sets, Taskcluster's main, with no newer commit, and whose images are
+    the ones that community-tc uses (as otherwise, skipping them would leave it
+    on older images). worker-images changes a lot, but it is usually only the
+    Taskcluster version that matters, so imageset.sh asks whether to rebuild
+    them, saying what changed in worker-images since."""
+    head = gh(f"{API_ROOT}/repos/{REPO}/git/ref/heads/{REF}").json()["object"]["sha"]
+    latest = latest_taskcluster_version()
+    compared = {}  # worker-images commit -> (commits since, files changed since), on main
+    built = []
+    for workflow_file, configs in WORKFLOWS.items():
+        for config in configs:
+            run = latest_successful_run(workflow_file, config)
+            if not run:
+                continue
+            sha = run["head_sha"]
+            if config.endswith("-staging"):
+                newer = gh(f"{API_ROOT}/repos/taskcluster/taskcluster/commits",
+                           params={"sha": "main", "since": run["created_at"], "per_page": 1}).json()
+                if newer:
+                    continue
+                taskcluster = "Taskcluster's main, with no newer commit"
+            else:
+                if pinned_taskcluster_version(config, sha) != latest:
+                    continue
+                taskcluster = f"Taskcluster v{latest}, the latest release"
+            images = run_images(workflow_file, config, run["id"])
+            if not images or not deployed(config, get_cloud_provider(workflow_file), images):
+                continue
+            if sha not in compared:
+                if sha == head:
+                    compared[sha] = (0, [])
+                else:
+                    comparison = gh(f"{API_ROOT}/repos/{REPO}/compare/{sha}...{head}").json()
+                    compared[sha] = (comparison.get("total_commits", 0),
+                                     [f["filename"] for f in comparison.get("files", [])])
+            commits, files = compared[sha]
+            own = tceng_files(workflow_file, config)
+            built.append({"workflow": workflow_file, "config": config, "cloud": get_cloud_provider(workflow_file),
+                          "built": run["created_at"][:10], "url": run["html_url"], "sha": sha[:7],
+                          "taskcluster": taskcluster, "commits": commits,
+                          "own": sorted(p for p in files if own(p)),
+                          "shared": sorted(p for p in files if p.startswith(SHARED_CODE))})
+    with open(output, "w") as f:
+        json.dump({"head": head, "built": built}, f)
 
 
 # ---- Selection / matching ----
@@ -646,14 +852,55 @@ def update_fxci_script(imagesets, image_set, worker_images, fxci_image):
     image[FXCI_METADATA_KEY].setdefault("machine-setup", {})["script"] = script
     return script
 
+def same_taskcluster(image_set, cloud, old_names, new_names, old_script, new_script):
+    """Whether new images of `image_set` would have the Taskcluster that fxci's
+    current (old) ones have: for production image sets, the same pinned
+    release (at the worker-images commits that their bootstrap script links
+    are at), and for staging image sets, no commit on Taskcluster's main
+    between their builds. False if that can't be told."""
+    if image_set.endswith("-staging"):
+        _, old_run = worker_images_jobs(image_set, cloud, old_names)
+        _, new_run = worker_images_jobs(image_set, cloud, new_names)
+        if not old_run or not new_run:
+            return False
+        newer = gh(f"{API_ROOT}/repos/taskcluster/taskcluster/commits",
+                   params={"sha": "main", "since": old_run["created_at"], "until": new_run["created_at"],
+                           "per_page": 1}).json()
+        return not newer
+    sha = re.compile(re.escape(WORKER_IMAGES_RAW_URL) + r"([0-9a-f]{40})/")
+    old, new = sha.match(old_script or ""), sha.match(new_script or "")
+    if not old or not new:
+        return False
+    old_version = pinned_taskcluster_version(image_set, old.group(1))
+    return old_version is not None and old_version == pinned_taskcluster_version(image_set, new.group(1))
+
 def update_fxci_images(imagesets, worker_images):
     """Point the images in `worker_images` (fxci's worker-images.yml) at those in
     `imagesets`, in place, and link the updated ones to the bootstrap scripts
-    they were built with. Returns ([(fxci image, location, old, new)],
-    {fxci image: bootstrap script URL})."""
+    they were built with.
+    Returns ([(fxci image, location, old, new)],
+    {fxci image: bootstrap script URL}).
+
+    As it is usually only the Taskcluster version of the images that matters,
+    images that would have the Taskcluster that fxci's have already (e.g. as a
+    pull request like this one, from another run, has been merged) aren't
+    updated, unless their image set was rebuilt anyway, when you were asked
+    (IMAGESET_REBUILD_SAME, from imageset.sh)."""
     changes = []
     scripts = {}
     missing = []
+    rebuilt_anyway = os.environ.get("IMAGESET_REBUILD_SAME", "").split()
+
+    def wanted(fxci_image, image_set, cloud, old_names, new_names):
+        old_script = (worker_images[fxci_image].get(FXCI_METADATA_KEY) or {}).get("machine-setup", {}).get("script")
+        new_script = (imagesets[image_set].get("workerConfig", {}).get("genericWorker", {}).get("config", {})
+                      .get("workerTypeMetadata", {}).get("machine-setup", {}).get("script"))
+        if image_set in rebuilt_anyway or not same_taskcluster(image_set, cloud, old_names, new_names,
+                                                               old_script, new_script):
+            return True
+        print(f"ℹ️  fxci's {fxci_image} already has the Taskcluster that {image_set}'s new images have, so not updating it")
+        return False
+
     for fxci_image, (image_set, provider_id) in FXCI_IMAGES.items():
         if provider_id not in worker_images.get(fxci_image, {}):
             print(f"ℹ️  fxci has no {fxci_image} image for {provider_id}, so not updating it")
@@ -663,7 +910,8 @@ def update_fxci_images(imagesets, worker_images):
         if isinstance(current, str):
             # GCP: one image for all regions
             new = imagesets[image_set]["gcp"]["image"]
-            if current != new:
+            if current != new and wanted(fxci_image, image_set, "gcp", [current.rsplit("/", 1)[-1]],
+                                         [new.rsplit("/", 1)[-1]]):
                 worker_images[fxci_image][provider_id] = new
                 changes.append((fxci_image, None, current, new))
                 scripts[fxci_image] = update_fxci_script(imagesets, image_set, worker_images, fxci_image)
@@ -676,6 +924,7 @@ def update_fxci_images(imagesets, worker_images):
             raise SystemExit(f"❌ fxci's {fxci_image} has a deployment_id, which fxci appends to managed image "
                              "names, so can't be updated with full image names")
         built = imagesets[image_set]["azure"]["images"]
+        updates = {}
         for location in [k for k in current if k not in FXCI_AZURE_SETTINGS]:
             path = built.get(location.replace("-", ""))
             if not path:
@@ -683,6 +932,9 @@ def update_fxci_images(imagesets, worker_images):
                 continue
             new = path.rsplit("/", 1)[-1]
             if current[location] != new:
+                updates[location] = new
+        if updates and wanted(fxci_image, image_set, "azure", [current[l] for l in updates], list(updates.values())):
+            for location, new in updates.items():
                 changes.append((fxci_image, location, current[location], new))
                 current[location] = new
         if len(changes) > changed:
@@ -777,12 +1029,33 @@ def open_fxci_pr():
         imagesets = yaml.load(f)
     with tempfile.TemporaryDirectory() as tmp:
         def git(*args):
-            return subprocess.run(["git", *args], cwd=f"{tmp}/fxci-config", check=True,
-                                  capture_output=True, text=True).stdout.strip()
+            # fetch, and a push of the same commit, can be repeated (and the others don't use the network)
+            r = run_retrying(["git", *args], cwd=f"{tmp}/fxci-config", pass_fds=GPG_PASSPHRASE_FDS)
+            if r.returncode:
+                raise subprocess.CalledProcessError(r.returncode, r.args, r.stdout, r.stderr)
+            return r.stdout.strip()
+
+        def gh_cli(*args):
+            r = run_retrying(["gh", *args])
+            if r.returncode:
+                raise subprocess.CalledProcessError(r.returncode, r.args, r.stdout, r.stderr)
+            return r.stdout.strip()
+
+        def existing_pr(branch):
+            return gh_cli("pr", "list", "--repo", FXCI_REPO, "--head", branch, "--state", "open",
+                          "--json", "url", "--jq", ".[].url")
 
         # Clones your fork (creating it if needed) as `origin`, with fxci-config as `upstream`
-        fork = subprocess.run(["gh", "repo", "fork", FXCI_REPO, "--clone", "--default-branch-only"], cwd=tmp,
-                              capture_output=True, text=True)
+        # A failed clone's leftovers are removed, so that it can be repeated
+        def fork_and_clone():
+            subprocess.run(["rm", "-rf", f"{tmp}/fxci-config"])
+            return subprocess.run(["gh", "repo", "fork", FXCI_REPO, "--clone", "--default-branch-only"], cwd=tmp,
+                                  capture_output=True, text=True)
+        for wait in [*RETRY_SECONDS, None]:
+            fork = fork_and_clone()
+            if fork.returncode == 0 or wait is None or not TRANSIENT_RE.search(fork.stderr):
+                break
+            time.sleep(wait)
         if fork.returncode != 0:
             raise SystemExit(f"❌ Couldn't fork and clone {FXCI_REPO}:\n{fork.stdout}{fork.stderr}")
         git("fetch", "upstream", "main")
@@ -806,8 +1079,7 @@ def open_fxci_pr():
         # The same images give the same branch, so a rerun reuses the PR
         with open(images_file, "rb") as f:
             branch = f"tceng-images-{hashlib.sha256(f.read()).hexdigest()[:12]}"
-        existing = subprocess.run(["gh", "pr", "list", "--repo", FXCI_REPO, "--head", branch, "--state", "open",
-                                   "--json", "url", "--jq", ".[].url"], capture_output=True, text=True, check=True).stdout.strip()
+        existing = existing_pr(branch)
         if existing:
             print(f"♻️  Reusing {existing}")
             return
@@ -815,9 +1087,20 @@ def open_fxci_pr():
         title, body = fxci_pr_text(changes, scripts)
         git("commit", "--all", "--message", title)
         git("push", "--force", "origin", f"HEAD:refs/heads/{branch}")
-        fork_owner = subprocess.run(["gh", "api", "user", "--jq", ".login"], capture_output=True, text=True, check=True).stdout.strip()
-        subprocess.run(["gh", "pr", "create", "--repo", FXCI_REPO, "--base", "main", "--head", f"{fork_owner}:{branch}",
-                        "--title", title, "--body", body], check=True)
+        fork_owner = gh_cli("api", "user", "--jq", ".login")
+        # Creating it isn't simply repeated (it may have been created, if
+        # creating it failed), but whether it exists is checked again
+        for attempt in range(5):
+            created = subprocess.run(["gh", "pr", "create", "--repo", FXCI_REPO, "--base", "main",
+                                      "--head", f"{fork_owner}:{branch}", "--title", title, "--body", body])
+            if created.returncode == 0:
+                return
+            time.sleep(30)
+            existing = existing_pr(branch)
+            if existing:
+                print(f"♻️  {existing} was opened, although opening it failed")
+                return
+        raise SystemExit(f"❌ Couldn't open the pull request for {fork_owner}:{branch} in {FXCI_REPO}")
 
 
 # ---- Main ----
@@ -833,6 +1116,12 @@ def main():
     if sys.argv[1:] == ["--open-fxci-pr"]:
         open_fxci_pr()
         return
+    if sys.argv[1:2] == ["--check-built"] and len(sys.argv) == 3:
+        check_built(sys.argv[2])
+        return
+    if not WORKFLOWS:
+        print("ℹ️  No image sets to build (all were skipped).")
+        return
 
     if RUNS_FILE and os.path.exists(RUNS_FILE):
         with open(RUNS_FILE) as f:
@@ -843,9 +1132,24 @@ def main():
         if os.environ.get("UPDATE_TASKCLUSTER_VERSION", "true") == "true":
             bump_taskcluster_version()
 
-        # Only match runs triggered from here on, not any started while waiting for the PR.
+        # Only match runs triggered from here on, not any started while waiting
+        # for the PR, or since an interrupted run started triggering them (so
+        # that its runs are used, rather than triggered again)
         global SCRIPT_START_TIME
-        SCRIPT_START_TIME = datetime.now(timezone.utc)
+        started = f"{RUNS_FILE}.started" if RUNS_FILE else None
+        if started and os.path.exists(started):
+            with open(started) as f:
+                SCRIPT_START_TIME = datetime.fromisoformat(f.read().strip())
+            print(f"♻️  Using the builds triggered since {SCRIPT_START_TIME:%Y-%m-%d %H:%M} UTC, by an interrupted run")
+        else:
+            # GitHub's clock, as the runs' times are, rather than this one's
+            # (which can drift, e.g. in a VM), less a margin
+            date = gh(f"{API_ROOT}/rate_limit").headers.get("Date")
+            SCRIPT_START_TIME = (email.utils.parsedate_to_datetime(date) if date else datetime.now(timezone.utc)) \
+                - timedelta(seconds=5)
+            if started:
+                with open(started, "w") as f:
+                    f.write(SCRIPT_START_TIME.isoformat())
 
         # 1) Trigger all workflows in parallel and wait for all to complete
         run_map = trigger_all_workflows(WORKFLOWS)

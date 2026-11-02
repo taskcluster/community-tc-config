@@ -21,40 +21,92 @@ steps.
 
 ## Prerequisites
 
-1) AWS: the `AdministratorAccess` role on account `moz-fx-tc-community-workers`
+1) Docker, e.g. [Colima](https://github.com/abiosoft/colima) (`brew install
+   colima docker && colima start`) or Docker Desktop on macOS, or Docker Engine
+   on Linux. Nothing else needs installing (not even git): the script runs in a
+   container with the tools it needs ([`container/Dockerfile`](container/Dockerfile)),
+   which it builds, and rebuilds each week to update them (which takes a few
+   minutes).
+
+2) AWS: the `AdministratorAccess` role on account `moz-fx-tc-community-workers`
    (885316786408) in [Mozilla's AWS SSO](https://mozilla-cloudservices.awsapps.com/start).
 
-2) Azure and GCP: `az` and `gcloud` installed.
+3) GitHub: an account that is a member of the `taskcluster` and
+   `mozilla-platform-ops` organizations, with write access to
+   `mozilla-platform-ops/worker-images` (to trigger its workflows). `main` of
+   this repository is protected: only its admins (the
+   `taskcluster/community-tc-admins` team) can push to it directly. For anyone
+   else, the script opens pull requests instead (from a branch, or from your
+   fork), and waits for them to be approved and merged.
 
-3) GitHub: `gh` installed, and an account that can push to this repository.
+4) Your name and email for commits: taken from your git configuration
+   (`user.name` and `user.email`), if you have git, and otherwise asked for.
+   At the start, the script shows them, the gpg key that signs the commits,
+   and the repositories it commits to (`taskcluster/community-tc-config`,
+   pushed to `main`; `mozilla-platform-ops/worker-images` and
+   `mozilla-releng/fxci-config`, in pull requests), and asks whether to use
+   them, or change them.
 
-4) git: `user.name` and `user.email` set.
+5) gpg: a key that the taskcluster team password store is encrypted to, and
+   which can sign and encrypt (an ssh signing key won't do): `user.signingkey`, or else the key of `user.email`, in your
+   gpg home (`$GNUPGHOME`, or `~/.gnupg`). Only the key is used, by the
+   container's gpg (rather than your gpg, agent or configuration): its
+   passphrase is asked for once, at the start, and kept only in memory, giving
+   it to the commands that need it. Every commit the script makes is signed
+   with it, whatever your git settings, and checked before pushing; add it to
+   your GitHub account, for GitHub to show them as verified. Keys on a
+   smartcard aren't supported.
 
-5) gpg: a key that the taskcluster team password store is encrypted to. Its
-   passphrase is only asked for (if gpg-agent hasn't cached it) at the start.
+6) macOS workers (`prod` and `all`): a Mozilla LDAP account (asked for,
+   suggesting the account you signed in to Google Cloud with, or else your
+   git email, or your GitHub account's mozilla.com email, or set
+   `IMAGESET_LDAP_USERNAME`) with an
+   authenticator app for 2FA (Duo's "Hardware token" option), and a VNC session
+   as administrator on each Mac. The Macs are only reachable through the
+   Mozilla VPN, which the container connects to (only the container uses it,
+   so Viscosity isn't needed). The first time, the script downloads your VPN
+   certificate from [login.mozilla.com](https://login.mozilla.com/openvpn/)
+   (with your LDAP password and a 2FA code), and keeps it encrypted to your gpg
+   key; connecting needs another 2FA code, each time. The Macs are updated
+   right after the sign-ins, so that the VPN is only needed while you are
+   there. If a Mac is reinstalled, update [`mac_known_hosts`](mac_known_hosts).
 
-6) macOS workers (`prod` and `all`): **you must be connected to the Mozilla
-   corporate VPN**, as the Macs are only reachable through it, and have a VNC
-   session as administrator on each Mac. If a Mac is reinstalled, update
-   [`mac_known_hosts`](mac_known_hosts).
+Right after signing in, and before changing anything, the script checks that
+you have all the access that the run needs (in GitHub, Google Cloud, Azure,
+AWS, the password store and Taskcluster: see
+[`container/preflight.py`](container/preflight.py)), and if you don't, it
+stops, saying what is missing, and how to get it.
 
-The script doesn't use your own configuration of these tools (e.g.
-`~/.ssh/config`, `~/.gitconfig`, `~/.aws/config`, `~/.azure`,
-`~/.config/gcloud`, `~/.password-store`), apart from the AWS SSO token cache
-(`~/.aws/sso/cache`), nor your checkout of this repository: it signs in during
-the run, and clones upstream `main` and the password store into a temporary
-directory. To test local changes to the scripts, set
-`IMAGESET_LOCAL_CHANGES=true`.
+Signing in to Google Cloud, GitHub, Azure and AWS happens in your browser:
+the script opens each page, with any one-time code in your clipboard. Without
+a browser (e.g. over ssh), it shows the URL and code instead.
+
+The script doesn't use your own configuration of any tools, nor your checkout
+of this repository: it clones upstream `main`, and the container signs in
+during the run, and clones the password store. To test local changes to the
+scripts, set `IMAGESET_LOCAL_CHANGES=true`. If it isn't set, and your checkout
+has changes (files that differ from upstream `main`'s, other than ones where
+your checkout is just behind it), the script lists them, and asks whether to
+use them. It keeps progress (for resuming) and the encrypted
+VPN certificate in `~/.cache/community-tc-imagesets`.
 
 ## What it does
+
+Before anything slow starts (while you are still there, after the sign-ins
+and access checks), it checks which image sets already have the Taskcluster
+that a new build would: for production image sets, the latest release, and
+for staging image sets, Taskcluster's `main`, with no newer commit. As it is
+usually only the Taskcluster version that matters, it lists them, saying what
+changed in worker-images since they were built, and asks whether to rebuild
+them anyway, or skip them.
 
 Before triggering the builds, any `taskcluster_version` in worker-images' `config/tceng/` that
 isn't the latest Taskcluster release is bumped in a PR (with auto-merge enabled,
 so it lands as soon as it is approved), and the script waits for it to merge
 (`UPDATE_TASKCLUSTER_VERSION=false` skips this). The PR is opened as soon as the
 logins and other setup steps have completed, so it can be reviewed while
-instance types/VM sizes/machine types are updated and macOS workers are
-deployed; only triggering the builds waits for it to be merged. Failed
+macOS workers are deployed and instance types/VM sizes/machine types are
+updated; only triggering the builds waits for it to be merged. Failed
 worker-images jobs are rerun, up to `MAX_RUN_ATTEMPTS` attempts. Azure images
 that worker-images built in another subscription are copied into ours by
 `copy-azure-images.py` before `tc-admin apply` switches worker pools to them.
@@ -81,21 +133,13 @@ its worker pools.
 | `MAX_RUN_ATTEMPTS` | Attempts per worker-images workflow run, including reruns of failed jobs (and of jobs cancelled for exceeding their time limit, but not of jobs cancelled by hand) | `5` |
 | `DEPLOY_IMAGES` | Copy Azure images into place and `tc-admin apply` | `true` |
 | `UPDATE_FXCI_IMAGES` | Open the fxci-config PR to use the new images | `true` |
-| `IMAGESET_LOCAL_CHANGES` | Use the files of your checkout (other than `config/`), rather than upstream `main`'s, to test changes to the scripts | `false` |
+| `IMAGESET_LOCAL_CHANGES` | Use your checkout's changes (other than to `config/`), rather than upstream `main`'s files, to test changes to the scripts | asks, if your checkout has changes |
 | `IMAGESET_RESUME` | Whether to resume an unfinished run of the same target (skipping the steps it completed, and waiting for its worker-images builds rather than triggering new ones), rather than start again | asks |
-| `UPDATE_GCLOUD` | Run `gcloud components update` | `true` |
+| `IMAGESET_LDAP_USERNAME` | Your Mozilla LDAP username, for the VPN | asks |
+| `IMAGESET_PASSWORD_STORE_URL` | The git URL of the password store | `https://source.developers.google.com/p/taskcluster-passwords/r/secrets` |
 
 If a run fails, it says which step failed. Rerun the same command to continue
 from there: it asks whether to resume, or to start again.
 
 After a run, test the new images, e.g. by rerunning some tasks that previously
 ran successfully.
-
-## Required tools
-
-The script runs on macOS and Linux. It checks for the tools it needs before
-doing anything else, and says how to install any that are missing:
-`aws` (version 2), `az`, `gcloud`, `gh`, `git`, `gpg`, `pass`,
-`python3` (3.10 or later, with `venv`), `ssh` (OpenSSH 8.4 or later), `curl`, `tar`, and
-standard utilities. Without a browser (e.g. over ssh), signing in uses a URL and
-code instead.
