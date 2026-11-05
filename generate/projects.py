@@ -108,7 +108,9 @@ async def update_resources(resources, secret_values):
             )
         if project.workerPools:
             for name, worker_pool in project.workerPools.items():
-                worker_pool_id = "proj-{}/{}".format(project.name, name)
+                worker_pool_id = (
+                    name if "/" in name else "proj-{}/{}".format(project.name, name)
+                )
                 worker_pool["description"] = "Workers for " + project.name
                 worker_pool, secret, role = await build_worker_pool(
                     worker_pool_id, worker_pool, secret_values
