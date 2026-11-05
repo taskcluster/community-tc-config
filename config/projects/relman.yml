@@ -83,6 +83,48 @@ relman:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+    code-analysis-1/decision:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 4
+    code-analysis-1/linux-docker:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 10
+    code-analysis-1/linux-gcp:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 10
+    code-analysis-3/decision:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 4
+    code-analysis-3/linux-docker:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 10
+    code-analysis-3/linux-gcp:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 10
 
   secrets:
     bugzilla-dashboard-backend/deploy-production: true
@@ -271,6 +313,30 @@ relman:
         - repo:github.com/mozilla/code-review:branch:master
         - repo:github.com/mozilla/code-review:branch:production
         - repo:github.com/mozilla/code-review:release:published
+
+    # code-analysis pools for level 1 (pull requests and the testing branch)
+    - grant:
+        - queue:create-task:very-low:code-analysis-1/decision
+        - queue:create-task:low:code-analysis-1/linux-docker
+        - queue:create-task:low:code-analysis-1/linux-gcp
+      to:
+        - repo:github.com/mozilla/code-review:pull-request
+        - repo:github.com/mozilla/code-review:pull-request-untrusted
+        - repo:github.com/mozilla/code-review:branch:testing
+
+    # code-analysis pools for level 3 (master, production and releases)
+    - grant:
+        - queue:create-task:very-low:code-analysis-3/decision
+        - queue:create-task:low:code-analysis-3/linux-docker
+        - queue:create-task:low:code-analysis-3/linux-gcp
+      to:
+        - repo:github.com/mozilla/code-review:branch:master
+        - repo:github.com/mozilla/code-review:branch:production
+    - grant:
+        - queue:create-task:lowest:code-analysis-3/decision
+        - queue:create-task:low:code-analysis-3/linux-docker
+        - queue:create-task:low:code-analysis-3/linux-gcp
+      to: repo:github.com/mozilla/code-review:release:published
 
     - grant:
         - queue:cancel-task:code-analysis-level-1/*
