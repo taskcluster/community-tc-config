@@ -78,6 +78,33 @@ region us-east-2:
 
 This configuration was generated with the script `misc/aws-worker-vpc-setup.sh` in this repository.
 
+Worker-manager uses IAM user `taskcluster-worker-manager`, whose only permissions come from the customer-managed policy `taskcluster-worker-manager`.
+This policy is managed by hand (not in terraform), and should match the [worker-manager deployment docs](https://docs.taskcluster.net/docs/manual/deploying/worker-manager-config#aws):
+
+```
+$ ARN=arn:aws:iam::885316786408:policy/taskcluster-worker-manager
+$ aws iam get-policy-version --policy-arn "$ARN" --query PolicyVersion.Document \
+    --version-id "$(aws iam get-policy --policy-arn "$ARN" --query Policy.DefaultVersionId --output text)"
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeInstances",
+                "ec2:TerminateInstances",
+                "ec2:CreateTags",
+                "ec2:DescribeRegions",
+                "ec2:RunInstances",
+                "ec2:DescribeInstanceStatus",
+                "ec2:DescribeVolumes"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
 # GitHub App
 
 The GitHub app for the `taskcluster-github` service is called `Community-TC Integration`, under the Taskcluster organization.
