@@ -40,6 +40,6 @@ RUN set -eux; \
 # it is quick, and Playwright, with headless Chromium, for login.mozilla.com's
 # Duo prompt (see vpn.py)
 RUN pip install --no-cache-dir --break-system-packages \
-      playwright 'tc-admin>=5.2.1' 'json-e>=4.7.1' ruamel.yaml requests pytest \
+      playwright 'tc-admin>=6.0.1' 'json-e>=4.7.1' ruamel.yaml requests pytest \
  && playwright install --with-deps --only-shell chromium \
  && rm -rf /var/lib/apt/lists/*
