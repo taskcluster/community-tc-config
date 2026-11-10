@@ -1,0 +1,33 @@
+# Builds imageset.sh's container image each week, as imageset.sh does, so that
+# a new release of one of its tools that breaks the build is found before
+# someone needs the image.
+name: imageset container
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  pull_request:
+    paths:
+      - imagesets/container/**
+      - .github/workflows/imageset-container.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build
+        run: docker build --build-arg "TOOLS_WEEK=$(date +%G-%V)" -t imagesets imagesets/container
+      - name: Check the tools run
+        run: |
+          docker run --rm imagesets sh -c 'aws --version && az version && gcloud --version && gh --version && tc-admin --help > /dev/null'
+          docker run --rm imagesets python3 -c 'from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:
+              p.chromium.launch(headless=True).close()'
