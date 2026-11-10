@@ -1046,17 +1046,50 @@ function misc-mac-commit {
   fi
 }
 
+# Succeeds if each macOS worker accepts ssh connections (with the expected
+# host key), without logging in, so without its password: e.g. through your own
+# VPN connection, on the host, which the container's network goes through
+function macs-reachable {
+  local host
+  local output
+  mac-ssh-options
+  for host in "$@"; do
+    # Before MAC_SSH_OPTIONS, as ssh uses the first value of each option
+    output="$(ssh -o BatchMode=yes -o ConnectTimeout=5 "${MAC_SSH_OPTIONS[@]}" -n "administrator@${host}" true 2>&1 || true)"
+    if [[ "${output}" != *"Permission denied"* ]]; then
+      return 1
+    fi
+  done
+}
+
+# Makes sure that the VPN bundle is stored (see vpn.py), suggesting your LDAP
+# username, if it has to be downloaded
+function prepare-vpn {
+  IMAGESET_LDAP_SUGGESTION="$(suggest-ldap-username)"
+  export IMAGESET_LDAP_SUGGESTION
+  vpn prepare
+}
+
 function update-macs {
   local host
   misc-mac-commit
-  vpn connect
-  VPN_CONNECTED=true
+  # Not needed if your own VPN connection reaches them (and it would clash with
+  # one using the same certificate)
+  if macs-reachable "$@"; then
+    echo "The macOS workers are reachable (e.g. through your own VPN connection), so not connecting to the VPN."
+  else
+    prepare-vpn
+    vpn connect
+    VPN_CONNECTED=true
+  fi
   check-mac-connectivity "$@"
   for host in "$@"; do
     run-step "mac ${host}" update-mac "${host}"
   done
-  vpn disconnect
-  VPN_CONNECTED=false
+  if "${VPN_CONNECTED}"; then
+    vpn disconnect
+    VPN_CONNECTED=false
+  fi
 }
 
 function on-exit {
@@ -1149,9 +1182,12 @@ function deploy-image-sets {
   fi
 
   if [ "${#pending_macs[@]}" -gt 0 ]; then
-    IMAGESET_LDAP_SUGGESTION="$(suggest-ldap-username)"
-    export IMAGESET_LDAP_SUGGESTION
-    vpn prepare
+    # Only if the container will connect to the VPN (see update-macs)
+    if macs-reachable "${pending_macs[@]}"; then
+      echo "The macOS workers are reachable already (e.g. through your own VPN connection), so the container won't connect to the VPN for them."
+    else
+      prepare-vpn
+    fi
   fi
 
   local root_credentials
