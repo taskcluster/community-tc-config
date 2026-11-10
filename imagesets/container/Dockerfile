@@ -38,8 +38,9 @@ RUN set -eux; \
 
 # What this repository's scripts need (setup.py), so that run.sh's install of
 # it is quick, and Playwright, with headless Chromium, for login.mozilla.com's
-# Duo prompt (see vpn.py)
+# Duo prompt (see vpn.py). Playwright is pinned, as it brings its own node,
+# Chromium and system packages, so new releases can break the build.
 RUN pip install --no-cache-dir --break-system-packages \
-      playwright 'tc-admin>=6.0.1' 'json-e>=4.7.1' ruamel.yaml requests pytest \
+      'playwright==1.65.0' 'tc-admin>=6.0.1' 'json-e>=4.7.1' ruamel.yaml requests pytest \
  && playwright install --with-deps --only-shell chromium \
  && rm -rf /var/lib/apt/lists/*
