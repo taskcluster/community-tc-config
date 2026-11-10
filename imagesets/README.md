@@ -64,7 +64,10 @@ steps.
    authenticator app for 2FA (Duo's "Hardware token" option), and a VNC session
    as administrator on each Mac. The Macs are only reachable through the
    Mozilla VPN, which the container connects to (only the container uses it,
-   so Viscosity isn't needed). The first time, the script downloads your VPN
+   so Viscosity isn't needed), unless they are reachable already, e.g.
+   through your own VPN connection, which the container's network goes
+   through. Don't connect or disconnect your own VPN during a run, as the
+   container's network changes with it. The first time, the script downloads your VPN
    certificate from [login.mozilla.com](https://login.mozilla.com/openvpn/)
    (with your LDAP password and a 2FA code), and keeps it encrypted to your gpg
    key; connecting needs another 2FA code, each time. The Macs are updated
