@@ -15,7 +15,8 @@
 #   - your browser, which the container has this script open for sign-ins
 #
 # Progress (for resuming) and your VPN bundle (encrypted to your gpg key) are
-# kept in ~/.cache/community-tc-imagesets.
+# kept in ~/.cache/community-tc-imagesets. A failed run leaves a diagnostic
+# file (see container/diagnostics-README.md) in its diagnostics directory.
 
 set -eu
 set -o pipefail
@@ -179,14 +180,14 @@ function file-hash {
 # used. Old images are removed.
 function build-image {
   local context="${1}"
-  local log="${WORK}/build.log"
+  local tag="${2}"
+  local log="${IMAGESET_DIAGNOSTICS}/build-${tag##*:}.log"
   local week
   local hash
   local built
   local attempt
   week="$(date +%G-%V)"
   hash="$(file-hash "${context}/Dockerfile")"
-  local tag="${2}"
   local same
   built="$(docker image inspect --format '{{index .Config.Labels "org.mozilla.community-tc-imagesets.week"}} {{index .Config.Labels "org.mozilla.community-tc-imagesets.dockerfile"}}' "${tag}" 2> /dev/null || true)"
   if [ "${built}" == "${week} ${hash}" ]; then
@@ -280,6 +281,105 @@ function cleanup {
   fi
 }
 
+# What the diagnostic file says about the run, and the host
+function write-context {
+  local setting
+  echo "Started: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+  echo "Command: imageset.sh ${IMAGESET_TARGET}"
+  echo "Host: $(uname -srm)"
+  if [ "$(uname)" == Darwin ]; then
+    echo "macOS: $(sw_vers -productVersion 2> /dev/null)"
+  elif [ -f /etc/os-release ]; then
+    echo "OS: $(. /etc/os-release && echo "${PRETTY_NAME-}")"
+  fi
+  echo "Docker: $(docker version --format 'client {{.Client.Version}}, server {{.Server.Version}} ({{.Server.Os}}/{{.Server.Arch}})' 2>&1)"
+  echo "Docker host: $(docker info --format '{{.OperatingSystem}}, {{.NCPU}} CPUs, {{.MemTotal}} bytes of memory' 2>&1)"
+  echo "Settings:"
+  for setting in "${SETTINGS[@]}" IMAGESET_LOCAL_CHANGES IMAGESET_RESUME IMAGESET_KEEP_DIAGNOSTICS; do
+    if [ -n "${!setting+set}" ]; then
+      echo "  ${setting}=${!setting}"
+    fi
+  done
+  if command -v git > /dev/null && git -C "${CHECKOUT}" rev-parse HEAD > /dev/null 2>&1; then
+    echo "Checkout: $(git -C "${CHECKOUT}" log -1 --format='%H (%s)') on branch $(git -C "${CHECKOUT}" branch --show-current)"
+    echo "Checkout's local changes:"
+    git -C "${CHECKOUT}" status --short | sed 's/^/  /'
+  fi
+  if [ -f "${STATE_DIR}/${IMAGESET_TARGET}.steps" ]; then
+    echo "Steps completed by a previous run: $(paste -sd , - < "${STATE_DIR}/${IMAGESET_TARGET}.steps")"
+  fi
+}
+
+# Writes the diagnostic file, from the run's diagnostics directory, with
+# diagnostics.py, in the container image; or, if there's no image (its first
+# build failed), from the host's files alone, which have no secrets. Outputs
+# its path.
+function package-diagnostics {
+  local out="${STATE_DIR}/diagnostics"
+  local name
+  local image
+  name="imageset-${IMAGESET_TARGET}-$(date +%Y%m%d-%H%M%S)"
+  for image in "${IMAGE}:latest" "${IMAGE}:checkout"; do
+    if docker image inspect "${image}" > /dev/null 2>&1 &&
+      docker run --rm --security-opt label=disable --volume "${CHECKOUT}:/checkout:ro" \
+        --volume "${IMAGESET_DIAGNOSTICS}:/diagnostics:ro" --volume "${out}:/out" \
+        --env IMAGESET_HOST_UID="$(id -u)" --env IMAGESET_HOST_GID="$(id -g)" \
+        "${image}" python3 /checkout/imagesets/container/diagnostics.py package /diagnostics "/out/${name}.zip" >&2; then
+      echo "${out}/${name}.zip"
+      return
+    fi
+  done
+  cp "${CHECKOUT}/imagesets/container/diagnostics-README.md" "${IMAGESET_DIAGNOSTICS}/README.md"
+  if [ -f "${IMAGESET_DIAGNOSTICS}/transcript.raw" ]; then
+    mv "${IMAGESET_DIAGNOSTICS}/transcript.raw" "${IMAGESET_DIAGNOSTICS}/transcript.txt"
+  fi
+  if command -v zip > /dev/null; then
+    (cd "${IMAGESET_DIAGNOSTICS}" && zip -qr "${out}/${name}.zip" .) && echo "${out}/${name}.zip"
+  else
+    tar -czf "${out}/${name}.tar.gz" -C "${IMAGESET_DIAGNOSTICS}" . && echo "${out}/${name}.tar.gz"
+  fi
+}
+
+# Runs imageset.sh again, recorded by script, in a diagnostics directory; then
+# deletes it if the run succeeded (unless IMAGESET_KEEP_DIAGNOSTICS=true), or
+# writes the diagnostic file from it, and exits with the run's status
+function run-with-diagnostics {
+  local status=0
+  local file
+  case "${IMAGESET_KEEP_DIAGNOSTICS-}" in
+    true | false | '') ;;
+    *) echo "IMAGESET_KEEP_DIAGNOSTICS must be true or false" >&2; exit 64 ;;
+  esac
+  mkdir -p -m 700 "${STATE_DIR}/diagnostics"
+  find "${STATE_DIR}/diagnostics" -mindepth 1 -maxdepth 1 -mtime +30 -exec rm -rf {} + 2> /dev/null || true
+  IMAGESET_DIAGNOSTICS="$(mktemp -d "${STATE_DIR}/diagnostics/run.XXXXXXXX")"
+  export IMAGESET_DIAGNOSTICS
+  write-context > "${IMAGESET_DIAGNOSTICS}/context.txt" 2>&1
+  if ! command -v script > /dev/null; then
+    "${BASH}" "${0}" "$@" || status=$?
+  elif script --version 2> /dev/null | grep -q util-linux; then
+    script -q -f -e -c "$(printf '%q ' "${BASH}" "${0}" "$@")" "${IMAGESET_DIAGNOSTICS}/transcript.raw" || status=$?
+  else
+    script -q -F "${IMAGESET_DIAGNOSTICS}/transcript.raw" "${BASH}" "${0}" "$@" || status=$?
+  fi
+  echo "Exit status: ${status}" >> "${IMAGESET_DIAGNOSTICS}/context.txt"
+  if [ "${status}" == 0 ] && [ "${IMAGESET_KEEP_DIAGNOSTICS-}" != true ]; then
+    remove-dir "${IMAGESET_DIAGNOSTICS}"
+    exit 0
+  fi
+  if ! file="$(package-diagnostics)"; then
+    echo "WARNING: couldn't write the diagnostic file: its files are in ${IMAGESET_DIAGNOSTICS}" >&2
+    exit "${status}"
+  fi
+  remove-dir "${IMAGESET_DIAGNOSTICS}"
+  case "${status}" in
+    0) echo "Diagnostic file: ${file}" ;;
+    129 | 130 | 143) printf '\nDiagnostic file of this run: %s\n' "${file}" >&2 ;;
+    *) echo "Please send diagnostic file ${file} to Claude for analysis (your own Claude, or the imageset maintainers')." >&2 ;;
+  esac
+  exit "${status}"
+}
+
 ################## Entry point ##################
 
 # All of it in a function, which bash reads in full before running it, and
@@ -303,7 +403,6 @@ function main {
   fi
 
   check-docker
-  read-identity
 
   mkdir -p -m 700 "${STATE_DIR}"
   if [ -L "${STATE_DIR}" ] || ! [ -O "${STATE_DIR}" ]; then
@@ -311,6 +410,11 @@ function main {
     exit 1
   fi
   chmod 700 "${STATE_DIR}"
+  if [ -z "${IMAGESET_DIAGNOSTICS-}" ]; then
+    run-with-diagnostics "$@"
+  fi
+
+  read-identity
   LOCK=''
   WORK=''
   BRIDGE_PID=''
@@ -354,6 +458,8 @@ function main {
     --volume "${WORK}/clone/community-tc-config:/work"
     --volume "${STATE_DIR}:/state"
     --volume "${WORK}/bridge:/bridge"
+    --volume "${IMAGESET_DIAGNOSTICS}:/diagnostics"
+    --env IMAGESET_DIAGNOSTICS_DIR=/diagnostics
     --volume "${GNUPG_HOME}:/host-gnupg:ro"
     --env IMAGESET_GIT_NAME="${IMAGESET_GIT_NAME}"
     --env IMAGESET_GIT_EMAIL="${IMAGESET_GIT_EMAIL}"

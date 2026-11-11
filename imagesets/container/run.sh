@@ -7,6 +7,7 @@
 #                gpg key), kept between runs
 #   /bridge      where open-url asks imageset.sh to open your browser
 #   /host-gnupg  your gpg home (read-only)
+#   /diagnostics what imageset.sh's diagnostic file has from the container
 #
 # The tools are the image's, and only see this container: they sign in during
 # the run, through your browser (on the host).
@@ -1092,12 +1093,30 @@ function update-macs {
   fi
 }
 
+# Keeps the logs that the run doesn't show, for imageset.sh's diagnostic file
+function save-diagnostics {
+  local status="${1}"
+  local file
+  [ -d /diagnostics ] || return 0
+  mkdir -p /diagnostics/logs
+  for file in "${PREP_DIR}/pip.log" "${PREP_DIR}/gcloud-login.log" "${PREP_DIR}/built.json" /dev/shm/imageset-vpn/openvpn.log; do
+    if [ -f "${file}" ]; then
+      cp "${file}" /diagnostics/logs/
+    fi
+  done
+  {
+    echo "Failed step: ${CURRENT_STEP:-none}"
+    echo "Exit status: ${status}"
+  } >> /diagnostics/container.txt
+}
+
 function on-exit {
   local status="${1}"
   cd /
   if "${VPN_CONNECTED}"; then
     vpn disconnect > /dev/null 2>&1 || true
   fi
+  save-diagnostics "${status}" || true
   stop-gpg
   stop-host-gnupg
   rm -rf "${PREP_DIR}"
@@ -1105,7 +1124,7 @@ function on-exit {
   # the mounts show your uid (rather than with rootless Docker, where root is
   # you, or Docker on macOS, which maps them)
   if [ "$(stat -c %u /state)" == "${IMAGESET_HOST_UID}" ] && [ "${IMAGESET_HOST_UID}" != 0 ]; then
-    chown -R "${IMAGESET_HOST_UID}:${IMAGESET_HOST_GID}" /work /state 2> /dev/null || true
+    chown -R "${IMAGESET_HOST_UID}:${IMAGESET_HOST_GID}" /work /state /diagnostics 2> /dev/null || true
   fi
   finish "${status}"
 }
@@ -1271,6 +1290,13 @@ if [ "${#}" -ne 1 ] || ! [[ "${1}" =~ ^(prod|staging|all)$ ]]; then
   exit 64
 fi
 export IMAGESET_TARGET="${1}"
+if [ -d /diagnostics ]; then
+  {
+    echo "Clone: $(git -c safe.directory='*' -C /work log -1 --format='%H (%s)')"
+    echo "Clone's local changes:"
+    git -c safe.directory='*' -C /work status --short | sed 's/^/  /'
+  } > /diagnostics/container.txt 2>&1
+fi
 set-defaults
 
 PREP_DIR="$(mktemp -d /tmp/imageset.XXXXXXXX)"
@@ -1283,6 +1309,10 @@ RUN_GNUPGHOME=''
 HOST_GNUPGHOME=''
 VPN_CONNECTED=false
 trap 'status=$?; on-exit "${status}"; exit "${status}"' EXIT
+# So that the EXIT trap has the status
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 if ! "${IMAGESET_RESUME:-false}"; then
   rm -f "${STEPS_FILE}" "${IMAGESET_RUNS_FILE}" "${IMAGESET_RUNS_FILE}.started" "${IMAGESET_RUNS_FILE}.skip" "${IMAGESET_RUNS_FILE}.rebuild"

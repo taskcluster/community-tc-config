@@ -28,6 +28,5 @@ jobs:
       - name: Check the tools run
         run: |
           docker run --rm imagesets sh -c 'aws --version && az version && gcloud --version && gh --version && python3 -c "import tcadmin"'
-          docker run --rm imagesets python3 -c 'from playwright.sync_api import sync_playwright
-          with sync_playwright() as p:
-              p.chromium.launch(headless=True).close()'
+      - name: Test the sign-in and diagnostics
+        run: docker run --rm -v "$PWD:/repo" -w /repo/imagesets/container imagesets python3 -m pytest -q -p no:cacheprovider test_vpn.py
