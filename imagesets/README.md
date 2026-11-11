@@ -88,10 +88,14 @@ a browser (e.g. over ssh), it shows the URL and code instead.
 The script doesn't use your own configuration of any tools, nor your checkout
 of this repository: it clones upstream `main`, and the container signs in
 during the run, and clones the password store. To test local changes to the
-scripts, set `IMAGESET_LOCAL_CHANGES=true`. If it isn't set, and your checkout
-has changes (files that differ from upstream `main`'s, other than ones where
-your checkout is just behind it), the script lists them, and asks whether to
-use them. It keeps progress (for resuming) and the encrypted
+scripts, set `IMAGESET_LOCAL_CHANGES=true`: the clone's files are then exactly
+your checkout's (including deletions), other than `config/`. If it isn't set,
+and your checkout has changes of its own (commits that upstream `main` doesn't
+have, or uncommitted changes), the script lists them, and asks whether to use
+them. `config/` is always upstream `main`'s, as the run applies it to the
+deployment, and commits to it: the script refuses to run with your checkout's
+changes to it, which you can land on `main` first. It keeps progress (for
+resuming) and the encrypted
 VPN certificate in `~/.cache/community-tc-imagesets`.
 
 If a run fails, the script writes a diagnostic log (in
@@ -144,7 +148,7 @@ its worker pools.
 | `MAX_RUN_ATTEMPTS` | Attempts per worker-images workflow run, including reruns of failed jobs (and of jobs cancelled for exceeding their time limit, but not of jobs cancelled by hand) | `5` |
 | `DEPLOY_IMAGES` | Copy Azure images into place and `tc-admin apply` | `true` |
 | `UPDATE_FXCI_IMAGES` | Open the fxci-config PR to use the new images | `true` |
-| `IMAGESET_LOCAL_CHANGES` | Use your checkout's changes (other than to `config/`), rather than upstream `main`'s files, to test changes to the scripts | asks, if your checkout has changes |
+| `IMAGESET_LOCAL_CHANGES` | Use your checkout's files (other than `config/`, which can't have local changes), rather than upstream `main`'s, to test changes to the scripts | asks, if your checkout has changes |
 | `IMAGESET_RESUME` | Whether to resume an unfinished run of the same target (skipping the steps it completed, and waiting for its worker-images builds rather than triggering new ones), rather than start again | asks |
 | `IMAGESET_LDAP_USERNAME` | Your Mozilla LDAP username, for the VPN | asks |
 | `IMAGESET_KEEP_DIAGNOSTICS` | Keep the diagnostic log when the run succeeds (it is always kept when the run fails) | `false` |

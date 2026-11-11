@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 PIP_DISABLE_PIP_VERSION_CHECK=1
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      ca-certificates curl git gnupg iproute2 libatomic1 lsb-release openssh-client openssl openvpn pass python3 python3-pip socat unzip \
+      ca-certificates curl git gnupg iproute2 libatomic1 lsb-release openssh-client openssl openvpn pass python3 python3-pip rsync socat unzip \
  && rm -rf /var/lib/apt/lists/*
 
 # Changed by imageset.sh each week, so that the tools below are updated

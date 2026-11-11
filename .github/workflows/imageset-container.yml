@@ -32,5 +32,5 @@ jobs:
           docker run --rm imagesets sh -c 'aws --version && az version && gcloud --version && gh --version && python3 -c "import tcadmin"'
       - name: Check the scripts' syntax
         run: bash -n imagesets/imageset.sh && bash -n imagesets/container/run.sh && bash -n imagesets/container/clone.sh
-      - name: Test the sign-in
-        run: docker run --rm -v "$PWD:/repo" -w /repo/imagesets/container imagesets python3 -m pytest -q -p no:cacheprovider test_vpn.py
+      - name: Test the sign-in, and the use of local changes
+        run: docker run --rm -v "$PWD:/repo" -w /repo/imagesets/container imagesets python3 -m pytest -q -p no:cacheprovider test_vpn.py test_clone.py
