@@ -8,6 +8,8 @@ on:
   pull_request:
     paths:
       - imagesets/container/**
+      - imagesets/imageset.sh
+      - imagesets/diagnostics-README.md
       - .github/workflows/imageset-container.yml
   workflow_dispatch:
 permissions:
@@ -28,5 +30,7 @@ jobs:
       - name: Check the tools run
         run: |
           docker run --rm imagesets sh -c 'aws --version && az version && gcloud --version && gh --version && python3 -c "import tcadmin"'
-      - name: Test the sign-in and diagnostics
+      - name: Check the scripts' syntax
+        run: bash -n imagesets/imageset.sh && bash -n imagesets/container/run.sh && bash -n imagesets/container/clone.sh
+      - name: Test the sign-in
         run: docker run --rm -v "$PWD:/repo" -w /repo/imagesets/container imagesets python3 -m pytest -q -p no:cacheprovider test_vpn.py

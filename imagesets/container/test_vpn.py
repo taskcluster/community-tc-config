@@ -39,7 +39,7 @@ function code(o) {
     input.onkeydown = e => {
       if (e.key !== 'Enter') return;
       if (btoa(input.value) === %s) location = 'https://login.mozilla.com/openvpn/?via=' + encodeURIComponent(o);
-      else { input.value = ''; document.querySelector('h2').textContent = 'Incorrect passcode'; }
+      else { document.querySelector('h2').textContent = `Incorrect passcode ${input.value}`; input.value = ''; }
     };
   }, 300);
 }
@@ -90,7 +90,7 @@ def test_duo_mobile_passcode(tmp_path, monkeypatch):
 
 
 def test_hardware_token_preferred(tmp_path, monkeypatch):
-    url = run_sign_in(["Duo Push", "Hardware token", "Duo Mobile passcode"], iter([GOOD_CODE]), tmp_path, monkeypatch)
+    url = run_sign_in(["Duo Push", "Duo Mobile passcode", "Hardware token"], iter([GOOD_CODE]), tmp_path, monkeypatch)
     assert url.endswith("?via=Hardware%20token")
 
 
@@ -110,6 +110,15 @@ def test_no_passcode_option(tmp_path, monkeypatch):
         run_sign_in(["Duo Push", "Bypass Code"], iter([GOOD_CODE]), tmp_path, monkeypatch)
 
 
+def test_capture_scrubs_secrets(tmp_path):
+    capture = vpn.Capture(str(tmp_path))
+    capture.secret(PASSWORD)
+    capture.log(f"typed {PASSWORD}")
+    capture.write("page.html", f"<p>{PASSWORD}</p>")
+    assert PASSWORD not in (tmp_path / "browser" / "actions.log").read_text()
+    assert (tmp_path / "browser" / "page.html").read_text() == "<p><redacted></p>"
+
+
 def test_without_capture(tmp_path, monkeypatch):
     run_sign_in(["Duo Mobile passcode"], iter([GOOD_CODE]), tmp_path, monkeypatch, capture=False)
     assert not (tmp_path / "browser").exists()
@@ -125,5 +134,7 @@ def test_capture(tmp_path, monkeypatch):
     actions = (tmp_path / "browser" / "actions.log").read_text()
     assert "clicking 'Other options'" in actions and "clicking 'Duo Mobile passcode'" in actions
     assert "typed a 2FA code into #passcode-input" in actions
+    # The rejected code, which the mock shows on the page
+    assert "Incorrect passcode <redacted>" in (tmp_path / "browser" / "05-duo.html").read_text()
     # The hidden Hardware token button, on the first page
     assert "hidden  <button > Hardware token" in (tmp_path / "browser" / "02-duo.txt").read_text()

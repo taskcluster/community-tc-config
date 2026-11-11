@@ -1077,7 +1077,7 @@ function update-macs {
   # Not needed if your own VPN connection reaches them (and it would clash with
   # one using the same certificate)
   if macs-reachable "$@"; then
-    echo "The macOS workers are reachable (e.g. through your own VPN connection), so not connecting to the VPN."
+    echo "The macOS workers are reachable (e.g. through your own VPN connection), so not connecting to the VPN: stay connected to it until they are updated."
   else
     prepare-vpn
     vpn connect
@@ -1203,7 +1203,7 @@ function deploy-image-sets {
   if [ "${#pending_macs[@]}" -gt 0 ]; then
     # Only if the container will connect to the VPN (see update-macs)
     if macs-reachable "${pending_macs[@]}"; then
-      echo "The macOS workers are reachable already (e.g. through your own VPN connection), so the container won't connect to the VPN for them."
+      echo "The macOS workers are reachable already (e.g. through your own VPN connection), so the container won't connect to the VPN for them: stay connected to it until they are updated."
     else
       prepare-vpn
     fi
@@ -1295,7 +1295,7 @@ if [ -d /diagnostics ]; then
     echo "Clone: $(git -c safe.directory='*' -C /work log -1 --format='%H (%s)')"
     echo "Clone's local changes:"
     git -c safe.directory='*' -C /work status --short | sed 's/^/  /'
-  } > /diagnostics/container.txt 2>&1
+  } > /diagnostics/container.txt 2>&1 || true
 fi
 set-defaults
 

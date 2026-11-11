@@ -39,7 +39,8 @@ After this README, each section starts with a `===== name =====` line:
 
 The password and codes typed in the browser were replaced with `<redacted>`.
 The log can still have the user's name, email, LDAP username, the last digits
-of their phone number, and short-lived tokens, so keep it private.
+of their phone number, short-lived tokens, and anything typed ahead of a prompt
+(before it hid what was typed), so keep it private.
 
 ## The code
 
@@ -71,7 +72,8 @@ in the container).
    tests in the container image:
 
        docker build -t imagesets imagesets/container
-       docker run --rm -v "$PWD:/repo" -w /repo/imagesets/container imagesets python3 -m pytest -q test_vpn.py
+       docker run --rm -e PYTHONDONTWRITEBYTECODE=1 -v "$PWD:/repo" -w /repo/imagesets/container imagesets \
+         python3 -m pytest -q -p no:cacheprovider test_vpn.py
 
 3. Open a pull request against `main` with the fix, describing what the log
    showed (without its personal details).

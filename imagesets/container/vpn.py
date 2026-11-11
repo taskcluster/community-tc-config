@@ -287,7 +287,7 @@ def duo(page, user):
                 except PlaywrightTimeout:
                     CAPTURE.log(f"not back at login.mozilla.com after {CODE_WAIT // 1000}s")
                 continue
-            CAPTURE.log(f"clicking {target.inner_text(timeout=5000).splitlines()[0]!r}")
+            CAPTURE.log(f"clicking {(target.inner_text(timeout=5000).splitlines() or [action])[0]!r}")
             target.click(timeout=10000)
             if action == "other":
                 other_clicked = True

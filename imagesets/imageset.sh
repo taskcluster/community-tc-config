@@ -297,7 +297,8 @@ function write-context {
   echo "Settings:"
   for setting in "${SETTINGS[@]}" IMAGESET_LOCAL_CHANGES IMAGESET_RESUME IMAGESET_KEEP_DIAGNOSTICS; do
     if [ -n "${!setting+set}" ]; then
-      echo "  ${setting}=${!setting}"
+      # Without any credentials in URLs
+      echo "  ${setting}=${!setting}" | sed -E 's|://[^/@]+@|://<redacted>@|'
     fi
   done
   if command -v git > /dev/null && git -C "${CHECKOUT}" rev-parse HEAD > /dev/null 2>&1; then
@@ -314,7 +315,7 @@ function write-context {
 # overwritten lines (\r) and backspaces applied
 function clean-transcript {
   if command -v perl > /dev/null; then
-    perl -pe 's/\e\][^\a\e]*(?:\a|\e\\)//g; s/\e\[[0-?]*[ -\/]*[@-~]//g; s/\e[@-Z\\-_]//g;
+    perl -pe 's/\e\][^\a\e]*(?:\a|\e\\)//g; s/\e\[[0-?]*[ -\/]*[@-~]//g; s/\e[ -\/]*[0-~]//g;
       1 while s/[^\x08\n]\x08//; s/[^\r\n]*\r(?=[^\r\n])//g; s/[\x00-\x08\x0b-\x1f\x7f]//g' "${1}"
   else
     cat "${1}"
@@ -360,7 +361,9 @@ function run-with-diagnostics {
   find "${STATE_DIR}/diagnostics" -mindepth 1 -maxdepth 1 -mtime +30 -exec rm -rf {} + 2> /dev/null || true
   IMAGESET_DIAGNOSTICS="$(mktemp -d "${STATE_DIR}/diagnostics/run.XXXXXXXX")"
   export IMAGESET_DIAGNOSTICS
-  write-context > "${IMAGESET_DIAGNOSTICS}/context.txt" 2>&1
+  write-context > "${IMAGESET_DIAGNOSTICS}/context.txt" 2>&1 || true
+  # So that the log is still written if the terminal is closed, or this is killed
+  trap : HUP TERM
   if ! command -v script > /dev/null; then
     "${BASH}" "${0}" "$@" || status=$?
   elif script --version 2> /dev/null | grep -q util-linux; then
@@ -381,7 +384,8 @@ function run-with-diagnostics {
   remove-dir "${IMAGESET_DIAGNOSTICS}"
   case "${status}" in
     0) echo "Diagnostic log: ${file}" ;;
-    129 | 130 | 143) printf '\nDiagnostic log of this run: %s\n' "${file}" >&2 ;;
+    # Interrupted, or invalid settings
+    64 | 129 | 130 | 143) printf '\nDiagnostic log of this run: %s\n' "${file}" >&2 ;;
     *) echo "Please send diagnostic log ${file} to Claude for analysis (your own Claude, or the imageset maintainers')." >&2 ;;
   esac
   exit "${status}"
