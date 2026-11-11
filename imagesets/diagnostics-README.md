@@ -22,8 +22,9 @@ After this README, each section starts with a `===== name =====` line:
   user's checkout, steps completed by a previous run (if resuming), and the
   exit status.
 - `container.txt`: from inside the container: the commit of the clone that
-  ran (upstream `main`, with the user's local changes if
-  `IMAGESET_LOCAL_CHANGES`), the step that failed, and the exit status.
+  ran (upstream `main`), the full diff of the user's local changes that it
+  ran with (if `IMAGESET_LOCAL_CHANGES`), the step that failed, and the exit
+  status.
 - `build-checkout.log`, `build-latest.log`: the container image builds, if
   they were built in this run.
 - `logs/...`: logs that the run keeps out of the terminal: `pip.log`

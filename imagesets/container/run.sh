@@ -1129,6 +1129,25 @@ function on-exit {
   finish "${status}"
 }
 
+# The clone's commit, and its local changes (IMAGESET_LOCAL_CHANGES), in full,
+# through a temporary index, as the run commits from the clone's
+function describe-clone {
+  local index
+  index="$(mktemp -d)"
+  echo "Clone: $(GIT_INDEX_FILE="${index}/index" clone-git log -1 --format='%H (%s)')"
+  GIT_INDEX_FILE="${index}/index" clone-git read-tree HEAD
+  GIT_INDEX_FILE="${index}/index" clone-git add -A
+  echo "Clone's local changes:"
+  GIT_INDEX_FILE="${index}/index" clone-git diff --cached --stat HEAD
+  echo
+  GIT_INDEX_FILE="${index}/index" clone-git diff --cached HEAD
+  rm -rf "${index}"
+}
+
+function clone-git {
+  git -c safe.directory='*' -c core.pager=cat -c color.ui=false -C /work "$@"
+}
+
 ############### Deploy image sets ###############
 
 # Deploys the image sets of IMAGESET_TARGET: prod, staging or all.
@@ -1291,11 +1310,7 @@ if [ "${#}" -ne 1 ] || ! [[ "${1}" =~ ^(prod|staging|all)$ ]]; then
 fi
 export IMAGESET_TARGET="${1}"
 if [ -d /diagnostics ]; then
-  {
-    echo "Clone: $(git -c safe.directory='*' -C /work log -1 --format='%H (%s)')"
-    echo "Clone's local changes:"
-    git -c safe.directory='*' -C /work status --short | sed 's/^/  /'
-  } > /diagnostics/container.txt 2>&1 || true
+  describe-clone > /diagnostics/container.txt 2>&1 || true
 fi
 set-defaults
 
