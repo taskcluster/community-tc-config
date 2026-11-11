@@ -79,7 +79,8 @@ in the container).
 3. Open a pull request against `main` with the fix, describing what the log
    showed (without its personal details).
 4. The user can try the fix before it is merged, from a checkout of the pull
-   request's branch, with `IMAGESET_LOCAL_CHANGES=true imagesets/imageset.sh <target>`.
+   request's branch (which must have upstream `main`'s latest commit: rebase
+   it if not), with `IMAGESET_LOCAL_CHANGES=true imagesets/imageset.sh <target>`.
    Rerunning offers to resume from where the failed run stopped: don't delete
    `~/.cache/community-tc-imagesets`, which has that progress, and the user's
    VPN certificate.

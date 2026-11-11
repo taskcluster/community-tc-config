@@ -90,12 +90,13 @@ of this repository: it clones upstream `main`, and the container signs in
 during the run, and clones the password store. To test local changes to the
 scripts, set `IMAGESET_LOCAL_CHANGES=true`: the clone's files are then exactly
 your checkout's (including deletions), other than `config/`. If it isn't set,
-and your checkout has changes of its own (commits that upstream `main` doesn't
-have, or uncommitted changes), the script lists them, and asks whether to use
-them. `config/` is always upstream `main`'s, as the run applies it to the
-deployment, and commits to it: the script refuses to run with your checkout's
-changes to it, which you can land on `main` first. It keeps progress (for
-resuming) and the encrypted
+and your checkout has changes of its own, the script lists them, and asks
+whether to use them. Your checkout must have upstream `main`'s latest commit
+(pull, or rebase your branch), so that only your changes differ from it. And
+`config/` is always upstream `main`'s, as the run applies it to the deployment,
+and commits to it: the script refuses to run with your checkout's changes to
+it, which you can land on `main` first. It keeps progress (for resuming) and
+the encrypted
 VPN certificate in `~/.cache/community-tc-imagesets`.
 
 If a run fails, the script writes a diagnostic log (in
@@ -103,7 +104,7 @@ If a run fails, the script writes a diagnostic log (in
 its other logs, and the pages of the VPN sign-in, headed by a README that
 explains it, for Claude (yours, or the maintainers') to work out what went
 wrong and fix the scripts. Set `IMAGESET_KEEP_DIAGNOSTICS=true` to keep it when
-the run succeeds too.
+the run succeeds too. Diagnostic logs are deleted after 30 days.
 
 ## What it does
 

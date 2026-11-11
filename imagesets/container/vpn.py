@@ -134,6 +134,16 @@ ELEMENTS = """() => [...document.querySelectorAll('button, a, input, select, tex
 })"""
 
 
+def lean(html):
+    """The page's HTML, without the contents of its scripts, and values of its
+    hidden inputs (e.g. tokens), which don't matter for finding its controls"""
+    html = re.sub(r"(<script\b[^>]*>).*?(</script>)", r"\1\2", html, flags=re.S | re.I)
+    return re.sub(r"<input\b[^>]*>",
+                  lambda m: re.sub(r"""(\bvalue\s*=\s*)("[^"]*"|'[^']*'|[^\s>]+)""", r'\1""', m.group(0))
+                  if re.search(r"""\btype\s*=\s*["']?hidden\b""", m.group(0), re.I) else m.group(0),
+                  html, flags=re.I)
+
+
 class Capture:
     """Records each page of the sign-in (its URL, controls and HTML), and what
     was done, in DIR/browser, for imageset.sh's diagnostic log, with the
@@ -170,7 +180,7 @@ class Capture:
         self.pages += 1
         name = f"{self.pages:02d}-{label}"
         try:
-            self.write(f"{name}.html", page.content())
+            self.write(f"{name}.html", lean(page.content()))
             self.write(f"{name}.txt", f"URL: {page.url}\nTitle: {page.title()}\n\n" + "\n".join(page.evaluate(ELEMENTS)) + "\n")
             self.log(f"captured {name}: {page.url}")
         except Exception as e:
@@ -183,10 +193,13 @@ CAPTURE = Capture(os.environ.get("IMAGESET_DIAGNOSTICS_DIR"))
 # ---- Downloading the bundle ----
 
 def visible(locator):
+    """The first visible element of locator (as a page can have hidden copies
+    of an element too), or None"""
     try:
-        return locator.count() > 0 and locator.first.is_visible()
+        shown = locator.filter(visible=True)
+        return shown.first if shown.count() else None
     except Exception:
-        return False
+        return None
 
 
 def settle(page):
@@ -202,7 +215,7 @@ def page_text(page):
         text = re.sub(r"\n\s*\n+", "\n", page.locator("body").inner_text(timeout=5000)).strip()
     except Exception:
         text = ""
-    return "\n".join(f"  | {line[:100]}" for line in text.splitlines()[:20])
+    return CAPTURE.scrub("\n".join(f"  | {line[:100]}" for line in text.splitlines()[:20]))
 
 
 def download_links(page):
@@ -243,16 +256,16 @@ def duo_step(page, other_clicked):
     (click it: Other options); or None, if there's nothing to do"""
     if download_links(page):
         return ("done", None)
-    code_field = page.locator(CODE_FIELD)
-    if visible(code_field):
-        return ("code", code_field.first)
+    code_field = visible(page.locator(CODE_FIELD))
+    if code_field:
+        return ("code", code_field)
     for name in PASSCODE_OPTIONS:
-        option = page.get_by_role("button", name=name)
-        if visible(option):
-            return ("option", option.first)
-    other = page.get_by_role("button", name="Other options")
-    if not other_clicked and visible(other):
-        return ("other", other.first)
+        option = visible(page.get_by_role("button", name=name))
+        if option:
+            return ("option", option)
+    other = visible(page.get_by_role("button", name="Other options"))
+    if not other_clicked and other:
+        return ("other", other)
     return None
 
 
@@ -295,7 +308,7 @@ def duo(page, user):
             else:
                 waiting = page.locator(CODE_FIELD)
             try:
-                waiting.first.wait_for(state="visible", timeout=WAIT)
+                waiting.filter(visible=True).first.wait_for(timeout=WAIT)
             except PlaywrightTimeout:
                 CAPTURE.log(f"what was expected next didn't appear within {WAIT // 1000}s")
         except PlaywrightTimeout as e:

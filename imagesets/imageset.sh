@@ -29,15 +29,20 @@ SETTINGS=(BUILD_IMAGES DEPLOY_IMAGES DEPLOY_MACS UPDATE_FXCI_IMAGES UPDATE_OFFER
   MAX_RUN_ATTEMPTS IMAGESET_LDAP_USERNAME IMAGESET_PASSWORD_STORE_URL)
 
 function can-open-browser {
-  [ -z "${SSH_CONNECTION-}" ] && { [ "$(uname)" == Darwin ] || [ -n "${DISPLAY-}" ] || [ -n "${WAYLAND_DISPLAY-}" ]; }
+  [ -z "${SSH_CONNECTION-}" ] && { [ "$(uname)" == Darwin ] ||
+    { { [ -n "${DISPLAY-}" ] || [ -n "${WAYLAND_DISPLAY-}" ]; } && command -v xdg-open > /dev/null; }; }
 }
 
 function open-browser {
   if [ "$(uname)" == Darwin ]; then
     open "${1}"
+  elif command -v setsid > /dev/null; then
+    # In a session of its own, so that a browser it starts isn't hung up when
+    # the run (and its terminal) ends
+    setsid -f xdg-open "${1}" < /dev/null > /dev/null 2>&1
   else
     # It can stay in the foreground until the browser exits
-    xdg-open "${1}" > /dev/null 2>&1 &
+    xdg-open "${1}" < /dev/null > /dev/null 2>&1 &
   fi
 }
 
@@ -104,8 +109,15 @@ function check-docker {
     fi
     return 1
   fi
-  if ! docker info > /dev/null 2>&1; then
-    echo "Docker isn't running (docker info fails): start it, e.g. with colima start." >&2
+  local output
+  if ! output="$(docker info 2>&1)"; then
+    if [[ "${output}" == *"permission denied"* ]]; then
+      echo "You don't have permission to use Docker: add yourself to the docker group (sudo usermod -aG docker \"\${USER}\", then log in again), rather than running imageset.sh with sudo." >&2
+    elif [ "$(uname)" == Darwin ]; then
+      echo "Docker isn't running (docker info fails): start it, e.g. with colima start." >&2
+    else
+      echo "Docker isn't running (docker info fails): start it, e.g. with sudo systemctl start docker." >&2
+    fi
     return 1
   fi
 }
@@ -245,7 +257,17 @@ function remove-stale-runs {
 
 # A container killed before it could clean up may have left files owned by root
 function remove-dir {
-  rm -rf "${1}" 2> /dev/null || echo "WARNING: couldn't remove ${1} (e.g. sudo rm -rf it)" >&2
+  local image
+  rm -rf "${1}" 2> /dev/null && return
+  # Files that a container (as root) couldn't give back to you, with Docker on
+  # Linux, are removed by a container
+  for image in "${IMAGE}:latest" "${IMAGE}:checkout"; do
+    if docker run --rm --security-opt label=disable --volume "$(dirname "${1}"):/parent" "${image}" \
+      rm -rf "/parent/$(basename "${1}")" > /dev/null 2>&1 && ! [ -e "${1}" ]; then
+      return
+    fi
+  done
+  echo "WARNING: couldn't remove ${1} (e.g. sudo rm -rf it)" >&2
 }
 
 # Only one run of a target at a time: a second would use (and could delete)
@@ -257,7 +279,7 @@ function lock-target {
     pid="$(cat "${lock}/pid" 2> /dev/null || true)"
     if [ -n "${pid}" ] && kill -0 "${pid}" 2> /dev/null; then
       echo "Another ${IMAGESET_TARGET} run of imageset.sh is in progress (process ${pid}): wait for it to finish, or stop it." >&2
-      exit 1
+      exit 64
     fi
     # Left by a run that was killed
     rm -rf "${lock}"
@@ -322,13 +344,19 @@ function clean-transcript {
   fi
 }
 
+# Succeeds if the file is a file of the diagnostics directory, rather than a
+# symlink (which the container could make) to elsewhere
+function diagnostic-file {
+  [ -f "${1}" ] && ! [ -L "${1}" ] && ! [ -L "$(dirname "${1}")" ]
+}
+
 # Writes the diagnostic log, from the files of the run's diagnostics directory
 function write-diagnostic-log {
   local dir="${IMAGESET_DIAGNOSTICS}"
   local file
   cat "${CHECKOUT}/imagesets/diagnostics-README.md"
   for file in "${dir}"/{context.txt,container.txt,build-checkout.log,build-latest.log} "${dir}"/logs/* "${dir}/browser/actions.log"; do
-    if [ -f "${file}" ]; then
+    if diagnostic-file "${file}"; then
       printf '\n===== %s =====\n\n' "${file#"${dir}/"}"
       cat "${file}"
     fi
@@ -338,7 +366,7 @@ function write-diagnostic-log {
     clean-transcript "${dir}/transcript.raw"
   fi
   for file in "${dir}"/browser/*.txt; do
-    if [ -f "${file}" ]; then
+    if diagnostic-file "${file}" && diagnostic-file "${file%.txt}.html"; then
       printf '\n===== browser/%s =====\n\n' "${file##*/}"
       cat "${file}"
       printf '\n===== browser/%s =====\n\n' "$(basename "${file}" .txt).html"
@@ -366,10 +394,13 @@ function run-with-diagnostics {
   trap : HUP TERM
   if ! command -v script > /dev/null; then
     "${BASH}" "${0}" "$@" || status=$?
-  elif script --version 2> /dev/null | grep -q util-linux; then
-    script -q -f -e -c "$(printf '%q ' "${BASH}" "${0}" "$@")" "${IMAGESET_DIAGNOSTICS}/transcript.raw" || status=$?
-  else
+  elif [ "$(uname)" == Darwin ]; then
     script -q -F "${IMAGESET_DIAGNOSTICS}/transcript.raw" "${BASH}" "${0}" "$@" || status=$?
+  elif script --version 2> /dev/null | grep -q util-linux; then
+    SHELL=/bin/sh script -q -f -e -c "$(printf '%q ' "${BASH}" "${0}" "$@")" "${IMAGESET_DIAGNOSTICS}/transcript.raw" || status=$?
+  else
+    # e.g. BusyBox's: without a transcript
+    "${BASH}" "${0}" "$@" || status=$?
   fi
   echo "Exit status: ${status}" >> "${IMAGESET_DIAGNOSTICS}/context.txt"
   if [ "${status}" == 0 ] && [ "${IMAGESET_KEEP_DIAGNOSTICS-}" != true ]; then
@@ -408,6 +439,10 @@ function main {
   IMAGESET_TARGET="${1}"
   CHECKOUT="$(cd "$(dirname "${0}")/.." && pwd)"
 
+  if [ "$(id -u)" == 0 ]; then
+    echo "Don't run imageset.sh as root (e.g. with sudo): it uses your own gpg keys, and keeps its state in your home directory." >&2
+    exit 64
+  fi
   if ! [ -t 0 ] || ! [ -t 1 ]; then
     echo "imageset.sh needs a terminal, for its prompts and sign-ins." >&2
     exit 1
@@ -450,8 +485,15 @@ function main {
   # so the second build is cached.
   build-image "${CHECKOUT}/imagesets/container" "${IMAGE}:checkout"
   mkdir "${WORK}/clone"
+  clone_options=()
+  # Your global gitignore, which git in the container uses too (if it's
+  # under your home directory, which Docker can mount)
+  global_gitignore="$(git config --path core.excludesFile 2> /dev/null || echo "${XDG_CONFIG_HOME:-${HOME}/.config}/git/ignore")"
+  if [ -f "${global_gitignore}" ] && [[ "$(cd "$(dirname "${global_gitignore}")" && pwd -P)/" == "$(cd "${HOME}" && pwd -P)"/* ]]; then
+    clone_options+=(--volume "${global_gitignore}:/host-gitignore:ro")
+  fi
   docker run --rm --interactive --tty --init --name "imageset-${WORK##*/}" --security-opt label=disable \
-    --volume "${CHECKOUT}:/checkout:ro" --volume "${WORK}/clone:/work" \
+    --volume "${CHECKOUT}:/checkout:ro" --volume "${WORK}/clone:/work" ${clone_options[@]+"${clone_options[@]}"} \
     --env IMAGESET_LOCAL_CHANGES="${IMAGESET_LOCAL_CHANGES-}" --env IMAGESET_HOST_UID="$(id -u)" --env IMAGESET_HOST_GID="$(id -g)" \
     "${IMAGE}:checkout" bash /checkout/imagesets/container/clone.sh
   build-image "${WORK}/clone/community-tc-config/imagesets/container" "${IMAGE}:latest"
@@ -485,7 +527,7 @@ function main {
     # gcloud's sign-in sends your browser to http://localhost:8085/
     if (exec 3<> /dev/tcp/127.0.0.1/8085) 2> /dev/null; then
       echo "Port 8085 is in use, but gcloud's sign-in needs it: stop what is using it (e.g. another gcloud auth login)." >&2
-      exit 1
+      exit 64
     fi
     docker_options+=(--publish 127.0.0.1:8085:8085 --env IMAGESET_HOST_BROWSER=true)
   else

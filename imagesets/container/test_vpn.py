@@ -25,7 +25,10 @@ LOGIN_PAGE = """<html><body><form onsubmit="event.preventDefault();
 <button type=submit>Sign in</button></form></body></html>""" % base64.b64encode(PASSWORD.encode()).decode()
 
 # Duo Push first, then Other options, the options, and each option's passcode view
-DUO_PAGE = """<html><body><h2>Check for a Duo Push</h2><button onclick="show()">Other options</button>
+# The first "Other options" is a hidden copy (not visible, as it has no size)
+DUO_PAGE = """<html><body><h2>Check for a Duo Push</h2>
+<button style="width: 0; height: 0; padding: 0; border: 0; overflow: hidden">Other options</button>
+<button onclick="show()">Other options</button>
 <div style="display: none"><button>Hardware token</button></div>
 <script>
 function show() {
@@ -136,5 +139,7 @@ def test_capture(tmp_path, monkeypatch):
     assert "typed a 2FA code into #passcode-input" in actions
     # The rejected code, which the mock shows on the page
     assert "Incorrect passcode <redacted>" in (tmp_path / "browser" / "05-duo.html").read_text()
+    # Without the pages' scripts
+    assert "function show()" not in (tmp_path / "browser" / "02-duo.html").read_text()
     # The hidden Hardware token button, on the first page
     assert "hidden  <button > Hardware token" in (tmp_path / "browser" / "02-duo.txt").read_text()
