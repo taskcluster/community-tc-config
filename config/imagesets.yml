@@ -150,14 +150,14 @@ generic-worker-ubuntu-24-04-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://raw.githubusercontent.com/mozilla-platform-ops/worker-images/8d1eef6b1d2109725b0f8cefd4ab68215db67cee/scripts/linux/tceng/generic-worker-ubuntu-24-04-staging.sh
+            script: https://raw.githubusercontent.com/mozilla-platform-ops/worker-images/00bece4bc2c077482af0fb2a90638313f0911bcf/scripts/linux/tceng/generic-worker-ubuntu-24-04-staging.sh
   aws:
     amis:
-      eu-west-1: ami-01ee0a448eb4b9277
-      us-east-1: ami-0e840704843846ebb
-      us-west-2: ami-0c5d18a13ab0bb6bf
+      eu-west-1: ami-0d5d8d406fbdf4b82
+      us-east-1: ami-0215269ecf96ae43b
+      us-west-2: ami-0a5575c5331c6b6d3
   gcp:
-    image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-staging-21b50cf001464ca59ed7
+    image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-staging-0f1c88d83f0d43128934
 generic-worker-ubuntu-24-04-arm64-staging:
   workerImplementation: generic-worker
   workerConfig:
@@ -172,14 +172,14 @@ generic-worker-ubuntu-24-04-arm64-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: taskcluster-notifications+workers@mozilla.com
-            script: https://raw.githubusercontent.com/mozilla-platform-ops/worker-images/8d1eef6b1d2109725b0f8cefd4ab68215db67cee/scripts/linux/tceng/generic-worker-ubuntu-24-04-staging.sh
+            script: https://raw.githubusercontent.com/mozilla-platform-ops/worker-images/00bece4bc2c077482af0fb2a90638313f0911bcf/scripts/linux/tceng/generic-worker-ubuntu-24-04-staging.sh
   gcp:
-    image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-arm64-staging-f1d5fe984e8747ac918a
+    image: projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-arm64-staging-298c4c5f143d460a9445
   aws:
     amis:
-      eu-west-1: ami-0aa8b6db188574525
-      us-east-1: ami-0658ffdf52dac1277
-      us-west-2: ami-0eb414e337534808d
+      eu-west-1: ami-0a437c9c453828e7d
+      us-east-1: ami-0cfc24694e7628d69
+      us-west-2: ami-0c54f531dc6a0ae1a
 generic-worker-win2022:
   workerImplementation: generic-worker
   azure:
@@ -203,8 +203,8 @@ generic-worker-win2022-staging:
   workerImplementation: generic-worker
   azure:
     images:
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-620e9431d9de479086a1-eastus
-      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-3082067d3a464a358462-centralus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-1a461aed3c784b55b654-eastus
+      centralus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-cd56d670997d4bf0b802-centralus
   workerConfig:
     genericWorker:
       config:
@@ -216,7 +216,7 @@ generic-worker-win2022-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/mozilla-platform-ops/worker-images/8d1eef6b1d2109725b0f8cefd4ab68215db67cee/scripts/windows/tceng/generic-worker-win2022-staging.ps1
+            script: https://raw.githubusercontent.com/mozilla-platform-ops/worker-images/00bece4bc2c077482af0fb2a90638313f0911bcf/scripts/windows/tceng/generic-worker-win2022-staging.ps1
 generic-worker-win2022-gpu:
   azure:
     images:
@@ -241,7 +241,7 @@ generic-worker-win2022-gpu:
 generic-worker-win2022-gpu-staging:
   azure:
     images:
-      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-953b65e14224423a8537-eastus
+      eastus: /subscriptions/8a205152-b25a-417f-a676-80465535a6c9/resourceGroups/rg-tc-eng-images/providers/Microsoft.Compute/images/imageset-f7c7470d91594dd9bb5f-eastus
   workerImplementation: generic-worker
   workerConfig:
     genericWorker:
@@ -255,4 +255,4 @@ generic-worker-win2022-gpu-staging:
         workerTypeMetadata:
           machine-setup:
             maintainer: pmoore@mozilla.com
-            script: https://raw.githubusercontent.com/mozilla-platform-ops/worker-images/8d1eef6b1d2109725b0f8cefd4ab68215db67cee/scripts/windows/tceng/generic-worker-win2022-staging.ps1
+            script: https://raw.githubusercontent.com/mozilla-platform-ops/worker-images/00bece4bc2c077482af0fb2a90638313f0911bcf/scripts/windows/tceng/generic-worker-win2022-staging.ps1
