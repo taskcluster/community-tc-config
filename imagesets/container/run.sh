@@ -7,7 +7,7 @@
 #                gpg key), kept between runs
 #   /bridge      where open-url asks imageset.sh to open your browser
 #   /host-gnupg  your gpg home (read-only)
-#   /diagnostics what imageset.sh's diagnostic file has from the container
+#   /diagnostics what imageset.sh's diagnostic log has from the container
 #
 # The tools are the image's, and only see this container: they sign in during
 # the run, through your browser (on the host).
@@ -1093,7 +1093,7 @@ function update-macs {
   fi
 }
 
-# Keeps the logs that the run doesn't show, for imageset.sh's diagnostic file
+# Keeps the logs that the run doesn't show, for imageset.sh's diagnostic log
 function save-diagnostics {
   local status="${1}"
   local file

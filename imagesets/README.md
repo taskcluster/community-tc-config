@@ -94,10 +94,10 @@ your checkout is just behind it), the script lists them, and asks whether to
 use them. It keeps progress (for resuming) and the encrypted
 VPN certificate in `~/.cache/community-tc-imagesets`.
 
-If a run fails, the script writes a diagnostic file (a zip, in
+If a run fails, the script writes a diagnostic log (in
 `~/.cache/community-tc-imagesets/diagnostics`), with a transcript of the run,
-logs, and the pages of the VPN sign-in, with secrets removed, and a README
-that explains it, for Claude (yours, or the maintainers') to work out what went
+its other logs, and the pages of the VPN sign-in, headed by a README that
+explains it, for Claude (yours, or the maintainers') to work out what went
 wrong and fix the scripts. Set `IMAGESET_KEEP_DIAGNOSTICS=true` to keep it when
 the run succeeds too.
 
@@ -147,7 +147,7 @@ its worker pools.
 | `IMAGESET_LOCAL_CHANGES` | Use your checkout's changes (other than to `config/`), rather than upstream `main`'s files, to test changes to the scripts | asks, if your checkout has changes |
 | `IMAGESET_RESUME` | Whether to resume an unfinished run of the same target (skipping the steps it completed, and waiting for its worker-images builds rather than triggering new ones), rather than start again | asks |
 | `IMAGESET_LDAP_USERNAME` | Your Mozilla LDAP username, for the VPN | asks |
-| `IMAGESET_KEEP_DIAGNOSTICS` | Keep the diagnostic file when the run succeeds (it is always kept when the run fails) | `false` |
+| `IMAGESET_KEEP_DIAGNOSTICS` | Keep the diagnostic log when the run succeeds (it is always kept when the run fails) | `false` |
 | `IMAGESET_PASSWORD_STORE_URL` | The git URL of the password store | `https://source.developers.google.com/p/taskcluster-passwords/r/secrets` |
 
 If a run fails, it says which step failed. Rerun the same command to continue

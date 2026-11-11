@@ -1,5 +1,5 @@
 """Tests of vpn.py's sign-in, against a mock of login.mozilla.com and Duo's
-Universal Prompt, and of diagnostics.py. In the container image:
+Universal Prompt. In the container image:
 
   docker run --rm -v "$PWD:/repo" -w /repo/imagesets/container imagesets python3 -m pytest -q test_vpn.py
 """
@@ -7,15 +7,12 @@ Universal Prompt, and of diagnostics.py. In the container image:
 import base64
 import json
 import os
-import subprocess
 import sys
-import zipfile
 
 import pytest
 from playwright.sync_api import sync_playwright
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import diagnostics  # noqa: E402
 import vpn  # noqa: E402
 
 PASSWORD = "correct horse battery staple"
@@ -118,64 +115,15 @@ def test_without_capture(tmp_path, monkeypatch):
     assert not (tmp_path / "browser").exists()
 
 
-def test_capture_and_replay(tmp_path, monkeypatch, capfd):
+def test_capture(tmp_path, monkeypatch):
     run_sign_in(["Duo Push", "Duo Mobile passcode"], iter(["111111", GOOD_CODE]), tmp_path, monkeypatch)
     files = sorted(os.listdir(tmp_path / "browser"))
-    assert "actions.log" in files
-    assert {"01-login.html", "01-login.png", "01-login.txt"} <= set(files)
+    assert {"actions.log", "01-login.html", "01-login.txt", "02-duo.html", "02-duo.txt"} <= set(files)
     for name in files:
-        data = (tmp_path / "browser" / name).read_bytes()
-        assert PASSWORD.encode() not in data and GOOD_CODE.encode() not in data and b"111111" not in data, name
+        text = (tmp_path / "browser" / name).read_text()
+        assert PASSWORD not in text and GOOD_CODE not in text and "111111" not in text, name
     actions = (tmp_path / "browser" / "actions.log").read_text()
     assert "clicking 'Other options'" in actions and "clicking 'Duo Mobile passcode'" in actions
-
-    # Replaying the captured pages gives the decisions that were made on them
-    zip_path = tmp_path / "d.zip"
-    diagnostics.package(str(tmp_path), str(zip_path))
-    capfd.readouterr()
-    diagnostics.replay(str(zip_path))
-    replayed = capfd.readouterr().out
-    assert "duo: clicks 'Other options'" in replayed
-    assert "duo: clicks 'Duo Mobile passcode'" in replayed
-    assert "duo: types the 2FA code into #passcode-input" in replayed
-    assert "duo: the download page: done" in replayed
-    assert "login: nothing it knows how to do" in replayed
-
-
-def test_package(tmp_path):
-    d = tmp_path / "d"
-    (d / "logs").mkdir(parents=True)
-    (d / "context.txt").write_text("Exit status: 1\n")
-    (d / "transcript.raw").write_text("\x1b[1mSigning in\x1b[0m\r\nTASKCLUSTER_ACCESS_TOKEN=abc123def456\r\n10%\r100%\r\n")
-    (d / "logs" / "openvpn.log").write_text("PUSH_REPLY,route 10.0.0.0,auth-token SESS_ID_xyz,ping 10\n<key>\nPRIVATE\n</key>\n")
-    diagnostics.package(str(d), str(tmp_path / "out.zip"))
-    z = zipfile.ZipFile(tmp_path / "out.zip")
-    assert {"README.md", "versions.txt", "context.txt", "transcript.txt", "logs/openvpn.log"} <= set(z.namelist())
-    assert z.read("transcript.txt").decode() == "Signing in\nTASKCLUSTER_ACCESS_TOKEN=<redacted>\n100%\n"
-    log = z.read("logs/openvpn.log").decode()
-    assert "SESS_ID_xyz" not in log and "PRIVATE" not in log
-    assert oct(os.stat(tmp_path / "out.zip").st_mode & 0o777) == "0o600"
-
-
-@pytest.mark.parametrize("text, expected", [
-    ("gho_abcdefghijklmnopqrstuvwxyz0123", "<redacted token>"),
-    ('"accessToken": "s3cr3t"', '"accessToken": "<redacted>"'),
-    ("password=hunter2", "password=<redacted>"),
-    ("https://github.com/login/oauth?code=abc&state=def", "https://github.com/login/oauth?code=<redacted>&state=<redacted>"),
-    ('<input type="hidden" name="t" value="v">', '<input type="hidden" name="t" value="<redacted>">'),
-    ('<input name="username" value="someone">', '<input name="username" value="someone">'),
-    ("-----BEGIN OPENSSH PRIVATE KEY-----\nabc\n-----END OPENSSH PRIVATE KEY-----", "<redacted PEM block>"),
-    ("AKIAABCDEFGHIJKLMNOP", "<redacted AWS key ID>"),
-    ("Enter the one-time code: ABCD-1234", "Enter the one-time code: ABCD-1234"),
-])
-def test_scrub(text, expected):
-    assert diagnostics.scrub(text) == expected
-
-
-def test_clean_transcript():
-    assert diagnostics.clean_transcript("\x1b]0;title\x07a\x1b[31mb\x1b[0m\r\nab\x08c\r\n\x04") == "ab\nac\n"
-
-
-def test_usage():
-    r = subprocess.run([sys.executable, diagnostics.__file__], capture_output=True, text=True)
-    assert r.returncode != 0 and "package DIR ZIP" in r.stderr
+    assert "typed a 2FA code into #passcode-input" in actions
+    # The hidden Hardware token button, on the first page
+    assert "hidden  <button > Hardware token" in (tmp_path / "browser" / "02-duo.txt").read_text()

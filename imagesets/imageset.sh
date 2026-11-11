@@ -16,7 +16,7 @@
 #
 # Progress (for resuming) and your VPN bundle (encrypted to your gpg key) are
 # kept in ~/.cache/community-tc-imagesets. A failed run leaves a diagnostic
-# file (see container/diagnostics-README.md) in its diagnostics directory.
+# log (see diagnostics-README.md) in its diagnostics directory.
 
 set -eu
 set -o pipefail
@@ -281,7 +281,7 @@ function cleanup {
   fi
 }
 
-# What the diagnostic file says about the run, and the host
+# What the diagnostic log says about the run, and the host
 function write-context {
   local setting
   echo "Started: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
@@ -310,39 +310,45 @@ function write-context {
   fi
 }
 
-# Writes the diagnostic file, from the run's diagnostics directory, with
-# diagnostics.py, in the container image; or, if there's no image (its first
-# build failed), from the host's files alone, which have no secrets. Outputs
-# its path.
-function package-diagnostics {
-  local out="${STATE_DIR}/diagnostics"
-  local name
-  local image
-  name="imageset-${IMAGESET_TARGET}-$(date +%Y%m%d-%H%M%S)"
-  for image in "${IMAGE}:latest" "${IMAGE}:checkout"; do
-    if docker image inspect "${image}" > /dev/null 2>&1 &&
-      docker run --rm --security-opt label=disable --volume "${CHECKOUT}:/checkout:ro" \
-        --volume "${IMAGESET_DIAGNOSTICS}:/diagnostics:ro" --volume "${out}:/out" \
-        --env IMAGESET_HOST_UID="$(id -u)" --env IMAGESET_HOST_GID="$(id -g)" \
-        "${image}" python3 /checkout/imagesets/container/diagnostics.py package /diagnostics "/out/${name}.zip" >&2; then
-      echo "${out}/${name}.zip"
-      return
-    fi
-  done
-  cp "${CHECKOUT}/imagesets/container/diagnostics-README.md" "${IMAGESET_DIAGNOSTICS}/README.md"
-  if [ -f "${IMAGESET_DIAGNOSTICS}/transcript.raw" ]; then
-    mv "${IMAGESET_DIAGNOSTICS}/transcript.raw" "${IMAGESET_DIAGNOSTICS}/transcript.txt"
-  fi
-  if command -v zip > /dev/null; then
-    (cd "${IMAGESET_DIAGNOSTICS}" && zip -qr "${out}/${name}.zip" .) && echo "${out}/${name}.zip"
+# The terminal transcript as it was shown: without escape sequences, and with
+# overwritten lines (\r) and backspaces applied
+function clean-transcript {
+  if command -v perl > /dev/null; then
+    perl -pe 's/\e\][^\a\e]*(?:\a|\e\\)//g; s/\e\[[0-?]*[ -\/]*[@-~]//g; s/\e[@-Z\\-_]//g;
+      1 while s/[^\x08\n]\x08//; s/[^\r\n]*\r(?=[^\r\n])//g; s/[\x00-\x08\x0b-\x1f\x7f]//g' "${1}"
   else
-    tar -czf "${out}/${name}.tar.gz" -C "${IMAGESET_DIAGNOSTICS}" . && echo "${out}/${name}.tar.gz"
+    cat "${1}"
   fi
 }
 
-# Runs imageset.sh again, recorded by script, in a diagnostics directory; then
-# deletes it if the run succeeded (unless IMAGESET_KEEP_DIAGNOSTICS=true), or
-# writes the diagnostic file from it, and exits with the run's status
+# Writes the diagnostic log, from the files of the run's diagnostics directory
+function write-diagnostic-log {
+  local dir="${IMAGESET_DIAGNOSTICS}"
+  local file
+  cat "${CHECKOUT}/imagesets/diagnostics-README.md"
+  for file in "${dir}"/{context.txt,container.txt,build-checkout.log,build-latest.log} "${dir}"/logs/* "${dir}/browser/actions.log"; do
+    if [ -f "${file}" ]; then
+      printf '\n===== %s =====\n\n' "${file#"${dir}/"}"
+      cat "${file}"
+    fi
+  done
+  if [ -f "${dir}/transcript.raw" ]; then
+    printf '\n===== transcript =====\n\n'
+    clean-transcript "${dir}/transcript.raw"
+  fi
+  for file in "${dir}"/browser/*.txt; do
+    if [ -f "${file}" ]; then
+      printf '\n===== browser/%s =====\n\n' "${file##*/}"
+      cat "${file}"
+      printf '\n===== browser/%s =====\n\n' "$(basename "${file}" .txt).html"
+      cat "${file%.txt}.html"
+    fi
+  done
+}
+
+# Runs imageset.sh again, recorded by script, with a diagnostics directory;
+# then deletes it if the run succeeded (unless IMAGESET_KEEP_DIAGNOSTICS=true),
+# or writes the diagnostic log from it, and exits with the run's status
 function run-with-diagnostics {
   local status=0
   local file
@@ -367,15 +373,16 @@ function run-with-diagnostics {
     remove-dir "${IMAGESET_DIAGNOSTICS}"
     exit 0
   fi
-  if ! file="$(package-diagnostics)"; then
-    echo "WARNING: couldn't write the diagnostic file: its files are in ${IMAGESET_DIAGNOSTICS}" >&2
+  file="${STATE_DIR}/diagnostics/imageset-${IMAGESET_TARGET}-$(date +%Y%m%d-%H%M%S).log"
+  if ! (umask 077 && write-diagnostic-log > "${file}"); then
+    echo "WARNING: couldn't write the diagnostic log: its files are in ${IMAGESET_DIAGNOSTICS}" >&2
     exit "${status}"
   fi
   remove-dir "${IMAGESET_DIAGNOSTICS}"
   case "${status}" in
-    0) echo "Diagnostic file: ${file}" ;;
-    129 | 130 | 143) printf '\nDiagnostic file of this run: %s\n' "${file}" >&2 ;;
-    *) echo "Please send diagnostic file ${file} to Claude for analysis (your own Claude, or the imageset maintainers')." >&2 ;;
+    0) echo "Diagnostic log: ${file}" ;;
+    129 | 130 | 143) printf '\nDiagnostic log of this run: %s\n' "${file}" >&2 ;;
+    *) echo "Please send diagnostic log ${file} to Claude for analysis (your own Claude, or the imageset maintainers')." >&2 ;;
   esac
   exit "${status}"
 }

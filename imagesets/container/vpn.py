@@ -15,8 +15,8 @@ The bundle is only decrypted in memory, or in /dev/shm (a memory filesystem)
 while openvpn starts. Passwords and codes are read from the terminal, and kept
 in memory only. The VPN only exists inside the container.
 
-With IMAGESET_DIAGNOSTICS_DIR (imageset.sh's diagnostics), each page of the
-sign-in, and what was done on it, is recorded there (see Capture).
+With IMAGESET_DIAGNOSTICS_DIR (for imageset.sh's diagnostic log), each page
+of the sign-in, and what was done on it, is recorded there (see Capture).
 """
 
 import datetime
@@ -127,13 +127,7 @@ def check_expiry(bundle):
 
 # ---- Diagnostics ----
 
-# Marks the elements that aren't visible, so that a captured page, without its
-# scripts and styles, can be replayed (diagnostics.py replay)
-MARK_HIDDEN = """() => {
-  for (const e of document.querySelectorAll('[data-imageset-hidden]')) e.removeAttribute('data-imageset-hidden');
-  for (const e of document.body.querySelectorAll('*')) if (!e.checkVisibility()) e.setAttribute('data-imageset-hidden', '');
-}"""
-UNMARK_HIDDEN = "() => { for (const e of document.querySelectorAll('[data-imageset-hidden]')) e.removeAttribute('data-imageset-hidden'); }"
+# A page's controls, and whether each is visible
 ELEMENTS = """() => [...document.querySelectorAll('button, a, input, select, textarea, [role=button], [role=link], iframe')].map(e => {
   const attrs = ['id', 'name', 'type', 'role', 'aria-label', 'autocomplete'].filter(a => e.hasAttribute(a)).map(a => `${a}=${e.getAttribute(a)}`);
   return `${e.checkVisibility() ? 'visible' : 'hidden '} <${e.tagName.toLowerCase()} ${attrs.join(' ')}> ${(e.innerText || '').replace(/\\s+/g, ' ').trim().slice(0, 120)}`;
@@ -141,10 +135,10 @@ ELEMENTS = """() => [...document.querySelectorAll('button, a, input, select, tex
 
 
 class Capture:
-    """Records each page of the sign-in (its URL, HTML, a screenshot, and its
-    controls), and what was done, in DIR/browser, for imageset.sh's diagnostic
-    file, with the password and codes typed replaced. Pages are captured
-    before anything is typed into them."""
+    """Records each page of the sign-in (its URL, controls and HTML), and what
+    was done, in DIR/browser, for imageset.sh's diagnostic log, with the
+    password and codes typed replaced. Pages are captured before anything is
+    typed into them."""
 
     def __init__(self, dir=None):
         self.dir = os.path.join(dir, "browser") if dir else None
@@ -176,15 +170,8 @@ class Capture:
         self.pages += 1
         name = f"{self.pages:02d}-{label}"
         try:
-            page.evaluate(MARK_HIDDEN)
-            try:
-                html = page.content()
-            finally:
-                page.evaluate(UNMARK_HIDDEN)
-            self.write(f"{name}.html", html)
+            self.write(f"{name}.html", page.content())
             self.write(f"{name}.txt", f"URL: {page.url}\nTitle: {page.title()}\n\n" + "\n".join(page.evaluate(ELEMENTS)) + "\n")
-            os.makedirs(self.dir, mode=0o700, exist_ok=True)
-            page.screenshot(path=os.path.join(self.dir, f"{name}.png"), full_page=True)
             self.log(f"captured {name}: {page.url}")
         except Exception as e:
             self.log(f"couldn't capture {name}: {e}")
@@ -432,7 +419,6 @@ def manage(vpn, sock, user):
     try:
         for line in m.makefile("r", encoding="utf-8", newline="\n"):
             line = line.rstrip("\r\n")
-            log_event(line)
             if line.startswith(">HOLD:"):
                 # Also after a failed attempt, before retrying
                 send("hold release")
@@ -463,16 +449,6 @@ def manage(vpn, sock, user):
     finally:
         m.close()
     return False
-
-
-def log_event(line):
-    """Records openvpn's management interface messages (which have no
-    secrets: only what is sent has), for imageset.sh's diagnostics"""
-    if CAPTURE.dir:
-        # Without the challenge's state ID
-        line = re.sub(r"(CRV1:[^:]*:)[^:]*", r"\1<redacted>", line)
-        with open(os.path.join(os.path.dirname(CAPTURE.dir), "vpn-connect.log"), "a") as f:
-            f.write(f"{datetime.datetime.now():%H:%M:%S} {line}\n")
 
 
 def use_vpn_dns(pushed):
