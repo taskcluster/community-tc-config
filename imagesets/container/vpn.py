@@ -169,9 +169,11 @@ def sign_in(page, user):
 
 def duo(page, user):
     """Duo's Universal Prompt: Other options, then Hardware token (a code from
-    an authenticator app), then the code. Never anything else."""
+    an authenticator app) or, if there isn't one, Duo Mobile passcode (a code
+    from the Duo Mobile app), then the code. Never anything else."""
     from playwright.sync_api import TimeoutError as PlaywrightTimeout
-    passcode_option = re.compile(r"^\s*Hardware token", re.I)
+    passcode_options = [re.compile(r"^\s*Hardware token", re.I), re.compile(r"^\s*Duo Mobile passcode", re.I)]
+    any_passcode_option = re.compile(r"^\s*(Hardware token|Duo Mobile passcode)", re.I)
     other_clicked = False
     codes = 0
     for _ in range(12):
@@ -193,8 +195,8 @@ def duo(page, user):
                 except PlaywrightTimeout:
                     pass
                 continue
-            option = page.get_by_role("button", name=passcode_option)
-            if visible(option):
+            option = next((o for o in (page.get_by_role("button", name=n) for n in passcode_options) if visible(o)), None)
+            if option is not None:
                 option.first.click(timeout=10000)
                 try:
                     code_field.first.wait_for(state="visible", timeout=15000)
@@ -206,7 +208,7 @@ def duo(page, user):
                 other.first.click(timeout=10000)
                 other_clicked = True
                 try:
-                    option.first.wait_for(state="visible", timeout=15000)
+                    page.get_by_role("button", name=any_passcode_option).first.wait_for(state="visible", timeout=15000)
                 except PlaywrightTimeout:
                     pass
                 continue
@@ -215,7 +217,8 @@ def duo(page, user):
             continue
         break
     raise VpnError("Couldn't get through Duo's prompt, which showed:\n" + page_text(page) +
-                   "\n(imageset.sh uses Duo's \"Hardware token\" option, for a code from an authenticator app.)")
+                   "\n(imageset.sh uses Duo's \"Hardware token\" option, for a code from an authenticator app, "
+                   "or else its \"Duo Mobile passcode\" option, for a code from the Duo Mobile app.)")
 
 
 def download(user):

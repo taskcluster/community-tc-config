@@ -61,7 +61,8 @@ steps.
    suggesting the account you signed in to Google Cloud with, or else your
    git email, or your GitHub account's mozilla.com email, or set
    `IMAGESET_LDAP_USERNAME`) with an
-   authenticator app for 2FA (Duo's "Hardware token" option), and a VNC session
+   authenticator app or the Duo Mobile app for 2FA codes (Duo's "Hardware
+   token" or "Duo Mobile passcode" option), and a VNC session
    as administrator on each Mac. The Macs are only reachable through the
    Mozilla VPN, which the container connects to (only the container uses it,
    so Viscosity isn't needed), unless they are reachable already, e.g.
