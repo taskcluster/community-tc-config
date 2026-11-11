@@ -262,7 +262,7 @@ function remove-dir {
   # Files that a container (as root) couldn't give back to you, with Docker on
   # Linux, are removed by a container
   for image in "${IMAGE}:latest" "${IMAGE}:checkout"; do
-    if docker run --rm --security-opt label=disable --volume "$(dirname "${1}"):/parent" "${image}" \
+    if docker run --rm --pull never --security-opt label=disable --volume "$(dirname "${1}"):/parent" "${image}" \
       rm -rf "/parent/$(basename "${1}")" > /dev/null 2>&1 && ! [ -e "${1}" ]; then
       return
     fi
@@ -361,7 +361,7 @@ function write-diagnostic-log {
       cat "${file}"
     fi
   done
-  if [ -f "${dir}/transcript.raw" ]; then
+  if diagnostic-file "${dir}/transcript.raw"; then
     printf '\n===== transcript =====\n\n'
     clean-transcript "${dir}/transcript.raw"
   fi
@@ -394,10 +394,10 @@ function run-with-diagnostics {
   trap : HUP TERM
   if ! command -v script > /dev/null; then
     "${BASH}" "${0}" "$@" || status=$?
-  elif [ "$(uname)" == Darwin ]; then
-    script -q -F "${IMAGESET_DIAGNOSTICS}/transcript.raw" "${BASH}" "${0}" "$@" || status=$?
   elif script --version 2> /dev/null | grep -q util-linux; then
     SHELL=/bin/sh script -q -f -e -c "$(printf '%q ' "${BASH}" "${0}" "$@")" "${IMAGESET_DIAGNOSTICS}/transcript.raw" || status=$?
+  elif [ "$(uname)" == Darwin ]; then
+    script -q -F "${IMAGESET_DIAGNOSTICS}/transcript.raw" "${BASH}" "${0}" "$@" || status=$?
   else
     # e.g. BusyBox's: without a transcript
     "${BASH}" "${0}" "$@" || status=$?
@@ -486,11 +486,12 @@ function main {
   build-image "${CHECKOUT}/imagesets/container" "${IMAGE}:checkout"
   mkdir "${WORK}/clone"
   clone_options=()
-  # Your global gitignore, which git in the container uses too (if it's
-  # under your home directory, which Docker can mount)
-  global_gitignore="$(git config --path core.excludesFile 2> /dev/null || echo "${XDG_CONFIG_HOME:-${HOME}/.config}/git/ignore")"
-  if [ -f "${global_gitignore}" ] && [[ "$(cd "$(dirname "${global_gitignore}")" && pwd -P)/" == "$(cd "${HOME}" && pwd -P)"/* ]]; then
-    clone_options+=(--volume "${global_gitignore}:/host-gitignore:ro")
+  # Your global gitignore, which git in the container uses too: a copy, as it
+  # may be a symlink to where Docker can't mount
+  global_gitignore="$(git -C "${CHECKOUT}" config --path core.excludesFile 2> /dev/null ||
+    echo "${XDG_CONFIG_HOME:-${HOME}/.config}/git/ignore")"
+  if [ -f "${global_gitignore}" ] && cat "${global_gitignore}" > "${WORK}/gitignore"; then
+    clone_options+=(--volume "${WORK}/gitignore:/host-gitignore:ro")
   fi
   docker run --rm --interactive --tty --init --name "imageset-${WORK##*/}" --security-opt label=disable \
     --volume "${CHECKOUT}:/checkout:ro" --volume "${WORK}/clone:/work" ${clone_options[@]+"${clone_options[@]}"} \
