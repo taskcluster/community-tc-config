@@ -130,7 +130,7 @@ The `workerTypeMetadata.machine-setup.script` of each image set with new images
 is set to the URL of the bootstrap script in worker-images, at the commit the
 images were built from, so that users can see how their worker was set up.
 Finally, the new images are logged with links to the worker-images jobs that
-built them, and a PR is opened (from your fork) to have
+built them, and a PR is opened (from your fork, with auto-merge enabled) to have
 fxci's worker pools that use the same images use the new ones too
 (`UPDATE_FXCI_IMAGES=false` skips this). It isn't opened if any location that
 fxci uses has no new image, e.g. because its build failed. The PR also sets the

@@ -269,16 +269,25 @@ def find_pr(branch):
              params={"head": f"{owner}:{branch}", "state": "all", "per_page": 1}).json()
     return prs[0] if prs else None
 
+def merge_method(repo):
+    """The way to merge PRs that `repo` allows: a merge commit, if it allows
+    them, or else squashing, or else rebasing"""
+    settings = gh(f"{API_ROOT}/repos/{repo}").json()
+    if settings.get("allow_merge_commit", True):
+        return "merge"
+    return "squash" if settings.get("allow_squash_merge") else "rebase"
+
 def enable_auto_merge(pr):
     """Have GitHub merge `pr` as soon as it is approved, so that nobody needs to
     come back and merge it after reviewing it."""
     if pr["merged_at"] or pr.get("auto_merge"):
         return
-    query = """mutation($id: ID!) {
-      enablePullRequestAutoMerge(input: {pullRequestId: $id, mergeMethod: MERGE}) { clientMutationId }
+    query = """mutation($id: ID!, $method: PullRequestMergeMethod!) {
+      enablePullRequestAutoMerge(input: {pullRequestId: $id, mergeMethod: $method}) { clientMutationId }
     }"""
     try:
-        errors = gh(f"{API_ROOT}/graphql", "POST", json={"query": query, "variables": {"id": pr["node_id"]}}).json().get("errors")
+        variables = {"id": pr["node_id"], "method": merge_method(REPO).upper()}
+        errors = gh(f"{API_ROOT}/graphql", "POST", json={"query": query, "variables": variables}).json().get("errors")
     except requests.exceptions.RequestException as e:
         errors = e
     if errors:
@@ -1045,6 +1054,15 @@ def open_fxci_pr():
             return gh_cli("pr", "list", "--repo", FXCI_REPO, "--head", branch, "--state", "open",
                           "--json", "url", "--jq", ".[].url")
 
+        def auto_merge(url):
+            """Has GitHub merge it as soon as it is approved"""
+            try:
+                gh_cli("pr", "merge", "--auto", f"--{merge_method(FXCI_REPO)}", url)
+                print(f"🤖 Enabled auto-merge on {url}")
+            except (subprocess.CalledProcessError, requests.exceptions.RequestException) as e:
+                print(f"⚠️  Couldn't enable auto-merge on {url}, it will need merging by hand: "
+                      f"{(getattr(e, 'stderr', None) or str(e)).strip()}")
+
         # Clones your fork (creating it if needed) as `origin`, with fxci-config as `upstream`
         # A failed clone's leftovers are removed, so that it can be repeated
         def fork_and_clone():
@@ -1082,6 +1100,7 @@ def open_fxci_pr():
         existing = existing_pr(branch)
         if existing:
             print(f"♻️  Reusing {existing}")
+            auto_merge(existing)
             return
 
         title, body = fxci_pr_text(changes, scripts)
@@ -1094,11 +1113,13 @@ def open_fxci_pr():
             created = subprocess.run(["gh", "pr", "create", "--repo", FXCI_REPO, "--base", "main",
                                       "--head", f"{fork_owner}:{branch}", "--title", title, "--body", body])
             if created.returncode == 0:
+                auto_merge(existing_pr(branch))
                 return
             time.sleep(30)
             existing = existing_pr(branch)
             if existing:
                 print(f"♻️  {existing} was opened, although opening it failed")
+                auto_merge(existing)
                 return
         raise SystemExit(f"❌ Couldn't open the pull request for {fork_owner}:{branch} in {FXCI_REPO}")
 
