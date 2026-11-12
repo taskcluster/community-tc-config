@@ -67,11 +67,11 @@ function choose-local-changes {
   fi
   if ! checkout-has-upstream; then
     if [ "${IMAGESET_LOCAL_CHANGES}" == true ]; then
-      echo "Your checkout doesn't have upstream main's latest commit, so IMAGESET_LOCAL_CHANGES=true would run its older files too (against upstream main's config/): pull (or rebase), and rerun." >&2
+      echo "Your checkout doesn't have upstream main's latest commit, so IMAGESET_LOCAL_CHANGES=true would run its older files too: update it from upstream main (e.g. git pull ${OFFICIAL_GIT_REPO} main), and rerun." >&2
       exit 64
     fi
     if has-local-changes; then
-      echo "Your checkout has changes, but not upstream main's latest commit, so upstream main's files run: to run your changes, pull (or rebase), and rerun."
+      echo "Your checkout has changes, but not upstream main's latest commit, so upstream main's files run: to run your changes, update it from upstream main (e.g. git pull ${OFFICIAL_GIT_REPO} main), and rerun."
     fi
     IMAGESET_LOCAL_CHANGES=false
     return

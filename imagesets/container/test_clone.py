@@ -130,7 +130,7 @@ def test_refuses_checkout_without_upstream(repos):
     sh("git pull -q", clone)
     sh("echo mine > changed.txt", checkout)
     result = clone_sh("choose-local-changes", checkout, clone, local_changes="true")
-    assert result.returncode == 64 and "pull (or rebase)" in result.stderr
+    assert result.returncode == 64 and "git pull " in result.stderr
     # Not asked, without IMAGESET_LOCAL_CHANGES: upstream main's files run
     result = clone_sh("choose-local-changes; echo $IMAGESET_LOCAL_CHANGES", checkout, clone)
     assert result.returncode == 0 and "upstream main's files run" in result.stdout

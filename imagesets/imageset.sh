@@ -22,6 +22,7 @@ set -eu
 set -o pipefail
 
 IMAGE=community-tc-imagesets
+OFFICIAL_GIT_REPO='https://github.com/taskcluster/community-tc-config'
 # Under your home directory, as Docker (e.g. Colima) may only be able to mount that
 STATE_DIR="${HOME}/.cache/community-tc-imagesets"
 # The settings that are passed to the container (see README.md)
@@ -309,6 +310,52 @@ function cleanup {
   fi
 }
 
+# Checks the settings' values, which run.sh would otherwise only check after
+# the slow image builds
+function check-settings {
+  local setting
+  for setting in BUILD_IMAGES DEPLOY_IMAGES UPDATE_TASKCLUSTER_VERSION UPDATE_FXCI_IMAGES DEPLOY_MACS UPDATE_OFFERINGS \
+    IMAGESET_LOCAL_CHANGES IMAGESET_RESUME IMAGESET_KEEP_DIAGNOSTICS; do
+    case "${!setting-}" in
+      true | false | '') ;;
+      *) echo "${setting} must be true or false, rather than '${!setting}'" >&2; exit 64 ;;
+    esac
+  done
+  if [ -n "${MAX_RUN_ATTEMPTS-}" ] && ! [[ "${MAX_RUN_ATTEMPTS}" =~ ^[1-9][0-9]*$ ]]; then
+    echo "MAX_RUN_ATTEMPTS must be a positive number, rather than '${MAX_RUN_ATTEMPTS}'" >&2
+    exit 64
+  fi
+}
+
+# With IMAGESET_LOCAL_CHANGES=true, refuses (before the slow image builds, if
+# you have git) what clone.sh would: a checkout without upstream main's latest
+# commit, or with changes to config/
+function check-local-changes {
+  local upstream
+  local changes
+  if [ "${IMAGESET_LOCAL_CHANGES-}" != true ] || ! command -v git > /dev/null ||
+    ! git -C "${CHECKOUT}" rev-parse --git-dir > /dev/null 2>&1; then
+    return
+  fi
+  # If upstream can't be reached, clone.sh checks
+  upstream="$(git ls-remote "${OFFICIAL_GIT_REPO}" refs/heads/main 2> /dev/null | cut -f1)"
+  [ -n "${upstream}" ] || return 0
+  if ! git -C "${CHECKOUT}" merge-base --is-ancestor "${upstream}" HEAD 2> /dev/null; then
+    echo "Your checkout doesn't have upstream main's latest commit (${upstream:0:8}), so IMAGESET_LOCAL_CHANGES=true would run its older files too: update it from upstream main (e.g. git pull ${OFFICIAL_GIT_REPO} main), and rerun." >&2
+    exit 64
+  fi
+  changes="$({
+    git -C "${CHECKOUT}" diff --name-only "${upstream}" -- config
+    git -C "${CHECKOUT}" ls-files --others --exclude-standard -- config
+  } | sort -u)"
+  if [ -n "${changes}" ]; then
+    echo "Your checkout changes config/ (the deployment's configuration, which the run applies with tc-admin apply, and commits to main):" >&2
+    echo "${changes}" | sed 's/^/  /' >&2
+    echo "imageset.sh doesn't run with local changes to config/: land them on upstream main first (with a pull request, or by pushing to main), or revert them, and rerun." >&2
+    exit 64
+  fi
+}
+
 # What the diagnostic log says about the run, and the host
 function write-context {
   local setting
@@ -387,10 +434,6 @@ function write-diagnostic-log {
 function run-with-diagnostics {
   local status=0
   local file
-  case "${IMAGESET_KEEP_DIAGNOSTICS-}" in
-    true | false | '') ;;
-    *) echo "IMAGESET_KEEP_DIAGNOSTICS must be true or false" >&2; exit 64 ;;
-  esac
   mkdir -p -m 700 "${STATE_DIR}/diagnostics"
   find "${STATE_DIR}/diagnostics" -mindepth 1 -maxdepth 1 -mtime +30 -exec rm -rf {} + 2> /dev/null || true
   IMAGESET_DIAGNOSTICS="$(mktemp -d "${STATE_DIR}/diagnostics/run.XXXXXXXX")"
@@ -454,7 +497,17 @@ function main {
     exit 1
   fi
 
+  check-settings
   check-docker
+  if can-open-browser && (exec 3<> /dev/tcp/127.0.0.1/8085) 2> /dev/null; then
+    # gcloud's sign-in sends your browser to http://localhost:8085/
+    echo "Port 8085 is in use, but gcloud's sign-in needs it: stop what is using it (e.g. another gcloud auth login)." >&2
+    exit 64
+  fi
+  # Once (rather than again, recorded)
+  if [ -z "${IMAGESET_DIAGNOSTICS-}" ]; then
+    check-local-changes
+  fi
 
   mkdir -p -m 700 "${STATE_DIR}"
   if [ -L "${STATE_DIR}" ] || ! [ -O "${STATE_DIR}" ]; then
@@ -481,10 +534,6 @@ function main {
   remove-stale-runs
   WORK="$(mktemp -d "${STATE_DIR}/run.XXXXXXXX")"
   echo $$ > "${WORK}/pid"
-  case "${IMAGESET_LOCAL_CHANGES-}" in
-    true | false | '') ;;
-    *) echo "IMAGESET_LOCAL_CHANGES must be true or false" >&2; exit 64 ;;
-  esac
 
   # The image of your checkout clones upstream main (with your changes, if you
   # choose), and then upstream main's image runs it. They are usually the same,
@@ -531,11 +580,6 @@ function main {
     --env IMAGESET_HOST_GID="$(id -g)"
   )
   if can-open-browser; then
-    # gcloud's sign-in sends your browser to http://localhost:8085/
-    if (exec 3<> /dev/tcp/127.0.0.1/8085) 2> /dev/null; then
-      echo "Port 8085 is in use, but gcloud's sign-in needs it: stop what is using it (e.g. another gcloud auth login)." >&2
-      exit 64
-    fi
     docker_options+=(--publish 127.0.0.1:8085:8085 --env IMAGESET_HOST_BROWSER=true)
   else
     docker_options+=(--env IMAGESET_HOST_BROWSER=false)
