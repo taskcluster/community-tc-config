@@ -125,13 +125,30 @@ def warn(what, how=""):
     warnings.append((what, how))
 
 
+def diagnostic_log(name, line):
+    """Adds a line to logs/`name` of imageset.sh's diagnostic log"""
+    dir = os.environ.get("IMAGESET_DIAGNOSTICS_DIR")
+    if not dir:
+        return
+    os.makedirs(f"{dir}/logs", exist_ok=True)
+    with open(f"{dir}/logs/{name}", "a") as f:
+        f.write(f"{time.strftime('%H:%M:%S', time.gmtime())} {line}\n")
+
+
 def run(*args, **kwargs):
     """Runs a command (each check only reads), repeating it on transient
     errors, so that they aren't mistaken for missing access"""
     for wait in [*RETRY_SECONDS, None]:
+        start = time.monotonic()
         r = subprocess.run(args, capture_output=True, text=True, **kwargs)
-        if r.returncode == 0 or wait is None or not TRANSIENT_RE.search(r.stderr + r.stdout[:2000]):
+        diagnostic_log("preflight.log", f"{time.monotonic() - start:.1f}s, exit status {r.returncode}: "
+                       f"{' '.join(args)[:200]}")
+        transient = TRANSIENT_RE.search(r.stderr + r.stdout[:2000])
+        if r.returncode == 0 or wait is None or not transient:
             return r
+        print(f"{args[0]} failed with what looks like a transient error ({transient.group(0)}): trying again in "
+              f"{wait}s...")
+        diagnostic_log("preflight.log", f"retrying in {wait}s, after: {last_line(r.stderr or r.stdout)}")
         time.sleep(wait)
 
 
@@ -166,14 +183,9 @@ def sso_url(headers):
 
 def log_response(what, status, headers, body):
     """Records a GitHub response, for imageset.sh's diagnostic log"""
-    dir = os.environ.get("IMAGESET_DIAGNOSTICS_DIR")
-    if not dir:
-        return
-    os.makedirs(f"{dir}/logs", exist_ok=True)
     message = body.get("message") if isinstance(body, dict) else body
-    with open(f"{dir}/logs/preflight-github.log", "a") as f:
-        f.write(f"{time.strftime('%H:%M:%S')} {what}: HTTP {status}, X-GitHub-SSO: {headers.get('x-github-sso')}, "
-                f"message: {message}\n")
+    diagnostic_log("preflight-github.log", f"{what}: HTTP {status}, X-GitHub-SSO: {headers.get('x-github-sso')}, "
+                   f"message: {message}")
 
 
 def check_org(org):
@@ -498,7 +510,9 @@ def main():
     if len(sys.argv) != 2 or sys.argv[1] not in ("accounts", "secrets"):
         sys.exit(f"Usage: {sys.argv[0]} accounts|secrets")
     print("Checking your access...")
+    start = time.monotonic()
     {"accounts": check_accounts, "secrets": check_secrets}[sys.argv[1]]()
+    diagnostic_log("preflight.log", f"checked {sys.argv[1]} in {time.monotonic() - start:.1f}s")
     report()
 
 

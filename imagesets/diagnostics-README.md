@@ -29,12 +29,15 @@ After this README, each section starts with a `===== name =====` line:
   they were built in this run.
 - `logs/...`: logs that the run keeps out of the terminal: `pip.log`
   (installing tc-admin), `gcloud-login.log`, `openvpn.log`, `built.json`
-  (image sets already built), `preflight-github.log` (GitHub's responses to
-  the access checks of your organization memberships and single sign-on).
+  (image sets already built), `preflight.log` (each command of the access
+  checks, with how long it took, and any retries), `preflight-github.log`
+  (GitHub's responses to the access checks of your organization memberships
+  and single sign-on).
 - `browser/actions.log`: what `vpn.py` did, signing in to login.mozilla.com
   through Duo's prompt in a headless browser, for the VPN certificate.
 - `transcript`: everything shown in the terminal, from start to end (what was
-  typed only where it was echoed: not passwords).
+  typed only where it was echoed: not passwords), each line starting with the
+  time (UTC) it was shown.
 - `browser/NN-label.txt` and `.html`: each page of that sign-in, as `vpn.py`
   found it: its URL, its buttons, links and inputs (and whether each was
   visible), and its HTML.

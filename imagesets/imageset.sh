@@ -386,12 +386,26 @@ function write-context {
   fi
 }
 
+# Copies its input, starting each line with the time (UTC) it was shown
+function timestamp-lines {
+  perl -e '$| = 1; my $start = 1;
+    while (sysread(STDIN, my $data, 65536)) {
+      my @t = gmtime; my $time = sprintf("%02d:%02d:%02d ", @t[2, 1, 0]);
+      $data = $time . $data if $start;
+      $data =~ s/\n(?=.)/\n$time/gs;
+      $start = $data =~ /\n\z/;
+      print $data;
+    }'
+}
+
 # The terminal transcript as it was shown: without escape sequences, and with
-# overwritten lines (\r) and backspaces applied
+# overwritten lines (\r) and backspaces applied (keeping the times that
+# timestamp-lines added)
 function clean-transcript {
   if command -v perl > /dev/null; then
     perl -pe 's/\e\][^\a\e]*(?:\a|\e\\)//g; s/\e\[[0-?]*[ -\/]*[@-~]//g; s/\e[ -\/]*[0-~]//g;
-      1 while s/[^\x08\n]\x08//; s/[^\r\n]*\r(?=[^\r\n])//g; s/[\x00-\x08\x0b-\x1f\x7f]//g' "${1}"
+      1 while s/[^\x08\n]\x08//; s/^(\d\d:\d\d:\d\d )?(?:[^\r\n]*\r(?=[^\r\n]))+/$1 \/\/ ""/e;
+      s/[\x00-\x08\x0b-\x1f\x7f]//g' "${1}"
   else
     cat "${1}"
   fi
@@ -434,6 +448,8 @@ function write-diagnostic-log {
 function run-with-diagnostics {
   local status=0
   local file
+  local transcript
+  local stamper=''
   mkdir -p -m 700 "${STATE_DIR}/diagnostics"
   find "${STATE_DIR}/diagnostics" -mindepth 1 -maxdepth 1 -mtime +30 -exec rm -rf {} + 2> /dev/null || true
   IMAGESET_DIAGNOSTICS="$(mktemp -d "${STATE_DIR}/diagnostics/run.XXXXXXXX")"
@@ -441,15 +457,33 @@ function run-with-diagnostics {
   write-context > "${IMAGESET_DIAGNOSTICS}/context.txt" 2>&1 || true
   # So that the log is still written if the terminal is closed, or this is killed
   trap : HUP TERM
+  # script writes the transcript through timestamp-lines, if it can
+  transcript="${IMAGESET_DIAGNOSTICS}/transcript.raw"
+  if { script --version 2> /dev/null | grep -q util-linux || [ "$(uname)" == Darwin ]; } &&
+    command -v perl > /dev/null && mkfifo "${IMAGESET_DIAGNOSTICS}/transcript.fifo"; then
+    (trap '' HUP TERM && timestamp-lines < "${IMAGESET_DIAGNOSTICS}/transcript.fifo" > "${transcript}") &
+    stamper=$!
+    transcript="${IMAGESET_DIAGNOSTICS}/transcript.fifo"
+  fi
   if ! command -v script > /dev/null; then
     "${BASH}" "${0}" "$@" || status=$?
   elif script --version 2> /dev/null | grep -q util-linux; then
-    SHELL=/bin/sh script -q -f -e -c "$(printf '%q ' "${BASH}" "${0}" "$@")" "${IMAGESET_DIAGNOSTICS}/transcript.raw" || status=$?
+    SHELL=/bin/sh script -q -f -e -c "$(printf '%q ' "${BASH}" "${0}" "$@")" "${transcript}" || status=$?
   elif [ "$(uname)" == Darwin ]; then
-    script -q -F "${IMAGESET_DIAGNOSTICS}/transcript.raw" "${BASH}" "${0}" "$@" || status=$?
+    script -q -F "${transcript}" "${BASH}" "${0}" "$@" || status=$?
   else
     # e.g. BusyBox's: without a transcript
     "${BASH}" "${0}" "$@" || status=$?
+  fi
+  if [ -n "${stamper}" ]; then
+    # It ends once nothing has the transcript open, but a process that the run
+    # left running could still have it open
+    for _ in 1 2 3 4 5 6 7 8 9 10; do
+      kill -0 "${stamper}" 2> /dev/null || break
+      sleep 0.5
+    done
+    kill "${stamper}" 2> /dev/null || true
+    wait "${stamper}" 2> /dev/null || true
   fi
   echo "Exit status: ${status}" >> "${IMAGESET_DIAGNOSTICS}/context.txt"
   if [ "${status}" == 0 ] && [ "${IMAGESET_KEEP_DIAGNOSTICS-}" != true ]; then
