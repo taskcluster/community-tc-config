@@ -230,8 +230,7 @@ fuzzing:
         routes:
           - notify.email.truber@mozilla.com.on-failed
           - notify.email.twsmith@mozilla.com.on-failed
-      schedule:
-        - "0 */2 * * *"
+      # scheduled on Firefox CI
     grizzly-reduce-reset-error:
       description: Hook for resetting Grizzly reduce tasks on error
       owner: truber@mozilla.com
@@ -562,8 +561,7 @@ fuzzing:
           owner: mdauer@mozilla.com
           source: https://github.com/MozillaSecurity/orion/tree/master/services/nss-corpus-update
           description: Hook for updating the NSS fuzzing corpus
-      schedule:
-        - "0 0 1,15 * *"
+      # scheduled on Firefox CI
   grants:
     - grant:
         - queue:create-task:highest:proj-fuzzing/ci
