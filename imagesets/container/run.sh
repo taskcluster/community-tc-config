@@ -114,6 +114,7 @@ function read-mac-passwords {
 # repository, so that the workers don't drift from it.
 MAC_FILES=(
   update.sh:/var/root/update.sh:755
+  configure.sh:/var/root/configure.sh:755
   run-generic-worker.sh:/usr/local/bin/run-generic-worker.sh:755
   com.mozilla.genericworker.plist:/Library/LaunchDaemons/com.mozilla.genericworker.plist:644
   runner.yml:/etc/generic-worker/runner.yml:600
@@ -676,6 +677,7 @@ function update-offerings {
 function update-mac {
   local host="${1}"
   retry-mac install-mac-files "${host}"
+  retry-mac mac-ssh "${host}" sudo -n /var/root/configure.sh
   # The lock stops a retry from running alongside an interrupted run
   retry-mac mac-ssh "${host}" sudo -n lockf -t 900 /var/run/com.mozilla.genericworker.update.lock /var/root/update.sh
   # update.sh only says when something is wrong

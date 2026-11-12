@@ -49,17 +49,29 @@ Maintenance script for updating Taskcluster worker components:
 - Restarts the worker services
 - Includes retry logic with exponential backoff for network operations
 
-## Set up outside this repository
+### [configure.sh](configure.sh)
+Settings, applied on every deployment: automatic updates (including of macOS)
+on, and Spotlight and the Apple Neural Engine daemon off.
 
-Each worker also relies on setup that isn't in this repository, done once when
-it was installed, which these files assume:
+### [setup.sh](setup.sh)
+One-time setup of a new worker (see below).
 
-- An `administrator` account, with passwordless `sudo`, which `imageset.sh`
-  logs in to over ssh with a password (`mdc1/generic-worker-ci/<host>` in the
-  password store).
-- A console user that is logged in (`imageset.sh` notes that you should VNC
-  in as administrator first), with a LaunchAgent,
-  `~/Library/LaunchAgents/com.mozilla.genericworker.launchagent.plist`, which
-  `update.sh` restarts.
-- The worker's signing key, `/etc/generic-worker/ed25519_key`.
-- The worker's `staticSecret`, in its `/etc/generic-worker/runner.yml`.
+## Setting up a new worker
+
+1. Relops install macOS and enroll it in their MDM, with an `administrator`
+   account with passwordless `sudo`, ssh, Screen Sharing, and Xcode (with its
+   licence accepted).
+2. Add its administrator password to the password store
+   (`mdc1/generic-worker-ci/<host>`), and its host key to
+   [mac_known_hosts](../../imagesets/mac_known_hosts)
+   (`ssh-keyscan -t ed25519 <host>`).
+3. Install the "Skip Setup Assistant" profile of
+   [macos-configuration-profiles](https://github.com/mozilla-platform-ops/macos-configuration-profiles)
+   (in System Settings, as macOS requires), so that task users don't get
+   first-login wizards.
+4. Run `sudo bash setup.sh` on it, with its `staticSecret` (from its worker
+   pool's definition).
+5. Add it to `MAC_HOSTS` in [run.sh](../../imagesets/container/run.sh), and run
+   `imagesets/imageset.sh prod`, which installs the rest. Its signing key is
+   created when the worker first starts, and generic-worker installs its own
+   LaunchAgent for each task user it logs in.

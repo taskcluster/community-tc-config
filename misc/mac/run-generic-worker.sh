@@ -37,6 +37,11 @@ if [ "${btm_size}" -ge "${BTM_MAX_BYTES}" ]; then
   log "Finished resetting BTM database."
 fi
 
+if ! [ -f /etc/generic-worker/ed25519_key ]; then
+  log "Creating the signing key..."
+  /usr/local/bin/generic-worker new-ed25519-keypair --file /etc/generic-worker/ed25519_key
+fi
+
 log "Changing to home directory..."
 cd ~
 log "Current directory: $(pwd)"
