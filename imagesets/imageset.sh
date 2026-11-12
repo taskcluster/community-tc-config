@@ -214,8 +214,14 @@ function build-image {
     return
   fi
   echo "Building the container image, with this week's tools (this takes a few minutes, once a week)..."
+  local options=()
+  # Only BuildKit (buildx) has it: e.g. Ubuntu's docker.io doesn't, and its
+  # legacy builder's output is plain anyway
+  if docker buildx version > /dev/null 2>&1; then
+    options+=(--progress=plain)
+  fi
   for attempt in 1 2 3 4 5; do
-    if docker build --progress=plain --build-arg "TOOLS_WEEK=${week}" --label "org.mozilla.community-tc-imagesets.week=${week}" \
+    if docker build ${options[@]+"${options[@]}"} --build-arg "TOOLS_WEEK=${week}" --label "org.mozilla.community-tc-imagesets.week=${week}" \
       --label "org.mozilla.community-tc-imagesets.dockerfile=${hash}" -t "${tag}" "${context}" > "${log}" 2>&1; then
       docker image prune --force --filter label=org.mozilla.community-tc-imagesets=true > /dev/null 2>&1 || true
       # Each week's build adds a few GB of build cache, which nothing else
