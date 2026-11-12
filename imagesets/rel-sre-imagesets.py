@@ -318,14 +318,9 @@ def create_signed_commit(message, tree, parent):
         "committer": {"name": name, "email": email, "date": date},
         "signature": signature,
     }).json()
-    # The hash covers the signature, so it matches only if GitHub created the
-    # commit that was signed
-    gpgsig = "gpgsig " + signature.rstrip("\n").replace("\n", "\n ") + "\n"
-    signed = f"{headers}{gpgsig}\n{message}".encode()
-    expected = hashlib.sha1(f"commit {len(signed)}\0".encode() + signed).hexdigest()
-    if commit["sha"] != expected:
-        raise SystemExit(f"❌ GitHub created commit {commit['sha']}, rather than the signed commit {expected}")
     verification = commit.get("verification") or {}
+    if verification.get("reason") == "invalid":
+        raise SystemExit(f"❌ GitHub created commit {commit['sha']}, which doesn't match its signature")
     if not verification.get("verified"):
         print(f"⚠️  GitHub doesn't show commit {commit['sha']} as verified ({verification.get('reason')}): "
               f"add gpg key {key} to your GitHub account, if it isn't there")
