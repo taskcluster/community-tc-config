@@ -560,6 +560,7 @@ function pull-request {
   local title
   local state
   local attempt
+  local method
   login="$(retry-transient gh api user --jq .login)"
   if [ "${COMMUNITY_TC_CONFIG_PUBLISH}" == fork ]; then
     owner="${login}"
@@ -596,9 +597,17 @@ function pull-request {
     echo "Couldn't open a pull request for ${owner}:${branch}." >&2
     return 1
   fi
-  # So that it is merged as soon as it is approved, where that is allowed
-  gh pr merge --auto --merge "${url}" > /dev/null 2>&1 || true
-  echo "Opened ${url} (you can't push to main): waiting for someone to approve it, and for it to be merged..."
+  echo "Opened ${url} (you can't push to main)."
+  # So that it is merged as soon as it is approved, if you may (with a merge
+  # method that the repository allows)
+  method="$(retry-transient gh api repos/taskcluster/community-tc-config \
+    --jq 'if .allow_merge_commit then "merge" elif .allow_squash_merge then "squash" else "rebase" end' 2> /dev/null || echo merge)"
+  if gh pr merge --auto "--${method}" "${url}" > /dev/null 2>&1; then
+    echo "Enabled auto-merge on it, so it is merged once it is approved."
+  else
+    echo "Couldn't enable auto-merge on it (e.g. you may not merge its pull requests), so it needs merging by hand once it is approved."
+  fi
+  echo "Waiting for someone to approve it, and for it to be merged..."
   while true; do
     state="$(gh pr view "${url}" --json state --jq .state 2> /dev/null || echo UNKNOWN)"
     case "${state}" in

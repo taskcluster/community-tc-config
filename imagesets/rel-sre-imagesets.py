@@ -1031,6 +1031,21 @@ Each updated image's `{FXCI_METADATA_KEY}` links to the {REPO} bootstrap script 
 """ + "\n".join(f"* `{image}`: {script}" for image, script in sorted(scripts.items()))
     return title, body
 
+def enable_fxci_auto_merge(url, gh_cli):
+    """Has GitHub merge the fxci-config PR as soon as it is approved, if you
+    may (otherwise it needs merging by hand: that doesn't stop the run)"""
+    if not url.startswith("https://"):
+        print(f"⚠️  Couldn't enable auto-merge on the fxci-config pull request (its URL is unknown), "
+              f"it will need merging by hand")
+        return
+    try:
+        gh_cli("pr", "merge", "--auto", f"--{merge_method(FXCI_REPO)}", url)
+        print(f"🤖 Enabled auto-merge on {url}")
+    except (subprocess.CalledProcessError, requests.exceptions.RequestException) as e:
+        detail = (getattr(e, "stderr", None) or str(e)).strip().splitlines()
+        print(f"⚠️  Couldn't enable auto-merge on {url}, it will need merging by hand"
+              + (f": {detail[-1]}" if detail else ""))
+
 def open_fxci_pr():
     """Open a PR (from the GitHub user's fork) to have fxci use the image sets'
     latest images too, since fxci's config can only be changed with a PR."""
@@ -1054,14 +1069,6 @@ def open_fxci_pr():
             return gh_cli("pr", "list", "--repo", FXCI_REPO, "--head", branch, "--state", "open",
                           "--json", "url", "--jq", ".[].url")
 
-        def auto_merge(url):
-            """Has GitHub merge it as soon as it is approved"""
-            try:
-                gh_cli("pr", "merge", "--auto", f"--{merge_method(FXCI_REPO)}", url)
-                print(f"🤖 Enabled auto-merge on {url}")
-            except (subprocess.CalledProcessError, requests.exceptions.RequestException) as e:
-                print(f"⚠️  Couldn't enable auto-merge on {url}, it will need merging by hand: "
-                      f"{(getattr(e, 'stderr', None) or str(e)).strip()}")
 
         # Clones your fork (creating it if needed) as `origin`, with fxci-config as `upstream`
         # A failed clone's leftovers are removed, so that it can be repeated
@@ -1100,7 +1107,7 @@ def open_fxci_pr():
         existing = existing_pr(branch)
         if existing:
             print(f"♻️  Reusing {existing}")
-            auto_merge(existing)
+            enable_fxci_auto_merge(existing, gh_cli)
             return
 
         title, body = fxci_pr_text(changes, scripts)
@@ -1110,16 +1117,20 @@ def open_fxci_pr():
         # Creating it isn't simply repeated (it may have been created, if
         # creating it failed), but whether it exists is checked again
         for attempt in range(5):
+            # Its URL is its output
             created = subprocess.run(["gh", "pr", "create", "--repo", FXCI_REPO, "--base", "main",
-                                      "--head", f"{fork_owner}:{branch}", "--title", title, "--body", body])
+                                      "--head", f"{fork_owner}:{branch}", "--title", title, "--body", body],
+                                     stdout=subprocess.PIPE, text=True)
             if created.returncode == 0:
-                auto_merge(existing_pr(branch))
+                url = created.stdout.strip().splitlines()[-1] if created.stdout.strip() else ""
+                print(f"📝 Opened {url}")
+                enable_fxci_auto_merge(url, gh_cli)
                 return
             time.sleep(30)
             existing = existing_pr(branch)
             if existing:
                 print(f"♻️  {existing} was opened, although opening it failed")
-                auto_merge(existing)
+                enable_fxci_auto_merge(existing, gh_cli)
                 return
         raise SystemExit(f"❌ Couldn't open the pull request for {fork_owner}:{branch} in {FXCI_REPO}")
 
