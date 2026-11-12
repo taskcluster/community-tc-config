@@ -61,7 +61,8 @@ steps.
    suggesting the account you signed in to Google Cloud with, or else your
    git email, or your GitHub account's mozilla.com email, or set
    `IMAGESET_LDAP_USERNAME`) with an
-   authenticator app for 2FA (Duo's "Hardware token" option), and a VNC session
+   authenticator app or the Duo Mobile app for 2FA codes (Duo's "Hardware
+   token" or "Duo Mobile passcode" option), and a VNC session
    as administrator on each Mac. The Macs are only reachable through the
    Mozilla VPN, which the container connects to (only the container uses it,
    so Viscosity isn't needed), unless they are reachable already, e.g.
@@ -87,11 +88,23 @@ a browser (e.g. over ssh), it shows the URL and code instead.
 The script doesn't use your own configuration of any tools, nor your checkout
 of this repository: it clones upstream `main`, and the container signs in
 during the run, and clones the password store. To test local changes to the
-scripts, set `IMAGESET_LOCAL_CHANGES=true`. If it isn't set, and your checkout
-has changes (files that differ from upstream `main`'s, other than ones where
-your checkout is just behind it), the script lists them, and asks whether to
-use them. It keeps progress (for resuming) and the encrypted
+scripts, set `IMAGESET_LOCAL_CHANGES=true`: the clone's files are then exactly
+your checkout's (including deletions), other than `config/`. If it isn't set,
+and your checkout has changes of its own, the script lists them, and asks
+whether to use them. Your checkout must have upstream `main`'s latest commit
+(pull, or rebase your branch), so that only your changes differ from it. And
+`config/` is always upstream `main`'s, as the run applies it to the deployment,
+and commits to it: the script refuses to run with your checkout's changes to
+it, which you can land on `main` first. It keeps progress (for resuming) and
+the encrypted
 VPN certificate in `~/.cache/community-tc-imagesets`.
+
+If a run fails, the script writes a diagnostic log (in
+`~/.cache/community-tc-imagesets/diagnostics`), with a transcript of the run,
+its other logs, and the pages of the VPN sign-in, headed by a README that
+explains it, for Claude (yours, or the maintainers') to work out what went
+wrong and fix the scripts. Set `IMAGESET_KEEP_DIAGNOSTICS=true` to keep it when
+the run succeeds too. Diagnostic logs are deleted after 30 days.
 
 ## What it does
 
@@ -117,7 +130,7 @@ The `workerTypeMetadata.machine-setup.script` of each image set with new images
 is set to the URL of the bootstrap script in worker-images, at the commit the
 images were built from, so that users can see how their worker was set up.
 Finally, the new images are logged with links to the worker-images jobs that
-built them, and a PR is opened (from your fork) to have
+built them, and a PR is opened (from your fork, with auto-merge enabled) to have
 fxci's worker pools that use the same images use the new ones too
 (`UPDATE_FXCI_IMAGES=false` skips this). It isn't opened if any location that
 fxci uses has no new image, e.g. because its build failed. The PR also sets the
@@ -136,9 +149,10 @@ its worker pools.
 | `MAX_RUN_ATTEMPTS` | Attempts per worker-images workflow run, including reruns of failed jobs (and of jobs cancelled for exceeding their time limit, but not of jobs cancelled by hand) | `5` |
 | `DEPLOY_IMAGES` | Copy Azure images into place and `tc-admin apply` | `true` |
 | `UPDATE_FXCI_IMAGES` | Open the fxci-config PR to use the new images | `true` |
-| `IMAGESET_LOCAL_CHANGES` | Use your checkout's changes (other than to `config/`), rather than upstream `main`'s files, to test changes to the scripts | asks, if your checkout has changes |
+| `IMAGESET_LOCAL_CHANGES` | Use your checkout's files (other than `config/`, which can't have local changes), rather than upstream `main`'s, to test changes to the scripts | asks, if your checkout has changes |
 | `IMAGESET_RESUME` | Whether to resume an unfinished run of the same target (skipping the steps it completed, and waiting for its worker-images builds rather than triggering new ones), rather than start again | asks |
 | `IMAGESET_LDAP_USERNAME` | Your Mozilla LDAP username, for the VPN | asks |
+| `IMAGESET_KEEP_DIAGNOSTICS` | Keep the diagnostic log when the run succeeds (it is always kept when the run fails) | `false` |
 | `IMAGESET_PASSWORD_STORE_URL` | The git URL of the password store | `https://source.developers.google.com/p/taskcluster-passwords/r/secrets` |
 
 If a run fails, it says which step failed. Rerun the same command to continue

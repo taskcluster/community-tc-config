@@ -164,11 +164,26 @@ def sso_url(headers):
     return m.group(1) if m else None
 
 
+def log_response(what, status, headers, body):
+    """Records a GitHub response, for imageset.sh's diagnostic log"""
+    dir = os.environ.get("IMAGESET_DIAGNOSTICS_DIR")
+    if not dir:
+        return
+    os.makedirs(f"{dir}/logs", exist_ok=True)
+    message = body.get("message") if isinstance(body, dict) else body
+    with open(f"{dir}/logs/preflight-github.log", "a") as f:
+        f.write(f"{time.strftime('%H:%M:%S')} {what}: HTTP {status}, X-GitHub-SSO: {headers.get('x-github-sso')}, "
+                f"message: {message}\n")
+
+
 def check_org(org):
     """You're an active member of the org, and your sign-in is authorized for
     its single sign-on. If it isn't, has you authorize it, and checks again."""
+    message = None
     for _ in range(3):
         status, headers, body = gh(f"user/memberships/orgs/{org}")
+        log_response(f"user/memberships/orgs/{org}", status, headers, body)
+        message = body.get("message") if isinstance(body, dict) else None
         url = sso_url(headers)
         if status == 403 and url:
             print(f"Your GitHub sign-in isn't authorized for the {org} organization's single sign-on.")
@@ -184,7 +199,8 @@ def check_org(org):
         else:
             fail(f"GitHub: you aren't a member of the {org} organization", HOW["github-org"].format(org=org))
         return False
-    fail(f"GitHub: your sign-in still isn't authorized for the {org} organization's single sign-on",
+    fail(f"GitHub: your sign-in still isn't authorized for the {org} organization's single sign-on"
+         + (f" (GitHub says: {message})" if message else ""),
          f"authorize it at https://github.com/orgs/{org}/sso, then rerun")
     return False
 

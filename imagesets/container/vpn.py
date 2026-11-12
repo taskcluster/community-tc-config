@@ -14,6 +14,9 @@ with-gpg).
 The bundle is only decrypted in memory, or in /dev/shm (a memory filesystem)
 while openvpn starts. Passwords and codes are read from the terminal, and kept
 in memory only. The VPN only exists inside the container.
+
+With IMAGESET_DIAGNOSTICS_DIR (for imageset.sh's diagnostic log), each page
+of the sign-in, and what was done on it, is recorded there (see Capture).
 """
 
 import datetime
@@ -69,7 +72,7 @@ def ask_code(user, purpose=""):
     os.makedirs(RUN, mode=0o700, exist_ok=True)
     another = os.path.exists(ASKED_CODE)
     open(ASKED_CODE, "w").close()
-    return getpass.getpass(f"{'Another 2FA code' if another else '2FA code'} for {user}{purpose}: ").strip()
+    return CAPTURE.secret(getpass.getpass(f"{'Another 2FA code' if another else '2FA code'} for {user}{purpose}: ").strip())
 
 
 def gpg(*args, input=None):
@@ -122,13 +125,81 @@ def check_expiry(bundle):
 
 
 
+# ---- Diagnostics ----
+
+# A page's controls, and whether each is visible
+ELEMENTS = """() => [...document.querySelectorAll('button, a, input, select, textarea, [role=button], [role=link], iframe')].map(e => {
+  const attrs = ['id', 'name', 'type', 'role', 'aria-label', 'autocomplete'].filter(a => e.hasAttribute(a)).map(a => `${a}=${e.getAttribute(a)}`);
+  return `${e.checkVisibility() ? 'visible' : 'hidden '} <${e.tagName.toLowerCase()} ${attrs.join(' ')}> ${(e.innerText || '').replace(/\\s+/g, ' ').trim().slice(0, 120)}`;
+})"""
+
+
+def lean(html):
+    """The page's HTML, without the contents of its scripts, and values of its
+    hidden inputs (e.g. tokens), which don't matter for finding its controls"""
+    html = re.sub(r"(<script\b[^>]*>).*?(</script>)", r"\1\2", html, flags=re.S | re.I)
+    return re.sub(r"<input\b[^>]*>",
+                  lambda m: re.sub(r"""(\bvalue\s*=\s*)("[^"]*"|'[^']*'|[^\s>]+)""", r'\1""', m.group(0))
+                  if re.search(r"""\btype\s*=\s*["']?hidden\b""", m.group(0), re.I) else m.group(0),
+                  html, flags=re.I)
+
+
+class Capture:
+    """Records each page of the sign-in (its URL, controls and HTML), and what
+    was done, in DIR/browser, for imageset.sh's diagnostic log, with the
+    password and codes typed replaced. Pages are captured before anything is
+    typed into them."""
+
+    def __init__(self, dir=None):
+        self.dir = os.path.join(dir, "browser") if dir else None
+        self.secrets = []
+        self.pages = 0
+
+    def secret(self, value):
+        if value:
+            self.secrets.append(value)
+        return value
+
+    def scrub(self, text):
+        for secret in self.secrets:
+            text = text.replace(secret, "<redacted>")
+        return text
+
+    def write(self, name, text, mode="w"):
+        os.makedirs(self.dir, mode=0o700, exist_ok=True)
+        with open(os.path.join(self.dir, name), mode, encoding="utf-8") as f:
+            f.write(self.scrub(text))
+
+    def log(self, message):
+        if self.dir:
+            self.write("actions.log", f"{datetime.datetime.now():%H:%M:%S} {message}\n", "a")
+
+    def page(self, page, label):
+        if not self.dir:
+            return
+        self.pages += 1
+        name = f"{self.pages:02d}-{label}"
+        try:
+            self.write(f"{name}.html", lean(page.content()))
+            self.write(f"{name}.txt", f"URL: {page.url}\nTitle: {page.title()}\n\n" + "\n".join(page.evaluate(ELEMENTS)) + "\n")
+            self.log(f"captured {name}: {page.url}")
+        except Exception as e:
+            self.log(f"couldn't capture {name}: {e}")
+
+
+CAPTURE = Capture(os.environ.get("IMAGESET_DIAGNOSTICS_DIR"))
+
+
 # ---- Downloading the bundle ----
 
 def visible(locator):
+    """The first visible element of locator (as a page can have hidden copies
+    of an element too), or None"""
     try:
-        return locator.count() > 0 and locator.first.is_visible()
+        shown = locator.filter(visible=True)
+        return shown.first if shown.count() else None
     except Exception:
-        return False
+        return None
 
 
 def settle(page):
@@ -144,7 +215,7 @@ def page_text(page):
         text = re.sub(r"\n\s*\n+", "\n", page.locator("body").inner_text(timeout=5000)).strip()
     except Exception:
         text = ""
-    return "\n".join(f"  | {line[:100]}" for line in text.splitlines()[:20])
+    return CAPTURE.scrub("\n".join(f"  | {line[:100]}" for line in text.splitlines()[:20]))
 
 
 def download_links(page):
@@ -157,65 +228,97 @@ def download_links(page):
 def sign_in(page, user):
     for attempt in range(ATTEMPTS):
         page.goto(f"{LOGIN}/login/")
+        CAPTURE.page(page, "login")
         page.fill("#id_username", user)
-        page.fill("#id_password", getpass.getpass(f"Password for {user} (Mozilla LDAP): "))
+        page.fill("#id_password", CAPTURE.secret(getpass.getpass(f"Password for {user} (Mozilla LDAP): ")))
         page.click("button[type=submit]")
+        CAPTURE.log("filled #id_username and #id_password, and clicked button[type=submit]")
         settle(page)
         if urllib.parse.urlsplit(page.url).path.rstrip("/") != "/login":
             return
+        CAPTURE.log("the password was rejected")
         print("That password was rejected." + (" Try again." if attempt + 1 < ATTEMPTS else ""))
     raise VpnError(f"Couldn't sign in to {LOGIN}")
 
 
+CODE_FIELD = "#passcode-input"
+# How long to wait for what is expected next, and to be back at login.mozilla.com after a code (ms)
+WAIT = 15000
+CODE_WAIT = 20000
+# In order of preference
+PASSCODE_OPTIONS = [re.compile(r"^\s*Hardware token", re.I), re.compile(r"^\s*Duo Mobile passcode", re.I)]
+
+
+def duo_step(page, other_clicked):
+    """What to do next at Duo's Universal Prompt, as it is now: (action,
+    locator), where action is "done" (at the download page), "code" (type a
+    2FA code into it), "option" (click it: a passcode option), or "other"
+    (click it: Other options); or None, if there's nothing to do"""
+    if download_links(page):
+        return ("done", None)
+    code_field = visible(page.locator(CODE_FIELD))
+    if code_field:
+        return ("code", code_field)
+    for name in PASSCODE_OPTIONS:
+        option = visible(page.get_by_role("button", name=name))
+        if option:
+            return ("option", option)
+    other = visible(page.get_by_role("button", name="Other options"))
+    if not other_clicked and other:
+        return ("other", other)
+    return None
+
+
 def duo(page, user):
     """Duo's Universal Prompt: Other options, then Hardware token (a code from
-    an authenticator app), then the code. Never anything else."""
+    an authenticator app) or, if there isn't one, Duo Mobile passcode (a code
+    from the Duo Mobile app), then the code. Never anything else."""
     from playwright.sync_api import TimeoutError as PlaywrightTimeout
-    passcode_option = re.compile(r"^\s*Hardware token", re.I)
     other_clicked = False
     codes = 0
     for _ in range(12):
         settle(page)
-        if download_links(page):
-            return
+        CAPTURE.page(page, "duo")
         try:
-            code_field = page.locator("#passcode-input")
-            if visible(code_field):
+            step = duo_step(page, other_clicked)
+            if step is None:
+                break
+            action, target = step
+            if action == "done":
+                return
+            if action == "code":
                 if codes == ATTEMPTS:
                     break
                 if codes:
                     print("That code was rejected: wait for the next one.")
                 codes += 1
-                code_field.first.fill(ask_code(user))
+                target.fill(ask_code(user))
                 page.keyboard.press("Enter")
+                CAPTURE.log(f"typed a 2FA code into {CODE_FIELD}, and pressed Enter")
                 try:
-                    page.wait_for_url(re.compile(r"^https://login\.mozilla\.com/"), timeout=20000)
+                    page.wait_for_url(re.compile(r"^https://login\.mozilla\.com/"), timeout=CODE_WAIT)
                 except PlaywrightTimeout:
-                    pass
+                    CAPTURE.log(f"not back at login.mozilla.com after {CODE_WAIT // 1000}s")
                 continue
-            option = page.get_by_role("button", name=passcode_option)
-            if visible(option):
-                option.first.click(timeout=10000)
-                try:
-                    code_field.first.wait_for(state="visible", timeout=15000)
-                except PlaywrightTimeout:
-                    pass
-                continue
-            other = page.get_by_role("button", name="Other options")
-            if not other_clicked and visible(other):
-                other.first.click(timeout=10000)
+            CAPTURE.log(f"clicking {(target.inner_text(timeout=5000).splitlines() or [action])[0]!r}")
+            target.click(timeout=10000)
+            if action == "other":
                 other_clicked = True
-                try:
-                    option.first.wait_for(state="visible", timeout=15000)
-                except PlaywrightTimeout:
-                    pass
-                continue
-        except PlaywrightTimeout:
+                waiting = page.get_by_role("button", name=re.compile("|".join(p.pattern for p in PASSCODE_OPTIONS), re.I))
+            else:
+                waiting = page.locator(CODE_FIELD)
+            try:
+                waiting.filter(visible=True).first.wait_for(timeout=WAIT)
+            except PlaywrightTimeout:
+                CAPTURE.log(f"what was expected next didn't appear within {WAIT // 1000}s")
+        except PlaywrightTimeout as e:
             # e.g. an element replaced while Duo animates: look again
+            CAPTURE.log(f"timed out, looking again: {e}")
             continue
-        break
+    CAPTURE.log("found nothing to do on the page: giving up")
     raise VpnError("Couldn't get through Duo's prompt, which showed:\n" + page_text(page) +
-                   "\n(imageset.sh uses Duo's \"Hardware token\" option, for a code from an authenticator app.)")
+                   "\n(imageset.sh uses Duo's \"Hardware token\" option, for a code from an authenticator app, "
+                   "or else its \"Duo Mobile passcode\" option, for a code from the Duo Mobile app.)")
 
 
 def download(user):
@@ -227,17 +330,25 @@ def download(user):
             # As some sites turn away "HeadlessChrome"
             user_agent = browser.new_page().evaluate("navigator.userAgent").replace("HeadlessChrome", "Chrome")
             page = browser.new_context(user_agent=user_agent).new_page()
-            sign_in(page, user)
-            page.goto(f"{LOGIN}/openvpn/")
-            duo(page, user)
-            # Only ever the download link: the page also has one to revoke the certificate
-            linux = [l for l in download_links(page) if l.rstrip("/").endswith("/Linux")]
-            if not linux:
-                raise VpnError(f"No Linux download on {LOGIN}/openvpn/, which showed:\n" + page_text(page))
-            response = page.request.get(linux[0])
-            if not response.ok:
-                raise VpnError(f"Downloading {linux[0]} failed: HTTP {response.status}")
-            return response.body()
+            try:
+                sign_in(page, user)
+                page.goto(f"{LOGIN}/openvpn/")
+                duo(page, user)
+                CAPTURE.page(page, "openvpn")
+                # Only ever the download link: the page also has one to revoke the certificate
+                linux = [l for l in download_links(page) if l.rstrip("/").endswith("/Linux")]
+                if not linux:
+                    raise VpnError(f"No Linux download on {LOGIN}/openvpn/, which showed:\n" + page_text(page))
+                CAPTURE.log(f"downloading {linux[0]}")
+                response = page.request.get(linux[0])
+                if not response.ok:
+                    raise VpnError(f"Downloading {linux[0]} failed: HTTP {response.status}")
+                CAPTURE.log(f"downloaded {len(response.body())} bytes ({response.headers.get('content-type')})")
+                return response.body()
+            except Exception as e:
+                CAPTURE.log(f"failed: {type(e).__name__}: {e}")
+                CAPTURE.page(page, "failed")
+                raise
         finally:
             browser.close()
 
