@@ -1,10 +1,4 @@
 [
-    "a1.2xlarge",
-    "a1.4xlarge",
-    "a1.large",
-    "a1.medium",
-    "a1.metal",
-    "a1.xlarge",
     "c5.12xlarge",
     "c5.18xlarge",
     "c5.24xlarge",
@@ -714,6 +708,7 @@
     "t8i.nano",
     "t8i.small",
     "trn1.32xlarge",
+    "trn2.48xlarge",
     "u-6tb1.112xlarge",
     "u-6tb1.56xlarge",
     "u7i-12tb.224xlarge",
