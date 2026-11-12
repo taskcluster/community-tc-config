@@ -310,7 +310,8 @@ def create_signed_commit(message, tree, parent):
                                pass_fds=GPG_PASSPHRASE_FDS)
     if signature.returncode != 0:
         raise SystemExit(f"❌ Couldn't sign the commit with gpg key {key}:\n{signature.stderr.decode()}")
-    signature = signature.stdout.decode()
+    # GitHub keeps a trailing newline in the gpgsig header, which git doesn't
+    signature = signature.stdout.decode().rstrip("\n")
     date = datetime.fromtimestamp(now, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     commit = gh(f"{API_ROOT}/repos/{REPO}/git/commits", "POST", json={
         "message": message, "tree": tree, "parents": [parent],
@@ -320,7 +321,7 @@ def create_signed_commit(message, tree, parent):
     }).json()
     # The hash covers the signature, so it matches only if GitHub created the
     # commit that was signed
-    gpgsig = "gpgsig " + signature.rstrip("\n").replace("\n", "\n ") + "\n"
+    gpgsig = "gpgsig " + signature.replace("\n", "\n ") + "\n"
     signed = f"{headers}{gpgsig}\n{message}".encode()
     expected = hashlib.sha1(f"commit {len(signed)}\0".encode() + signed).hexdigest()
     if commit["sha"] != expected:
