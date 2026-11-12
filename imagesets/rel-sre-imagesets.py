@@ -79,6 +79,8 @@ IMAGESETS_FILE = "config/imagesets.yml"
 TCENG_CONFIG_DIR = "config/tceng"
 TASKCLUSTER_VERSION_RE = re.compile(r"^(\s*taskcluster_version:\s*)([\"']?)([^\"'\s#]+)([\"']?)", re.M)
 PR_POLL_SECONDS = 60
+# The workflows' jobs that don't build an image
+SETUP_JOBS = {"Verify User Access", "Create Image Tasks", "Get Project ID & ImageName from Config"}
 # Builds occasionally fail transiently (e.g. an Azure VM create that hangs, or
 # a stuck download), so failed jobs are rerun until a run has had this many
 # attempts.
@@ -1214,6 +1216,8 @@ def main():
 
         for job in jobs:
             job_name = job["name"]
+            if job_name in SETUP_JOBS:
+                continue
             print(f"      - Job name: '{job_name}'")
 
             # Parse job name based on cloud provider
