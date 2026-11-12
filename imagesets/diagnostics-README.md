@@ -29,7 +29,8 @@ After this README, each section starts with a `===== name =====` line:
   they were built in this run.
 - `logs/...`: logs that the run keeps out of the terminal: `pip.log`
   (installing tc-admin), `gcloud-login.log`, `openvpn.log`, `built.json`
-  (image sets already built).
+  (image sets already built), `preflight-github.log` (GitHub's responses to
+  the access checks of your organization memberships and single sign-on).
 - `browser/actions.log`: what `vpn.py` did, signing in to login.mozilla.com
   through Duo's prompt in a headless browser, for the VPN certificate.
 - `transcript`: everything shown in the terminal, from start to end (what was

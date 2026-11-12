@@ -165,3 +165,14 @@ def test_global_gitignore(repos, tmp_path):
     sh("echo token > .envrc", checkout)
     assert clone_sh("has-local-changes", checkout, clone, env=env).returncode != 0
     assert clone_sh("sync-checkout --dry-run", checkout, clone, env=env).stdout == ""
+
+
+def test_permissions(repos):
+    upstream, clone, checkout = repos
+    # As git: only whether a file is executable counts (not e.g. a umask of 002's group write)
+    sh("chmod g+w same.txt changed.txt", checkout)
+    assert clone_sh("sync-checkout --dry-run", checkout, clone).stdout == ""
+    sh("chmod +x script.sh", checkout)
+    assert clone_sh("sync-checkout --dry-run", checkout, clone).stdout.splitlines() == ["  script.sh"]
+    clone_sh("sync-checkout", checkout, clone)
+    assert os.access(clone / "script.sh", os.X_OK)

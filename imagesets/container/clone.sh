@@ -19,14 +19,15 @@ HOST_GITIGNORE=/host-gitignore
 
 # Makes the clone's files those of the checkout (its tracked files, and its
 # untracked files that git doesn't ignore), other than config/, keeping the
-# clone's .git. With --dry-run, lists what that would change instead.
+# clone's .git. Of their permissions, only whether they're executable counts,
+# as with git. With --dry-run, lists what that would change instead.
 function sync-checkout {
   local ignored
   ignored="$(mktemp)"
   # As rsync patterns, anchored, with their wildcard characters escaped
   git -C "${CHECKOUT}" ls-files -z --others --ignored --exclude-standard --directory |
     tr '\0' '\n' | sed -e 's/[][*?\\]/\\&/g' -e 's|^|/|' > "${ignored}"
-  rsync --recursive --links --perms --checksum --delete --itemize-changes --out-format='%i %n' \
+  rsync --recursive --links --executability --checksum --delete --itemize-changes --out-format='%i %n' \
     --exclude=/.git --exclude=/config/ --exclude-from="${ignored}" "$@" "${CHECKOUT}/" "${CLONE}/" |
     # Files and symlinks, rather than directories
     awk '$1 == "*deleting" && $2 !~ /\/$/ { print "  " substr($0, index($0, $2)) " (deleted)" }
