@@ -338,7 +338,7 @@ function check-local-changes {
     return
   fi
   # If upstream can't be reached, clone.sh checks
-  upstream="$(git ls-remote "${OFFICIAL_GIT_REPO}" refs/heads/main 2> /dev/null | cut -f1)"
+  upstream="$(git ls-remote "${OFFICIAL_GIT_REPO}" refs/heads/main 2> /dev/null | cut -f1)" || true
   [ -n "${upstream}" ] || return 0
   if ! git -C "${CHECKOUT}" merge-base --is-ancestor "${upstream}" HEAD 2> /dev/null; then
     echo "Your checkout doesn't have upstream main's latest commit (${upstream:0:8}), so IMAGESET_LOCAL_CHANGES=true would run its older files too: update it from upstream main (e.g. git pull ${OFFICIAL_GIT_REPO} main), and rerun." >&2
