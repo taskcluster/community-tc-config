@@ -138,10 +138,10 @@ fxci uses has no new image, e.g. because its build failed. The PR also sets the
 same bootstrap script URL, which fxci merges into the `workerTypeMetadata` of
 its worker pools.
 
-Each PR that the script opens is assigned to you. The fxci-config PR requests a
-review from `mozilla-releng/tceng` (an approval from it is enough), and the
-others from two of `IMAGESET_REVIEWERS` in `container/run.sh` (TCEng's
-reviewers), other than you.
+Each PR that the script opens is assigned to you. CODEOWNERS requests their
+reviews: from `mozilla-platform-ops/tceng` (worker-images), `mozilla-releng/tceng`
+or `relops` (fxci-config: an approval from either is enough), and
+`taskcluster/community-tc-admins` (community-tc-config).
 
 ## Environment variables
 
