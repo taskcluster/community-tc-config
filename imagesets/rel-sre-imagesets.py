@@ -297,21 +297,15 @@ def enable_auto_merge(pr):
     else:
         print(f"🤖 Enabled auto-merge on {pr['html_url']}")
 
-def assign_and_request_reviews(repo, number, team):
-    """Assigns PR `number` of `repo` to its author, and requests a review from
-    `team`, if you may (otherwise only warns)"""
-    url = f"{API_ROOT}/repos/{repo}"
-    pr = gh(f"{url}/pulls/{number}").json()
-    author = pr["user"]["login"]
+def assign_pr(repo, number):
+    """Assigns PR `number` of `repo` to its author, if you may (otherwise only
+    warns). CODEOWNERS requests its reviews."""
+    pr = gh(f"{API_ROOT}/repos/{repo}/pulls/{number}").json()
     try:
-        gh(f"{url}/issues/{number}/assignees", "POST", max_retries=3, json={"assignees": [author]})
+        gh(f"{API_ROOT}/repos/{repo}/issues/{number}/assignees", "POST", max_retries=3,
+           json={"assignees": [pr["user"]["login"]]})
     except requests.exceptions.RequestException as e:
-        print(f"⚠️  Couldn't assign {pr['html_url']} to {author}: {e}")
-    try:
-        gh(f"{url}/pulls/{number}/requested_reviewers", "POST", max_retries=3, json={"team_reviewers": [team]})
-        print(f"👀 Requested a review of {pr['html_url']} from {repo.split('/')[0]}/{team}")
-    except requests.exceptions.RequestException as e:
-        print(f"⚠️  Couldn't request a review of {pr['html_url']} from {repo.split('/')[0]}/{team}: {e}")
+        print(f"⚠️  Couldn't assign {pr['html_url']} to {pr['user']['login']}: {e}")
 
 def create_signed_commit(message, tree, parent):
     """Create a commit with the GitHub API, signed with the gpg key that
@@ -373,8 +367,7 @@ def open_bump_pr(version, changes, base_sha):
         "body": f"https://github.com/taskcluster/taskcluster/releases/tag/v{version}",
     }).json()
     print(f"📝 Opened {pr['html_url']}")
-    # CODEOWNERS requests it too, for config/tceng
-    assign_and_request_reviews(REPO, pr["number"], "tceng")
+    assign_pr(REPO, pr["number"])
     enable_auto_merge(pr)
     return pr
 
@@ -1140,8 +1133,7 @@ def open_fxci_pr():
                 url = created.stdout.strip().splitlines()[-1] if created.stdout.strip() else ""
                 print(f"📝 Opened {url}")
                 if url.startswith("https://"):
-                    # Its code owners are relops or tceng: tceng's approval is enough
-                    assign_and_request_reviews(FXCI_REPO, url.rsplit("/", 1)[-1], "tceng")
+                    assign_pr(FXCI_REPO, url.rsplit("/", 1)[-1])
                 enable_fxci_auto_merge(url, gh_cli)
                 return
             time.sleep(30)
