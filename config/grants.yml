@@ -171,7 +171,6 @@
     - github-team:MozillaReality/fxr-eng-tc
 
     # for a few project admins
-    - project-admin:fuzzing
     - project-admin:wpt
 
     # for bugbug, mozci, relman
