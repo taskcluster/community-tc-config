@@ -140,9 +140,8 @@ its worker pools.
 
 Each PR that the script opens is assigned to you. The worker-images and
 fxci-config PRs request a review from TCEng's team (`mozilla-platform-ops/tceng`
-and `mozilla-releng/tceng`: an approval from it is enough), and the
-community-tc-config PR from two of `IMAGESET_REVIEWERS` in `container/run.sh`,
-other than you.
+and `mozilla-releng/tceng`: an approval from it is enough). CODEOWNERS requests
+a review of the community-tc-config PR from `taskcluster/community-tc-admins`.
 
 ## Environment variables
 
