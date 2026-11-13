@@ -152,6 +152,11 @@ relman:
     - grant: queue:create-task:lowest:proj-relman/generic-worker-ubuntu-24-04
       to: repo:github.com/mozilla/code-review:pull-request-untrusted
 
+    - grant:
+        - queue:create-task:lowest:proj-relman/generic-worker-ubuntu-24-04
+        - queue:route:checks
+      to: github-team:taskcluster/releng
+
     # all hooks
     - grant:
         - queue:scheduler-id:-
