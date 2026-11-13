@@ -10,11 +10,6 @@
 # armDeployment:
 #   Configuration for ARM deployments, containing the following keys:
 #   - templateSpecId: The resource ID of the template spec version.
-#
-# IMPORTANT:
-# Please do not change the structure of this file. It is actively
-# used by the fuzzing team's decision task to manage worker pools.
-# If you need to remove a region, please contact fuzzing+taskcluster@mozilla.com.
 
 
 subnets:
