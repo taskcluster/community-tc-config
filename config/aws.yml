@@ -12,11 +12,6 @@
 # security_groups:
 #   <aws-region-name>:
 #     <network-name>: <aws-security-group-id>
-#
-# Please do not move or edit the structure of that file as
-# it's being actively used by the fuzzing team decision task
-# to manage worker pools
-# If you remove a region, please reach out to fuzzing+taskcluster@mozilla.com
 
 subnets:
   us-west-1:
