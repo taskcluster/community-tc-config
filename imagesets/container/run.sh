@@ -33,9 +33,10 @@ function retry {
   done
 }
 
-# Who reviews the pull requests that the run opens (two of them, other than the
-# author), where a team can't be requested, in order of preference
-export IMAGESET_REVIEWERS="petemoore matt-boris lotas"
+# Who reviews the community-tc-config pull requests that the run opens (two of
+# them, other than the author), in order of preference, as the taskcluster
+# organization has no TCEng team
+IMAGESET_REVIEWERS="petemoore matt-boris lotas"
 
 # Assigns pull request $1 to its author ($2), and requests reviews from two of
 # IMAGESET_REVIEWERS, if you may (otherwise only warns)

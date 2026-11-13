@@ -297,10 +297,9 @@ def enable_auto_merge(pr):
     else:
         print(f"🤖 Enabled auto-merge on {pr['html_url']}")
 
-def assign_and_request_reviews(repo, number, people=False, teams=()):
-    """Assigns PR `number` of `repo` to its author, and requests reviews from
-    `teams`, and with `people`, from two of IMAGESET_REVIEWERS other than the
-    author, if you may (otherwise only warns)"""
+def assign_and_request_reviews(repo, number, team):
+    """Assigns PR `number` of `repo` to its author, and requests a review from
+    `team`, if you may (otherwise only warns)"""
     url = f"{API_ROOT}/repos/{repo}"
     pr = gh(f"{url}/pulls/{number}").json()
     author = pr["user"]["login"]
@@ -308,17 +307,11 @@ def assign_and_request_reviews(repo, number, people=False, teams=()):
         gh(f"{url}/issues/{number}/assignees", "POST", max_retries=3, json={"assignees": [author]})
     except requests.exceptions.RequestException as e:
         print(f"⚠️  Couldn't assign {pr['html_url']} to {author}: {e}")
-    reviewers = [r for r in os.environ.get("IMAGESET_REVIEWERS", "").split() if r.lower() != author.lower()][:2] \
-        if people else []
-    names = ", ".join([*reviewers, *teams])
-    if not names:
-        return
     try:
-        gh(f"{url}/pulls/{number}/requested_reviewers", "POST", max_retries=3,
-           json={"reviewers": reviewers, "team_reviewers": list(teams)})
-        print(f"👀 Requested reviews of {pr['html_url']} from {names}")
+        gh(f"{url}/pulls/{number}/requested_reviewers", "POST", max_retries=3, json={"team_reviewers": [team]})
+        print(f"👀 Requested a review of {pr['html_url']} from {repo.split('/')[0]}/{team}")
     except requests.exceptions.RequestException as e:
-        print(f"⚠️  Couldn't request reviews of {pr['html_url']} from {names}: {e}")
+        print(f"⚠️  Couldn't request a review of {pr['html_url']} from {repo.split('/')[0]}/{team}: {e}")
 
 def create_signed_commit(message, tree, parent):
     """Create a commit with the GitHub API, signed with the gpg key that
@@ -380,8 +373,8 @@ def open_bump_pr(version, changes, base_sha):
         "body": f"https://github.com/taskcluster/taskcluster/releases/tag/v{version}",
     }).json()
     print(f"📝 Opened {pr['html_url']}")
-    # mozilla-platform-ops/tceng can't be requested, as it has no access of its own to the repository
-    assign_and_request_reviews(REPO, pr["number"], people=True)
+    # CODEOWNERS requests it too, for config/tceng
+    assign_and_request_reviews(REPO, pr["number"], "tceng")
     enable_auto_merge(pr)
     return pr
 
@@ -1148,7 +1141,7 @@ def open_fxci_pr():
                 print(f"📝 Opened {url}")
                 if url.startswith("https://"):
                     # Its code owners are relops or tceng: tceng's approval is enough
-                    assign_and_request_reviews(FXCI_REPO, url.rsplit("/", 1)[-1], teams=["tceng"])
+                    assign_and_request_reviews(FXCI_REPO, url.rsplit("/", 1)[-1], "tceng")
                 enable_fxci_auto_merge(url, gh_cli)
                 return
             time.sleep(30)
