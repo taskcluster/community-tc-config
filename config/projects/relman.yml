@@ -83,6 +83,13 @@ relman:
       cloud: gcp
       minCapacity: 0
       maxCapacity: 10
+    untrusted-docker:
+      owner: mcastelluccio@mozilla.com
+      emailOnError: false
+      imageset: generic-worker-ubuntu-24-04
+      cloud: gcp
+      minCapacity: 0
+      maxCapacity: 10
 
   secrets:
     bugzilla-dashboard-backend/deploy-production: true
@@ -156,6 +163,11 @@ relman:
         - queue:create-task:lowest:proj-relman/generic-worker-ubuntu-24-04
         - queue:route:checks
       to: github-team:taskcluster/releng
+
+    - grant:
+        - queue:create-task:lowest:proj-relman/untrusted-docker
+        - docker-worker:capability:privileged:proj-relman/untrusted-docker
+      to: repo:github.com/mozilla/code-review:pull-request-untrusted
 
     # all hooks
     - grant:
