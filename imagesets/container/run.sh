@@ -33,8 +33,27 @@ function retry {
   done
 }
 
-# Sets MAC_SSH_OPTIONS, for ssh to the macOS workers as administrator.
-# StrictHostKeyChecking, as SSH_ASKPASS would answer a host key prompt.
+# Who reviews the pull requests that the run opens (two of them, other than the
+# author), where a team can't be requested, in order of preference
+export IMAGESET_REVIEWERS="petemoore matt-boris lotas"
+
+# Assigns pull request $1 to its author ($2), and requests reviews from two of
+# IMAGESET_REVIEWERS, if you may (otherwise only warns)
+function pr-reviewers {
+  local url="${1}"
+  local author="${2}"
+  local reviewers
+  reviewers="$(printf '%s\n' ${IMAGESET_REVIEWERS} | grep -vixF "${author}" | head -n 2 | paste -sd , - || true)"
+  if ! gh pr edit "${url}" --add-assignee "${author}" > /dev/null 2>&1; then
+    echo "WARNING: couldn't assign ${url} to ${author}." >&2
+  fi
+  if gh pr edit "${url}" --add-reviewer "${reviewers}" > /dev/null 2>&1; then
+    echo "Requested reviews of it from ${reviewers//,/, }."
+  else
+    echo "WARNING: couldn't request reviews of ${url} from ${reviewers//,/, }." >&2
+  fi
+}
+
 # Errors that may well not happen again if the command is repeated (e.g. a
 # dropped connection)
 TRANSIENT_ERRORS='SSL|EOF|[Cc]onnection (aborted|reset|refused|timed out|closed)|RemoteDisconnected|[Tt]imed out|[Tt]imeout|Could not resolve|[Nn]ame or service not known|[Tt]emporary failure in name resolution|Max retries exceeded|TooManyRequests|[Tt]hrottl|InternalServerError|ServiceUnavailable|GatewayTimeout|BadGateway|HTTP 5[0-9][0-9]|error: 5[0-9][0-9]|remote end hung up|RPC failed|i/o timeout|TLS handshake|[Nn]o route to host|[Nn]etwork is unreachable'
@@ -64,6 +83,8 @@ function retry-transient {
   done
 }
 
+# Sets MAC_SSH_OPTIONS, for ssh to the macOS workers as administrator.
+# StrictHostKeyChecking, as SSH_ASKPASS would answer a host key prompt.
 function mac-ssh-options {
   MAC_SSH_OPTIONS=(
     -F /dev/null
@@ -562,6 +583,7 @@ function pull-request {
   local state
   local attempt
   local method
+  local created=false
   login="$(retry-transient gh api user --jq .login)"
   if [ "${COMMUNITY_TC_CONFIG_PUBLISH}" == fork ]; then
     owner="${login}"
@@ -589,6 +611,7 @@ function pull-request {
     if url="$(gh pr create --repo taskcluster/community-tc-config --base main --head "${owner}:${branch}" --title "${title}" \
       --body "$(printf 'Opened by `imageset.sh %s` (step: %s), which waits for it to be merged.\n\n%s\n' \
         "${IMAGESET_TARGET}" "${step}" "$(git log --format='* %s' FETCH_HEAD..HEAD)")")"; then
+      created=true
       break
     fi
     echo "Opening the pull request failed: checking whether it was opened anyway, before trying again..." >&2
@@ -599,6 +622,9 @@ function pull-request {
     return 1
   fi
   echo "Opened ${url} (you can't push to main)."
+  if "${created}"; then
+    pr-reviewers "${url}" "${login}"
+  fi
   # So that it is merged as soon as it is approved, if you may (with a merge
   # method that the repository allows)
   method="$(retry-transient gh api repos/taskcluster/community-tc-config \
