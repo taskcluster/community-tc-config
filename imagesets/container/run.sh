@@ -136,6 +136,7 @@ function read-mac-passwords {
 MAC_FILES=(
   update.sh:/var/root/update.sh:755
   configure.sh:/var/root/configure.sh:755
+  install-macos-updates.sh:/var/root/install-macos-updates.sh:755
   run-generic-worker.sh:/usr/local/bin/run-generic-worker.sh:755
   com.mozilla.genericworker.plist:/Library/LaunchDaemons/com.mozilla.genericworker.plist:644
   runner.yml:/etc/generic-worker/runner.yml:600
@@ -708,6 +709,39 @@ function update-mac {
   retry-mac mac-ssh "${host}" sudo -n lockf -t 900 /var/run/com.mozilla.genericworker.update.lock /var/root/update.sh
   # update.sh only says when something is wrong
   echo "${host%%.*}: updated the worker to the latest Taskcluster release ($(gh api repos/taskcluster/taskcluster/releases/latest --jq .tag_name 2> /dev/null || echo latest)), and restarted it"
+  if "${UPDATE_MACOS}"; then
+    install-macos-updates "${host}"
+  fi
+}
+
+# How long to wait for a macOS worker to install its updates and restart
+MACOS_UPDATE_TIMEOUT=$((3 * 60 * 60))
+
+# Installs a macOS worker's updates (see misc/mac/install-macos-updates.sh),
+# and waits for it to restart
+function install-macos-updates {
+  local host="${1}"
+  local boot_time updates now
+  boot_time="$(retry-mac mac-ssh "${host}" sysctl -n kern.boottime)"
+  # Not retried, as it may have started installing them
+  updates="$(mac-ssh "${host}" sudo -n /var/root/install-macos-updates.sh)"
+  if [ -z "${updates}" ]; then
+    echo "${host%%.*}: no macOS updates to install"
+    return
+  fi
+  echo "${host%%.*}: installing macOS updates, and restarting (this can take an hour):"
+  echo "${updates}" | sed 's/^/  /'
+  local deadline=$((SECONDS + MACOS_UPDATE_TIMEOUT))
+  while [ "${SECONDS}" -lt "${deadline}" ]; do
+    sleep 60
+    now="$(mac-ssh "${host}" sysctl -n kern.boottime 2> /dev/null)" || continue
+    if [ "${now}" != "${boot_time}" ]; then
+      echo "${host%%.*}: restarted, now on macOS $(retry-mac mac-ssh "${host}" sw_vers -productVersion)"
+      return
+    fi
+  done
+  echo "${host%%.*} hasn't restarted after $((MACOS_UPDATE_TIMEOUT / 60)) minutes: see /var/log/install-macos-updates.log on it" >&2
+  return 1
 }
 
 function build-images {
@@ -758,12 +792,14 @@ function set-defaults {
   # Open a PR to have fxci's worker pools use the new images too
   : ${UPDATE_FXCI_IMAGES:=true}
   : ${DEPLOY_MACS:=${prod_default}}
+  # Install macOS updates on the macOS workers (which restarts them)
+  : ${UPDATE_MACOS:=false}
 
   : ${UPDATE_OFFERINGS:=${prod_default}}
 
   # As they are run (as true or false)
   local setting
-  for setting in BUILD_IMAGES DEPLOY_IMAGES UPDATE_TASKCLUSTER_VERSION UPDATE_FXCI_IMAGES DEPLOY_MACS UPDATE_OFFERINGS IMAGESET_HOST_BROWSER; do
+  for setting in BUILD_IMAGES DEPLOY_IMAGES UPDATE_TASKCLUSTER_VERSION UPDATE_FXCI_IMAGES DEPLOY_MACS UPDATE_MACOS UPDATE_OFFERINGS IMAGESET_HOST_BROWSER; do
     case "${!setting-}" in
       true | false) ;;
       *) echo "${setting} must be true or false, rather than '${!setting-}'" >&2; exit 64 ;;

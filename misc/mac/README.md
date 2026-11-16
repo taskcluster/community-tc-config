@@ -3,7 +3,7 @@
 This directory contains the configuration files and scripts of the static
 Taskcluster macOS workers (`proj-taskcluster/gw-ci-macos` in firefox-ci). This
 repository is their only source: `imagesets/imageset.sh prod` (or `all`) installs them on
-each worker (see `MAC_FILES` in [imageset.sh](../../imagesets/imageset.sh))
+each worker (see `MAC_FILES` in [run.sh](../../imagesets/container/run.sh))
 before updating it, so any changes made directly on a worker are overwritten.
 Change them here instead.
 
@@ -50,25 +50,37 @@ Maintenance script for updating Taskcluster worker components:
 - Includes retry logic with exponential backoff for network operations
 
 ### [configure.sh](configure.sh)
-Settings, applied on every deployment: automatic updates (including of macOS)
-on, and Spotlight and the Apple Neural Engine daemon off.
+Settings, applied on every deployment: automatic updates off (other than of
+XProtect and other data files), no sleep, and Spotlight, the Apple Neural
+Engine daemon and the (unused) puppet agent off.
+
+### [install-macos-updates.sh](install-macos-updates.sh)
+Installs the recommended software updates, other than a new major version of
+macOS, and restarts the worker, when `imagesets/imageset.sh` is run with
+`UPDATE_MACOS=true`. As relops do for their CI workers, updates are installed
+deliberately rather than automatically, which macOS wouldn't do anyway on
+workers that restart after every task.
 
 ### [setup.sh](setup.sh)
 One-time setup of a new worker (see below).
 
 ## Setting up a new worker
 
-1. Relops install macOS and enroll it in their MDM, with an `administrator`
-   account with passwordless `sudo`, ssh, Screen Sharing, and Xcode (with its
-   licence accepted).
+1. Relops install macOS and enroll it in their MDM (SimpleMDM, whose munki
+   and agent install its apps), with an `administrator` account with
+   passwordless `sudo`, ssh, Screen Sharing, Xcode (with its licence
+   accepted), FileVault off, and System Integrity Protection off. Turning SIP
+   off needs someone at the Mac in the datacenter, so don't erase an existing
+   worker (which also removes its accounts and ssh access): clean it up in
+   place, or plan a reinstall with relops.
 2. Add its administrator password to the password store
    (`mdc1/generic-worker-ci/<host>`), and its host key to
    [mac_known_hosts](../../imagesets/mac_known_hosts)
    (`ssh-keyscan -t ed25519 <host>`).
-3. Install the "Skip Setup Assistant" profile of
-   [macos-configuration-profiles](https://github.com/mozilla-platform-ops/macos-configuration-profiles)
-   (in System Settings, as macOS requires), so that task users don't get
-   first-login wizards.
+3. Ask relops to add it to their SimpleMDM group `proj-taskcluster
+   gw-ci-macos`, which installs the "System Settings - Skip Setup Assistant -
+   All Screens" profile, so that task users don't get first-login wizards.
+   The group has no other profiles, apps or update settings.
 4. Run `sudo bash setup.sh` on it, with its `staticSecret` (from its worker
    pool's definition).
 5. Add it to `MAC_HOSTS` in [run.sh](../../imagesets/container/run.sh), and run
