@@ -149,7 +149,7 @@ reviewers), other than you.
 |---|---|---|
 | `UPDATE_OFFERINGS` | Update EC2 instance types, Azure VM sizes and GCE machine types, and `tc-admin apply` | `true` (`false` for `staging`) |
 | `DEPLOY_MACS` | Update the macOS workers | `true` (`false` for `staging`) |
-| `UPDATE_MACOS` | Also install the macOS workers' software updates (other than a new major version of macOS), which restarts them: macOS doesn't install them automatically | `false` |
+| `UPDATE_MACOS` | When updating the macOS workers, also install their software updates (other than a new major version of macOS), which restarts them, one at a time: macOS doesn't install them automatically | `true` |
 | `BUILD_IMAGES` | Have worker-images build new images, and commit them to `config/imagesets.yml` | `true` |
 | `UPDATE_TASKCLUSTER_VERSION` | Bump worker-images' TCEng configs to the latest Taskcluster release before building | `true` (`false` for `staging`) |
 | `MAX_RUN_ATTEMPTS` | Attempts per worker-images workflow run, including reruns of failed jobs (and of jobs cancelled for exceeding their time limit, but not of jobs cancelled by hand) | `5` |

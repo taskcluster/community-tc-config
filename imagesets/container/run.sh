@@ -792,8 +792,8 @@ function set-defaults {
   # Open a PR to have fxci's worker pools use the new images too
   : ${UPDATE_FXCI_IMAGES:=true}
   : ${DEPLOY_MACS:=${prod_default}}
-  # Install macOS updates on the macOS workers (which restarts them)
-  : ${UPDATE_MACOS:=false}
+  # Also install the macOS workers' updates (which restarts them)
+  : ${UPDATE_MACOS:=true}
 
   : ${UPDATE_OFFERINGS:=${prod_default}}
 

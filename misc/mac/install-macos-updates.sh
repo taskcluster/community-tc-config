@@ -2,7 +2,7 @@
 
 # This file is managed in https://github.com/taskcluster/community-tc-config
 # (misc/mac/install-macos-updates.sh), and run on the macOS workers by
-# imagesets/imageset.sh when UPDATE_MACOS=true.
+# imagesets/imageset.sh, unless UPDATE_MACOS=false.
 #
 # Installs the recommended software updates, other than upgrades to a newer
 # major version of macOS, in the background: it stops the worker, and

@@ -56,8 +56,8 @@ Engine daemon and the (unused) puppet agent off.
 
 ### [install-macos-updates.sh](install-macos-updates.sh)
 Installs the recommended software updates, other than a new major version of
-macOS, and restarts the worker, when `imagesets/imageset.sh` is run with
-`UPDATE_MACOS=true`. As relops do for their CI workers, updates are installed
+macOS, and restarts the worker, whenever `imagesets/imageset.sh` updates the
+workers (unless it is run with `UPDATE_MACOS=false`). As relops do for their CI workers, updates are installed
 deliberately rather than automatically, which macOS wouldn't do anyway on
 workers that restart after every task.
 
