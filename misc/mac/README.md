@@ -61,7 +61,7 @@ A worker's setup has three parts:
 - The puppet agent off.
 - Spotlight indexing off, as in generic-worker's docs (`mdutil` and
   `.metadata_never_index`), and the Apple Neural Engine daemon (`aned`) off.
-- The firewall on.
+- The firewall on, and `/var/log/genericworker` readable.
 - Checks what relops provide (above), and warns about anything missing.
 
 ### [authorized_keys](authorized_keys)

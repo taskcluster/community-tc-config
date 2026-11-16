@@ -35,6 +35,8 @@ launchctl disable system/com.apple.aned
 
 /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on > /dev/null
 
+chmod 755 /var/log/genericworker
+
 # What relops set up (see README.md), which can't be done from here
 function check {
   local description="${1}"
