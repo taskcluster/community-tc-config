@@ -29,5 +29,23 @@ rm -f /var/log/puppetlabs/puppet/puppet.log
 launchctl load -w /System/Library/LaunchDaemons/com.apple.metadata.mds.plist 2> /dev/null || true
 mdutil -a -i off > /dev/null || echo "WARNING: couldn't turn off Spotlight indexing" >&2
 touch /System/Volumes/Data/.metadata_never_index
+chown root:wheel /System/Volumes/Data/.metadata_never_index
 
 launchctl disable system/com.apple.aned
+
+/usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on > /dev/null
+
+# What relops set up (see README.md), which can't be done from here
+function check {
+  local description="${1}"
+  shift
+  "$@" > /dev/null 2>&1 || echo "WARNING: ${description} (see misc/mac/README.md)" >&2
+}
+check "System Integrity Protection isn't off" sh -c 'csrutil status | grep -q disabled'
+check "FileVault isn't off" sh -c 'fdesetup status | grep -q "FileVault is Off"'
+check "ssh (Remote Login) isn't on" sh -c 'systemsetup -getremotelogin | grep -q On'
+check "Screen Sharing isn't on" sh -c 'launchctl print-disabled system | grep -q "\"com.apple.screensharing\" => enabled"'
+check "the admin group doesn't have passwordless sudo" grep -q '^%admin[[:space:]].*NOPASSWD: ALL' /etc/sudoers
+check "Xcode's licence isn't accepted" xcodebuild -license check
+check "the Mac isn't enrolled in relops' MDM" sh -c 'profiles status -type enrollment | grep -q "MDM enrollment: Yes"'
+check "the Skip Setup Assistant profile isn't installed" sh -c 'profiles show -type configuration | grep -q "Skip Setup Assistant"'

@@ -1,0 +1,16 @@
+# This file is managed in https://github.com/taskcluster/community-tc-config
+# (misc/mac/authorized_keys), and installed on the macOS workers as
+# /Users/administrator/.ssh/authorized_keys by imagesets/imageset.sh on every
+# deployment. Don't change it on a worker, as the next deployment will
+# overwrite it: change it in community-tc-config instead.
+#
+# imagesets/imageset.sh logs in with the administrator password, not a key.
+
+# Relops, for support
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDKQ5aTrL2DDI4LkvsXoR/sI94fPPExjRjLtt1QttaMUr6KETpBn0V43GqdKSzLNuv0iSbNYSCDwfe7TrNVxZ4oo7LpF6jAa0QOQVT1xCKNFITqkK/uR2ECJFVbZ/GP8oN+HrESvaRl0oglR/eGzxQcOiiZgAXUSasIe0FamVGPu46T4ski6A3bUTRG9Pjmy4m0KVjarIcphtybvyNpiicwDMicsJyDNbQw2tgZJNZgyewx7Y5OYSRJRTgHUxqrjUu3ZprmUleRMAP/Xez37Sc1GyE7m+hh2pK7lQSgIUd7bSwZW1iM8fr0KJ8CpFRi9jCFbI/WS6u3cF2ygeMQlX0/SGivn+AgHo5LoXzL2p7ib5zRJn7OuwFuCavuCPkJe1kISdQU+Xmm9vFCzXpiCx6dApuUcZdTGU+dnYzij9EqppHUDKonFV+Rq+Eqd43J8FMyIVIU6E/mEQh96dsKXADZhaji6i5T+E2v5Rd9AvGDcfYreVj2IzUF78CP9M5bhb7CZ/Nz+3GKc89mqqNBQrTFPLWA4NoECrlTGNiy83SZ8XcINiXdGFMEP8JBuKiPZAezHqWJgYdHa5p6zvzJDU8mbdkJ1kbpdy0WC/YGB9qkSaxIxk3s1jg1Rlm96jeP79OyGLPzO4CwOhFqQbOpcvmgwz+gG6oZwae0gX30DQoBxw== Relops rsa Key
+
+# Pete Moore (TCEng)
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC7HW/f5pQPsbz5k972sPAkDHBBi+bokaLIJbVe1zJRT pete-mozilla
+
+# Matt Boris (TCEng)
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEN/3cGL+zNN5bb2pfykIQ/JJFDHdRwN2OuGkQZ/Bso4 mboris

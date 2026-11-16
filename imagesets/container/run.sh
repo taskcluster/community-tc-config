@@ -131,7 +131,7 @@ function read-mac-passwords {
 }
 
 # Files in misc/mac that are installed on the macOS workers, before updating
-# them, as <file>:<path on the worker>:<mode>. They are only maintained in this
+# them, as <file>:<path on the worker>:<mode>[:<owner>] (root by default). They are only maintained in this
 # repository, so that the workers don't drift from it.
 MAC_FILES=(
   update.sh:/var/root/update.sh:755
@@ -140,6 +140,7 @@ MAC_FILES=(
   run-generic-worker.sh:/usr/local/bin/run-generic-worker.sh:755
   com.mozilla.genericworker.plist:/Library/LaunchDaemons/com.mozilla.genericworker.plist:644
   runner.yml:/etc/generic-worker/runner.yml:600
+  authorized_keys:/Users/administrator/.ssh/authorized_keys:600:administrator
 )
 
 # Install MAC_FILES on a macOS worker, with a script that runs on the worker as
@@ -151,10 +152,10 @@ MAC_FILES=(
 # into place, so that a running script isn't modified.
 function install-mac-files {
   local host="${1}"
-  local entry file dest mode
+  local entry file dest mode owner
   # Before the pipeline, where a missing file wouldn't stop it
   for entry in "${MAC_FILES[@]}"; do
-    IFS=: read -r file dest mode <<< "${entry}"
+    IFS=: read -r file dest mode owner <<< "${entry}"
     if ! [ -f "${IMAGESETS_DIR}/../misc/mac/${file}" ]; then
       echo "misc/mac/${file} is missing" >&2
       return 1
@@ -197,11 +198,18 @@ EOF
     echo "export WORKER_ID='${host%%.*}'"
     echo "export MISC_MAC_COMMIT='${MISC_MAC_COMMIT}'"
     for entry in "${MAC_FILES[@]}"; do
-      IFS=: read -r file dest mode <<< "${entry}"
+      IFS=: read -r file dest mode owner <<< "${entry}"
+      if [ -n "${owner}" ]; then
+        echo "install -d -o ${owner} -g staff -m 700 '$(dirname "${dest}")'"
+      fi
       echo "base64 -d << 'END_OF_BASE64' | replace_placeholders > '${dest}.new'"
       base64 < "${IMAGESETS_DIR}/../misc/mac/${file}"
       echo 'END_OF_BASE64'
-      echo "chown root:wheel '${dest}.new'"
+      if [ -n "${owner}" ]; then
+        echo "chown ${owner}:staff '${dest}.new'"
+      else
+        echo "chown root:wheel '${dest}.new'"
+      fi
       echo "chmod ${mode} '${dest}.new'"
       echo "if cmp -s '${dest}.new' '${dest}'; then rm '${dest}.new'; echo '${host%%.*}: ${dest} is up to date'; else mv -f '${dest}.new' '${dest}'; echo '${host%%.*}: updated ${dest}'; fi"
     done
