@@ -346,8 +346,7 @@ fuzzing:
           - secrets:get:project/fuzzing/pernosco-secret
         routes:
           - notify.email.jkratzer@mozilla.com.on-failed
-      schedule:
-        - "0 */8 * * 1-5"
+      # scheduled on Firefox CI
     bugmon-confirm:
       description: Hook for triggering bugmon forced confirmation tasks
       owner: jkratzer@mozilla.com
@@ -401,8 +400,7 @@ fuzzing:
           - secrets:get:project/fuzzing/pernosco-secret
         routes:
           - notify.email.jkratzer@mozilla.com.on-failed
-      schedule:
-        - "0 8 * * 6"
+      # scheduled on Firefox CI
     js-tests-distiller:
       description: Hook for distilling JS tests for fuzzing
       owner: fuzzing@mozilla.com
