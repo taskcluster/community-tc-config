@@ -33,24 +33,11 @@ function retry {
   done
 }
 
-# Who reviews the pull requests that the run opens (two of them, other than the
-# author), where a team can't be requested, in order of preference
-export IMAGESET_REVIEWERS="petemoore matt-boris lotas"
-
-# Assigns pull request $1 to its author ($2), and requests reviews from two of
-# IMAGESET_REVIEWERS, if you may (otherwise only warns)
-function pr-reviewers {
-  local url="${1}"
-  local author="${2}"
-  local reviewers
-  reviewers="$(printf '%s\n' ${IMAGESET_REVIEWERS} | grep -vixF "${author}" | head -n 2 | paste -sd , - || true)"
-  if ! gh pr edit "${url}" --add-assignee "${author}" > /dev/null 2>&1; then
-    echo "WARNING: couldn't assign ${url} to ${author}." >&2
-  fi
-  if gh pr edit "${url}" --add-reviewer "${reviewers}" > /dev/null 2>&1; then
-    echo "Requested reviews of it from ${reviewers//,/, }."
-  else
-    echo "WARNING: couldn't request reviews of ${url} from ${reviewers//,/, }." >&2
+# Assigns pull request $1 to its author ($2), if you may (otherwise only warns).
+# CODEOWNERS requests a review from taskcluster/community-tc-admins.
+function assign-pr {
+  if ! gh pr edit "${1}" --add-assignee "${2}" > /dev/null 2>&1; then
+    echo "WARNING: couldn't assign ${1} to ${2}." >&2
   fi
 }
 
@@ -623,7 +610,7 @@ function pull-request {
   fi
   echo "Opened ${url} (you can't push to main)."
   if "${created}"; then
-    pr-reviewers "${url}" "${login}"
+    assign-pr "${url}" "${login}"
   fi
   # So that it is merged as soon as it is approved, if you may (with a merge
   # method that the repository allows)
