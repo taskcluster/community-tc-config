@@ -118,14 +118,16 @@ function read-mac-passwords {
 }
 
 # Files in misc/mac that are installed on the macOS workers, before updating
-# them, as <file>:<path on the worker>:<mode>. They are only maintained in this
+# them, as <file>:<path on the worker>:<mode>[:<owner>] (root by default). They are only maintained in this
 # repository, so that the workers don't drift from it.
 MAC_FILES=(
   update.sh:/var/root/update.sh:755
   configure.sh:/var/root/configure.sh:755
+  install-macos-updates.sh:/var/root/install-macos-updates.sh:755
   run-generic-worker.sh:/usr/local/bin/run-generic-worker.sh:755
   com.mozilla.genericworker.plist:/Library/LaunchDaemons/com.mozilla.genericworker.plist:644
   runner.yml:/etc/generic-worker/runner.yml:600
+  authorized_keys:/Users/administrator/.ssh/authorized_keys:600:administrator
 )
 
 # Install MAC_FILES on a macOS worker, with a script that runs on the worker as
@@ -137,10 +139,10 @@ MAC_FILES=(
 # into place, so that a running script isn't modified.
 function install-mac-files {
   local host="${1}"
-  local entry file dest mode
+  local entry file dest mode owner
   # Before the pipeline, where a missing file wouldn't stop it
   for entry in "${MAC_FILES[@]}"; do
-    IFS=: read -r file dest mode <<< "${entry}"
+    IFS=: read -r file dest mode owner <<< "${entry}"
     if ! [ -f "${IMAGESETS_DIR}/../misc/mac/${file}" ]; then
       echo "misc/mac/${file} is missing" >&2
       return 1
@@ -183,11 +185,18 @@ EOF
     echo "export WORKER_ID='${host%%.*}'"
     echo "export MISC_MAC_COMMIT='${MISC_MAC_COMMIT}'"
     for entry in "${MAC_FILES[@]}"; do
-      IFS=: read -r file dest mode <<< "${entry}"
+      IFS=: read -r file dest mode owner <<< "${entry}"
+      if [ -n "${owner}" ]; then
+        echo "install -d -o ${owner} -g staff -m 700 '$(dirname "${dest}")'"
+      fi
       echo "base64 -d << 'END_OF_BASE64' | replace_placeholders > '${dest}.new'"
       base64 < "${IMAGESETS_DIR}/../misc/mac/${file}"
       echo 'END_OF_BASE64'
-      echo "chown root:wheel '${dest}.new'"
+      if [ -n "${owner}" ]; then
+        echo "chown ${owner}:staff '${dest}.new'"
+      else
+        echo "chown root:wheel '${dest}.new'"
+      fi
       echo "chmod ${mode} '${dest}.new'"
       echo "if cmp -s '${dest}.new' '${dest}'; then rm '${dest}.new'; echo '${host%%.*}: ${dest} is up to date'; else mv -f '${dest}.new' '${dest}'; echo '${host%%.*}: updated ${dest}'; fi"
     done
@@ -695,6 +704,39 @@ function update-mac {
   retry-mac mac-ssh "${host}" sudo -n lockf -t 900 /var/run/com.mozilla.genericworker.update.lock /var/root/update.sh
   # update.sh only says when something is wrong
   echo "${host%%.*}: updated the worker to the latest Taskcluster release ($(gh api repos/taskcluster/taskcluster/releases/latest --jq .tag_name 2> /dev/null || echo latest)), and restarted it"
+  if "${UPDATE_MACOS}"; then
+    install-macos-updates "${host}"
+  fi
+}
+
+# How long to wait for a macOS worker to install its updates and restart
+MACOS_UPDATE_TIMEOUT=$((3 * 60 * 60))
+
+# Installs a macOS worker's updates (see misc/mac/install-macos-updates.sh),
+# and waits for it to restart
+function install-macos-updates {
+  local host="${1}"
+  local boot_time updates now
+  boot_time="$(retry-mac mac-ssh "${host}" sysctl -n kern.boottime)"
+  # Not retried, as it may have started installing them
+  updates="$(mac-ssh "${host}" sudo -n /var/root/install-macos-updates.sh)"
+  if [ -z "${updates}" ]; then
+    echo "${host%%.*}: no macOS updates to install"
+    return
+  fi
+  echo "${host%%.*}: installing macOS updates, and restarting (this can take an hour):"
+  echo "${updates}" | sed 's/^/  /'
+  local deadline=$((SECONDS + MACOS_UPDATE_TIMEOUT))
+  while [ "${SECONDS}" -lt "${deadline}" ]; do
+    sleep 60
+    now="$(mac-ssh "${host}" sysctl -n kern.boottime 2> /dev/null)" || continue
+    if [ "${now}" != "${boot_time}" ]; then
+      echo "${host%%.*}: restarted, now on macOS $(retry-mac mac-ssh "${host}" sw_vers -productVersion)"
+      return
+    fi
+  done
+  echo "${host%%.*} hasn't restarted after $((MACOS_UPDATE_TIMEOUT / 60)) minutes: see /var/log/install-macos-updates.log on it" >&2
+  return 1
 }
 
 function build-images {
@@ -745,12 +787,14 @@ function set-defaults {
   # Open a PR to have fxci's worker pools use the new images too
   : ${UPDATE_FXCI_IMAGES:=true}
   : ${DEPLOY_MACS:=${prod_default}}
+  # Also install the macOS workers' updates (which restarts them)
+  : ${UPDATE_MACOS:=true}
 
   : ${UPDATE_OFFERINGS:=${prod_default}}
 
   # As they are run (as true or false)
   local setting
-  for setting in BUILD_IMAGES DEPLOY_IMAGES UPDATE_TASKCLUSTER_VERSION UPDATE_FXCI_IMAGES DEPLOY_MACS UPDATE_OFFERINGS IMAGESET_HOST_BROWSER; do
+  for setting in BUILD_IMAGES DEPLOY_IMAGES UPDATE_TASKCLUSTER_VERSION UPDATE_FXCI_IMAGES DEPLOY_MACS UPDATE_MACOS UPDATE_OFFERINGS IMAGESET_HOST_BROWSER; do
     case "${!setting-}" in
       true | false) ;;
       *) echo "${setting} must be true or false, rather than '${!setting-}'" >&2; exit 64 ;;

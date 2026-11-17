@@ -26,7 +26,7 @@ OFFICIAL_GIT_REPO='https://github.com/taskcluster/community-tc-config'
 # Under your home directory, as Docker (e.g. Colima) may only be able to mount that
 STATE_DIR="${HOME}/.cache/community-tc-imagesets"
 # The settings that are passed to the container (see README.md)
-SETTINGS=(BUILD_IMAGES DEPLOY_IMAGES DEPLOY_MACS UPDATE_FXCI_IMAGES UPDATE_OFFERINGS UPDATE_TASKCLUSTER_VERSION
+SETTINGS=(BUILD_IMAGES DEPLOY_IMAGES DEPLOY_MACS UPDATE_MACOS UPDATE_FXCI_IMAGES UPDATE_OFFERINGS UPDATE_TASKCLUSTER_VERSION
   MAX_RUN_ATTEMPTS IMAGESET_LDAP_USERNAME IMAGESET_PASSWORD_STORE_URL)
 
 function can-open-browser {
@@ -314,7 +314,7 @@ function cleanup {
 # the slow image builds
 function check-settings {
   local setting
-  for setting in BUILD_IMAGES DEPLOY_IMAGES UPDATE_TASKCLUSTER_VERSION UPDATE_FXCI_IMAGES DEPLOY_MACS UPDATE_OFFERINGS \
+  for setting in BUILD_IMAGES DEPLOY_IMAGES UPDATE_TASKCLUSTER_VERSION UPDATE_FXCI_IMAGES DEPLOY_MACS UPDATE_MACOS UPDATE_OFFERINGS \
     IMAGESET_LOCAL_CHANGES IMAGESET_RESUME IMAGESET_KEEP_DIAGNOSTICS; do
     case "${!setting-}" in
       true | false | '') ;;
