@@ -51,12 +51,15 @@ A worker's setup has three parts:
 
 ## What every deployment does
 
-`imageset.sh` installs these files, runs `configure.sh`, then `update.sh`, then
-`install-macos-updates.sh`, on one worker at a time.
+`imageset.sh` installs these files, runs `configure.sh`, drains the worker
+(`worker.sh`), runs `update.sh`, then `install-macos-updates.sh`, on one worker
+at a time.
 
 ### [configure.sh](configure.sh)
 - Automatic updates off, other than of XProtect and other data files (see
   `install-macos-updates.sh`).
+- Automatic login back on, if an interrupted `install-macos-updates.sh` left
+  it off.
 - No sleep, and restart after a power failure (`pmset`).
 - The puppet agent off.
 - Spotlight indexing off, as in generic-worker's docs (`mdutil` and
@@ -69,7 +72,8 @@ The ssh keys of the `administrator` account: relops', for support, and TCEng's.
 `imageset.sh` itself logs in with the password.
 
 ### [update.sh](update.sh)
-Updates the worker to the latest Taskcluster release:
+Updates the worker to the latest Taskcluster release. `imageset.sh` first
+drains the worker (see `worker.sh`), so that stopping it doesn't stop a task.
 - Downloads `generic-worker`, `livelog`, `start-worker` and
   `taskcluster-proxy`, before stopping the worker, so that it keeps running if
   a download fails.
@@ -80,13 +84,34 @@ Updates the worker to the latest Taskcluster release:
   next time it is run.
 - Restarts the worker.
 
+### [worker.sh](worker.sh)
+- `drain`: asks generic-worker to stop claiming tasks, and to exit once its
+  task (if any) has finished (SIGINT), without aborting the task or restarting
+  the Mac. `imageset.sh` waits up to 4 hours for it to exit, and then fails
+  for that worker, which no longer claims tasks.
+- `status`: whether the worker is stopped, running, or ready (running, with
+  the task user's launch agent, so it can run tasks).
+
 ### [install-macos-updates.sh](install-macos-updates.sh)
 Installs the recommended software updates (macOS, Command Line Tools, Safari),
-other than a new major version of macOS, and restarts the worker; `imageset.sh`
-waits for it to restart. As relops do for their CI workers, updates are
-installed deliberately rather than automatically: macOS wouldn't install them
-by itself anyway, as the workers restart after every task. Skip it with
-`UPDATE_MACOS=false`.
+other than a new major version of macOS. With no updates to install, it changes
+nothing. Otherwise `imageset.sh`, one worker at a time:
+- Asks generic-worker to stop claiming tasks and to exit once its task has
+  finished (SIGINT), and waits for it to exit.
+- Turns automatic login off and logs out the task user. Otherwise, after an
+  update, macOS logs back in the user who was logged in when it was installed,
+  once, rather than generic-worker's next task user, and the worker gives up
+  waiting for that user's launch agent.
+- Installs the updates, with the administrator's password on stdin (on Apple
+  silicon, installing a macOS update needs a volume owner's password), and
+  waits for the worker to restart. If it isn't on the new version of macOS,
+  it tries again, up to 3 times.
+- Turns automatic login back on, restarts the worker, and waits for its worker
+  to be ready for tasks, whether or not the updates were installed.
+
+As relops do for their CI workers, updates are installed deliberately rather
+than automatically: macOS wouldn't install them by itself anyway, as the
+workers restart after every task. Skip it with `UPDATE_MACOS=false`.
 
 ### [com.mozilla.genericworker.plist](com.mozilla.genericworker.plist)
 The LaunchDaemon that runs `run-generic-worker.sh` as root at boot, logging to
