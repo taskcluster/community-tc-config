@@ -441,8 +441,7 @@ fuzzing:
         routes:
           - index.project.fuzzing.js-tests-distiller.latest
           - notify.email.fuzzing@mozilla.com.on-failed
-      schedule:
-        - "0 0 * * *"
+      # scheduled on Firefox CI
     coverage-revision:
       description: Hook for pinning m-c revision for periodic fuzzing coverage tasks
       owner: fuzzing@mozilla.com
@@ -483,8 +482,7 @@ fuzzing:
         routes:
           - index.project.fuzzing.coverage-revision.latest
           - notify.email.fuzzing@mozilla.com.on-failed
-      schedule:
-        - "0 0 * * 1"
+      # scheduled on Firefox CI
     nss-corpus-update:
       description: Hook for updating the NSS fuzzing corpus
       owner: mdauer@mozilla.com
