@@ -1019,7 +1019,9 @@ def fxci_pr_text(changes, scripts):
             match = TASKCLUSTER_VERSION_RE.search(config)
             if match:
                 versions.add(match.group(3))
-    title = "Update TCEng worker images" + (f" to Taskcluster {', '.join(sorted(versions))}" if versions else "")
+    kinds = {"staging" if image.endswith("-staging") else "production" for image in images}
+    title = (f"Update {' and '.join(sorted(kinds, reverse=True))} TCEng worker images"
+             + (f" to Taskcluster {', '.join(sorted(versions))}" if versions else ""))
 
     def linked(name):
         return f"[`{name}`]({jobs[name]})" if name in jobs else f"`{name}`"

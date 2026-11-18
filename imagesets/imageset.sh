@@ -214,7 +214,13 @@ function build-image {
     docker tag "${same}" "${tag}"
     return
   fi
-  echo "Building the container image, with this week's tools (this takes a few minutes, once a week)..."
+  local reason="its Dockerfile changed"
+  if [ -z "${built}" ]; then
+    reason="none built yet"
+  elif [ "${built#* }" == "${hash}" ]; then
+    reason="new week's tools"
+  fi
+  echo "Building the container image (${reason}; this takes a few minutes)..."
   local options=()
   # Only BuildKit (buildx) has it: e.g. Ubuntu's docker.io doesn't, and its
   # legacy builder's output is plain anyway
