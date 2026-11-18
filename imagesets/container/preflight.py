@@ -99,7 +99,7 @@ GPG_FDS = _open_fds(int(os.environ["IMAGESET_GPG_PASSPHRASE_FD"])) if os.environ
 # Errors of a command that may well not happen again if it is repeated (e.g. a
 # dropped connection)
 TRANSIENT_RE = re.compile(
-    r"SSL|EOF|Connection (aborted|reset|refused|timed out|closed)|RemoteDisconnected|timed out|Timeout|"
+    r"SSL|\bEOF\b|Connection (aborted|reset|refused|timed out|closed)|RemoteDisconnected|timed out|Timeout|"
     r"Could not resolve|Name or service not known|Temporary failure in name resolution|Max retries exceeded|"
     r"TooManyRequests|Throttl|InternalServerError|ServiceUnavailable|GatewayTimeout|BadGateway|"
     r"HTTP 5\d\d|error: 5\d\d|remote end hung up|RPC failed|i/o timeout|TLS handshake|No route to host|"
