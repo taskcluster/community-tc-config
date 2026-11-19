@@ -124,6 +124,7 @@ MAC_FILES=(
   update.sh:/var/root/update.sh:755
   configure.sh:/var/root/configure.sh:755
   install-macos-updates.sh:/var/root/install-macos-updates.sh:755
+  worker.sh:/var/root/worker.sh:755
   run-generic-worker.sh:/usr/local/bin/run-generic-worker.sh:755
   com.mozilla.genericworker.plist:/Library/LaunchDaemons/com.mozilla.genericworker.plist:644
   runner.yml:/etc/generic-worker/runner.yml:600
@@ -698,45 +699,173 @@ function update-offerings {
 
 function update-mac {
   local host="${1}"
+  local updates="" status=0 boot_time
   retry-mac install-mac-files "${host}"
   retry-mac mac-ssh "${host}" sudo -n /var/root/configure.sh
-  # The lock stops a retry from running alongside an interrupted run
-  retry-mac mac-ssh "${host}" sudo -n lockf -t 900 /var/run/com.mozilla.genericworker.update.lock /var/root/update.sh
-  # update.sh only says when something is wrong
-  echo "${host%%.*}: updated the worker to the latest Taskcluster release ($(gh api repos/taskcluster/taskcluster/releases/latest --jq .tag_name 2> /dev/null || echo latest)), and restarted it"
   if "${UPDATE_MACOS}"; then
-    install-macos-updates "${host}"
+    if ! updates="$(retry-mac macos-updates-step "${host}" list)"; then
+      echo "${host%%.*}: couldn't list its macOS updates (see above)" >&2
+      return 1
+    fi
+    if [ -z "${updates}" ]; then
+      echo "${host%%.*}: no macOS updates to install"
+    fi
   fi
+  # So that stopping the worker doesn't stop a task
+  drain-macos-worker "${host}" || return 1
+  if [ -n "${updates}" ]; then
+    install-macos-updates "${host}" "${updates}" || status=$?
+  fi
+  boot_time="$(retry-mac mac-ssh "${host}" sysctl -n kern.boottime)"
+  # Updates the worker, and starts it: generic-worker creates its next task
+  # user, sets up automatic login for it, and restarts the Mac. The lock stops a
+  # retry from running alongside an interrupted run.
+  retry-mac mac-ssh "${host}" sudo -n lockf -t 900 /var/run/com.mozilla.genericworker.update.lock /var/root/update.sh || return 1
+  # update.sh only says when something is wrong
+  echo "${host%%.*}: updated the worker to the latest Taskcluster release ($(gh api repos/taskcluster/taskcluster/releases/latest --jq .tag_name 2> /dev/null || echo latest)), and started it"
+  wait-for-macos-worker "${host}" "${boot_time}" || return 1
+  return "${status}"
 }
 
+# How long to wait for a macOS worker to finish its task, before stopping it
+MACOS_DRAIN_TIMEOUT=$((4 * 60 * 60))
 # How long to wait for a macOS worker to install its updates and restart
 MACOS_UPDATE_TIMEOUT=$((3 * 60 * 60))
+# How many times to try to install a macOS worker's updates: an attempt can
+# fail (e.g. "Failed to queue update and restart"), and then works after the
+# restart
+MACOS_UPDATE_ATTEMPTS=3
+# How long to wait for a macOS worker to restart, once update.sh has started it
+MACOS_RESTART_TIMEOUT=$((15 * 60))
+# How long to wait, after that, for its next task user to log in and for its
+# worker to be ready (the MDM check-in at each new user's first login takes
+# minutes: see community-tc-config#1043)
+MACOS_WORKER_READY_TIMEOUT=$((30 * 60))
 
-# Installs a macOS worker's updates (see misc/mac/install-macos-updates.sh),
-# and waits for it to restart
-function install-macos-updates {
+# Runs a step of misc/mac/install-macos-updates.sh on a macOS worker
+function macos-updates-step {
   local host="${1}"
-  local boot_time updates now
-  boot_time="$(retry-mac mac-ssh "${host}" sysctl -n kern.boottime)"
-  # Not retried, as it may have started installing them
-  updates="$(mac-ssh "${host}" sudo -n /var/root/install-macos-updates.sh)"
-  if [ -z "${updates}" ]; then
-    echo "${host%%.*}: no macOS updates to install"
-    return
-  fi
-  echo "${host%%.*}: installing macOS updates, and restarting (this can take an hour):"
-  echo "${updates}" | sed 's/^/  /'
-  local deadline=$((SECONDS + MACOS_UPDATE_TIMEOUT))
-  while [ "${SECONDS}" -lt "${deadline}" ]; do
+  shift
+  mac-ssh "${host}" sudo -n /var/root/install-macos-updates.sh "$@"
+}
+
+# Prints a macOS worker's state (see misc/mac/worker.sh)
+function macos-worker-status {
+  mac-ssh "${1}" sudo -n /var/root/worker.sh status 2> /dev/null
+}
+
+# Asks a macOS worker's generic-worker to stop claiming tasks, and waits for it
+# to exit once its task (if any) has finished
+function drain-macos-worker {
+  local host="${1}"
+  local deadline=$((SECONDS + MACOS_DRAIN_TIMEOUT))
+  echo "${host%%.*}: waiting for its worker to finish its task, if it has one, and stop"
+  retry-mac mac-ssh "${host}" sudo -n /var/root/worker.sh drain
+  until [ "$(macos-worker-status "${host}")" == stopped ]; do
+    if [ "${SECONDS}" -ge "${deadline}" ]; then
+      echo "${host%%.*}'s worker hasn't stopped after $((MACOS_DRAIN_TIMEOUT / 60)) minutes. It doesn't claim tasks any more: restart it, or the Mac, once its task has finished" >&2
+      return 1
+    fi
+    sleep 10
+  done
+}
+
+# Waits for a macOS worker to restart (for its boot time to change)
+function wait-for-mac-restart {
+  local host="${1}"
+  local boot_time="${2}"
+  local timeout="${3}"
+  local deadline=$((SECONDS + timeout))
+  local now="${boot_time}"
+  local unreachable=""
+  while [ "${now}" == "${boot_time}" ]; do
+    if [ "${SECONDS}" -ge "${deadline}" ]; then
+      if [ -n "${unreachable}" ]; then
+        echo "${host%%.*} couldn't be reached to see whether it has restarted, after $((timeout / 60)) minutes: ${unreachable}" >&2
+      else
+        echo "${host%%.*} hasn't restarted after $((timeout / 60)) minutes" >&2
+      fi
+      return 1
+    fi
     sleep 60
-    now="$(mac-ssh "${host}" sysctl -n kern.boottime 2> /dev/null)" || continue
-    if [ "${now}" != "${boot_time}" ]; then
-      echo "${host%%.*}: restarted, now on macOS $(retry-mac mac-ssh "${host}" sw_vers -productVersion)"
-      return
+    if now="$(mac-ssh "${host}" sysctl -n kern.boottime 2> /dev/null)"; then
+      unreachable=""
+    else
+      unreachable="$(mac-ssh "${host}" true 2>&1 | tail -1)" || true
+      now="${boot_time}"
     fi
   done
-  echo "${host%%.*} hasn't restarted after $((MACOS_UPDATE_TIMEOUT / 60)) minutes: see /var/log/install-macos-updates.log on it" >&2
+}
+
+# Installs a macOS worker's updates (see misc/mac/install-macos-updates.sh), with
+# its worker stopped. update.sh then starts the worker.
+function install-macos-updates {
+  local host="${1}"
+  local updates="${2}"
+  local status=0
+  echo "${host%%.*}: macOS updates to install:"
+  echo "${updates}" | sed 's/^/  /'
+  retry-mac macos-updates-step "${host}" prepare && install-macos-updates-attempts "${host}" "${updates}" || status=$?
+  # Whether or not they were installed
+  retry-mac macos-updates-step "${host}" restore || status=1
+  return "${status}"
+}
+
+# Installs a macOS worker's updates, trying again if it isn't on the new
+# version of macOS after its restart
+function install-macos-updates-attempts {
+  local host="${1}"
+  local updates="${2}"
+  local password_var="MAC_PASSWORD_$(mac-name "${host}")"
+  local attempt boot_time version expected
+  # e.g. "macOS Tahoe 26.7.3 26.7.3" (title, version)
+  expected="$(awk '/^macOS / { print $NF; exit }' <<< "${updates}")"
+  for attempt in $(seq "${MACOS_UPDATE_ATTEMPTS}"); do
+    boot_time="$(retry-mac mac-ssh "${host}" sysctl -n kern.boottime)"
+    echo "${host%%.*}: installing its macOS updates, and restarting (this can take an hour)"
+    # Not retried, as it may have started installing them. The password is
+    # for installing macOS updates, which needs a volume owner's.
+    if ! printf '%s\n' "${!password_var}" | MAC_SSH_STDIN=true macos-updates-step "${host}" install; then
+      echo "${host%%.*}: install-macos-updates.sh install failed (see above)" >&2
+      return 1
+    fi
+    if ! wait-for-mac-restart "${host}" "${boot_time}" "${MACOS_UPDATE_TIMEOUT}"; then
+      echo "${host%%.*}: see /var/log/install-macos-updates.log on it" >&2
+      return 1
+    fi
+    version="$(retry-mac mac-ssh "${host}" sw_vers -productVersion)"
+    if [ -z "${expected}" ] || [ "${version}" == "${expected}" ]; then
+      echo "${host%%.*}: restarted, now on macOS ${version}"
+      return
+    fi
+    echo "${host%%.*}: restarted, but is still on macOS ${version}, not ${expected}. The end of /var/log/install-macos-updates.log on it:" >&2
+    retry-mac mac-ssh "${host}" sudo -n cat /var/log/install-macos-updates.log | grep -v '^Downloading: ' | tail -5 | sed 's/^/  /' >&2 || true
+    if [ "${attempt}" != "${MACOS_UPDATE_ATTEMPTS}" ]; then
+      echo "${host%%.*}: trying again" >&2
+    fi
+  done
+  echo "${host%%.*}: couldn't install its macOS updates after ${MACOS_UPDATE_ATTEMPTS} attempts" >&2
   return 1
+}
+
+# Waits for a macOS worker to restart (generic-worker restarts it after update.sh
+# starts it, to log in its next task user), and then for its worker to be ready
+# for tasks
+function wait-for-macos-worker {
+  local host="${1}"
+  local boot_time="${2}"
+  local deadline
+  wait-for-mac-restart "${host}" "${boot_time}" "${MACOS_RESTART_TIMEOUT}" || return 1
+  echo "${host%%.*}: restarted, waiting for its worker to be ready (this can take a few minutes)"
+  deadline=$((SECONDS + MACOS_WORKER_READY_TIMEOUT))
+  until [ "$(macos-worker-status "${host}")" == ready ]; do
+    if [ "${SECONDS}" -ge "${deadline}" ]; then
+      echo "${host%%.*}'s worker isn't ready after $((MACOS_WORKER_READY_TIMEOUT / 60)) minutes: see /var/log/genericworker/ on it" >&2
+      return 1
+    fi
+    sleep 30
+  done
+  echo "${host%%.*}: its worker is ready"
 }
 
 function build-images {

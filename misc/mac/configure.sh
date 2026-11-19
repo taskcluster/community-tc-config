@@ -16,6 +16,13 @@ for key in AutomaticCheckEnabled ConfigDataInstall; do
   defaults write /Library/Preferences/com.apple.SoftwareUpdate "${key}" -bool true
 done
 
+# Automatic login back on, if a run of install-macos-updates.sh was
+# interrupted after it had turned it off
+if [ -f /etc/kcpassword.install-macos-updates ] && ! [ -f /etc/kcpassword ]; then
+  mv /etc/kcpassword.install-macos-updates /etc/kcpassword
+  echo "WARNING: turned automatic login back on, which an interrupted macOS update had left off" >&2
+fi
+
 # Never sleep, and restart after a power failure
 pmset -a sleep 0 displaysleep 0 disksleep 0 standby 0 autorestart 1
 

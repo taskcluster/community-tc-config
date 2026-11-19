@@ -38,10 +38,12 @@ fi
 
 current_user=$(scutil <<< "show State:/Users/ConsoleUser" | sed -n 's/.*Name : //p')
 uid=''
-[ -n "${current_user}" ] && uid=$(id -u "${current_user}")
-
-if [ -z "${current_user}" ] || [ -z "${uid}" ]; then
-  echo "WARNING: Cannot detect current user (${current_user}) or uid (${uid})" >&2
+# Nobody is logged in (loginwindow is at the console) after install-macos-updates.sh
+if [ -n "${current_user}" ] && [ "${current_user}" != loginwindow ]; then
+  uid=$(id -u "${current_user}" 2> /dev/null || true)
+  if [ -z "${uid}" ]; then
+    echo "WARNING: Cannot detect the uid of the current user (${current_user})" >&2
+  fi
 fi
 
 # Download the new binaries before stopping the worker, so that it keeps running
@@ -79,6 +81,8 @@ function stop-service {
   return 1
 }
 
+# imageset.sh drains the worker first (worker.sh drain), so that this doesn't
+# stop a task
 DAEMON_PLIST=/Library/LaunchDaemons/com.mozilla.genericworker.plist
 AGENT_PLIST="/Users/${current_user}/Library/LaunchAgents/com.mozilla.genericworker.launchagent.plist"
 
