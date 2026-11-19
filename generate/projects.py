@@ -110,22 +110,16 @@ async def update_resources(resources, secret_values):
             for name, worker_pool in project.workerPools.items():
                 worker_pool_id = "proj-{}/{}".format(project.name, name)
                 worker_pool["description"] = "Workers for " + project.name
-                worker_pool, secret, role = await build_worker_pool(
+                worker_pool, role = await build_worker_pool(
                     worker_pool_id, worker_pool, secret_values
                 )
                 if project.externallyManaged.manage_individual_resources():
                     resources.manage("WorkerPool={}$".format(worker_pool_id))
                     if role:
                         resources.manage("Role=" + re.escape(role.roleId) + "$")
-                    if secret:
-                        resources.manage(
-                            "Secret=worker-pool:{}$".format(worker_pool_id)
-                        )
                 resources.add(worker_pool)
                 if role:
                     resources.add(role)
-                if secret:
-                    resources.add(secret)
         if project.clients:
             for name, info in project.clients.items():
                 clientId = "project/{}/{}".format(project.name, name)

@@ -4,7 +4,7 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file, You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 
-from tcadmin.resources import WorkerPool, Secret, Role
+from tcadmin.resources import WorkerPool, Role
 
 from collections import defaultdict
 from functools import lru_cache
@@ -91,11 +91,6 @@ class WorkerPoolSettings:
 
         # config - passed to worker-manager
         self.config = {}
-
-        # secret_tpl - template for the `worker-pool:<workerPoolId>` secret (optional)
-        # if secrets are being generated, this will be "rendered" with the SeretValues
-        # instance and used as the value of the secret.
-        self.secret_tpl = {}
 
         # scopes - any additional scopes required for workers in this cloud
         self.scopes = []
@@ -219,17 +214,6 @@ async def build_worker_pool(workerPoolId, cfg, secret_values):
             "Error generating worker pool configuration for {}".format(workerPoolId)
         ) from e
 
-    if wp.secret_tpl:
-        if secret_values:
-            secret = Secret(
-                name="worker-pool:{}".format(workerPoolId),
-                secret=secret_values.render(wp.secret_tpl),
-            )
-        else:
-            secret = Secret(name="worker-pool:{}".format(workerPoolId))
-    else:
-        secret = None
-
     if wp.scopes:
         role = Role(
             roleId="worker-pool:{}".format(workerPoolId),
@@ -250,7 +234,7 @@ async def build_worker_pool(workerPoolId, cfg, secret_values):
         config=wp.config,
     )
 
-    return workerpool, secret, role
+    return workerpool, role
 
 
 @cloud
@@ -811,39 +795,6 @@ def generic_worker(wp, **cfg):
             )
 
     wp.scopes.append("auth:sentry:" + sentryProject)
-
-    return wp
-
-
-@worker_implementation
-def docker_worker(wp, **cfg):
-    if wp.supports_worker_config():
-        wp.merge_config(
-            "workerConfig",
-            WorkerPoolSettings.EXISTING_CONFIG,
-            {
-                "shutdown": {
-                    "enabled": True,
-                    "afterIdleSeconds": 15,
-                },
-            },
-        )
-
-    if wp.supports_worker_manager_config():
-        for launchConfig in wp.config["launchConfigs"]:
-            launchConfig.setdefault("workerManager", {}).setdefault(
-                "launchConfigId", get_launch_config_id(launchConfig, wp.workerPoolId)
-            )
-
-    wp.secret_tpl = {
-        "config": {
-            "statelessHostname": {
-                "secret": "$stateless-dns-secret",
-                "domain": "taskcluster-worker.net",
-            }
-        }
-    }
-    wp.scopes.append("auth:sentry:docker-worker")
 
     return wp
 
