@@ -28,7 +28,6 @@ region us-west-1:
   us-west-1b: subnet-0a5344f7003aede7c
  security groups:
   no-inbound: sg-00c4014bc978171d5
-  docker-worker: sg-0d2ff88f36a05b499
   ssh: sg-0f9ee22a4a6cef474
   rdp: sg-0ddc5eae2e56a43c5
 region us-west-2:
@@ -42,7 +41,6 @@ region us-west-2:
   us-west-2d: subnet-0fc336d9e5934c913
  security groups:
   no-inbound: sg-0659c2937ecbe7254
-  docker-worker: sg-0f8a656368c567425
   ssh: sg-0985b20410d30c5b2
   rdp: sg-0728e02d721b9d2c8
 region us-east-1:
@@ -58,7 +56,6 @@ region us-east-1:
   us-east-1f: subnet-0cc340c5cf9346dcc
  security groups:
   no-inbound: sg-07f7d21a488e192c6
-  docker-worker: sg-08fea1235cf66b102
   ssh: sg-04e801d56ce1f8d85
   rdp: sg-0f814fceb57681f0b
 region us-east-2:
@@ -71,7 +68,6 @@ region us-east-2:
   us-east-2c: subnet-01eb0c6a5e15846db
  security groups:
   no-inbound: sg-00a9d64b3595c5088
-  docker-worker: sg-0388de36e2f30ced2
   ssh: sg-009999abb8ebe2627
   rdp: sg-0ba932a63b653dc19
 ```

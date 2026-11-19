@@ -20,7 +20,7 @@
 #                         underneath the key depends on the cloud (see below).
 #   workerImplementation: the name of a @worker_pool_type annotated function in
 #                         `generate/workers.py` (with `-`s replaced with `_`s)
-#                         e.g. `docker-worker`/`generic-worker`.
+#                         e.g. `generic-worker`.
 #   workerConfig:         a dict to merge with generated workerConfig sections
 #                         in generated worker pool definitions.
 #
@@ -42,34 +42,11 @@
 #
 # gcp:
 #   image:                Fully qualified name of the machine image to spawn.
-#                         e.g. `projects/taskcluster-imaging/global/images/docker-worker-gcp-googlecompute-2019-11-04t22-31-35z`
+#                         e.g. `projects/taskcluster-imaging/global/images/generic-worker-ubuntu-24-04-d5e6798ba6c741918ed0`
 
 generic-worker:
   workerImplementation: generic-worker
   # (this is intended for use with static workers)
-docker-worker:
-  workerImplementation: docker-worker
-  gcp:
-    image: projects/community-tc-workers/global/images/docker-worker-sfwv7ea5qm9wuoig3274
-  aws:
-    # originally built with the `docker_community_aws` builder in monopacker
-    amis:
-      us-west-1: ami-02bd313d7bdc30ca2
-      us-west-2: ami-0c2f7ba5e98be094a
-      us-east-1: ami-00200edd7c6e8e836
-      us-east-2: ami-0a4917cc81d805e72
-# v44.23.4 docker worker which includes the disableSeccomp feature
-docker-worker-legacy:
-  workerImplementation: docker-worker
-  gcp:
-    image: projects/taskcluster-imaging/global/images/docker-community-gcp-googlecompute-2022-12-19t19-01-04z
-  aws:
-    # originally built with the `docker_community_aws` builder in monopacker
-    amis:
-      us-east-1: ami-0ec6d5fc54628fa9b
-      us-east-2: ami-071b3ff08f2d9c1dd
-      us-west-1: ami-03f677a21b2fadb15
-      us-west-2: ami-0de87470eb34a8e36
 generic-worker-freebsd:
   workerImplementation: generic-worker
   workerConfig:
