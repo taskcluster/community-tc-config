@@ -316,8 +316,6 @@ def gcp(
     GOOGLE_PROVIDER = "community-tc-workers-google"
 
     # Use local yaml file for GCP network constants
-    # These constants are set in a separate file to be used by external services
-    # like the fuzzing team decision tasks
     _config_path = os.path.join(os.path.dirname(__file__), "../config/gcp.yml")
     assert os.path.exists(_config_path), "Missing gcp config in {}".format(_config_path)
     gcp_config = yaml.safe_load(open(_config_path))
@@ -450,8 +448,6 @@ def aws(
     AWS_PROVIDER = "community-tc-workers-aws"
 
     # Use local yaml file for AWS network constants
-    # These constants are set in a separate file to be used by external services
-    # like the fuzzing team decision tasks
     _config_path = os.path.join(os.path.dirname(__file__), "../config/aws.yml")
     assert os.path.exists(_config_path), "Missing aws config in {}".format(_config_path)
     aws_config = yaml.safe_load(open(_config_path))
@@ -671,8 +667,6 @@ def azure(
     AZURE_PROVIDER = "community-tc-workers-azure"
 
     # Use local yaml file for Azure network constants
-    # These constants are set in a separate file to be used by external services
-    # like the fuzzing team decision tasks
     _config_path = os.path.join(os.path.dirname(__file__), "../config/azure.yml")
     assert os.path.exists(_config_path), "Missing azure config in {}".format(
         _config_path
