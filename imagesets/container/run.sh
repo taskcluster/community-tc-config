@@ -235,6 +235,36 @@ function retry-mac {
   done
 }
 
+# Records, for the diagnostic log, how the container resolves and routes to a
+# macOS worker that it couldn't reach through its VPN connection
+function vpn-network-diagnostics {
+  local host="${1}"
+  local server
+  [ -n "${IMAGESET_DIAGNOSTICS_DIR:-}" ] || return 0
+  mkdir -p "${IMAGESET_DIAGNOSTICS_DIR}/logs"
+  {
+    echo "===== $(date -u +%H:%M:%S) ${host}"
+    echo "--- /etc/resolv.conf"
+    cat /etc/resolv.conf
+    echo "--- ip addr"
+    ip addr
+    echo "--- ip route"
+    ip route
+    echo "--- getent ahosts ${host}"
+    timeout 30 getent ahosts "${host}" || echo "exit status $?"
+    for server in $(awk '$1 == "nameserver" { print $2 }' /etc/resolv.conf); do
+      echo "--- ip route get ${server}"
+      ip route get "${server}" || true
+      echo "--- dig @${server} ${host} (udp)"
+      dig +time=3 +tries=2 "@${server}" "${host}" || echo "exit status $?"
+      echo "--- dig @${server} ${host} (tcp)"
+      dig +tcp +time=3 +tries=1 "@${server}" "${host}" || echo "exit status $?"
+      echo "--- dig @${server} mozilla.com (udp)"
+      dig +short +time=3 +tries=1 "@${server}" mozilla.com || echo "exit status $?"
+    done
+  } >> "${IMAGESET_DIAGNOSTICS_DIR}/logs/vpn-network.log" 2>&1 || true
+}
+
 # Fail early if any macOS worker can't be reached over ssh, or administrator
 # doesn't have passwordless sudo, rather than discovering it after all the
 # other (lengthy) steps have run.
@@ -256,7 +286,12 @@ function check-mac-connectivity {
     done
     if [ "${status}" != 0 ] || [ "${output}" != "hello" ]; then
       echo "Cannot ssh to administrator@${host} and run sudo: ${output}" >&2
-      if [ "${status}" == 255 ] && ! [[ "${output}" =~ "Host key verification failed"|"Permission denied" ]]; then
+      if [ "${status}" == 255 ] && "${VPN_CONNECTED}"; then
+        vpn-network-diagnostics "${host}"
+      fi
+      if [[ "${output}" == *"Could not resolve hostname"* ]] && "${VPN_CONNECTED}"; then
+        echo "The VPN is connected, but its DNS servers didn't resolve ${host}: please share the diagnostic log (it has the container's DNS settings and lookups, in logs/vpn-network.log)." >&2
+      elif [ "${status}" == 255 ] && ! [[ "${output}" =~ "Host key verification failed"|"Permission denied" ]]; then
         echo "The VPN is connected, but ${host} can't be reached through it: it may be rebooting, or you may not be in the vpn_releng group, which you request in a bug in Infrastructure & Operations :: Corporate VPN: ACL requests, at https://bugzilla.mozilla.org." >&2
       fi
       if [[ "${output}" == *"Host key verification failed"* ]]; then
