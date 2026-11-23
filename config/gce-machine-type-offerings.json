@@ -56188,10 +56188,6 @@
     "zone": "europe-west1-c"
   },
   {
-    "name": "a4x-maxgpu-4g-metal",
-    "zone": "europe-west1-d"
-  },
-  {
     "name": "c2-standard-16",
     "zone": "europe-west1-d"
   },
@@ -138536,15 +138532,7 @@
     "zone": "us-west1-c"
   },
   {
-    "name": "c3-standard-176-lssd",
-    "zone": "us-west1-c"
-  },
-  {
     "name": "c3-standard-22",
-    "zone": "us-west1-c"
-  },
-  {
-    "name": "c3-standard-22-lssd",
     "zone": "us-west1-c"
   },
   {
@@ -138552,15 +138540,7 @@
     "zone": "us-west1-c"
   },
   {
-    "name": "c3-standard-4-lssd",
-    "zone": "us-west1-c"
-  },
-  {
     "name": "c3-standard-44",
-    "zone": "us-west1-c"
-  },
-  {
-    "name": "c3-standard-44-lssd",
     "zone": "us-west1-c"
   },
   {
@@ -138568,15 +138548,7 @@
     "zone": "us-west1-c"
   },
   {
-    "name": "c3-standard-8-lssd",
-    "zone": "us-west1-c"
-  },
-  {
     "name": "c3-standard-88",
-    "zone": "us-west1-c"
-  },
-  {
-    "name": "c3-standard-88-lssd",
     "zone": "us-west1-c"
   },
   {
@@ -139112,15 +139084,7 @@
     "zone": "us-west1-c"
   },
   {
-    "name": "c4d-highmem-16-lssd",
-    "zone": "us-west1-c"
-  },
-  {
     "name": "c4d-highmem-192",
-    "zone": "us-west1-c"
-  },
-  {
-    "name": "c4d-highmem-192-lssd",
     "zone": "us-west1-c"
   },
   {
@@ -139132,15 +139096,7 @@
     "zone": "us-west1-c"
   },
   {
-    "name": "c4d-highmem-32-lssd",
-    "zone": "us-west1-c"
-  },
-  {
     "name": "c4d-highmem-384",
-    "zone": "us-west1-c"
-  },
-  {
-    "name": "c4d-highmem-384-lssd",
     "zone": "us-west1-c"
   },
   {
@@ -139152,15 +139108,7 @@
     "zone": "us-west1-c"
   },
   {
-    "name": "c4d-highmem-48-lssd",
-    "zone": "us-west1-c"
-  },
-  {
     "name": "c4d-highmem-64",
-    "zone": "us-west1-c"
-  },
-  {
-    "name": "c4d-highmem-64-lssd",
     "zone": "us-west1-c"
   },
   {
@@ -139168,15 +139116,7 @@
     "zone": "us-west1-c"
   },
   {
-    "name": "c4d-highmem-8-lssd",
-    "zone": "us-west1-c"
-  },
-  {
     "name": "c4d-highmem-96",
-    "zone": "us-west1-c"
-  },
-  {
-    "name": "c4d-highmem-96-lssd",
     "zone": "us-west1-c"
   },
   {
@@ -139184,15 +139124,7 @@
     "zone": "us-west1-c"
   },
   {
-    "name": "c4d-standard-16-lssd",
-    "zone": "us-west1-c"
-  },
-  {
     "name": "c4d-standard-192",
-    "zone": "us-west1-c"
-  },
-  {
-    "name": "c4d-standard-192-lssd",
     "zone": "us-west1-c"
   },
   {
@@ -139204,15 +139136,7 @@
     "zone": "us-west1-c"
   },
   {
-    "name": "c4d-standard-32-lssd",
-    "zone": "us-west1-c"
-  },
-  {
     "name": "c4d-standard-384",
-    "zone": "us-west1-c"
-  },
-  {
-    "name": "c4d-standard-384-lssd",
     "zone": "us-west1-c"
   },
   {
@@ -139224,15 +139148,7 @@
     "zone": "us-west1-c"
   },
   {
-    "name": "c4d-standard-48-lssd",
-    "zone": "us-west1-c"
-  },
-  {
     "name": "c4d-standard-64",
-    "zone": "us-west1-c"
-  },
-  {
-    "name": "c4d-standard-64-lssd",
     "zone": "us-west1-c"
   },
   {
@@ -139240,15 +139156,7 @@
     "zone": "us-west1-c"
   },
   {
-    "name": "c4d-standard-8-lssd",
-    "zone": "us-west1-c"
-  },
-  {
     "name": "c4d-standard-96",
-    "zone": "us-west1-c"
-  },
-  {
-    "name": "c4d-standard-96-lssd",
     "zone": "us-west1-c"
   },
   {
