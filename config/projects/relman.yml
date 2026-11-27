@@ -225,6 +225,13 @@ relman:
     - grant: secrets:get:project/relman/bugzilla-dashboard-backend/deploy-testing
       to: repo:github.com/mozilla/bugzilla-dashboard-backend:branch:testing
 
+    # bugbot: the rule scenarios run against a local BMO, in Docker. Not for
+    # pull requests from non-collaborators (pull-request-untrusted).
+    - grant: docker-worker:capability:privileged
+      to:
+        - repo:github.com/mozilla/bugbot:pull-request
+        - repo:github.com/mozilla/bugbot:branch:*
+
     # task-boot
     - grant: docker-worker:capability:privileged
       to: repo:github.com/mozilla/task-boot:*
