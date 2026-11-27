@@ -21,6 +21,10 @@ tasks:
   in:
     $let:
       tests:
+        # The worker sets TASKCLUSTER_ROOT_URL to its own deployment, which
+        # tc-admin rejects when it differs from tc-admin.py's root URL, so
+        # unset it. `tc-admin diff` exits 2 when it shows differences, but
+        # usage errors also exit 2, so only accept 2 if a diff was printed.
         - image: 'python:3.11'
           name: tc-admin diff
           command:
@@ -33,8 +37,10 @@ tasks:
               git config advice.detachedHead false &&
               git checkout ${repo.ref} &&
               pip install --no-use-pep517 -e . &&
+              unset TASKCLUSTER_ROOT_URL &&
               tc-admin generate --without-secrets >/dev/null &&
-              { tc-admin diff --without-secrets | cat; true; }
+              { tc-admin diff --without-secrets >../diff.txt; status=$?; cat ../diff.txt;
+              [ $status -eq 0 ] || { [ $status -eq 2 ] && [ -s ../diff.txt ]; }; }
         - image: 'python:3.11'
           name: black
           command:
