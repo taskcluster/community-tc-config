@@ -16,7 +16,7 @@ def keymatch(attributes, target):
         return [attributes[target]]
 
     # regular expression match
-    matches = [v for k, v in attributes.items() if re.match(k + "$", target)]
+    matches = [v for k, v in attributes.items() if re.fullmatch(k, target)]
     if matches:
         return matches
 
