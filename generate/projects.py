@@ -49,11 +49,7 @@ class ExternallyManaged:
 
             # this corresponds to repo-admin:*
             for repo in project.repos:
-                pat = (
-                    (re.escape(repo[:-1]) + ".*")
-                    if repo[-1] == "*"
-                    else re.escape(repo)
-                )
+                pat = re.escape(repo[:-1] if repo[-1] == "*" else repo) + ".*"
                 patterns.append(r"Role=repo:" + pat)
 
             return patterns
@@ -114,9 +110,9 @@ async def update_resources(resources, secret_values):
                     worker_pool_id, worker_pool, secret_values
                 )
                 if project.externallyManaged.manage_individual_resources():
-                    resources.manage("WorkerPool={}$".format(worker_pool_id))
+                    resources.manage("WorkerPool={}".format(worker_pool_id))
                     if role:
-                        resources.manage("Role=" + re.escape(role.roleId) + "$")
+                        resources.manage("Role=" + re.escape(role.roleId))
                 resources.add(worker_pool)
                 if role:
                     resources.add(role)
@@ -124,7 +120,7 @@ async def update_resources(resources, secret_values):
             for name, info in project.clients.items():
                 clientId = "project/{}/{}".format(project.name, name)
                 if project.externallyManaged.manage_individual_resources():
-                    resources.manage("Client={}$".format(clientId))
+                    resources.manage("Client={}".format(clientId))
                 description = info.get("description", "")
                 scopes = info["scopes"]
                 resources.add(
@@ -136,7 +132,7 @@ async def update_resources(resources, secret_values):
                     continue
                 name = "project/{}/{}".format(project.name, nameSuffix)
                 if project.externallyManaged.manage_individual_resources():
-                    resources.manage("Secret={}$".format(name))
+                    resources.manage("Secret={}".format(name))
                 if secret_values:
                     resources.add(Secret(name=name, secret=secret_values.render(info)))
                 else:
@@ -145,7 +141,7 @@ async def update_resources(resources, secret_values):
             for hookId, info in project.hooks.items():
                 hookGroupId = "project-{}".format(project.name)
                 if project.externallyManaged.manage_individual_resources():
-                    resources.manage("Hook={}/{}$".format(hookGroupId, hookId))
+                    resources.manage("Hook={}/{}".format(hookGroupId, hookId))
                 resources.add(
                     Hook(
                         hookGroupId=hookGroupId,
@@ -163,7 +159,7 @@ async def update_resources(resources, secret_values):
         for grant in Grants.from_project(project):
             if project.externallyManaged.manage_individual_resources():
                 for role in grant.to:
-                    resources.manage("Role=" + re.escape(role) + "$")
+                    resources.manage("Role=" + re.escape(role))
             grant.update_resources(resources)
 
 
@@ -181,6 +177,6 @@ async def get_externally_managed_resource_patterns():
             patterns.append(pattern)
         for secret, info in project.secrets.items():
             if info is True:
-                patterns.append("Secret=project/{}/{}$".format(project.name, secret))
+                patterns.append("Secret=project/{}/{}".format(project.name, secret))
 
     return patterns

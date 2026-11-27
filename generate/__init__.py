@@ -23,8 +23,7 @@ async def update_resources(resources):
     # ..and except static clients and user-generatd clients
     externally_managed_patterns.append("Client=(static|github)/.*")
 
-    em_bar = "|".join(externally_managed_patterns)
-    resources.manage(r"(?!{}).*".format(em_bar))
+    resources.manage(".*", excludes=externally_managed_patterns)
 
     secret_values = None
     if AppConfig.current().options.get("with_secrets"):
