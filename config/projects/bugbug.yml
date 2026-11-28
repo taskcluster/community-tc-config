@@ -3,7 +3,7 @@ bugbug:
     - github-team:mozilla/ci-engineering-workflow-and-quality-tools
   externallyManaged: true # bugbug deploys some hooks into this space
   repos:
-    - github.com/mozilla/bugbug:*
+    - github.com/mozilla/ai-dev:*
   workerPools:
     ci:
       owner: mcastelluccio@mozilla.com
@@ -109,7 +109,7 @@ bugbug:
         - queue:route:statuses
         - queue:route:checks
       to:
-        - repo:github.com/mozilla/bugbug:*
+        - repo:github.com/mozilla/ai-dev:*
 
     # all hooks
     - grant:
@@ -127,14 +127,14 @@ bugbug:
         - secrets:get:project/bugbug/deploy
       to: project:bugbug/deploy
     - grant: assume:project:bugbug/build
-      to: repo:github.com/mozilla/bugbug:*
+      to: repo:github.com/mozilla/ai-dev:*
     # The build scopes for the tag will come from the previous rule.
     - grant:
         - assume:project:bugbug/deploy
         - assume:hook-id:project-bugbug/bugbug
         - hooks:modify-hook:project-bugbug/bugbug
         - secrets:get:project/bugbug/integration
-      to: repo:github.com/mozilla/bugbug:tag:*
+      to: repo:github.com/mozilla/ai-dev:tag:*
     - grant:
         - assume:project:bugbug/build
         - assume:project:bugbug/deploy
